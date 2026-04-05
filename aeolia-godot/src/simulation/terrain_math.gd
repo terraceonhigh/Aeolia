@@ -1,94 +1,89 @@
 ## Height function and noise utilities.
 ## Pure math. No rendering. Produces height values from (x,y,z)
 ## coordinates on the unit sphere. Used by any renderer.
+##
+## NOISE IMPLEMENTATION: Hash-based value noise with smoothstep interpolation,
+## matching the JSX original exactly. NOT Perlin gradient noise.
 class_name TerrainMath
 extends RefCounted
 
-# -- Permutation table (fixed seed 42 for determinism) --
-static var _P: PackedInt32Array
-static var _initialized := false
+
+## Hash function — matches JSX _hash(x,y,z) exactly.
+## Returns [0, 1] from integer lattice coordinates.
+static func _hash(ix: int, iy: int, iz: int) -> float:
+	# Force 32-bit arithmetic matching JS integer overflow behavior
+	var h: int = (ix * 374761393 + iy * 668265263 + iz * 1274126177) & 0xFFFFFFFF
+	# Sign-extend to match JS |0 behavior (treat as signed 32-bit)
+	if h >= 0x80000000:
+		h -= 0x100000000
+	h = _imul(h ^ _unsigned_rshift(h, 13), 1274126177)
+	return float(((h ^ _unsigned_rshift(h, 16)) & 0x7FFFFFFF)) / float(0x7FFFFFFF)
 
 
-static func _ensure_init() -> void:
-	if _initialized:
-		return
-	_initialized = true
-	var p: Array[int] = []
-	p.resize(256)
-	for i in 256:
-		p[i] = i
-	# Fisher-Yates with fixed seed for determinism
-	var s: int = 42
-	for i in range(255, 0, -1):
-		s = (s * 16807) % 2147483647
-		var j: int = s % (i + 1)
-		var tmp: int = p[i]
-		p[i] = p[j]
-		p[j] = tmp
-	_P.resize(512)
-	for i in 512:
-		_P[i] = p[i & 255]
+## Unsigned right shift matching JS >>> operator.
+static func _unsigned_rshift(val: int, shift: int) -> int:
+	return (val & 0xFFFFFFFF) >> shift
 
 
-static func _fade(t: float) -> float:
-	return t * t * t * (t * (t * 6.0 - 15.0) + 10.0)
+## 32-bit integer multiply matching JS Math.imul.
+static func _imul(a: int, b: int) -> int:
+	a = a & 0xFFFFFFFF
+	b = b & 0xFFFFFFFF
+	var al: int = a & 0xFFFF
+	var ah: int = (a >> 16) & 0xFFFF
+	var bl: int = b & 0xFFFF
+	var bh: int = (b >> 16) & 0xFFFF
+	var result: int = ((al * bl) + (((ah * bl + al * bh) & 0xFFFF) << 16)) & 0xFFFFFFFF
+	# Sign-extend for JS |0 semantics
+	if result >= 0x80000000:
+		result -= 0x100000000
+	return result
 
 
-static func _grad(hash_val: int, x: float, y: float, z: float) -> float:
-	var h: int = hash_val & 15
-	var u: float = x if h < 8 else y
-	var v: float
-	if h < 4:
-		v = y
-	elif h == 12 or h == 14:
-		v = x
-	else:
-		v = z
-	return ((-u) if (h & 1) else u) + ((-v) if (h & 2) else v)
-
-
-## 3D Perlin noise. Returns roughly [-1, 1].
+## 3D value noise with smoothstep interpolation — matches JSX smoothNoise exactly.
+## Returns roughly [-1, 1].
 static func smooth_noise(x: float, y: float, z: float) -> float:
-	_ensure_init()
-	var xi: int = floori(x) & 255
-	var yi: int = floori(y) & 255
-	var zi: int = floori(z) & 255
-	var xf: float = x - floorf(x)
-	var yf: float = y - floorf(y)
-	var zf: float = z - floorf(z)
-	var u: float = _fade(xf)
-	var v: float = _fade(yf)
-	var w: float = _fade(zf)
-	var A: int = _P[xi] + yi
-	var AA: int = _P[A] + zi
-	var AB: int = _P[A + 1] + zi
-	var B: int = _P[xi + 1] + yi
-	var BA: int = _P[B] + zi
-	var BB: int = _P[B + 1] + zi
-	return lerpf(
-		lerpf(
-			lerpf(_grad(_P[AA], xf, yf, zf), _grad(_P[BA], xf - 1.0, yf, zf), u),
-			lerpf(_grad(_P[AB], xf, yf - 1.0, zf), _grad(_P[BB], xf - 1.0, yf - 1.0, zf), u),
-			v),
-		lerpf(
-			lerpf(_grad(_P[AA + 1], xf, yf, zf - 1.0), _grad(_P[BA + 1], xf - 1.0, yf, zf - 1.0), u),
-			lerpf(_grad(_P[AB + 1], xf, yf - 1.0, zf - 1.0), _grad(_P[BB + 1], xf - 1.0, yf - 1.0, zf - 1.0), u),
-			v),
-		w)
+	var ix: int = floori(x)
+	var iy: int = floori(y)
+	var iz: int = floori(z)
+	var fx: float = x - float(ix)
+	var fy: float = y - float(iy)
+	var fz: float = z - float(iz)
+	# Smoothstep interpolation (not quintic like Perlin)
+	var ux: float = fx * fx * (3.0 - 2.0 * fx)
+	var uy: float = fy * fy * (3.0 - 2.0 * fy)
+	var uz: float = fz * fz * (3.0 - 2.0 * fz)
+	# 8 corner hashes
+	var n000: float = _hash(ix, iy, iz)
+	var n100: float = _hash(ix + 1, iy, iz)
+	var n010: float = _hash(ix, iy + 1, iz)
+	var n110: float = _hash(ix + 1, iy + 1, iz)
+	var n001: float = _hash(ix, iy, iz + 1)
+	var n101: float = _hash(ix + 1, iy, iz + 1)
+	var n011: float = _hash(ix, iy + 1, iz + 1)
+	var n111: float = _hash(ix + 1, iy + 1, iz + 1)
+	# Trilinear interpolation → remap to [-1, 1]
+	return (n000 * (1.0 - ux) * (1.0 - uy) * (1.0 - uz) + \
+		n100 * ux * (1.0 - uy) * (1.0 - uz) + \
+		n010 * (1.0 - ux) * uy * (1.0 - uz) + \
+		n110 * ux * uy * (1.0 - uz) + \
+		n001 * (1.0 - ux) * (1.0 - uy) * uz + \
+		n101 * ux * (1.0 - uy) * uz + \
+		n011 * (1.0 - ux) * uy * uz + \
+		n111 * ux * uy * uz) * 2.0 - 1.0
 
 
-## Fractal Brownian Motion — layered noise.
+## Fractal Brownian Motion — matches JSX fbm exactly.
+## Initial amplitude 0.5, frequency 3.5, halving amplitude, 2.1× frequency.
 static func fbm(x: float, y: float, z: float, octaves: int) -> float:
-	var val := 0.0
-	var amp := 1.0
-	var freq := 1.0
-	var total := 0.0
+	var v := 0.0
+	var a := 0.5
+	var f := 3.5
 	for i in octaves:
-		val += smooth_noise(x * freq, y * freq, z * freq) * amp
-		total += amp
-		amp *= 0.45
-		freq *= 2.1
-	return val / total
+		v += a * smooth_noise(x * f, y * f, z * f)
+		a *= 0.5
+		f *= 2.1
+	return v
 
 
 ## Computes terrain height at a point on the unit sphere.
@@ -139,6 +134,16 @@ static func compute_height(x: float, y: float, z: float,
 	# (B) Corridor connections - domain-warped great-circle bands
 	for e in world_edges.size():
 		var ed: Dictionary = world_edges[e]
+		# Fast pre-reject: skip edges clearly not near this vertex. The unwarped
+		# perpendicular distance to the great-circle plane differs from the warped
+		# dtp by at most cwa = ed.w * 1.2. Using 3.5x width as conservative cutoff.
+		if absf(x * ed.nx + y * ed.ny + z * ed.nz) > ed.w * 3.5:
+			continue
+		# Vertex must be angularly between the two arch endpoints (slack 0.2 for warp).
+		if x * ed.ax + y * ed.ay + z * ed.az < ed.dot_ab - 0.55:
+			continue
+		if x * ed.bx + y * ed.by + z * ed.bz < ed.dot_ab - 0.55:
+			continue
 		var cws := 2.5
 		var cwa: float = ed.w * 1.2
 		var cwx: float = x + smooth_noise(x * cws + e * 13.3, y * cws + e * 5.5, z * cws + e * 9.1) * cwa
@@ -211,10 +216,9 @@ static func compute_height(x: float, y: float, z: float,
 					(1.0 - absf(smooth_noise(x * rs * 7.0, y * rs * 7.0, z * rs * 7.0)))
 				var slope_factor: float = sin(minf(1.0, pv / pk.h) * PI)
 				pv *= 1.0 - ridge * 0.35 * slope_factor
-			# Fine roughness
-			if detail > 6 and pv > 100.0:
-				pv += smooth_noise(x * ws * 25.0, y * ws * 25.0, z * ws * 25.0) * 60.0 * \
-					sin(minf(1.0, pv / pk.h) * PI)
+			# Fine terrain roughness (closest zoom) — matches JSX exactly
+			if detail > 6 and pv > 30.0:
+				pv *= 1.0 + fbm(x * ws * 4.0, y * ws * 4.0, z * ws * 4.0, detail - 5) * 0.08
 			if pv > height:
 				height = pv
 

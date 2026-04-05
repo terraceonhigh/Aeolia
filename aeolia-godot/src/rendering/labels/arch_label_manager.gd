@@ -2,21 +2,21 @@ class_name ArchLabelManager
 extends Node3D
 
 ## Manages floating Label3D nodes for all 42 archipelagos (arches) in Aeolia.
-## Labels show the polity/faction name positioned at each archipelago with hemisphere culling
-## to hide labels that face away from the camera.
+## Labels show the polity/faction name positioned at each archipelago with
+## geometric horizon culling to hide labels on the far side of the globe.
 
 # Color mapping for different factions
 const FACTION_COLORS = {
-	"reach": Color(0.85, 0.35, 0.25),      # Reddish
-	"lattice": Color(0.25, 0.55, 0.85),    # Bluish
-	"unknown": Color(0.5, 0.5, 0.5),       # Gray
-	"other": Color(0.7, 0.7, 0.6)          # Beige
+	"reach": Color(0.85, 0.35, 0.25),
+	"lattice": Color(0.25, 0.55, 0.85),
+	"unknown": Color(0.5, 0.5, 0.5),
+	"other": Color(0.7, 0.7, 0.6)
 }
 
 const LABEL_FONT_SIZE: int = 6
 const LABEL_PIXEL_SIZE: float = 0.005
 const LABEL_OUTLINE_SIZE: int = 3
-const LABEL_POSITION_SCALE: float = 1.008  # Push labels just above sphere surface
+const LABEL_POSITION_SCALE: float = 1.008
 const LABEL_RENDER_PRIORITY: int = 10
 
 
@@ -25,13 +25,6 @@ func _ready() -> void:
 
 
 ## Initializes all archipelago labels from world data.
-##
-## Args:
-##   world_data: Dictionary containing archipelago positions and polity information
-##               Expected structure:
-##               - archs: Array of archipelago center positions [Vector3, ...]
-##               - history: Dictionary with states information
-##                 - states: Array of state dictionaries with 'name' and 'faction' keys
 func setup(world_data: Dictionary) -> void:
 	if not world_data.has("archs") or not world_data.has("history"):
 		push_error("ArchLabelManager.setup: Invalid world_data structure")
@@ -46,62 +39,48 @@ func setup(world_data: Dictionary) -> void:
 
 	var states = history["states"]
 
-	# Create a label for each archipelago
 	for i in range(mini(archs.size(), states.size())):
 		var arch: Dictionary = archs[i]
 		var state: Dictionary = states[i]
 
 		var label := Label3D.new()
-
-		# Set text from polity name
 		label.text = state.get("name", "Arch %d" % i)
 
-		# Position at archipelago center, pushed outward
 		var center := Vector3(arch.cx, arch.cy, arch.cz)
 		label.position = center * LABEL_POSITION_SCALE
 
-		# Configure text rendering
 		label.font_size = LABEL_FONT_SIZE
 		label.pixel_size = LABEL_PIXEL_SIZE
 		label.outline_size = LABEL_OUTLINE_SIZE
 
-		# Set color based on faction
 		var faction = state.get("faction", "unknown") as String
 		var color = FACTION_COLORS.get(faction, FACTION_COLORS["other"])
 		label.modulate = color
 
-		# Always face the camera
 		label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-
-		# Render on top of other elements
 		label.render_priority = LABEL_RENDER_PRIORITY
 
-		# Add as child node
 		add_child(label)
 
 
-## Per-frame update to handle hemisphere culling.
-## Hides labels that face away from the camera to avoid visual clutter and overlap.
+## Per-frame: geometric horizon culling using camera distance.
 func _process(_delta: float) -> void:
-	var camera = get_viewport().get_camera_3d()
+	var camera: Camera3D = get_viewport().get_camera_3d()
 	if camera == null:
 		return
 
-	# Get camera forward direction (negative Z in camera space)
-	var camera_forward = -camera.global_transform.basis.z
+	var cam_pos: Vector3 = camera.global_position
+	var cam_dist: float = cam_pos.length()
+	var cam_dir: Vector3 = cam_pos.normalized()
 
-	# Check visibility for each label child
+	# Geometric horizon: point visible iff dot(point_dir, cam_dir) > cutoff
+	var cutoff: float
+	if cam_dist <= 1.0:
+		cutoff = -1.0
+	else:
+		cutoff = cos(acos(1.0 / cam_dist) + deg_to_rad(3.0))
+
 	for child in get_children():
 		if child is Label3D:
-			var label = child as Label3D
-
-			# Get normalized direction from origin to label
-			var label_direction = label.position.normalized()
-
-			# Calculate dot product to determine if label faces camera
-			# Positive values = facing camera, negative = facing away
-			# Use -0.1 threshold for generous culling (allows edge labels to show)
-			var dot_product = label_direction.dot(camera_forward)
-
-			# Show if dot product > -0.1 (slightly generous to handle edge cases)
-			label.visible = dot_product > -0.1
+			var label_dir: Vector3 = (child as Label3D).position.normalized()
+			child.visible = label_dir.dot(cam_dir) > cutoff

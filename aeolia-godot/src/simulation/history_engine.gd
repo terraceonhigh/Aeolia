@@ -149,7 +149,8 @@ static func assign_politics(archs: Array, plateau_edges: Array, p_seed: int, rea
 		hop_count[idx] = hops
 		parent_arch[idx] = from
 
-		# Check neighbors for DF adjacency
+		# Check neighbors for DF adjacency: a newly claimed node
+		# borders an existing node of the other power across an edge
 		for nb in adj[idx]:
 			if claimed[nb] and claimed[nb] != power and df_year == null:
 				df_year = year
@@ -195,7 +196,7 @@ static func assign_politics(archs: Array, plateau_edges: Array, p_seed: int, rea
 			arrival_yr[i] = -500 + roundi(float(j + 1) / float(industrial_n + 1) * 300.0)
 		elif k < total_slots:
 			var j = k - serial_n - colonial_n - industrial_n
-			var df_off = df_year if df_year else 200
+			var df_off = absi(df_year) if df_year != null else 200
 			arrival_yr[i] = -200 + roundi(float(j + 1) / float(nuclear_n + 1) * float(mini(200, df_off - 200)))
 		else:
 			# El Dorados — beyond Σ2^n budget
@@ -664,10 +665,14 @@ static func assign_politics(archs: Array, plateau_edges: Array, p_seed: int, rea
 	elif df_target == "lattice":
 		t_name = names[lattice_arch]
 
-	var v_name = names[df_arch] if df_arch >= 0 else "unknown"
-	var df_label = "%d BP — %s detects radio traffic beyond %s. %s exists. The Dark Forest breaks." % [
-		abs(df_year) if df_year else 0, d_name, v_name, t_name
-	]
+	var v_name = names[df_arch] if (df_arch != null and df_arch >= 0) else "unknown"
+	var df_label: String
+	if df_year != null:
+		df_label = "%d BP — %s detects radio traffic beyond %s. %s exists. The Dark Forest breaks." % [
+			abs(df_year), d_name, v_name, t_name
+		]
+	else:
+		df_label = "The Dark Forest holds. No contact detected."
 
 	log.append({
 		"arch": -1, "name": "⚠ CONTACT",
@@ -729,14 +734,37 @@ static func _edge_cost(year: int, hops: int, power: String) -> int:
 		# NUCLEAR
 		cost = 61
 
-	# If cost pushes past an era boundary, check if waiting is cheaper
+	# If cost pushes past an era boundary, check if waiting is cheaper.
+	# Match JSX exactly: use plain era cost (non-recursive) and return on first improvement.
 	for b in ERA_BOUNDS:
 		if year < b and year + cost > b:
-			var alt = (b - year + 1) + _edge_cost(b + 1, hops, power)
+			var alt = (b - year + 1) + _base_era_cost(b + 1, hops, power)
 			if alt < cost:
-				cost = alt
+				return alt
 
 	return cost
+
+
+## Plain era cost lookup — no boundary-crossing optimization.
+## Mirrors JSX's inner costInEra() closure used in the alt formula.
+static func _base_era_cost(year: int, hops: int, power: String) -> int:
+	var is_lattice = power == "lattice"
+	var is_garrison = is_lattice and hops <= 3
+	if year < -500:
+		if is_garrison: return 167
+		if is_lattice: return 12000
+		if hops <= 1: return 350
+		if hops <= 2: return 580
+		if hops <= 3: return 1060
+		return 8000
+	elif year < -200:
+		if is_garrison: return 85
+		if is_lattice: return 350 if hops <= 5 else 700
+		if hops <= 4: return 125
+		if hops <= 6: return 145
+		return 200
+	else:
+		return 61
 
 
 ## BFS to compute distances from start node.

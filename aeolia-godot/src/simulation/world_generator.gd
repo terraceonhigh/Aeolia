@@ -49,7 +49,7 @@ static func build_world(p_seed: int) -> Dictionary:
 		else:
 			arch_size = 0.25 + rng.next_float() * 0.45
 
-		var n: int = maxi(3, roundi(arch_size * (5.0 + rng.next_float() * 8.0)))
+		var n: int = maxi(2, roundi(arch_size * (3.0 + rng.next_float() * 5.0)))
 		arch_specs.append({ "lat": j_lat, "lon": j_lon, "size": arch_size, "n": n })
 
 	# ── Build arch objects with peaks ──
@@ -83,8 +83,8 @@ static func build_world(p_seed: int) -> Dictionary:
 			var pz: float = cz + dist * (ca * rz + sa * fz)
 			var pl: float = sqrt(px * px + py * py + pz * pz)
 			px /= pl; py /= pl; pz /= pl
-			var w: float = 0.010 + rng.next_float() * 0.020 * spec.size
-			var raw_h: float = Constants.ISLAND_MAX_HEIGHT * (0.4 + rng.next_float() * 0.6) * (spec.size / 1.3)
+			var w: float = 0.005 + rng.next_float() * 0.008 * spec.size
+			var raw_h: float = Constants.ISLAND_MAX_HEIGHT * (0.4 + rng.next_float() * 0.6) * (spec.size / 1.5)
 			var h: float = minf(Constants.ISLAND_MAX_HEIGHT, raw_h)
 			peaks.append({
 				"px": px, "py": py, "pz": pz,
@@ -94,7 +94,7 @@ static func build_world(p_seed: int) -> Dictionary:
 		archs.append({
 			"cx": cx, "cy": cy, "cz": cz,
 			"peaks": peaks,
-			"shelf_r": spec.size * 0.18,
+			"shelf_r": spec.size * 0.12,
 		})
 
 	# ── Find most-antipodal pair → Reach (north) & Lattice (south) ──
@@ -115,8 +115,10 @@ static func build_world(p_seed: int) -> Dictionary:
 		lattice_arch = tmp
 
 	# ── Override core archs with bible-mandated geographies ──
-	_regen_peaks(archs[reach_arch], RNG.new(s * 7 + 1), 1.8, 24, 0.010, 0.020, 1.2)
-	_regen_peaks(archs[lattice_arch], RNG.new(s * 13 + 2), 0.8, 35, 0.009, 0.014, 1.0)
+	# Reach: 14 peaks, wide spread (size 1.8), moderate widths, tall peaks
+	_regen_peaks(archs[reach_arch], RNG.new(s * 7 + 1), 1.8, 14, 0.005, 0.008, 1.2)
+	# Lattice: 22 peaks, tight cluster (size 0.8), narrower but many
+	_regen_peaks(archs[lattice_arch], RNG.new(s * 13 + 2), 0.8, 22, 0.004, 0.006, 1.0)
 
 	# ── Generate plateau edge network from proximity ──
 	var pair_dists: Array = []
@@ -221,7 +223,7 @@ static func _regen_peaks(arch: Dictionary, prng: RNG, arch_size: float, n: int,
 			"h": h, "w": w, "w2inv": 3.0 / (w * w),
 		})
 	arch.peaks = peaks
-	arch.shelf_r = arch_size * 0.18
+	arch.shelf_r = arch_size * 0.12
 
 
 ## Add an edge if not already present.

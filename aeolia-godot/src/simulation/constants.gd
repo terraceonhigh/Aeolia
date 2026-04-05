@@ -5,8 +5,8 @@ extends RefCounted
 
 # -- Planet Parameters --
 const PLANET_RADIUS := 1.0           # Normalized unit sphere
-const OCEAN_DEPTH_BASE := -4500.0    # meters (cosmetic, for height function)
-const ISLAND_MAX_HEIGHT := 3200.0    # meters above sea level
+const OCEAN_DEPTH_BASE := -4200.0    # meters — matches JSX original
+const ISLAND_MAX_HEIGHT := 3000.0    # meters — basalt at 1g, Aeolian isostasy
 const PLATEAU_HEIGHT := -120.0       # meters (submarine shelf depth)
 const ARCH_COUNT := 42               # number of archipelagos
 
