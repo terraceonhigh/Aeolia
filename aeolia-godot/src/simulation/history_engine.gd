@@ -175,7 +175,12 @@ static func assign_politics(archs: Array, plateau_edges: Array, p_seed: int, rea
 		if claimed[i] and i != reach_arch and i != lattice_arch:
 			contactable.append(i)
 
-	contactable.sort_custom(func(a, b): return arrival_yr[a] < arrival_yr[b])
+	# Stable sort by arrival year — use arch index as tiebreaker to match
+	# JS Array.sort stable behaviour (equal-time entries keep ascending-index order).
+	contactable.sort_custom(func(a, b):
+		if arrival_yr[a] != arrival_yr[b]:
+			return arrival_yr[a] < arrival_yr[b]
+		return a < b)
 	var nc = contactable.size()
 
 	var serial_n = maxi(1, roundi(float(nc) * 0.05))
@@ -183,7 +188,6 @@ static func assign_politics(archs: Array, plateau_edges: Array, p_seed: int, rea
 	var industrial_n = maxi(2, roundi(float(nc) * 0.20))
 	var nuclear_n = maxi(2, roundi(float(nc) * 0.40))
 	var total_slots = serial_n + colonial_n + industrial_n + nuclear_n
-
 	for k in range(nc):
 		var i = contactable[k]
 		if k < serial_n:
