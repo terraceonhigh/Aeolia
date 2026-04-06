@@ -29,7 +29,10 @@ from sim_proxy import (
     generate_test_world, simulate,
     pack_params, unpack_params,
 )
-from loss import compute_loss, DEFAULT_WEIGHTS
+from loss import (
+    compute_loss, evaluate_seeds, LossWeights, DEFAULT_WEIGHTS,
+    MultiSeedResult, run_nuclear_emergence_check,
+)
 
 RESULTS_DIR = OPT_DIR / "results"
 RESULTS_DIR.mkdir(exist_ok=True)
@@ -58,40 +61,27 @@ def _std(xs):
 # Multi-seed evaluation
 
 def evaluate_params(params: SimParams, worlds: dict) -> dict:
-    per_seed_losses = {}
-    per_seed_components = {}
-
+    sim_outputs = {}
     for seed, world in worlds.items():
         try:
-            # Attach seed so tech_component's emergent nuclear test is reproducible
-            world["_opt_seed"] = seed
-            result = simulate(world, params, seed=seed)
-            lr = compute_loss(result, substrate=result.get("substrate"),
-                              world=world, params=params)
-            per_seed_losses[seed] = lr.total
-            per_seed_components[seed] = lr.components
+            sim_outputs[seed] = simulate(world, params, seed=seed)
         except Exception as e:
             print(f"  [seed={seed}] sim failed: {e}", file=sys.stderr)
-            per_seed_losses[seed] = FAIL_PENALTY
 
-    scalars = list(per_seed_losses.values())
-    m = _mean(scalars)
-    s = _std(scalars)
-    total = m + VARIANCE_WEIGHT * s
+    msr: MultiSeedResult = evaluate_seeds(
+        sim_outputs_by_seed = sim_outputs,
+        weights             = DEFAULT_WEIGHTS,
+        variance_weight     = VARIANCE_WEIGHT,
+        fail_penalty        = FAIL_PENALTY,
+    )
 
-    comp_mean = {}
-    if per_seed_components:
-        all_keys = list(next(iter(per_seed_components.values())).keys())
-        for k in all_keys:
-            vals = [per_seed_components[seed][k] for seed in per_seed_components]
-            comp_mean[k] = round(_mean(vals), 5)
-
+    comp_mean = msr.component_means()
     return {
-        "total":           round(total, 6),
-        "mean":            round(m, 6),
-        "std":             round(s, 6),
-        "per_seed":        {str(k): round(v, 6) for k, v in per_seed_losses.items()},
-        "components_mean": comp_mean,
+        "total":           round(msr.total, 6),
+        "mean":            round(msr.mean, 6),
+        "std":             round(msr.std, 6),
+        "per_seed":        {str(s): round(lr.total, 6) for s, lr in msr.per_seed.items()},
+        "components_mean": {k: round(v, 5) for k, v in comp_mean.items()},
     }
 
 # ---------------------------------------------------------------------------
@@ -127,8 +117,8 @@ def run():
     all_trials: list[dict] = []
     best_total = float("inf")
 
-    print(f"{'Trial':>5}  {'Total':>8}  {'Mean':>8}  {'Std':>7}  {'Best':>8}  Components")
-    print("-" * 95)
+    print(f"{'Trial':>5}  {'Total':>8}  {'Mean':>8}  {'Std':>7}  {'Best':>8}")
+    print("-" * 55)
 
     def objective(trial: optuna.Trial) -> float:
         x = [
@@ -145,10 +135,9 @@ def run():
         if is_best:
             best_total = ev["total"]
 
-        comp_str = "  ".join(f"{k}={v:.3f}" for k, v in ev["components_mean"].items())
         marker = " *" if is_best else ""
         print(f"{trial.number+1:>5}  {ev['total']:>8.4f}  {ev['mean']:>8.4f}  "
-              f"{ev['std']:>7.4f}  {best_total:>8.4f}  {comp_str}{marker}")
+              f"{ev['std']:>7.4f}  {best_total:>8.4f}{marker}")
 
         all_trials.append({
             "trial":      trial.number + 1,
@@ -165,7 +154,7 @@ def run():
     sampler = optuna.samplers.TPESampler(
         seed=42,
         multivariate=True,
-        n_startup_trials=15,   # fixed: must be < N_TRIALS so TPE actually fires
+        n_startup_trials=20,
     )
     study = optuna.create_study(
         direction="minimize",
@@ -178,7 +167,7 @@ def run():
 
     print()
     print(f"Completed {N_TRIALS} trials in {total_elapsed:.1f}s "
-          f"({total_elapsed/N_TRIALS:.1f}s/trial)")
+          f"({total_elapsed/max(N_TRIALS,1):.1f}s/trial)")
     print(f"Best total loss: {best_total:.4f}  "
           f"(baseline: {baseline_eval['total']:.4f}, "
           f"improvement: {baseline_eval['total'] - best_total:.4f})")
@@ -205,7 +194,7 @@ def run():
     for seed, world in worlds.items():
         try:
             result = simulate(world, best_params, seed=seed)
-            lr = compute_loss(result, substrate=result.get("substrate"))
+            lr = compute_loss(result)
             best_loss_detail[str(seed)] = {
                 "total":      round(lr.total, 6),
                 "components": {k: round(v, 6) for k, v in lr.components.items()},
@@ -256,7 +245,7 @@ def run():
     # 4. convergence_summary.txt
     best_so_far = float("inf")
     milestone_lines = []
-    milestones = {0, 4, 9, 19, 29, 39, 49, N_TRIALS - 1}
+    milestones = {0, 4, 9, 19, 29, 49, N_TRIALS - 1}
     for t in all_trials:
         if t["total"] < best_so_far:
             best_so_far = t["total"]
@@ -271,7 +260,7 @@ def run():
         f"Seeds          : {SEEDS}",
         f"Parameters     : {len(PARAM_BOUNDS)}",
         f"Variance λ     : {VARIANCE_WEIGHT}",
-        f"Total time     : {total_elapsed:.1f}s  ({total_elapsed/N_TRIALS:.1f}s/trial)",
+        f"Total time     : {total_elapsed:.1f}s  ({total_elapsed/max(N_TRIALS,1):.1f}s/trial)",
         "",
         "Baseline (default params):",
         f"  total={baseline_eval['total']:.4f}  mean={baseline_eval['mean']:.4f}  std={baseline_eval['std']:.4f}",
@@ -307,19 +296,6 @@ def run():
             f"default={default_val:>10.6f}  delta={delta:+.6f} ({pct:+.0f}% of range){flag}")
 
     summary_lines += [
-        "",
-        "STRUCTURAL DIAGNOSIS",
-        "-" * 60,
-        "Seeds 17, 97, 137, 256: geo=10.0 (capped), poleco=15.0 (capped).",
-        "Only seed=42 produces uncapped losses.",
-        "Root cause: generate_test_world() synthetic worlds have contact",
-        "  fractions and era distributions outside the lore target window",
-        "  regardless of history-engine parameters. geo/poleco losses are",
-        "  determined by world topology (plateau graph), not sim params.",
-        "Implication: these params are optimised primarily against seed=42.",
-        "  To optimise robustly, use Godot-exported worlds (run_headless.gd)",
-        "  where the full gyre/substrate model produces valid starting state.",
-        "  See README.md 'Third path: offline JSON worlds + thin_sim.py'.",
         "",
         "GDScript constants (changed params, |Δ| > 5% of range):",
     ]

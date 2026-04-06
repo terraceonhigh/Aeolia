@@ -239,24 +239,57 @@ def _crop_distance(contactor: str, contacted: str) -> float:
 
 
 # ---------------------------------------------------------------------------
-# Substrate fast-path (simplified port of substrate.gd)
+# Substrate — full faithful port of substrate.gd
 # ---------------------------------------------------------------------------
 
 _ISLAND_MAX_HEIGHT = 3000.0
-_RAINFALL_MULT     = 1.4     # Aeolia atmospheric multiplier (constants.gd)
 
 
-def _compute_substrate_fast(archs: list, plateau_edges: list, seed: int) -> list:
+def _compute_gyre_position(arch: dict, all_archs: list) -> float:
+    cy_clamped = max(-1.0, min(1.0, arch["cy"]))
+    lat        = math.asin(cy_clamped) * 180.0 / math.pi
+    abs_lat    = abs(lat)
+    band_archs = []
+    for other_arch in all_archs:
+        other_cy  = max(-1.0, min(1.0, other_arch["cy"]))
+        other_lat = math.asin(other_cy) * 180.0 / math.pi
+        if abs(abs(other_lat) - abs_lat) < 15:
+            band_archs.append(other_arch)
+    if len(band_archs) < 2:
+        return 0.5
+    lons = []
+    for band_arch in band_archs:
+        lons.append(math.atan2(band_arch["cz"], band_arch["cx"]) * 180.0 / math.pi)
+    lons.sort()
+    max_gap    = 0.0
+    gap_center = 0.0
+    for j in range(len(lons)):
+        next_lon = lons[(j + 1) % len(lons)]
+        if j == len(lons) - 1:
+            next_lon += 360.0
+        gap = next_lon - lons[j]
+        if gap > max_gap:
+            max_gap    = gap
+            gap_center = lons[j] + gap / 2.0
+    if max_gap < 10:
+        return 0.5
+    my_lon  = math.atan2(arch["cz"], arch["cx"]) * 180.0 / math.pi
+    rel_pos = math.fmod(my_lon - gap_center + 540.0, 360.0) / 360.0
+    return max(0.0, min(1.0, rel_pos))
+
+
+def _compute_substrate(archs: list, plateau_edges: list, seed: int) -> list:
     """
-    Compute per-arch primary_crop, primary_yield, trade value, and climate.
-    Simplified port of substrate.gd: skips gyre model, uses uniform ocean warmth.
-    Sufficient for optimisation; use the GDScript version for rendering.
+    Full faithful port of substrate.gd compute_substrate().
+    Includes gyre model, ocean warmth, cluster density for tidal range,
+    upwelling, political culture, production mode, minerals, and narrative.
     """
     rng = Mulberry32((seed if seed > 0 else 42) * 47 + 2024)
     n   = len(archs)
 
     edge_count   = [0] * n
     edge_lengths = [[] for _ in range(n)]
+
     for edge in plateau_edges:
         a, b = int(edge[0]), int(edge[1])
         edge_count[a] += 1
@@ -269,12 +302,32 @@ def _compute_substrate_fast(archs: list, plateau_edges: list, seed: int) -> list
         edge_lengths[a].append(ang)
         edge_lengths[b].append(ang)
 
+    all_lens = []
+    for lens_list in edge_lengths:
+        all_lens.extend(lens_list)
+    max_edge_len = 0.5
+    if all_lens:
+        max_edge_len = max(all_lens)
+
     substrates = []
     for i, arch in enumerate(archs):
-        cy      = max(-1.0, min(1.0, arch["cy"]))
-        lat     = math.asin(cy) * 180.0 / math.pi
-        abs_lat = abs(lat)
+        cy_clamped = max(-1.0, min(1.0, arch["cy"]))
+        lat        = math.asin(cy_clamped) * 180.0 / math.pi
+        abs_lat    = abs(lat)
+        size       = arch["shelf_r"] / 0.12
 
+        peaks     = arch.get("peaks", [])
+        peak_count = len(peaks)
+        avg_h      = 0.0
+        if peak_count > 0:
+            sum_h = sum(pk["h"] for pk in peaks)
+            avg_h = sum_h / (peak_count * _ISLAND_MAX_HEIGHT)
+
+        avg_edge = 0.5
+        if edge_lengths[i]:
+            avg_edge = sum(edge_lengths[i]) / len(edge_lengths[i])
+
+        # Wind belt
         if   abs_lat < 12: wind_belt = "doldrums"
         elif abs_lat < 28: wind_belt = "trades"
         elif abs_lat < 35: wind_belt = "subtropical"
@@ -283,28 +336,66 @@ def _compute_substrate_fast(archs: list, plateau_edges: list, seed: int) -> list
         else:              wind_belt = "polar"
 
         base_rain = {
-            "doldrums":   2800.0,
-            "trades":     2200.0,
-            "subtropical": 600.0,
-            "westerlies": 1400.0,
-            "subpolar":   1100.0,
-            "polar":       300.0,
+            "doldrums":    2800.0,
+            "trades":      2200.0,
+            "subtropical":  600.0,
+            "westerlies":  1400.0,
+            "subpolar":    1100.0,
+            "polar":        300.0,
         }[wind_belt]
 
-        peaks   = arch.get("peaks", [])
-        avg_h   = (sum(p["h"] for p in peaks) / (len(peaks) * _ISLAND_MAX_HEIGHT)
-                   if peaks else 0.0)
-        orographic = 1.0 + avg_h * 1.8
-        effective_rainfall = base_rain * orographic * _RAINFALL_MULT
+        orographic_bonus = 1.0 + avg_h * 1.8
 
-        mean_temp      = 28.0 - abs_lat * 0.45
+        gyre_pos    = _compute_gyre_position(arch, archs)
+        ocean_warmth = 0.0
+        if gyre_pos < 0.3:
+            ocean_warmth = 0.8 + gyre_pos
+        elif gyre_pos > 0.7:
+            ocean_warmth = 0.3 - (gyre_pos - 0.7)
+        else:
+            ocean_warmth = 0.4 + gyre_pos * 0.2
+        ocean_warmth = max(0.0, min(1.0, ocean_warmth))
+
+        moisture_bonus      = 1.0 + max(0.0, ocean_warmth - 0.4) * 0.4
+        effective_rainfall  = base_rain * orographic_bonus * moisture_bonus * 1.4
+
+        mean_temp      = 28.0 - abs_lat * 0.45 + (ocean_warmth - 0.5) * 4.0
         seasonal_range = abs_lat * 0.15 * 0.7
 
-        shelf_r    = arch.get("shelf_r", 0.06)
-        tidal_range = 2.0 + shelf_r * 30.0
+        # Tidal range with cluster density
+        nearby_archs = 0
+        for other_arch in archs:
+            if other_arch is not arch:
+                d = (arch["cx"] * other_arch["cx"] +
+                     arch["cy"] * other_arch["cy"] +
+                     arch["cz"] * other_arch["cz"])
+                if d > 0.95:
+                    nearby_archs += 1
+        cluster_density = min(1.0, float(nearby_archs) / 5.0)
+        abs_lat_rad     = abs_lat * math.pi / 180.0
+        tidal_range     = ((2.0 + arch["shelf_r"] * 30.0 + cluster_density * 4.0) *
+                           (0.8 + abs(math.sin(abs_lat_rad)) * 0.4))
 
-        upwelling = edge_count[i] * 0.08
+        # Upwelling
+        upwelling = 0.0
+        if gyre_pos > 0.7:
+            upwelling += 0.4
+        if abs_lat < 5:
+            upwelling += 0.3
+        upwelling += edge_count[i] * 0.08
 
+        fisheries_richness = min(1.0, upwelling * 0.5 + effective_rainfall * 0.0001 + edge_count[i] * 0.05)
+
+        # Climate zone
+        if   mean_temp > 24 and effective_rainfall > 2000: climate_zone = "tropical_wet"
+        elif mean_temp > 24 and effective_rainfall < 1000: climate_zone = "tropical_dry"
+        elif mean_temp > 10 and effective_rainfall > 1200: climate_zone = "temperate_wet"
+        elif mean_temp > 10:                               climate_zone = "temperate_dry"
+        elif mean_temp > 2:                                climate_zone = "subpolar"
+        else:                                              climate_zone = "polar_fringe"
+
+        # Crops
+        shelf_r = arch["shelf_r"]
         can_grow = {
             "paddi": (mean_temp >= 20 and effective_rainfall >= 1200 and
                       tidal_range >= 2.0 and shelf_r >= 0.08 and abs_lat <= 28),
@@ -323,19 +414,10 @@ def _compute_substrate_fast(archs: list, plateau_edges: list, seed: int) -> list
 
         yields = {}
         if can_grow["paddi"]:
-            # Tidal-hydraulic bonus: extreme tidal range enables terrace dike systems
-            # that allow paddi to outcompete sago in high-rainfall equatorial zones.
-            # The full GDScript model achieves this implicitly through the gyre model
-            # (eastern gyre arches get less moisture, favouring paddi over sago).
-            # Without the gyre, we apply a direct bonus when tidal_range > 5 m so that
-            # the Lattice's paddi agriculture emerges correctly from its wide shelf.
-            # At tidal_range = 6.2 (shelf_r=0.14): bonus = 0.53 → paddi yield ≈ 5.1 > sago 4.0
-            tidal_bonus = min(1.0, max(0.0, (tidal_range - 2.0) / 8.0))
             yields["paddi"] = (5.0
                 * min(1.0, (mean_temp - 18.0) / 15.0)
                 * min(1.0, effective_rainfall / 1800.0)
-                * min(1.0, tidal_range / 5.0)
-                * (1.0 + tidal_bonus))
+                * min(1.0, tidal_range / 5.0))
         if can_grow["emmer"]:
             yields["emmer"] = (2.5
                 * (1.0 - abs(mean_temp - 16.0) / 20.0)
@@ -347,7 +429,7 @@ def _compute_substrate_fast(archs: list, plateau_edges: list, seed: int) -> list
         if can_grow["nori"]:
             yields["nori"] = (1.5
                 * min(1.0, upwelling * 2.0)
-                * min(1.0, edge_count[i] / 3.0) * 2.0)
+                * min(1.0, float(edge_count[i]) / 3.0) * 2.0)
         if can_grow["sago"]:
             yields["sago"] = (4.0
                 * min(1.0, effective_rainfall / 2500.0)
@@ -357,49 +439,164 @@ def _compute_substrate_fast(archs: list, plateau_edges: list, seed: int) -> list
                 * (1.0 - abs(mean_temp - 12.0) / 15.0)
                 * min(1.0, effective_rainfall / 600.0))
 
-        if yields:
-            primary_crop  = max(yields, key=yields.get)
-            primary_yield = yields[primary_crop]
-            ranked        = sorted(yields.items(), key=lambda kv: -kv[1])
-            secondary_crop = ranked[1][0] if len(ranked) > 1 else None
+        # Stable sort: descending yield, then ascending name (matches GDScript stable sort)
+        crop_entries = sorted(yields.items(), key=lambda kv: (-kv[1], kv[0]))
+
+        primary_crop   = "foraging"
+        secondary_crop = None
+        primary_yield  = 0.5
+        if crop_entries:
+            primary_crop  = crop_entries[0][0]
+            primary_yield = crop_entries[0][1]
+        if len(crop_entries) > 1:
+            secondary_crop = crop_entries[1][0]
+
+        # Trade goods
+        stimulant_map = {"paddi": "char",   "emmer": "qahwa", "taro": "awa",
+                         "sago":  "pinang", "papa":  "aqua",  "nori": "",
+                         "foraging": ""}
+        fiber_map     = {"paddi": "seric",  "emmer": "fell",  "taro": "tapa",
+                         "sago":  "tapa",   "nori":  "byssus","papa": "qivu",
+                         "foraging": ""}
+        protein_map   = {"paddi": "kerbau", "emmer": "kri",   "taro": "moa",
+                         "sago":  "moa",    "nori":  "",       "papa": "",
+                         "foraging": ""}
+        stim_type  = stimulant_map.get(primary_crop, "")
+        fiber_type = fiber_map.get(primary_crop, "")
+        prot_type  = protein_map.get(primary_crop, "")
+
+        stim_prod  = (0.3 + rng.next_float() * 0.5) if stim_type  != "" else 0.0
+        fiber_prod = (0.3 + rng.next_float() * 0.5) if fiber_type != "" else 0.0
+        prot_prod  = (0.3 + rng.next_float() * 0.4) if prot_type  != "" else 0.0
+
+        nori_export = 0.0
+        if primary_crop == "nori":
+            nori_export = 0.6 + rng.next_float() * 0.3
+        elif can_grow["nori"]:
+            nori_export = 0.1 + rng.next_float() * 0.2
+
+        total_trade_value = stim_prod * 0.4 + fiber_prod * 0.3 + prot_prod * 0.2 + nori_export * 0.3
+
+        # Political culture
+        culture_init = {
+            "paddi":    {"awareness": 0.70, "participation": 0.15},
+            "emmer":    {"awareness": 0.70, "participation": 0.70},
+            "taro":     {"awareness": 0.15, "participation": 0.10},
+            "nori":     {"awareness": 0.30, "participation": 0.55},
+            "sago":     {"awareness": 0.15, "participation": 0.20},
+            "papa":     {"awareness": 0.25, "participation": 0.15},
+            "foraging": {"awareness": 0.05, "participation": 0.05},
+        }
+        pc = dict(culture_init.get(primary_crop, culture_init["foraging"]))
+        if pc["awareness"] > 0.5 and pc["participation"] > 0.5:
+            culture_label = "civic"
+        elif pc["awareness"] > 0.5:
+            culture_label = "subject"
         else:
-            primary_crop   = "foraging"
-            primary_yield  = 0.5
-            secondary_crop = None
+            culture_label = "parochial"
 
-        # Trade value: simplified normalisation to [0, 1]
-        total_trade_value = min(1.0, primary_yield / 5.0)
+        # Production mode
+        prod_init = {
+            "paddi":    {"surplus": 0.85, "labor": 0.25},
+            "emmer":    {"surplus": 0.65, "labor": 0.70},
+            "taro":     {"surplus": 0.55, "labor": 0.15},
+            "nori":     {"surplus": 0.35, "labor": 0.55},
+            "sago":     {"surplus": 0.10, "labor": 0.05},
+            "papa":     {"surplus": 0.20, "labor": 0.10},
+            "foraging": {"surplus": 0.05, "labor": 0.02},
+        }
+        prod = dict(prod_init.get(primary_crop, prod_init["foraging"]))
+        prod["labor"] = min(prod["labor"], prod["surplus"] + 0.3)  # forbidden zone
 
-        # Minerals (§10g — matches substrate.gd formulas exactly)
-        # RNG calls must come AFTER crop/trade so arch-order is stable per seed.
-        size_norm = shelf_r / 0.12
+        surplus = prod["surplus"]
+        labor   = prod["labor"]
+        if   surplus > 0.7 and labor < 0.3:  mode_label = "asiatic"
+        elif surplus > 0.7 and labor < 0.6:  mode_label = "tributary empire"
+        elif surplus > 0.7:                  mode_label = "state capital"
+        elif surplus > 0.4 and labor >= 0.6: mode_label = "mercantile"
+        elif surplus > 0.4 and labor >= 0.3: mode_label = "petty commodity"
+        elif surplus > 0.4:                  mode_label = "tributary"
+        elif surplus > 0.15:                 mode_label = "household"
+        elif labor < 0.2:                    mode_label = "communal"
+        else:                                mode_label = "frontier"
+
+        if   surplus > 0.7:  collab_eff = 0.85
+        elif surplus > 0.5:  collab_eff = 0.60
+        elif surplus > 0.3:  collab_eff = 0.45
+        elif surplus > 0.15: collab_eff = 0.20
+        else:                collab_eff = 0.05
+
+        extract_ceil_map = {
+            "asiatic": 0.40, "mercantile": 0.30, "tributary": 0.50,
+            "petty commodity": 0.25, "household": 0.10, "communal": 0.05,
+        }
+        extraction_ceiling = extract_ceil_map.get(mode_label, 0.30)
+
+        # Minerals
         minerals = {
             "Fe": True,
             "Cu": rng.next_float() < 0.20,
             "Au": rng.next_float() < (0.05 + avg_h * 0.08),
-            "Pu": rng.next_float() < (0.03 + size_norm * 0.02),
+            "Pu": rng.next_float() < (0.03 + size * 0.02),
         }
 
+        # Narrative
+        gender_economy = min(1.0, avg_edge / max_edge_len)
+        metaphor_map  = {"paddi": "tidal", "emmer": "navigational", "taro": "seasonal",
+                         "sago":  "seasonal", "nori": "oceanic", "papa": "endurance",
+                         "foraging": "animist"}
+        religion_map  = {"subject": "formal-institutional", "civic": "devotional-debate",
+                         "parochial": "animist-local"}
+
         substrates.append({
+            "climate": {
+                "latitude":           lat,
+                "abs_latitude":       abs_lat,
+                "wind_belt":          wind_belt,
+                "mean_temp":          mean_temp,
+                "seasonal_range":     seasonal_range,
+                "base_rainfall":      base_rain,
+                "effective_rainfall": effective_rainfall,
+                "tidal_range":        tidal_range,
+                "ocean_warmth":       ocean_warmth,
+                "gyre_position":      gyre_pos,
+                "upwelling":          upwelling,
+                "fisheries_richness": fisheries_richness,
+                "climate_zone":       climate_zone,
+            },
             "crops": {
                 "primary_crop":   primary_crop,
                 "secondary_crop": secondary_crop,
                 "primary_yield":  primary_yield,
                 "can_grow":       can_grow,
             },
-            "climate": {
-                "latitude":            lat,
-                "abs_latitude":        abs_lat,
-                "wind_belt":           wind_belt,
-                "mean_temp":           mean_temp,
-                "effective_rainfall":  effective_rainfall,
-                "tidal_range":         tidal_range,
-                "upwelling":           upwelling,
-            },
             "trade_goods": {
+                "stimulant":        {"type": stim_type,  "production": stim_prod},
+                "fiber":            {"type": fiber_type, "production": fiber_prod},
+                "protein":          {"type": prot_type,  "production": prot_prod},
+                "nori_export":      nori_export,
+                "stimulant_deficit": stim_type  == "",
+                "fiber_deficit":     fiber_type == "",
                 "total_trade_value": total_trade_value,
             },
+            "political_culture": {
+                "awareness":     pc["awareness"],
+                "participation": pc["participation"],
+                "label":         culture_label,
+            },
+            "production": {
+                "surplus":                  prod["surplus"],
+                "labor":                    prod["labor"],
+                "mode":                     mode_label,
+                "collaboration_efficiency": collab_eff,
+                "extraction_ceiling":       extraction_ceiling,
+            },
             "minerals": minerals,
+            "narrative": {
+                "gender_economy": gender_economy,
+                "metaphor":       metaphor_map.get(primary_crop, "animist"),
+                "religion":       religion_map.get(culture_label, "animist-local"),
+            },
         })
 
     return substrates
@@ -415,17 +612,17 @@ _ERA_BOUNDS = [-500, -200]
 def _base_era_cost(year: int, hops: int, power: str) -> int:
     is_garrison = power == "lattice" and hops <= 3
     if year < -500:
-        if is_garrison:    return 167
+        if is_garrison:        return 167
         if power == "lattice": return 12000
-        if hops <= 1:      return 350
-        if hops <= 2:      return 580
-        if hops <= 3:      return 1060
+        if hops <= 1:          return 350
+        if hops <= 2:          return 580
+        if hops <= 3:          return 1060
         return 8000
     elif year < -200:
-        if is_garrison:    return 85
+        if is_garrison:        return 85
         if power == "lattice": return 350 if hops <= 5 else 700
-        if hops <= 4:      return 125
-        if hops <= 6:      return 145
+        if hops <= 4:          return 125
+        if hops <= 6:          return 145
         return 200
     else:
         return 61
@@ -540,36 +737,21 @@ def generate_test_world(seed: int = 42, n_archs: int = 42) -> dict:
         archs.append({"cx": cx, "cy": cy, "cz": cz, "shelf_r": shelf_r, "peaks": peaks})
 
     # Override Reach: subtropical band (28–34°N) with short peaks.
-    # Emmer requires effective_rainfall ≤ 2000 mm.
-    #   Subtropical base rain = 600 mm; after Aeolia ×1.4 and orographic
-    #   enhancement from ~400 m peaks → ~1100 mm effective, well within emmer range.
-    #   Papa cannot grow here (requires abs_lat ≥ 35), so emmer wins uncontested.
-    #   Westerlies (lat > 35°) would give base rain 1400 mm → ~2800 mm effective
-    #   with any peaks, blowing past the emmer ceiling — so we cap at lat 34°.
     reach_arch = _find_arch(archs, lat_min=28.0, lat_max=34.0)
     if reach_arch is None or reach_arch == 0 and len(archs) > 1:
-        # Fallback: expand to full subtropical + low-westerlies
         reach_arch = _find_arch(archs, lat_min=25.0, lat_max=38.0) or 0
     archs[reach_arch]["shelf_r"] = max(archs[reach_arch]["shelf_r"], 0.10)
-    # Short peaks (200–600 m) keep effective rainfall inside emmer's 400–2000 mm window
     archs[reach_arch]["peaks"]   = [{"h": 200.0 + rng.next_float() * 400.0} for _ in range(14)]
 
     # Override Lattice: equatorial zone (4–13°S).
-    # Paddi requires mean_temp ≥ 20°C → abs_lat ≤ 17.8° in this model.
-    # Sago requires abs_lat ≤ 15°; placing at 4–13°S keeps sago in competition,
-    # but the tidal-hydraulic paddi yield bonus (added in _compute_substrate_fast)
-    # ensures paddi wins when shelf_r ≥ 0.14 (tidal_range ≥ 6.2 m).
-    # Nori is excluded at mean_temp > 22°C (abs_lat < 13.3°), so the range 4–13°S
-    # also avoids nori competition.
     lattice_arch = _find_arch(archs, lat_min=-13.0, lat_max=-4.0, exclude=[reach_arch])
     if lattice_arch is None or lattice_arch == reach_arch:
         lattice_arch = _find_arch(archs, lat_min=-17.0, lat_max=-3.0, exclude=[reach_arch]) or 1
     archs[lattice_arch]["shelf_r"] = max(archs[lattice_arch]["shelf_r"], 0.14)
-    # Low-medium peaks: keep temp hot (paddi) and rainfall in paddi range
-    archs[lattice_arch]["peaks"]   = [{"h": 150.0  + rng.next_float() * 500.0} for _ in range(22)]
+    archs[lattice_arch]["peaks"]   = [{"h": 150.0 + rng.next_float() * 500.0} for _ in range(22)]
 
     plateau_edges = _generate_plateau_edges(archs)
-    substrate     = _compute_substrate_fast(archs, plateau_edges, seed)
+    substrate     = _compute_substrate(archs, plateau_edges, seed)
 
     return {
         "archs":         archs,
@@ -581,11 +763,68 @@ def generate_test_world(seed: int = 42, n_archs: int = 42) -> dict:
 
 
 # ---------------------------------------------------------------------------
+# Real world loader — reads Godot-exported JSON from run_headless.gd
+# ---------------------------------------------------------------------------
+
+def load_godot_world(path: str) -> dict:
+    """
+    Load a Godot-exported world JSON (produced by run_headless.gd) and
+    normalise its flat substrate to the nested format that simulate() needs.
+
+    The exported substrate has top-level keys (primary_crop, tidal_range, …).
+    simulate() expects substrate[i]["crops"]["primary_crop"] and
+    substrate[i]["minerals"]["Au"], so we convert here.
+    """
+    import json
+    with open(path) as f:
+        data = json.load(f)
+
+    flat_sub = data.get("substrate", [])
+    nested_sub = []
+    for s in flat_sub:
+        nested_sub.append({
+            "crops": {
+                "primary_crop":   s.get("primary_crop",   "emmer"),
+                "primary_yield":  s.get("primary_yield",  0.5),
+                "secondary_crop": s.get("secondary_crop", None),
+            },
+            "climate": {
+                "latitude":           s.get("latitude",           0.0),
+                "abs_latitude":       s.get("abs_latitude",      30.0),
+                "tidal_range":        s.get("tidal_range",        2.0),
+                "mean_temp":          s.get("mean_temp",         18.0),
+                "effective_rainfall": s.get("effective_rainfall", 1000.0),
+                "upwelling":          s.get("upwelling",          0.1),
+            },
+            "trade_goods": {
+                "total_trade_value": s.get("total_trade_value", 0.0),
+            },
+            "minerals": s.get("minerals", {"Fe": True, "Cu": False, "Au": False, "Pu": False}),
+        })
+
+    data["substrate"] = nested_sub
+    return data
+
+
+# ---------------------------------------------------------------------------
 # Core simulation — Python port of history_engine.assign_politics
 # ---------------------------------------------------------------------------
 
 def _log2(x: float) -> float:
     return math.log2(x) if x > 0.0 else 0.0
+
+
+def _has_pu_access(arch_idx: int, substrate: list, adj: list, status_data: list) -> bool:
+    """
+    Returns True if arch_idx's own substrate has Pu==True, OR any adjacent arch
+    has Pu==True AND that adjacent arch's status_data sovereignty >= 0.2.
+    """
+    if substrate[arch_idx]["minerals"]["Pu"]:
+        return True
+    for nb in adj[arch_idx]:
+        if substrate[nb]["minerals"]["Pu"] and status_data[nb]["sovereignty"] >= 0.2:
+            return True
+    return False
 
 
 def simulate(
@@ -605,21 +844,31 @@ def simulate(
     Returns
     -------
     dict with keys:
-      states      — per-arch final state (same schema as GDScript)
-      log         — history log entries
-      df_year     — year Dark Forest broke (negative BP) or None
-      df_arch     — arch index where contact detected
-      df_detector — "reach" or "lattice"
-      reach_arch  — index of Reach core
-      lattice_arch— index of Lattice core
-      epi_log     — per-contact mortality records (not in GDScript output)
-      substrate   — substrate used (from world or recomputed)
+      states               — per-arch final state (same schema as GDScript)
+      log                  — history log entries
+      df_year              — year Dark Forest broke (negative BP) or None
+      df_arch              — arch index where contact detected
+      df_detector          — "reach" or "lattice"
+      reach_arch           — index of Reach core
+      lattice_arch         — index of Lattice core
+      epi_log              — per-contact mortality records (not in GDScript output)
+      substrate            — substrate used (from world or recomputed)
+      archs                — archs forwarded from world
+      plateau_edges        — plateau_edges forwarded from world
+      contact_years        — {i: arrival_yr[i]} for contacted archs
+      hop_count            — list of hop counts per arch
+      mineral_access       — per-arch mineral access dict (own + adjacent with sov >= 0.2)
+      tech_snapshots       — tech vectors after each era
+      pop_snapshots        — pop vectors after each era
+      colony_sov_pre_nuclear — sovereignty of colonies/garrisons before post-nuclear recovery
+      reach_pu_access      — bool: Reach core has Pu access
+      lattice_pu_access    — bool: Lattice core has Pu access
     """
     archs         = world["archs"]
     plateau_edges = world["plateau_edges"]
     reach_arch    = world["reach_arch"]
     lattice_arch  = world["lattice_arch"]
-    substrate     = world.get("substrate") or _compute_substrate_fast(archs, plateau_edges, seed)
+    substrate     = world.get("substrate") or _compute_substrate(archs, plateau_edges, seed)
 
     rng = Mulberry32((seed if seed != 0 else 42) * 31 + 1066)
     N   = len(archs)
@@ -651,14 +900,19 @@ def simulate(
     l_dist = bfs_dist(lattice_arch)
 
     # Resource potential
+    # Supports both synthetic worlds (have arch["peaks"]) and Godot-exported worlds
+    # (have arch["peak_count"] + arch["avg_h"] but no peaks array).
     potential = []
     for i, arch in enumerate(archs):
-        p    = len(arch.get("peaks", []))
-        sz   = arch.get("shelf_r", 0.06) / 0.12
-        avg_h = 0.0
-        if p > 0:
-            avg_h = sum(pk["h"] for pk in arch["peaks"]) / (p * _ISLAND_MAX_HEIGHT)
-        pot = (p / 20.0 * 0.4 + avg_h * 0.3 + sz / 2.2 * 0.3) * (0.6 + rng.next_float() * 0.4)
+        if "peaks" in arch:
+            p_    = len(arch["peaks"])
+            avg_h = (sum(pk["h"] for pk in arch["peaks"]) / (p_ * _ISLAND_MAX_HEIGHT)
+                     if p_ > 0 else 0.0)
+        else:
+            p_    = arch.get("peak_count", 0)
+            avg_h = arch.get("avg_h", 0.0)
+        sz  = arch.get("shelf_r", 0.06) / 0.12
+        pot = (p_ / 20.0 * 0.4 + avg_h * 0.3 + sz / 2.2 * 0.3) * (0.6 + rng.next_float() * 0.4)
         potential.append(pot)
 
     # ── PHASE 1: DIJKSTRA WAVEFRONT ──────────────────────────────────────
@@ -667,10 +921,10 @@ def simulate(
     hop_count  = [0]    * N
     parent_arch= [-1]   * N
 
-    claimed[reach_arch]   = "reach"
-    arrival_yr[reach_arch] = R_START
-    claimed[lattice_arch]  = "lattice"
-    arrival_yr[lattice_arch] = L_START
+    claimed[reach_arch]     = "reach"
+    arrival_yr[reach_arch]  = R_START
+    claimed[lattice_arch]   = "lattice"
+    arrival_yr[lattice_arch]= L_START
 
     df_year = df_arch = df_detector = df_target = None
 
@@ -678,12 +932,16 @@ def simulate(
     counter = 0
     pq = []
     for nb in adj[reach_arch]:
-        cost = _edge_cost(R_START, 1, "reach")
-        heapq.heappush(pq, (R_START + cost, counter, nb, "reach", 1, reach_arch))
+        raw_cost = _edge_cost(R_START, 1, "reach")
+        if substrate[nb]["minerals"]["Au"]:
+            raw_cost = max(1, int(raw_cost * 0.85))
+        heapq.heappush(pq, (R_START + raw_cost, counter, nb, "reach", 1, reach_arch))
         counter += 1
     for nb in adj[lattice_arch]:
-        cost = _edge_cost(L_START, 1, "lattice")
-        heapq.heappush(pq, (L_START + cost, counter, nb, "lattice", 1, lattice_arch))
+        raw_cost = _edge_cost(L_START, 1, "lattice")
+        if substrate[nb]["minerals"]["Au"]:
+            raw_cost = max(1, int(raw_cost * 0.85))
+        heapq.heappush(pq, (L_START + raw_cost, counter, nb, "lattice", 1, lattice_arch))
         counter += 1
 
     while pq:
@@ -712,8 +970,10 @@ def simulate(
         for nb in adj[idx]:
             if claimed[nb] is not None:
                 continue
-            cost = _edge_cost(year, hops + 1, power)
-            heapq.heappush(pq, (year + cost, counter, nb, power, hops + 1, idx))
+            raw_cost = _edge_cost(year, hops + 1, power)
+            if substrate[nb]["minerals"]["Au"]:
+                raw_cost = max(1, int(raw_cost * 0.85))
+            heapq.heappush(pq, (year + raw_cost, counter, nb, power, hops + 1, idx))
             counter += 1
 
     # ── PHASE 2: Σ2ⁿ REDISTRIBUTION ─────────────────────────────────────
@@ -723,8 +983,8 @@ def simulate(
     contactable.sort(key=lambda i: (arrival_yr[i], i))
     nc = len(contactable)
 
-    serial_n   = max(1, round(nc * 0.05))
-    colonial_n = max(1, round(nc * 0.10))
+    serial_n     = max(1, round(nc * 0.05))
+    colonial_n   = max(1, round(nc * 0.10))
     industrial_n = max(2, round(nc * 0.20))
     nuclear_n    = max(2, round(nc * 0.40))
     total_slots  = serial_n + colonial_n + industrial_n + nuclear_n
@@ -827,8 +1087,8 @@ def simulate(
                                    "status": "contacted", "eraOfContact": era}
         else:  # lattice
             if hops <= 3:
-                sovereign[i] = lattice_arch
-                colony_yr[i] = yr + 200
+                sovereign[i]  = lattice_arch
+                colony_yr[i]  = yr + 200
                 status_data[i] = {"sovereignty": 0.30, "tradeIntegration": 0.50,
                                    "status": "garrison", "eraOfContact": era}
             elif hops <= 5:
@@ -838,14 +1098,25 @@ def simulate(
                 status_data[i] = {"sovereignty": 0.90, "tradeIntegration": 0.15,
                                    "status": "pulse", "eraOfContact": era}
 
+    # ── POST-PHASE-3: MINERAL ACCESS ──────────────────────────────────────
+    mineral_access = []
+    for i in range(N):
+        access = dict(substrate[i]["minerals"])  # start with own
+        for nb in adj[i]:
+            if status_data[nb]["sovereignty"] >= 0.2:
+                for m in ["Fe", "Cu", "Au", "Pu"]:
+                    if substrate[nb]["minerals"][m]:
+                        access[m] = True
+        mineral_access.append(access)
+
     # ── PHASE 4: POPULATION MODEL ─────────────────────────────────────────
 
     pop  = []
     tech = []
     for i, arch in enumerate(archs):
-        p    = len(arch.get("peaks", []))
+        p_   = len(arch.get("peaks", []))
         sz   = arch.get("shelf_r", 0.06) / 0.12
-        base = float(p) * sz * (3.0 + rng.next_float() * 4.0)
+        base = float(p_) * sz * (3.0 + rng.next_float() * 4.0)
         pop.append(base)
         tech.append(0.0)
 
@@ -863,6 +1134,9 @@ def simulate(
     tech[reach_arch]   = max(tech[reach_arch],   p.antiquity_tech_floor_reach)
     tech[lattice_arch] = max(tech[lattice_arch], p.antiquity_tech_floor_lattice)
     pop[lattice_arch] *= p.antiquity_lattice_pop_mult
+
+    # Snapshot after ERA 1
+    tech_snap = {"after_antiquity": list(tech)}
 
     # -- ERA 2: SERIAL CONTACT --
     log.append({"arch": -1, "name": "═══ SERIAL CONTACT", "faction": "era",
@@ -899,6 +1173,10 @@ def simulate(
             pop[i]     *= 1.0 + float(trade_years) * p.serial_trade_rate
             tech[i]    += 0.5 + rng.next_float() * 0.5
 
+            # Cu → serial tech bonus
+            if substrate[i]["minerals"]["Cu"]:
+                tech[i] += 0.2
+
             if power == "reach":
                 reach_network  += 1
             else:
@@ -920,6 +1198,9 @@ def simulate(
     # Lattice: larger base (paddi surplus), lower log₂ coefficient — stable surplus (δ=0.04)
     pop[lattice_arch] *= p.lattice_serial_base_mult * (1.0 + _log2(1.0 + lattice_network) * p.lattice_serial_log_coeff)
     tech[lattice_arch] = min(6.0, tech[lattice_arch] + 1.0)
+
+    # Snapshot after ERA 2
+    tech_snap["after_serial"] = list(tech)
 
     # -- ERA 3: COLONIAL EMPIRES --
     log.append({"arch": -1, "name": "═══ COLONIAL EMPIRES", "faction": "era",
@@ -954,15 +1235,15 @@ def simulate(
                 reach_colonies += 1
 
             elif sd["status"] == "garrison":
-                absorbed        = pop[i] * (p.garrison_absorb_base + rng.next_float() * p.garrison_absorb_range)
-                pop[i]         -= absorbed
+                absorbed           = pop[i] * (p.garrison_absorb_base + rng.next_float() * p.garrison_absorb_range)
+                pop[i]            -= absorbed
                 pop[lattice_arch] += absorbed
                 lattice_garrisons += 1
 
             elif sd["status"] == "tributary":
-                tribute = pop[i] * (0.05 + rng.next_float() * 0.05)
+                tribute            = pop[i] * (0.05 + rng.next_float() * 0.05)
                 pop[lattice_arch] += tribute
-                lattice_tribs += 1
+                lattice_tribs     += 1
 
             elif sd["status"] == "client":
                 pop[i]  *= 1.0 + _log2(1.0 + reach_network) * 0.10
@@ -980,6 +1261,10 @@ def simulate(
             shock2          = 1.0 - mortality2
             pop[i]         *= shock2
             tech[i]        += 0.3
+
+            # Cu → colonial tech bonus
+            if substrate[i]["minerals"]["Cu"]:
+                tech[i] += 0.2
 
             epi_log.append({
                 "arch":           i,
@@ -1004,6 +1289,12 @@ def simulate(
             continue
         pop[i]  *= 1.0 + 0.0005 * potential[i] * 15.0
         tech[i]  = min(4.0, tech[i] + potential[i] * 0.1)
+
+    # Snapshot after ERA 3
+    tech_snap["after_colonial"] = list(tech)
+    pop_snap = {"after_serial": list(pop)}  # retroactive — recorded here for simplicity
+    # (after_serial pop is not separately tracked; record post-colonial as well)
+    pop_snap["after_colonial"] = list(pop)
 
     # -- ERA 4: INDUSTRIAL --
     log.append({"arch": -1, "name": "═══ INDUSTRIAL", "faction": "era",
@@ -1046,6 +1337,10 @@ def simulate(
     tech[reach_arch]   = max(tech[reach_arch],   p.tech_floor_reach_ind)
     tech[lattice_arch] = max(tech[lattice_arch], p.tech_floor_lattice_ind)
 
+    # Snapshot after ERA 4 floor but BEFORE nuclear override
+    tech_snap["after_industrial"] = list(tech)
+    pop_snap["after_industrial"]  = list(pop)
+
     # -- ERA 4→5 SOVEREIGNTY DRIFT --
     for i in range(N):
         if not claimed[i] or i == reach_arch or i == lattice_arch:
@@ -1059,15 +1354,33 @@ def simulate(
             sd["sovereignty"] = min(0.85, sd["sovereignty"] +
                                     contact_age * p.client_sov_drift_per_yr)
 
+    # Record colony sovereignty before post-nuclear recovery
+    colony_sov_pre_nuclear = {
+        i: status_data[i]["sovereignty"]
+        for i in range(N)
+        if status_data[i]["status"] in ("colony", "garrison")
+    }
+
     # -- ERA 5: NUCLEAR --
     log.append({"arch": -1, "name": "═══ NUCLEAR THRESHOLD", "faction": "era",
                 "label": "200 BP–present · Reactor seaplanes · Post-colonial recovery",
                 "contactYr": -200})
 
+    # Compute Pu access for reach and lattice cores
+    reach_pu_access   = _has_pu_access(reach_arch,   substrate, adj, status_data)
+    lattice_pu_access = _has_pu_access(lattice_arch, substrate, adj, status_data)
+
     pop[reach_arch]   *= p.reach_nuclear_pop_mult
-    tech[reach_arch]   = 10.0
+    if reach_pu_access:
+        tech[reach_arch] = 10.0
+    else:
+        tech[reach_arch] = min(tech[reach_arch], 8.5)
+
     pop[lattice_arch] *= p.lattice_nuclear_pop_mult
-    tech[lattice_arch] = 9.5
+    if lattice_pu_access:
+        tech[lattice_arch] = 9.5
+    else:
+        tech[lattice_arch] = min(tech[lattice_arch], 8.5)
 
     for i in range(N):
         if i == reach_arch or i == lattice_arch:
@@ -1084,17 +1397,14 @@ def simulate(
         if sovereign[i] >= 0 and rng.next_float() < p.nuclear_green_rev_prob:
             pop[i] *= p.nuclear_green_rev_mult_min + rng.next_float() * p.nuclear_green_rev_mult_range
 
-        # Pu nuclear gate: archs without Pu in their sphere receive reduced tech access.
-        mins_i  = substrate[i].get("minerals", {})
-        pu_here = mins_i.get("Pu", False)
-        pu_near = pu_here or any(
-            claimed[nb] == claimed[i] and substrate[nb].get("minerals", {}).get("Pu", False)
-            for nb in adj[i]
-        )
-        pu_mult = 1.0 if pu_near else p.pu_nuclear_tech_fraction
+        # Pu nuclear gate: archs without Pu access are capped at 8.5
+        pu_access = _has_pu_access(i, substrate, adj, status_data)
+        if pu_access:
+            tech[i] = min(10.0, tech[i] + access)
+        else:
+            tech[i] = min(8.5, tech[i] + access * p.pu_nuclear_tech_fraction)
 
-        pop[i]  *= 1.0 + access * 0.2
-        tech[i]  = min(10.0, tech[i] + access * pu_mult)
+        pop[i] *= 1.0 + access * 0.2
 
     # ── POST-NUCLEAR SOVEREIGNTY RECOVERY ──
     # Matches history_engine.gd lines 631-643 exactly.
@@ -1138,17 +1448,28 @@ def simulate(
         })
 
     return {
-        "states":      states,
-        "log":         log,
-        "df_year":     df_year,
-        "df_arch":     df_arch,
-        "df_detector": df_detector,
-        "reach_arch":  reach_arch,
-        "lattice_arch":lattice_arch,
-        "epi_log":     epi_log,
-        "substrate":   substrate,
+        "states":                states,
+        "log":                   log,
+        "df_year":               df_year,
+        "df_arch":               df_arch,
+        "df_detector":           df_detector,
+        "reach_arch":            reach_arch,
+        "lattice_arch":          lattice_arch,
+        "epi_log":               epi_log,
+        "substrate":             substrate,
         # Per-arch mineral dicts — consumed by ore_component in loss.py
-        "minerals":    [substrate[i].get("minerals", {}) for i in range(N)],
+        "minerals":              [substrate[i].get("minerals", {}) for i in range(N)],
         # Per-arch adjacency — consumed by geo/ore topology checks
-        "adj":         adj,
+        "adj":                   adj,
+        # New fields
+        "archs":                 archs,
+        "plateau_edges":         plateau_edges,
+        "contact_years":         {i: arrival_yr[i] for i in range(N) if arrival_yr[i] is not None},
+        "hop_count":             list(hop_count),
+        "mineral_access":        mineral_access,
+        "tech_snapshots":        tech_snap,
+        "pop_snapshots":         pop_snap,
+        "colony_sov_pre_nuclear":colony_sov_pre_nuclear,
+        "reach_pu_access":       reach_pu_access,
+        "lattice_pu_access":     lattice_pu_access,
     }
