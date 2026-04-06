@@ -151,6 +151,14 @@ class SimParams:
     nuclear_green_rev_mult_min:  float = 1.30  # min pop boost from Green Rev
     nuclear_green_rev_mult_range:float = 0.30  # range of Green Rev pop boost
 
+    # ── MINERAL EFFECTS ──────────────────────────────────────────────────────
+    # Cu: serial-era development accelerant → shifts arrival year earlier
+    cu_serial_year_bonus:     float = 150.0   # years earlier for Cu-bearing serial archs
+    # Au: contact priority → Au-bearing archs contacted earlier across all eras
+    au_contact_year_bonus:    float = 80.0    # years earlier for Au-bearing archs
+    # Pu: nuclear gate → tech access fraction for non-Pu archs in nuclear era
+    pu_nuclear_tech_fraction: float = 0.60    # fraction of nuclear tech without Pu access
+
 
 DEFAULT_PARAMS = SimParams()
 
@@ -186,6 +194,9 @@ PARAM_BOUNDS: list = [
     ("nuclear_access_colony",         0.40,   0.90),
     ("nuclear_access_garrison",       0.25,   0.75),
     ("nuclear_access_independent",    0.10,   0.50),
+    ("cu_serial_year_bonus",          0.0,  400.0),
+    ("au_contact_year_bonus",         0.0,  250.0),
+    ("pu_nuclear_tech_fraction",      0.2,    0.9),
 ]
 
 
@@ -359,6 +370,16 @@ def _compute_substrate_fast(archs: list, plateau_edges: list, seed: int) -> list
         # Trade value: simplified normalisation to [0, 1]
         total_trade_value = min(1.0, primary_yield / 5.0)
 
+        # Minerals (§10g — matches substrate.gd formulas exactly)
+        # RNG calls must come AFTER crop/trade so arch-order is stable per seed.
+        size_norm = shelf_r / 0.12
+        minerals = {
+            "Fe": True,
+            "Cu": rng.next_float() < 0.20,
+            "Au": rng.next_float() < (0.05 + avg_h * 0.08),
+            "Pu": rng.next_float() < (0.03 + size_norm * 0.02),
+        }
+
         substrates.append({
             "crops": {
                 "primary_crop":   primary_crop,
@@ -378,6 +399,7 @@ def _compute_substrate_fast(archs: list, plateau_edges: list, seed: int) -> list
             "trade_goods": {
                 "total_trade_value": total_trade_value,
             },
+            "minerals": minerals,
         })
 
     return substrates
@@ -746,6 +768,23 @@ def simulate(
             claimed[i]    = None
             arrival_yr[i] = None
 
+    # ── MINERAL EFFECTS: post-redistribution ─────────────────────────────────
+    # Cu: serial-era development bonus (better tools → earlier contact/development).
+    # Au: contact priority (high trade value → contactors favoured this arch).
+    # Both shift arrival_yr earlier without disrupting order or phase-3 logic.
+    for i in range(N):
+        if arrival_yr[i] is None:
+            continue
+        mins = substrate[i].get("minerals", {})
+        if mins.get("Cu") and -5000 <= arrival_yr[i] < -2000:
+            arrival_yr[i] = max(-4999, arrival_yr[i] - int(params.cu_serial_year_bonus))
+        if mins.get("Au") and arrival_yr[i] is not None:
+            arrival_yr[i] = arrival_yr[i] - int(params.au_contact_year_bonus)
+    # Clamp: no arch can arrive before the Reach started
+    for i in range(N):
+        if arrival_yr[i] is not None:
+            arrival_yr[i] = max(-5000, arrival_yr[i])
+
     # ── PHASE 3: STATUS ASSIGNMENT ───────────────────────────────────────
     sovereign   = [-1]   * N
     colony_yr   = [None] * N
@@ -838,7 +877,9 @@ def simulate(
         yr    = arrival_yr[i]
         power = claimed[i]
         if yr is not None and yr >= -5000 and yr < -2000:
-            contactor_crop = "emmer" if power == "reach" else "paddi"
+            contactor_crop = (substrate[reach_arch]["crops"]["primary_crop"]
+                              if power == "reach"
+                              else substrate[lattice_arch]["crops"]["primary_crop"])
             contacted_crop = substrate[i]["crops"]["primary_crop"]
             dist           = _crop_distance(contactor_crop, contacted_crop)
             base_sev       = p.serial_shock_base_min + rng.next_float() * p.serial_shock_base_range
@@ -929,7 +970,9 @@ def simulate(
 
         # New contacts in colonial era
         if yr >= -2000 and yr < -500:
-            contactor_crop2 = "emmer" if power == "reach" else "paddi"
+            contactor_crop2 = (substrate[reach_arch]["crops"]["primary_crop"]
+                               if power == "reach"
+                               else substrate[lattice_arch]["crops"]["primary_crop"])
             contacted_crop2 = substrate[i]["crops"]["primary_crop"]
             dist2           = _crop_distance(contactor_crop2, contacted_crop2)
             base_sev2       = p.colonial_shock_base_min + rng.next_float() * p.colonial_shock_base_range
@@ -1041,8 +1084,17 @@ def simulate(
         if sovereign[i] >= 0 and rng.next_float() < p.nuclear_green_rev_prob:
             pop[i] *= p.nuclear_green_rev_mult_min + rng.next_float() * p.nuclear_green_rev_mult_range
 
+        # Pu nuclear gate: archs without Pu in their sphere receive reduced tech access.
+        mins_i  = substrate[i].get("minerals", {})
+        pu_here = mins_i.get("Pu", False)
+        pu_near = pu_here or any(
+            claimed[nb] == claimed[i] and substrate[nb].get("minerals", {}).get("Pu", False)
+            for nb in adj[i]
+        )
+        pu_mult = 1.0 if pu_near else p.pu_nuclear_tech_fraction
+
         pop[i]  *= 1.0 + access * 0.2
-        tech[i]  = min(10.0, tech[i] + access)
+        tech[i]  = min(10.0, tech[i] + access * pu_mult)
 
     # ── POST-NUCLEAR SOVEREIGNTY RECOVERY ──
     # Matches history_engine.gd lines 631-643 exactly.
@@ -1095,4 +1147,8 @@ def simulate(
         "lattice_arch":lattice_arch,
         "epi_log":     epi_log,
         "substrate":   substrate,
+        # Per-arch mineral dicts — consumed by ore_component in loss.py
+        "minerals":    [substrate[i].get("minerals", {}) for i in range(N)],
+        # Per-arch adjacency — consumed by geo/ore topology checks
+        "adj":         adj,
     }

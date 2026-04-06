@@ -37,7 +37,7 @@ RESULTS_DIR.mkdir(exist_ok=True)
 # ---------------------------------------------------------------------------
 # Config
 
-N_TRIALS        = 200
+N_TRIALS        = 50
 SEEDS           = [17, 42, 97, 137, 256]
 VARIANCE_WEIGHT = 0.30   # λ: total = mean + λ * std
 FAIL_PENALTY    = 2.0
@@ -63,8 +63,11 @@ def evaluate_params(params: SimParams, worlds: dict) -> dict:
 
     for seed, world in worlds.items():
         try:
+            # Attach seed so tech_component's emergent nuclear test is reproducible
+            world["_opt_seed"] = seed
             result = simulate(world, params, seed=seed)
-            lr = compute_loss(result, substrate=result.get("substrate"))
+            lr = compute_loss(result, substrate=result.get("substrate"),
+                              world=world, params=params)
             per_seed_losses[seed] = lr.total
             per_seed_components[seed] = lr.components
         except Exception as e:
@@ -162,7 +165,7 @@ def run():
     sampler = optuna.samplers.TPESampler(
         seed=42,
         multivariate=True,
-        n_startup_trials=20,   # fixed: must be < N_TRIALS so TPE actually fires
+        n_startup_trials=15,   # fixed: must be < N_TRIALS so TPE actually fires
     )
     study = optuna.create_study(
         direction="minimize",
@@ -253,7 +256,7 @@ def run():
     # 4. convergence_summary.txt
     best_so_far = float("inf")
     milestone_lines = []
-    milestones = {0, 4, 9, 19, 29, 49, 74, 99, 149, 199, N_TRIALS - 1}
+    milestones = {0, 4, 9, 19, 29, 39, 49, N_TRIALS - 1}
     for t in all_trials:
         if t["total"] < best_so_far:
             best_so_far = t["total"]
