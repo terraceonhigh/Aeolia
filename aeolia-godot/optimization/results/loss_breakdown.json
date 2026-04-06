@@ -1,0 +1,292 @@
+{
+  "17": {
+    "total": 25.599108,
+    "components": {
+      "geo": 10.0,
+      "ag": 0.504613,
+      "tech": 0.0,
+      "poleco": 15.0,
+      "epi": 0.0,
+      "pop": 0.094495
+    },
+    "details": {
+      "geo": {
+        "contact_frac": 0.142857,
+        "n_indep": 0,
+        "reach_frac": 0.833333,
+        "l_contact": 36.862245,
+        "l_indep": 9.0,
+        "l_balance": 0.080278
+      },
+      "ag": {
+        "reach_crop": "nori",
+        "lattice_crop": "paddi",
+        "yield_ratio": 1.351047,
+        "n_distinct_crops": 6,
+        "paddi_frac": 0.047619,
+        "emmer_frac": 0.0
+      },
+      "tech": {
+        "reach_tech": 10.0,
+        "lattice_tech": 9.5,
+        "tech_gap": 0.5,
+        "indep_techs": []
+      },
+      "poleco": {
+        "df_year": -1400,
+        "era_fracs": {
+          "sail": 0.047619047619047616,
+          "colonial": 0.047619047619047616,
+          "industrial": 0.0,
+          "nuclear": 0.0,
+          "uncontacted": 0.8571428571428571
+        },
+        "l_df": 144.0,
+        "l_era": 0.571372,
+        "l_sov": 2.098839,
+        "l_trade": 0.049031
+      },
+      "epi": {
+        "mortality_cv": 0.324933
+      },
+      "pop": {
+        "lattice_reach_ratio": 0.624426,
+        "pop_gini": 0.809415,
+        "mean_colony_sov": 0.631763,
+        "lattice_vs_median": 97.142857
+      }
+    }
+  },
+  "42": {
+    "total": 12.865428,
+    "components": {
+      "geo": 9.451707,
+      "ag": 0.490348,
+      "tech": 0.0,
+      "poleco": 2.825744,
+      "epi": 0.013972,
+      "pop": 0.083657
+    },
+    "details": {
+      "geo": {
+        "contact_frac": 0.261905,
+        "n_indep": 0,
+        "reach_frac": 0.727273,
+        "l_contact": 23.823696,
+        "l_indep": 9.0,
+        "l_balance": 0.031426
+      },
+      "ag": {
+        "reach_crop": "nori",
+        "lattice_crop": "paddi",
+        "yield_ratio": 1.378607,
+        "n_distinct_crops": 6,
+        "paddi_frac": 0.02381,
+        "emmer_frac": 0.0
+      },
+      "tech": {
+        "reach_tech": 10.0,
+        "lattice_tech": 9.5,
+        "tech_gap": 0.5,
+        "indep_techs": []
+      },
+      "poleco": {
+        "df_year": -400,
+        "era_fracs": {
+          "sail": 0.047619047619047616,
+          "colonial": 0.09523809523809523,
+          "industrial": 0.07142857142857142,
+          "nuclear": 0.0,
+          "uncontacted": 0.7380952380952381
+        },
+        "l_df": 4.0,
+        "l_era": 0.414796,
+        "l_sov": 1.423202,
+        "l_trade": 0.038135
+      },
+      "epi": {
+        "mortality_cv": 0.181798
+      },
+      "pop": {
+        "lattice_reach_ratio": 0.640971,
+        "pop_gini": 0.775794,
+        "mean_colony_sov": 0.590475,
+        "lattice_vs_median": 33.722222
+      }
+    }
+  },
+  "97": {
+    "total": 25.859459,
+    "components": {
+      "geo": 10.0,
+      "ag": 0.847102,
+      "tech": 0.0,
+      "poleco": 15.0,
+      "epi": 0.0,
+      "pop": 0.012358
+    },
+    "details": {
+      "geo": {
+        "contact_frac": 0.142857,
+        "n_indep": 0,
+        "reach_frac": 0.833333,
+        "l_contact": 36.862245,
+        "l_indep": 9.0,
+        "l_balance": 0.080278
+      },
+      "ag": {
+        "reach_crop": "nori",
+        "lattice_crop": "paddi",
+        "yield_ratio": 0.998409,
+        "n_distinct_crops": 6,
+        "paddi_frac": 0.047619,
+        "emmer_frac": 0.0
+      },
+      "tech": {
+        "reach_tech": 10.0,
+        "lattice_tech": 9.5,
+        "tech_gap": 0.5,
+        "indep_techs": []
+      },
+      "poleco": {
+        "df_year": -1400,
+        "era_fracs": {
+          "sail": 0.047619047619047616,
+          "colonial": 0.047619047619047616,
+          "industrial": 0.0,
+          "nuclear": 0.0,
+          "uncontacted": 0.8571428571428571
+        },
+        "l_df": 144.0,
+        "l_era": 0.571372,
+        "l_sov": 2.060894,
+        "l_trade": 0.049031
+      },
+      "epi": {
+        "mortality_cv": 0.330984
+      },
+      "pop": {
+        "lattice_reach_ratio": 2.093535,
+        "pop_gini": 0.829787,
+        "mean_colony_sov": 0.627643,
+        "lattice_vs_median": 126.833333
+      }
+    }
+  },
+  "137": {
+    "total": 26.332755,
+    "components": {
+      "geo": 10.0,
+      "ag": 1.327921,
+      "tech": 0.0,
+      "poleco": 15.0,
+      "epi": 0.0,
+      "pop": 0.004834
+    },
+    "details": {
+      "geo": {
+        "contact_frac": 0.047619,
+        "n_indep": 0,
+        "reach_frac": 0.5,
+        "l_contact": 49.3339,
+        "l_indep": 9.0,
+        "l_balance": 0.0
+      },
+      "ag": {
+        "reach_crop": "papa",
+        "lattice_crop": "paddi",
+        "yield_ratio": 0.757538,
+        "n_distinct_crops": 6,
+        "paddi_frac": 0.02381,
+        "emmer_frac": 0.0
+      },
+      "tech": {
+        "reach_tech": 10.0,
+        "lattice_tech": 9.5,
+        "tech_gap": 0.5,
+        "indep_techs": []
+      },
+      "poleco": {
+        "df_year": -5000,
+        "era_fracs": {
+          "sail": 0.0,
+          "colonial": 0.0,
+          "industrial": 0.0,
+          "nuclear": 0.0,
+          "uncontacted": 0.9523809523809523
+        },
+        "l_df": 2304.0,
+        "l_era": 0.705839,
+        "l_sov": 0.0,
+        "l_trade": 0.0
+      },
+      "epi": {
+        "note": "no epi_log and insufficient state data; epi component skipped"
+      },
+      "pop": {
+        "lattice_reach_ratio": 2.257812,
+        "pop_gini": 0.826466,
+        "mean_colony_sov": null,
+        "lattice_vs_median": 144.5
+      }
+    }
+  },
+  "256": {
+    "total": 26.032033,
+    "components": {
+      "geo": 10.0,
+      "ag": 0.992751,
+      "tech": 0.0,
+      "poleco": 15.0,
+      "epi": 0.0,
+      "pop": 0.039281
+    },
+    "details": {
+      "geo": {
+        "contact_frac": 0.047619,
+        "n_indep": 0,
+        "reach_frac": 0.5,
+        "l_contact": 49.3339,
+        "l_indep": 9.0,
+        "l_balance": 0.0
+      },
+      "ag": {
+        "reach_crop": "nori",
+        "lattice_crop": "paddi",
+        "yield_ratio": 0.907824,
+        "n_distinct_crops": 6,
+        "paddi_frac": 0.071429,
+        "emmer_frac": 0.0
+      },
+      "tech": {
+        "reach_tech": 10.0,
+        "lattice_tech": 9.5,
+        "tech_gap": 0.5,
+        "indep_techs": []
+      },
+      "poleco": {
+        "df_year": -5000,
+        "era_fracs": {
+          "sail": 0.0,
+          "colonial": 0.0,
+          "industrial": 0.0,
+          "nuclear": 0.0,
+          "uncontacted": 0.9523809523809523
+        },
+        "l_df": 2304.0,
+        "l_era": 0.705839,
+        "l_sov": 0.0,
+        "l_trade": 0.0
+      },
+      "epi": {
+        "note": "no epi_log and insufficient state data; epi component skipped"
+      },
+      "pop": {
+        "lattice_reach_ratio": 2.579741,
+        "pop_gini": 0.813672,
+        "mean_colony_sov": null,
+        "lattice_vs_median": 133.0
+      }
+    }
+  }
+}

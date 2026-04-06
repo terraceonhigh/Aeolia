@@ -1,0 +1,11 @@
+[configuration]
+entry_symbol = "terrain_math_ext_init"
+compatibility_minimum = "4.3"
+
+[libraries]
+; macOS: framework bundle (produced by SCons macos build)
+macos.debug   = "res://gdextension/bin/libterrainmath.macos.template_debug.framework"
+macos.release = "res://gdextension/bin/libterrainmath.macos.template_release.framework"
+; Linux (for future portability)
+linux.debug.x86_64   = "res://gdextension/bin/libterrainmath.linux.template_debug.x86_64.so"
+linux.release.x86_64 = "res://gdextension/bin/libterrainmath.linux.template_release.x86_64.so"

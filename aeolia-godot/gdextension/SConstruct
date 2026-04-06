@@ -1,0 +1,51 @@
+#!/usr/bin/env python
+# SConstruct for Aeolia terrain_math GDExtension
+#
+# Setup (one-time):
+#   cd gdextension
+#   git submodule add -b godot-4.6-stable https://github.com/godotengine/godot-cpp
+#   git submodule update --init --recursive
+#
+# Build (macOS debug):
+#   scons platform=macos target=template_debug
+#
+# Build (macOS release):
+#   scons platform=macos target=template_release
+#
+# Output goes to gdextension/bin/ which is referenced by res://gdextension/bin/
+# via the bin/terrain_math.gdextension descriptor.
+#
+# IMPORTANT: do NOT build with custom_api_file pointing to a different Godot version.
+# The godot-cpp submodule must match Godot 4.6.x.
+#
+# Strict IEEE 754 compliance is required for bit-identical results vs GDScript.
+# Do NOT add -ffast-math or /fp:fast to CCFLAGS.
+
+import os
+
+# Pull in the godot-cpp environment (handles platform detection, compiler flags, etc.)
+env = SConscript("godot-cpp/SConstruct")
+
+# Strip -ffast-math if it somehow crept in — we need strict FP for bit-identical hashes.
+for flag_list in ("CCFLAGS", "CXXFLAGS", "CFLAGS"):
+    if flag_list in env:
+        env[flag_list] = [f for f in env[flag_list] if f not in ("-ffast-math", "/fp:fast")]
+
+env.Append(CPPPATH=["src/"])
+sources = Glob("src/*.cpp")
+
+if env["platform"] == "macos":
+    # Godot 4 macOS GDExtensions are distributed as framework bundles.
+    # The framework directory name and inner dylib name must match exactly.
+    lib_name = "libterrainmath.{}.{}".format(env["platform"], env["target"])
+    library = env.SharedLibrary(
+        "bin/{}.framework/{}".format(lib_name, lib_name),
+        source=sources,
+    )
+else:
+    library = env.SharedLibrary(
+        "bin/libterrainmath{}{}".format(env["suffix"], env["SHLIBSUFFIX"]),
+        source=sources,
+    )
+
+Default(library)

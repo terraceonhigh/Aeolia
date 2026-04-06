@@ -10,3 +10,17 @@ export_presets.cfg
 *.swp
 *.swo
 *~
+
+# Node
+node_modules/
+
+# Build artifacts
+*.os
+*.o
+aeolia-godot/gdextension/bin/
+aeolia-godot/gdextension/.sconsign.dblite
+
+# Python
+__pycache__/
+*.pyc
+*.pyo

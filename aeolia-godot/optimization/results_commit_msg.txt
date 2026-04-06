@@ -1,0 +1,25 @@
+optimization: run 50-trial LHS+exploit search, 5 seeds, save results
+
+Pure-Python LHS optimizer (no optuna/scipy required): 40 random Latin
+Hypercube trials + 10 exploitation trials around best-so-far. Variance
+penalty λ=0.30 applied as mean + λ*std across seeds [17,42,97,137,256].
+
+Results:
+  Baseline total loss : 28.27  (mean=26.08, std=7.27)
+  Best total loss     : 24.91  (mean=23.34, std=5.24)
+  Improvement         : 3.36 over 50 trials / 17.9s
+
+Key findings from convergence_summary.txt:
+  - geo and poleco dominate (9.89 and 12.57) — contact fraction and Dark
+    Forest timing are structurally determined by world topology, not
+    tunable params; these require substrate/geography fixes (ANALYSIS §1)
+  - pop loss collapsed from 2.80 → 0.05: Lattice:Reach ratio now correct
+  - Largest movers: serial_trade_rate +147%, reach_serial_base_mult +67%,
+    garrison_absorb_base +85%, reach_ind_tech_growth +56%
+  - reach_serial_log_coeff moved DOWN (-59%): optimizer found population
+    surplus drives Reach more than knowledge spillover at current geo scale
+  - reach_nuclear_pop_mult +35%: nuclear era pop growth was underweight
+
+Files added: run_optimization.py, smoke_test.py, results/
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
