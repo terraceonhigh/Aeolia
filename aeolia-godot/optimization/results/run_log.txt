@@ -1,0 +1,344 @@
+/Users/terrace/Library/Python/3.9/lib/python/site-packages/optuna/_experimental.py:33: ExperimentalWarning: Argument ``multivariate`` is an experimental feature. The interface can change in the future.
+  optuna_warn(
+Aeolia History Engine Optimizer (Optuna TPE)
+  Trials       : 200
+  Seeds        : [17, 42, 97, 137, 256]
+  Params       : 30
+  Variance λ   : 0.3
+  Results dir  : /Users/terrace/Labs/Aeolia/aeolia-godot/optimization/results
+
+Generating worlds...
+  seed=17: 42 archs, 144 edges
+  seed=42: 42 archs, 141 edges
+  seed=97: 42 archs, 143 edges
+  seed=137: 42 archs, 141 edges
+  seed=256: 42 archs, 141 edges
+
+Evaluating default params (baseline)...
+  Baseline total=28.2664  mean=26.0844  std=7.2734
+  Components: geo=9.890  ag=0.833  tech=0.000  poleco=12.554  epi=0.004  pop=2.803
+
+Trial     Total      Mean      Std      Best  Components
+-----------------------------------------------------------------------------------------------
+    1   32.1504   29.4338   9.0551   32.1504  geo=9.890  ag=0.833  tech=0.000  poleco=12.553  epi=0.003  pop=6.155 *
+    2   24.9257   23.3525   5.2439   24.9257  geo=9.890  ag=0.833  tech=0.000  poleco=12.548  epi=0.002  pop=0.080 *
+    3   30.8051   28.2804   8.4158   24.9257  geo=9.890  ag=0.833  tech=0.000  poleco=12.600  epi=0.003  pop=4.955
+    4   29.5105   27.0355   8.2500   24.9257  geo=9.890  ag=0.833  tech=0.000  poleco=12.532  epi=0.003  pop=3.777
+    5   32.7273   30.3344   7.9761   24.9257  geo=9.890  ag=0.833  tech=0.000  poleco=12.566  epi=0.011  pop=7.035
+    6   30.9643   28.3525   8.7061   24.9257  geo=9.890  ag=0.833  tech=0.000  poleco=12.572  epi=0.005  pop=5.052
+    7   27.0059   25.0421   6.5458   24.9257  geo=9.890  ag=0.833  tech=0.000  poleco=12.539  epi=0.002  pop=1.778
+    8   32.0997   29.3648   9.1164   24.9257  geo=9.890  ag=0.833  tech=0.000  poleco=12.591  epi=0.005  pop=6.046
+    9   30.0570   27.4776   8.5979   24.9257  geo=9.890  ag=0.833  tech=0.000  poleco=12.573  epi=0.003  pop=4.179
+   10   32.0874   29.3504   9.1236   24.9257  geo=9.890  ag=0.833  tech=0.000  poleco=12.596  epi=0.002  pop=6.029
+   11   25.0835   23.4739   5.3653   24.9257  geo=9.890  ag=0.833  tech=0.000  poleco=12.557  epi=0.003  pop=0.190
+   12   32.0874   29.3388   9.1618   24.9257  geo=9.890  ag=0.833  tech=0.000  poleco=12.554  epi=0.003  pop=6.059
+   13   30.9668   28.3351   8.7723   24.9257  geo=9.890  ag=0.833  tech=0.000  poleco=12.534  epi=0.004  pop=5.075
+   14   25.0042   23.4154   5.2961   24.9257  geo=9.890  ag=0.833  tech=0.000  poleco=12.559  epi=0.003  pop=0.130
+   15   30.1553   27.5575   8.6594   24.9257  geo=9.890  ag=0.833  tech=0.000  poleco=12.537  epi=0.005  pop=4.292
+   16   27.0037   25.0402   6.5449   24.9257  geo=9.890  ag=0.833  tech=0.000  poleco=12.536  epi=0.004  pop=1.778
+   17   32.1195   29.4005   9.0633   24.9257  geo=9.890  ag=0.833  tech=0.000  poleco=12.584  epi=0.003  pop=6.090
+   18   32.1459   29.4288   9.0572   24.9257  geo=9.890  ag=0.833  tech=0.000  poleco=12.561  epi=0.002  pop=6.143
+   19   32.0920   29.3523   9.1323   24.9257  geo=9.890  ag=0.833  tech=0.000  poleco=12.583  epi=0.003  pop=6.043
+   20   31.9220   29.1879   9.1136   24.9257  geo=9.890  ag=0.833  tech=0.000  poleco=12.558  epi=0.003  pop=5.904
+   21   24.9337   23.3593   5.2482   24.9257  geo=9.890  ag=0.833  tech=0.000  poleco=12.549  epi=0.003  pop=0.084
+   22   25.8407   24.1064   5.7810   24.9257  geo=9.890  ag=0.833  tech=0.000  poleco=12.553  epi=0.003  pop=0.828
+   23   26.4522   24.6080   6.1474   24.9257  geo=9.890  ag=0.833  tech=0.000  poleco=12.554  epi=0.004  pop=1.328
+   24   24.9647   23.4022   5.2085   24.9257  geo=9.890  ag=0.833  tech=0.000  poleco=12.559  epi=0.003  pop=0.118
+   25   24.9293   23.3537   5.2520   24.9257  geo=9.890  ag=0.833  tech=0.000  poleco=12.543  epi=0.003  pop=0.085
+   26   24.9379   23.3538   5.2803   24.9257  geo=9.890  ag=0.833  tech=0.000  poleco=12.551  epi=0.004  pop=0.077
+   27   24.9057   23.3221   5.2787   24.9057  geo=9.890  ag=0.833  tech=0.000  poleco=12.542  epi=0.002  pop=0.054 *
+   28   25.1038   23.4813   5.4086   24.9057  geo=9.890  ag=0.833  tech=0.000  poleco=12.538  epi=0.003  pop=0.217
+   29   24.9829   23.3897   5.3107   24.9057  geo=9.890  ag=0.833  tech=0.000  poleco=12.553  epi=0.003  pop=0.110
+   30   25.1011   23.4992   5.3396   24.9057  geo=9.890  ag=0.833  tech=0.000  poleco=12.565  epi=0.002  pop=0.209
+   31   24.9330   23.3567   5.2544   24.9057  geo=9.890  ag=0.833  tech=0.000  poleco=12.544  epi=0.003  pop=0.087
+   32   24.8924   23.3005   5.3063   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.539  epi=0.006  pop=0.032 *
+   33   24.9224   23.3422   5.2675   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.549  epi=0.008  pop=0.062
+   34   25.1845   23.5437   5.4694   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.538  epi=0.011  pop=0.272
+   35   24.9531   23.3812   5.2395   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.549  epi=0.009  pop=0.100
+   36   25.1054   23.4860   5.3982   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.550  epi=0.007  pop=0.206
+   37   24.9225   23.3536   5.2299   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.572  epi=0.003  pop=0.056
+   38   24.9688   23.3985   5.2344   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.579  epi=0.004  pop=0.092
+   39   25.1014   23.4807   5.4025   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.546  epi=0.005  pop=0.206
+   40   24.9564   23.3853   5.2368   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.575  epi=0.002  pop=0.085
+   41   26.7342   24.8588   6.2513   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.542  epi=0.003  pop=1.591
+   42   24.9410   23.3820   5.1969   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.578  epi=0.003  pop=0.079
+   43   24.9362   23.3744   5.2061   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.565  epi=0.002  pop=0.084
+   44   25.0783   23.4656   5.3757   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.547  epi=0.003  pop=0.192
+   45   25.2647   23.6177   5.4900   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.539  epi=0.008  pop=0.347
+   46   24.9488   23.3834   5.2179   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.560  epi=0.010  pop=0.090
+   47   24.8982   23.3077   5.3016   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.540  epi=0.006  pop=0.039
+   48   25.0087   23.4099   5.3291   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.561  epi=0.008  pop=0.118
+   49   25.1859   23.5468   5.4636   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.540  epi=0.009  pop=0.275
+   50   24.9148   23.3398   5.2498   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.562  epi=0.007  pop=0.048
+   51   25.7026   23.9861   5.7218   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.547  epi=0.008  pop=0.708
+   52   25.1477   23.5295   5.3938   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.554  epi=0.004  pop=0.248
+   53   25.0889   23.4934   5.3184   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.579  epi=0.005  pop=0.186
+   54   24.9106   23.3270   5.2787   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.542  epi=0.003  pop=0.059
+   55   24.9115   23.3337   5.2593   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.546  epi=0.003  pop=0.062
+   56   25.1216   23.4963   5.4176   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.537  epi=0.004  pop=0.232
+   57   24.9187   23.3475   5.2375   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.562  epi=0.004  pop=0.059
+   58   25.0241   23.4074   5.3890   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.540  epi=0.002  pop=0.143
+   59   24.9709   23.3687   5.3409   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.538  epi=0.003  pop=0.104
+   60   24.9167   23.3361   5.2687   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.547  epi=0.007  pop=0.059
+   61   25.0500   23.4690   5.2701   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.573  epi=0.003  pop=0.170
+   62   24.9198   23.3256   5.3142   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.544  epi=0.005  pop=0.054
+   63   24.9037   23.3250   5.2622   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.557  epi=0.003  pop=0.042
+   64   24.9011   23.3157   5.2847   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.539  epi=0.003  pop=0.051
+   65   24.9241   23.3444   5.2656   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.554  epi=0.003  pop=0.064
+   66   24.9258   23.3544   5.2379   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.559  epi=0.005  pop=0.067
+   67   24.9026   23.3092   5.3112   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.530  epi=0.008  pop=0.048
+   68   24.9134   23.3254   5.2932   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.534  epi=0.009  pop=0.060
+   69   24.9200   23.3345   5.2848   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.550  epi=0.004  pop=0.058
+   70   25.0345   23.4461   5.2945   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.575  epi=0.003  pop=0.145
+   71   25.7108   23.9967   5.7136   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.542  epi=0.005  pop=0.728
+   72   24.9297   23.3502   5.2651   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.540  epi=0.006  pop=0.081
+   73   24.8980   23.3085   5.2985   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.540  epi=0.007  pop=0.038
+   74   24.8989   23.3134   5.2849   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.547  epi=0.007  pop=0.036
+   75   25.4659   23.7880   5.5930   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.541  epi=0.004  pop=0.520
+   76   25.1593   23.5480   5.3708   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.570  epi=0.008  pop=0.248
+   77   25.3343   23.6789   5.5181   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.549  epi=0.010  pop=0.397
+   78   24.8938   23.3045   5.2975   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.544  epi=0.007  pop=0.031
+   79   24.9265   23.3233   5.3440   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.537  epi=0.007  pop=0.056
+   80   24.9183   23.3350   5.2773   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.541  epi=0.010  pop=0.061
+   81   24.9594   23.3571   5.3412   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.544  epi=0.007  pop=0.083
+   82   24.9104   23.3151   5.3177   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.532  epi=0.007  pop=0.053
+   83   24.9240   23.3293   5.3157   24.8924  geo=9.890  ag=0.833  tech=0.000  poleco=12.547  epi=0.005  pop=0.054
+   84   24.8825   23.2854   5.3238   24.8825  geo=9.890  ag=0.833  tech=0.000  poleco=12.535  epi=0.004  pop=0.024 *
+   85   24.9000   23.3013   5.3291   24.8825  geo=9.890  ag=0.833  tech=0.000  poleco=12.533  epi=0.003  pop=0.043
+   86   25.4062   23.7450   5.5373   24.8825  geo=9.890  ag=0.833  tech=0.000  poleco=12.557  epi=0.006  pop=0.458
+   87   25.8314   24.0868   5.8154   24.8825  geo=9.890  ag=0.833  tech=0.000  poleco=12.537  epi=0.003  pop=0.824
+   88   24.9058   23.3241   5.2721   24.8825  geo=9.890  ag=0.833  tech=0.000  poleco=12.546  epi=0.003  pop=0.052
+   89   24.9050   23.3211   5.2796   24.8825  geo=9.890  ag=0.833  tech=0.000  poleco=12.551  epi=0.005  pop=0.042
+   90   24.9133   23.3315   5.2726   24.8825  geo=9.890  ag=0.833  tech=0.000  poleco=12.547  epi=0.007  pop=0.055
+   91   24.9240   23.3216   5.3415   24.8825  geo=9.890  ag=0.833  tech=0.000  poleco=12.532  epi=0.008  pop=0.058
+   92   24.9279   23.3571   5.2362   24.8825  geo=9.890  ag=0.833  tech=0.000  poleco=12.556  epi=0.003  pop=0.075
+   93   24.8985   23.3110   5.2919   24.8825  geo=9.890  ag=0.833  tech=0.000  poleco=12.533  epi=0.002  pop=0.052
+   94   24.9031   23.3187   5.2813   24.8825  geo=9.890  ag=0.833  tech=0.000  poleco=12.541  epi=0.003  pop=0.052
+   95   25.0264   23.4154   5.3698   24.8825  geo=9.890  ag=0.833  tech=0.000  poleco=12.539  epi=0.003  pop=0.151
+   96   24.9126   23.3326   5.2669   24.8825  geo=9.890  ag=0.833  tech=0.000  poleco=12.538  epi=0.003  pop=0.069
+   97   24.9081   23.3233   5.2824   24.8825  geo=9.890  ag=0.833  tech=0.000  poleco=12.541  epi=0.005  pop=0.055
+   98   24.9481   23.3717   5.2546   24.8825  geo=9.890  ag=0.833  tech=0.000  poleco=12.563  epi=0.002  pop=0.084
+   99   25.2651   23.6167   5.4947   24.8825  geo=9.890  ag=0.833  tech=0.000  poleco=12.540  epi=0.003  pop=0.350
+  100   25.0910   23.4606   5.4346   24.8825  geo=9.890  ag=0.833  tech=0.000  poleco=12.533  epi=0.008  pop=0.197
+  101   24.8985   23.3099   5.2954   24.8825  geo=9.890  ag=0.833  tech=0.000  poleco=12.541  epi=0.003  pop=0.043
+  102   25.1618   23.5311   5.4356   24.8825  geo=9.890  ag=0.833  tech=0.000  poleco=12.548  epi=0.002  pop=0.258
+  103   24.9666   23.3683   5.3277   24.8825  geo=9.890  ag=0.833  tech=0.000  poleco=12.550  epi=0.005  pop=0.090
+  104   24.8889   23.2938   5.3172   24.8825  geo=9.890  ag=0.833  tech=0.000  poleco=12.534  epi=0.008  pop=0.030
+  105   24.9833   23.3844   5.3295   24.8825  geo=9.890  ag=0.833  tech=0.000  poleco=12.553  epi=0.008  pop=0.101
+  106   24.9211   23.3427   5.2613   24.8825  geo=9.890  ag=0.833  tech=0.000  poleco=12.545  epi=0.005  pop=0.069
+  107   24.9629   23.3729   5.3002   24.8825  geo=9.890  ag=0.833  tech=0.000  poleco=12.541  epi=0.003  pop=0.106
+  108   24.8982   23.3135   5.2822   24.8825  geo=9.890  ag=0.833  tech=0.000  poleco=12.543  epi=0.004  pop=0.044
+  109   25.0295   23.4183   5.3706   24.8825  geo=9.890  ag=0.833  tech=0.000  poleco=12.541  epi=0.004  pop=0.151
+  110   25.0274   23.4294   5.3266   24.8825  geo=9.890  ag=0.833  tech=0.000  poleco=12.546  epi=0.003  pop=0.157
+  111   24.8822   23.2919   5.3011   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.539  epi=0.003  pop=0.027 *
+  112   24.9976   23.3928   5.3492   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.549  epi=0.004  pop=0.117
+  113   24.9277   23.3331   5.3153   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.548  epi=0.003  pop=0.060
+  114   24.9277   23.3269   5.3361   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.533  epi=0.009  pop=0.062
+  115   24.9146   23.3276   5.2899   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.532  epi=0.008  pop=0.064
+  116   25.4227   23.7534   5.5643   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.548  epi=0.003  pop=0.479
+  117   24.8976   23.2997   5.3263   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.535  epi=0.003  pop=0.039
+  118   24.8994   23.3108   5.2952   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.545  epi=0.003  pop=0.040
+  119   24.9304   23.3335   5.3230   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.543  epi=0.004  pop=0.064
+  120   24.9280   23.3515   5.2549   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.548  epi=0.006  pop=0.075
+  121   24.9199   23.3509   5.2301   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.560  epi=0.002  pop=0.066
+  122   25.0002   23.4012   5.3299   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.557  epi=0.005  pop=0.117
+  123   25.7304   24.0163   5.7138   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.550  epi=0.007  pop=0.737
+  124   25.2111   23.5732   5.4599   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.545  epi=0.004  pop=0.301
+  125   24.8984   23.3171   5.2709   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.546  epi=0.003  pop=0.046
+  126   24.9255   23.3292   5.3212   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.540  epi=0.003  pop=0.063
+  127   25.2747   23.6244   5.5010   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.540  epi=0.003  pop=0.358
+  128   24.9051   23.3155   5.2987   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.539  epi=0.010  pop=0.043
+  129   24.9066   23.3291   5.2585   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.560  epi=0.005  pop=0.041
+  130   25.2126   23.5743   5.4608   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.542  epi=0.003  pop=0.307
+  131   24.9136   23.3388   5.2494   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.552  epi=0.004  pop=0.061
+  132   24.9296   23.3674   5.2072   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.566  epi=0.003  pop=0.075
+  133   24.8915   23.3077   5.2795   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.546  epi=0.003  pop=0.035
+  134   24.9130   23.3293   5.2788   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.539  epi=0.005  pop=0.063
+  135   24.9585   23.3665   5.3066   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.552  epi=0.003  pop=0.089
+  136   24.9979   23.3839   5.3798   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.535  epi=0.002  pop=0.124
+  137   24.9076   23.3288   5.2625   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.564  epi=0.003  pop=0.039
+  138   24.9057   23.3207   5.2834   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.537  epi=0.003  pop=0.059
+  139   24.9164   23.3234   5.3102   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.542  epi=0.003  pop=0.055
+  140   25.3816   23.7060   5.5853   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.529  epi=0.009  pop=0.445
+  141   24.8981   23.3094   5.2958   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.538  epi=0.007  pop=0.042
+  142   24.8985   23.3122   5.2878   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.551  epi=0.007  pop=0.031
+  143   25.6399   23.9402   5.6656   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.547  epi=0.012  pop=0.659
+  144   24.9088   23.3237   5.2836   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.550  epi=0.004  pop=0.047
+  145   25.0445   23.4274   5.3903   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.542  epi=0.002  pop=0.160
+  146   24.9073   23.3295   5.2593   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.548  epi=0.004  pop=0.055
+  147   24.9028   23.3232   5.2651   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.553  epi=0.005  pop=0.042
+  148   24.9048   23.3247   5.2668   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.546  epi=0.003  pop=0.053
+  149   24.9015   23.3133   5.2941   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.535  epi=0.003  pop=0.053
+  150   24.9367   23.3769   5.1991   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.572  epi=0.006  pop=0.076
+  151   24.9035   23.3142   5.2975   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.538  epi=0.008  pop=0.045
+  152   24.8996   23.3116   5.2932   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.543  epi=0.008  pop=0.038
+  153   25.0187   23.4020   5.3888   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.537  epi=0.003  pop=0.139
+  154   24.9067   23.3248   5.2729   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.541  epi=0.003  pop=0.058
+  155   24.9273   23.3372   5.3002   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.541  epi=0.003  pop=0.070
+  156   24.9287   23.3504   5.2610   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.565  epi=0.008  pop=0.055
+  157   26.0714   24.3003   5.9036   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.535  epi=0.006  pop=1.036
+  158   24.9071   23.3291   5.2600   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.547  epi=0.003  pop=0.056
+  159   24.9250   23.3590   5.2201   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.568  epi=0.004  pop=0.064
+  160   24.8922   23.2978   5.3146   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.534  epi=0.007  pop=0.034
+  161   24.9248   23.3376   5.2905   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.555  epi=0.006  pop=0.053
+  162   24.9037   23.3015   5.3408   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.533  epi=0.005  pop=0.040
+  163   24.9998   23.3967   5.3436   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.550  epi=0.003  pop=0.120
+  164   25.1244   23.4983   5.4203   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.545  epi=0.007  pop=0.224
+  165   24.9469   23.3490   5.3261   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.546  epi=0.008  pop=0.073
+  166   25.2577   23.6055   5.5074   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.534  epi=0.003  pop=0.345
+  167   24.9032   23.3202   5.2767   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.546  epi=0.005  pop=0.046
+  168   24.9195   23.3145   5.3502   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.528  epi=0.003  pop=0.060
+  169   25.0500   23.4252   5.4160   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.533  epi=0.006  pop=0.163
+  170   24.8960   23.3015   5.3151   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.538  epi=0.008  pop=0.032
+  171   28.1453   25.9795   7.2192   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.539  epi=0.011  pop=2.706
+  172   25.1936   23.5827   5.3698   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.575  epi=0.003  pop=0.282
+  173   25.4670   23.7850   5.6066   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.539  epi=0.011  pop=0.512
+  174   25.6572   23.9576   5.6654   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.555  epi=0.007  pop=0.673
+  175   25.0825   23.4817   5.3361   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.567  epi=0.003  pop=0.188
+  176   24.8967   23.3151   5.2720   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.550  epi=0.003  pop=0.039
+  177   24.9138   23.3342   5.2653   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.549  epi=0.003  pop=0.060
+  178   24.9119   23.3412   5.2354   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.564  epi=0.003  pop=0.051
+  179   24.8965   23.3023   5.3138   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.533  epi=0.006  pop=0.040
+  180   24.9257   23.3277   5.3267   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.537  epi=0.005  pop=0.063
+  181   25.4456   23.7938   5.5060   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.575  epi=0.003  pop=0.493
+  182   24.9097   23.3306   5.2636   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.551  epi=0.006  pop=0.051
+  183   24.9181   23.3200   5.3271   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.533  epi=0.005  pop=0.058
+  184   24.9055   23.3019   5.3452   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.532  epi=0.003  pop=0.044
+  185   26.1671   24.3647   6.0080   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.540  epi=0.006  pop=1.096
+  186   27.1690   25.2136   6.5181   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.539  epi=0.009  pop=1.942
+  187   24.8941   23.3089   5.2839   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.542  epi=0.003  pop=0.041
+  188   24.9117   23.3319   5.2659   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.544  epi=0.004  pop=0.061
+  189   24.9860   23.3797   5.3544   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.541  epi=0.004  pop=0.112
+  190   25.6483   23.9361   5.7072   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.537  epi=0.003  pop=0.673
+  191   25.7034   23.9964   5.6900   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.549  epi=0.003  pop=0.721
+  192   24.9084   23.3308   5.2585   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.552  epi=0.004  pop=0.052
+  193   24.9018   23.3169   5.2827   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.540  epi=0.004  pop=0.050
+  194   24.9188   23.3140   5.3494   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.534  epi=0.005  pop=0.052
+  195   24.9320   23.3333   5.3290   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.536  epi=0.003  pop=0.072
+  196   25.1446   23.5097   5.4495   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.536  epi=0.007  pop=0.244
+  197   24.9404   23.3410   5.3312   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.543  epi=0.004  pop=0.072
+  198   24.9293   23.3311   5.3273   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.532  epi=0.008  pop=0.069
+  199   24.9248   23.3522   5.2420   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.548  epi=0.003  pop=0.078
+  200   25.1164   23.5093   5.3568   24.8822  geo=9.890  ag=0.833  tech=0.000  poleco=12.566  epi=0.003  pop=0.218
+
+Completed 200 trials in 87.0s (0.4s/trial)
+Best total loss: 24.8822  (baseline: 28.2664, improvement: 3.3842)
+
+Saved: /Users/terrace/Labs/Aeolia/aeolia-godot/optimization/results/best_params.json
+Saved: /Users/terrace/Labs/Aeolia/aeolia-godot/optimization/results/loss_breakdown.json
+Saved: /Users/terrace/Labs/Aeolia/aeolia-godot/optimization/results/convergence.json
+Saved: /Users/terrace/Labs/Aeolia/aeolia-godot/optimization/results/convergence_summary.txt
+
+Aeolia History Engine — Optimization Results
+============================================================
+Backend        : Optuna TPE (multivariate, n_startup=20)
+Trials         : 200
+Seeds          : [17, 42, 97, 137, 256]
+Parameters     : 30
+Variance λ     : 0.3
+Total time     : 87.0s  (0.4s/trial)
+
+Baseline (default params):
+  total=28.2664  mean=26.0844  std=7.2734
+  geo=9.8903  ag=0.8326  tech=0.0000  poleco=12.5542  epi=0.0041  pop=2.8032
+
+Best (trial #111):
+  total=24.8822  mean=23.2919  std=5.3011
+  geo=9.8903  ag=0.8326  tech=0.0000  poleco=12.5393  epi=0.0031  pop=0.0265
+  Improvement vs baseline: 3.3842
+
+Per-seed losses (best params):
+  seed=17: total=25.5763  geo=10.0000  ag=0.5046  tech=0.0000  poleco=15.0000  epi=0.0011  pop=0.0706
+  seed=42: total=12.7009  geo=9.4517  ag=0.4903  tech=0.0000  poleco=2.6965  epi=0.0126  pop=0.0498
+  seed=97: total=25.8543  geo=10.0000  ag=0.8471  tech=0.0000  poleco=15.0000  epi=0.0021  pop=0.0051
+  seed=137: total=26.3319  geo=10.0000  ag=1.3279  tech=0.0000  poleco=15.0000  epi=0.0000  pop=0.0039
+  seed=256: total=25.9959  geo=10.0000  ag=0.9928  tech=0.0000  poleco=15.0000  epi=0.0000  pop=0.0032
+
+Convergence (best-so-far):
+  trial   1: best_so_far=32.1504
+  trial   5: best_so_far=24.9257
+  trial  10: best_so_far=24.9257
+  trial  20: best_so_far=24.9257
+  trial  30: best_so_far=24.9057
+  trial  50: best_so_far=24.8924
+  trial  75: best_so_far=24.8924
+  trial 100: best_so_far=24.8825
+  trial 150: best_so_far=24.8822
+  trial 200: best_so_far=24.8822
+
+Best parameter values (vs defaults):
+  antiquity_base_growth                best=  0.006248  default=  0.002000  delta=+0.004248 (+47% of range) <<<
+  antiquity_lattice_pop_mult           best=  1.960616  default=  2.500000  delta=-0.539384 (-22% of range) <<<
+  serial_shock_base_min                best=  0.176581  default=  0.200000  delta=-0.023419 (-9% of range)
+  serial_shock_base_range              best=  0.306499  default=  0.250000  delta=+0.056499 (+19% of range)
+  serial_trade_rate                    best=  0.000966  default=  0.000400  delta=+0.000566 (+63% of range) <<<
+  reach_serial_base_mult               best=  2.294548  default=  1.300000  delta=+0.994548 (+59% of range) <<<
+  reach_serial_log_coeff               best=  0.121475  default=  0.300000  delta=-0.178525 (-36% of range) <<<
+  lattice_serial_base_mult             best=  1.581665  default=  1.900000  delta=-0.318335 (-14% of range)
+  lattice_serial_log_coeff             best=  0.156573  default=  0.120000  delta=+0.036573 (+14% of range)
+  extraction_base                      best=  0.126997  default=  0.150000  delta=-0.023003 (-8% of range)
+  extraction_per_year                  best=  0.000025  default=  0.000100  delta=-0.000075 (-25% of range) <<<
+  garrison_absorb_base                 best=  0.232817  default=  0.150000  delta=+0.082817 (+28% of range) <<<
+  reach_colony_surplus                 best=  0.065000  default=  0.120000  delta=-0.055000 (-27% of range) <<<
+  lattice_garrison_bonus               best=  0.240972  default=  0.150000  delta=+0.090972 (+36% of range) <<<
+  lattice_trib_bonus                   best=  0.067715  default=  0.080000  delta=-0.012285 (-7% of range)
+  reach_ind_tech_mult                  best=  0.207988  default=  0.120000  delta=+0.087988 (+42% of range) <<<
+  reach_ind_pot_mult                   best=  0.081898  default=  0.140000  delta=-0.058102 (-22% of range) <<<
+  reach_ind_log_coeff                  best=  0.071492  default=  0.140000  delta=-0.068508 (-27% of range) <<<
+  reach_ind_tech_growth                best=  1.394849  default=  0.900000  delta=+0.494849 (+35% of range) <<<
+  lattice_ind_tech_mult                best=  0.041995  default=  0.060000  delta=-0.018005 (-14% of range)
+  lattice_ind_pot_mult                 best=  0.385063  default=  0.220000  delta=+0.165063 (+55% of range) <<<
+  lattice_ind_log_coeff                best=  0.176419  default=  0.100000  delta=+0.076419 (+45% of range) <<<
+  lattice_ind_tech_growth              best=  0.523846  default=  0.600000  delta=-0.076154 (-7% of range)
+  tech_floor_reach_ind                 best=  6.924300  default=  7.000000  delta=-0.075700 (-8% of range)
+  tech_floor_lattice_ind               best=  6.525130  default=  6.500000  delta=+0.025130 (+3% of range)
+  reach_nuclear_pop_mult               best=  1.544799  default=  1.400000  delta=+0.144799 (+16% of range)
+  lattice_nuclear_pop_mult             best=  1.407028  default=  1.350000  delta=+0.057028 (+6% of range)
+  nuclear_access_colony                best=  0.516187  default=  0.700000  delta=-0.183813 (-37% of range) <<<
+  nuclear_access_garrison              best=  0.396321  default=  0.500000  delta=-0.103679 (-21% of range) <<<
+  nuclear_access_independent           best=  0.475243  default=  0.300000  delta=+0.175243 (+44% of range) <<<
+
+STRUCTURAL DIAGNOSIS
+------------------------------------------------------------
+Seeds 17, 97, 137, 256: geo=10.0 (capped), poleco=15.0 (capped).
+Only seed=42 produces uncapped losses.
+Root cause: generate_test_world() synthetic worlds have contact
+  fractions and era distributions outside the lore target window
+  regardless of history-engine parameters. geo/poleco losses are
+  determined by world topology (plateau graph), not sim params.
+Implication: these params are optimised primarily against seed=42.
+  To optimise robustly, use Godot-exported worlds (run_headless.gd)
+  where the full gyre/substrate model produces valid starting state.
+  See README.md 'Third path: offline JSON worlds + thin_sim.py'.
+
+GDScript constants (changed params, |Δ| > 5% of range):
+  var antiquity_base_growth := 0.006248
+  var antiquity_lattice_pop_mult := 1.960616
+  var serial_shock_base_min := 0.176581
+  var serial_shock_base_range := 0.306499
+  var serial_trade_rate := 0.000966
+  var reach_serial_base_mult := 2.294548
+  var reach_serial_log_coeff := 0.121475
+  var lattice_serial_base_mult := 1.581665
+  var lattice_serial_log_coeff := 0.156573
+  var extraction_base := 0.126997
+  var extraction_per_year := 0.000025
+  var garrison_absorb_base := 0.232817
+  var reach_colony_surplus := 0.065000
+  var lattice_garrison_bonus := 0.240972
+  var lattice_trib_bonus := 0.067715
+  var reach_ind_tech_mult := 0.207988
+  var reach_ind_pot_mult := 0.081898
+  var reach_ind_log_coeff := 0.071492
+  var reach_ind_tech_growth := 1.394849
+  var lattice_ind_tech_mult := 0.041995
+  var lattice_ind_pot_mult := 0.385063
+  var lattice_ind_log_coeff := 0.176419
+  var lattice_ind_tech_growth := 0.523846
+  var tech_floor_reach_ind := 6.924300
+  var reach_nuclear_pop_mult := 1.544799
+  var lattice_nuclear_pop_mult := 1.407028
+  var nuclear_access_colony := 0.516187
+  var nuclear_access_garrison := 0.396321
+  var nuclear_access_independent := 0.475243
+

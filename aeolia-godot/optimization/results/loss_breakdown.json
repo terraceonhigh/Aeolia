@@ -1,13 +1,13 @@
 {
   "17": {
-    "total": 25.599108,
+    "total": 25.576283,
     "components": {
       "geo": 10.0,
       "ag": 0.504613,
       "tech": 0.0,
       "poleco": 15.0,
-      "epi": 0.0,
-      "pop": 0.094495
+      "epi": 0.001092,
+      "pop": 0.070579
     },
     "details": {
       "geo": {
@@ -43,29 +43,29 @@
         },
         "l_df": 144.0,
         "l_era": 0.571372,
-        "l_sov": 2.098839,
+        "l_sov": 1.375084,
         "l_trade": 0.049031
       },
       "epi": {
-        "mortality_cv": 0.324933
+        "mortality_cv": 0.266957
       },
       "pop": {
-        "lattice_reach_ratio": 0.624426,
-        "pop_gini": 0.809415,
-        "mean_colony_sov": 0.631763,
-        "lattice_vs_median": 97.142857
+        "lattice_reach_ratio": 0.682195,
+        "pop_gini": 0.794062,
+        "mean_colony_sov": 0.551701,
+        "lattice_vs_median": 94.142857
       }
     }
   },
   "42": {
-    "total": 12.865428,
+    "total": 12.700925,
     "components": {
       "geo": 9.451707,
       "ag": 0.490348,
       "tech": 0.0,
-      "poleco": 2.825744,
-      "epi": 0.013972,
-      "pop": 0.083657
+      "poleco": 2.696528,
+      "epi": 0.012554,
+      "pop": 0.049788
     },
     "details": {
       "geo": {
@@ -101,29 +101,29 @@
         },
         "l_df": 4.0,
         "l_era": 0.414796,
-        "l_sov": 1.423202,
+        "l_sov": 1.078626,
         "l_trade": 0.038135
       },
       "epi": {
-        "mortality_cv": 0.181798
+        "mortality_cv": 0.187956
       },
       "pop": {
-        "lattice_reach_ratio": 0.640971,
-        "pop_gini": 0.775794,
-        "mean_colony_sov": 0.590475,
-        "lattice_vs_median": 33.722222
+        "lattice_reach_ratio": 0.761232,
+        "pop_gini": 0.757628,
+        "mean_colony_sov": 0.5407,
+        "lattice_vs_median": 31.210526
       }
     }
   },
   "97": {
-    "total": 25.859459,
+    "total": 25.854253,
     "components": {
       "geo": 10.0,
       "ag": 0.847102,
       "tech": 0.0,
       "poleco": 15.0,
-      "epi": 0.0,
-      "pop": 0.012358
+      "epi": 0.002057,
+      "pop": 0.005094
     },
     "details": {
       "geo": {
@@ -159,29 +159,29 @@
         },
         "l_df": 144.0,
         "l_era": 0.571372,
-        "l_sov": 2.060894,
+        "l_sov": 1.369943,
         "l_trade": 0.049031
       },
       "epi": {
-        "mortality_cv": 0.330984
+        "mortality_cv": 0.254643
       },
       "pop": {
-        "lattice_reach_ratio": 2.093535,
-        "pop_gini": 0.829787,
-        "mean_colony_sov": 0.627643,
-        "lattice_vs_median": 126.833333
+        "lattice_reach_ratio": 2.154639,
+        "pop_gini": 0.823152,
+        "mean_colony_sov": 0.551038,
+        "lattice_vs_median": 121.916667
       }
     }
   },
   "137": {
-    "total": 26.332755,
+    "total": 26.331866,
     "components": {
       "geo": 10.0,
       "ag": 1.327921,
       "tech": 0.0,
       "poleco": 15.0,
       "epi": 0.0,
-      "pop": 0.004834
+      "pop": 0.003945
     },
     "details": {
       "geo": {
@@ -224,22 +224,22 @@
         "note": "no epi_log and insufficient state data; epi component skipped"
       },
       "pop": {
-        "lattice_reach_ratio": 2.257812,
-        "pop_gini": 0.826466,
+        "lattice_reach_ratio": 1.985989,
+        "pop_gini": 0.825616,
         "mean_colony_sov": null,
-        "lattice_vs_median": 144.5
+        "lattice_vs_median": 141.75
       }
     }
   },
   "256": {
-    "total": 26.032033,
+    "total": 25.995922,
     "components": {
       "geo": 10.0,
       "ag": 0.992751,
       "tech": 0.0,
       "poleco": 15.0,
       "epi": 0.0,
-      "pop": 0.039281
+      "pop": 0.003171
     },
     "details": {
       "geo": {
@@ -282,10 +282,10 @@
         "note": "no epi_log and insufficient state data; epi component skipped"
       },
       "pop": {
-        "lattice_reach_ratio": 2.579741,
-        "pop_gini": 0.813672,
+        "lattice_reach_ratio": 2.225243,
+        "pop_gini": 0.809757,
         "mean_colony_sov": null,
-        "lattice_vs_median": 133.0
+        "lattice_vs_median": 114.6
       }
     }
   }

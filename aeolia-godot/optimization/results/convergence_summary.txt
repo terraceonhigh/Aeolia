@@ -1,55 +1,112 @@
 Aeolia History Engine — Optimization Results
 ============================================================
-Trials         : 50  (40 random LHS + 10 exploit)
+Backend        : Optuna TPE (multivariate, n_startup=20)
+Trials         : 200
 Seeds          : [17, 42, 97, 137, 256]
 Parameters     : 30
 Variance λ     : 0.3
-Total time     : 17.9s
+Total time     : 87.0s  (0.4s/trial)
 
 Baseline (default params):
   total=28.2664  mean=26.0844  std=7.2734
   geo=9.8903  ag=0.8326  tech=0.0000  poleco=12.5542  epi=0.0041  pop=2.8032
 
-Best (trial #50):
-  total=24.9102  mean=23.3378  std=5.2416
-  geo=9.8903  ag=0.8326  tech=0.0000  poleco=12.5651  epi=0.0028  pop=0.0469
-  Improvement vs baseline: 3.3562
+Best (trial #111):
+  total=24.8822  mean=23.2919  std=5.3011
+  geo=9.8903  ag=0.8326  tech=0.0000  poleco=12.5393  epi=0.0031  pop=0.0265
+  Improvement vs baseline: 3.3842
 
 Per-seed losses (best params):
-  seed=17: total=25.5991  geo=10.0000  ag=0.5046  tech=0.0000  poleco=15.0000  epi=0.0000  pop=0.0945
-  seed=42: total=12.8654  geo=9.4517  ag=0.4903  tech=0.0000  poleco=2.8257  epi=0.0140  pop=0.0837
-  seed=97: total=25.8595  geo=10.0000  ag=0.8471  tech=0.0000  poleco=15.0000  epi=0.0000  pop=0.0124
-  seed=137: total=26.3328  geo=10.0000  ag=1.3279  tech=0.0000  poleco=15.0000  epi=0.0000  pop=0.0048
-  seed=256: total=26.0320  geo=10.0000  ag=0.9928  tech=0.0000  poleco=15.0000  epi=0.0000  pop=0.0393
+  seed=17: total=25.5763  geo=10.0000  ag=0.5046  tech=0.0000  poleco=15.0000  epi=0.0011  pop=0.0706
+  seed=42: total=12.7009  geo=9.4517  ag=0.4903  tech=0.0000  poleco=2.6965  epi=0.0126  pop=0.0498
+  seed=97: total=25.8543  geo=10.0000  ag=0.8471  tech=0.0000  poleco=15.0000  epi=0.0021  pop=0.0051
+  seed=137: total=26.3319  geo=10.0000  ag=1.3279  tech=0.0000  poleco=15.0000  epi=0.0000  pop=0.0039
+  seed=256: total=25.9959  geo=10.0000  ag=0.9928  tech=0.0000  poleco=15.0000  epi=0.0000  pop=0.0032
+
+Convergence (best-so-far):
+  trial   1: best_so_far=32.1504
+  trial   5: best_so_far=24.9257
+  trial  10: best_so_far=24.9257
+  trial  20: best_so_far=24.9257
+  trial  30: best_so_far=24.9057
+  trial  50: best_so_far=24.8924
+  trial  75: best_so_far=24.8924
+  trial 100: best_so_far=24.8825
+  trial 150: best_so_far=24.8822
+  trial 200: best_so_far=24.8822
 
 Best parameter values (vs defaults):
-  antiquity_base_growth                best=  0.003354  default=  0.002000  delta=+0.001354 (+67.7%) <<<
-  antiquity_lattice_pop_mult           best=  1.603923  default=  2.500000  delta=-0.896077 (-35.8%) <<<
-  serial_shock_base_min                best=  0.337920  default=  0.200000  delta=+0.137920 (+69.0%) <<<
-  serial_shock_base_range              best=  0.223976  default=  0.250000  delta=-0.026024 (-10.4%)
-  serial_trade_rate                    best=  0.000989  default=  0.000400  delta=+0.000589 (+147.3%) <<<
-  reach_serial_base_mult               best=  2.173644  default=  1.300000  delta=+0.873644 (+67.2%) <<<
-  reach_serial_log_coeff               best=  0.124289  default=  0.300000  delta=-0.175711 (-58.6%) <<<
-  lattice_serial_base_mult             best=  1.939434  default=  1.900000  delta=+0.039434 (+2.1%)
-  lattice_serial_log_coeff             best=  0.113583  default=  0.120000  delta=-0.006417 (-5.3%)
-  extraction_base                      best=  0.157468  default=  0.150000  delta=+0.007468 (+5.0%)
-  extraction_per_year                  best=  0.000155  default=  0.000100  delta=+0.000055 (+54.7%) <<<
-  garrison_absorb_base                 best=  0.277605  default=  0.150000  delta=+0.127605 (+85.1%) <<<
-  reach_colony_surplus                 best=  0.129703  default=  0.120000  delta=+0.009703 (+8.1%)
-  lattice_garrison_bonus               best=  0.065501  default=  0.150000  delta=-0.084499 (-56.3%) <<<
-  lattice_trib_bonus                   best=  0.075022  default=  0.080000  delta=-0.004978 (-6.2%)
-  reach_ind_tech_mult                  best=  0.126198  default=  0.120000  delta=+0.006198 (+5.2%)
-  reach_ind_pot_mult                   best=  0.041671  default=  0.140000  delta=-0.098329 (-70.2%) <<<
-  reach_ind_log_coeff                  best=  0.060163  default=  0.140000  delta=-0.079837 (-57.0%) <<<
-  reach_ind_tech_growth                best=  1.403895  default=  0.900000  delta=+0.503895 (+56.0%) <<<
-  lattice_ind_tech_mult                best=  0.089376  default=  0.060000  delta=+0.029376 (+49.0%) <<<
-  lattice_ind_pot_mult                 best=  0.160871  default=  0.220000  delta=-0.059129 (-26.9%) <<<
-  lattice_ind_log_coeff                best=  0.142713  default=  0.100000  delta=+0.042713 (+42.7%) <<<
-  lattice_ind_tech_growth              best=  0.827983  default=  0.600000  delta=+0.227983 (+38.0%) <<<
-  tech_floor_reach_ind                 best=  6.695246  default=  7.000000  delta=-0.304754 (-4.4%)
-  tech_floor_lattice_ind               best=  6.438379  default=  6.500000  delta=-0.061621 (-0.9%)
-  reach_nuclear_pop_mult               best=  1.888490  default=  1.400000  delta=+0.488490 (+34.9%) <<<
-  lattice_nuclear_pop_mult             best=  1.428754  default=  1.350000  delta=+0.078754 (+5.8%)
-  nuclear_access_colony                best=  0.616490  default=  0.700000  delta=-0.083510 (-11.9%)
-  nuclear_access_garrison              best=  0.750000  default=  0.500000  delta=+0.250000 (+50.0%) <<<
-  nuclear_access_independent           best=  0.339460  default=  0.300000  delta=+0.039460 (+13.2%)
+  antiquity_base_growth                best=  0.006248  default=  0.002000  delta=+0.004248 (+47% of range) <<<
+  antiquity_lattice_pop_mult           best=  1.960616  default=  2.500000  delta=-0.539384 (-22% of range) <<<
+  serial_shock_base_min                best=  0.176581  default=  0.200000  delta=-0.023419 (-9% of range)
+  serial_shock_base_range              best=  0.306499  default=  0.250000  delta=+0.056499 (+19% of range)
+  serial_trade_rate                    best=  0.000966  default=  0.000400  delta=+0.000566 (+63% of range) <<<
+  reach_serial_base_mult               best=  2.294548  default=  1.300000  delta=+0.994548 (+59% of range) <<<
+  reach_serial_log_coeff               best=  0.121475  default=  0.300000  delta=-0.178525 (-36% of range) <<<
+  lattice_serial_base_mult             best=  1.581665  default=  1.900000  delta=-0.318335 (-14% of range)
+  lattice_serial_log_coeff             best=  0.156573  default=  0.120000  delta=+0.036573 (+14% of range)
+  extraction_base                      best=  0.126997  default=  0.150000  delta=-0.023003 (-8% of range)
+  extraction_per_year                  best=  0.000025  default=  0.000100  delta=-0.000075 (-25% of range) <<<
+  garrison_absorb_base                 best=  0.232817  default=  0.150000  delta=+0.082817 (+28% of range) <<<
+  reach_colony_surplus                 best=  0.065000  default=  0.120000  delta=-0.055000 (-27% of range) <<<
+  lattice_garrison_bonus               best=  0.240972  default=  0.150000  delta=+0.090972 (+36% of range) <<<
+  lattice_trib_bonus                   best=  0.067715  default=  0.080000  delta=-0.012285 (-7% of range)
+  reach_ind_tech_mult                  best=  0.207988  default=  0.120000  delta=+0.087988 (+42% of range) <<<
+  reach_ind_pot_mult                   best=  0.081898  default=  0.140000  delta=-0.058102 (-22% of range) <<<
+  reach_ind_log_coeff                  best=  0.071492  default=  0.140000  delta=-0.068508 (-27% of range) <<<
+  reach_ind_tech_growth                best=  1.394849  default=  0.900000  delta=+0.494849 (+35% of range) <<<
+  lattice_ind_tech_mult                best=  0.041995  default=  0.060000  delta=-0.018005 (-14% of range)
+  lattice_ind_pot_mult                 best=  0.385063  default=  0.220000  delta=+0.165063 (+55% of range) <<<
+  lattice_ind_log_coeff                best=  0.176419  default=  0.100000  delta=+0.076419 (+45% of range) <<<
+  lattice_ind_tech_growth              best=  0.523846  default=  0.600000  delta=-0.076154 (-7% of range)
+  tech_floor_reach_ind                 best=  6.924300  default=  7.000000  delta=-0.075700 (-8% of range)
+  tech_floor_lattice_ind               best=  6.525130  default=  6.500000  delta=+0.025130 (+3% of range)
+  reach_nuclear_pop_mult               best=  1.544799  default=  1.400000  delta=+0.144799 (+16% of range)
+  lattice_nuclear_pop_mult             best=  1.407028  default=  1.350000  delta=+0.057028 (+6% of range)
+  nuclear_access_colony                best=  0.516187  default=  0.700000  delta=-0.183813 (-37% of range) <<<
+  nuclear_access_garrison              best=  0.396321  default=  0.500000  delta=-0.103679 (-21% of range) <<<
+  nuclear_access_independent           best=  0.475243  default=  0.300000  delta=+0.175243 (+44% of range) <<<
+
+STRUCTURAL DIAGNOSIS
+------------------------------------------------------------
+Seeds 17, 97, 137, 256: geo=10.0 (capped), poleco=15.0 (capped).
+Only seed=42 produces uncapped losses.
+Root cause: generate_test_world() synthetic worlds have contact
+  fractions and era distributions outside the lore target window
+  regardless of history-engine parameters. geo/poleco losses are
+  determined by world topology (plateau graph), not sim params.
+Implication: these params are optimised primarily against seed=42.
+  To optimise robustly, use Godot-exported worlds (run_headless.gd)
+  where the full gyre/substrate model produces valid starting state.
+  See README.md 'Third path: offline JSON worlds + thin_sim.py'.
+
+GDScript constants (changed params, |Δ| > 5% of range):
+  var antiquity_base_growth := 0.006248
+  var antiquity_lattice_pop_mult := 1.960616
+  var serial_shock_base_min := 0.176581
+  var serial_shock_base_range := 0.306499
+  var serial_trade_rate := 0.000966
+  var reach_serial_base_mult := 2.294548
+  var reach_serial_log_coeff := 0.121475
+  var lattice_serial_base_mult := 1.581665
+  var lattice_serial_log_coeff := 0.156573
+  var extraction_base := 0.126997
+  var extraction_per_year := 0.000025
+  var garrison_absorb_base := 0.232817
+  var reach_colony_surplus := 0.065000
+  var lattice_garrison_bonus := 0.240972
+  var lattice_trib_bonus := 0.067715
+  var reach_ind_tech_mult := 0.207988
+  var reach_ind_pot_mult := 0.081898
+  var reach_ind_log_coeff := 0.071492
+  var reach_ind_tech_growth := 1.394849
+  var lattice_ind_tech_mult := 0.041995
+  var lattice_ind_pot_mult := 0.385063
+  var lattice_ind_log_coeff := 0.176419
+  var lattice_ind_tech_growth := 0.523846
+  var tech_floor_reach_ind := 6.924300
+  var reach_nuclear_pop_mult := 1.544799
+  var lattice_nuclear_pop_mult := 1.407028
+  var nuclear_access_colony := 0.516187
+  var nuclear_access_garrison := 0.396321
+  var nuclear_access_independent := 0.475243

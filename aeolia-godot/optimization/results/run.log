@@ -1,0 +1,136 @@
+Aeolia History Engine Optimizer
+  Trials       : 50
+  Seeds        : [17, 42, 97, 137, 256]
+  Params       : 30
+  Variance λ   : 0.3
+  Results dir  : /Users/terrace/Labs/Aeolia/aeolia-godot/optimization/results
+
+Generating worlds...
+  seed=17: 42 archs, 144 edges
+  seed=42: 42 archs, 141 edges
+  seed=97: 42 archs, 143 edges
+  seed=137: 42 archs, 141 edges
+  seed=256: 42 archs, 141 edges
+
+Evaluating default params (baseline)...
+  Baseline total=28.2664  mean=26.0844  std=7.2734
+  Components: {'geo': 9.89034, 'ag': 0.83255, 'tech': 0.0, 'poleco': 12.55421, 'epi': 0.0041, 'pop': 2.80319}
+
+Generating 40 Latin Hypercube candidates...
+Trial     Total      Mean      Std      Best  Components
+------------------------------------------------------------------------------------------
+    1   29.6153   27.2069   8.0279   29.6153  geo=9.890  ag=0.833  tech=0.000  poleco=12.591  epi=0.003  pop=3.890 *
+    2   29.9604   27.4160   8.4813   29.6153  geo=9.890  ag=0.833  tech=0.000  poleco=12.582  epi=0.004  pop=4.107
+    3   25.3857   23.7521   5.4454   25.3857  geo=9.890  ag=0.833  tech=0.000  poleco=12.576  epi=0.004  pop=0.449 *
+    4   32.0901   29.3445   9.1519   25.3857  geo=9.890  ag=0.833  tech=0.000  poleco=12.559  epi=0.005  pop=6.058
+    5   30.8565   28.2493   8.6907   25.3857  geo=9.890  ag=0.833  tech=0.000  poleco=12.566  epi=0.008  pop=4.953
+    6   28.0509   25.9247   7.0873   25.3857  geo=9.890  ag=0.833  tech=0.000  poleco=12.583  epi=0.007  pop=2.612
+    7   29.2602   26.8378   8.0745   25.3857  geo=9.890  ag=0.833  tech=0.000  poleco=12.570  epi=0.003  pop=3.542
+    8   29.0593   26.6851   7.9142   25.3857  geo=9.890  ag=0.833  tech=0.000  poleco=12.581  epi=0.003  pop=3.378
+    9   26.0662   24.2920   5.9137   25.3857  geo=9.890  ag=0.833  tech=0.000  poleco=12.556  epi=0.006  pop=1.007
+   10   25.0291   23.4399   5.2972   25.0291  geo=9.890  ag=0.833  tech=0.000  poleco=12.556  epi=0.003  pop=0.158 *
+   11   30.2414   27.6568   8.6153   25.0291  geo=9.890  ag=0.833  tech=0.000  poleco=12.560  epi=0.003  pop=4.371
+   12   26.4861   24.6639   6.0739   25.0291  geo=9.890  ag=0.833  tech=0.000  poleco=12.594  epi=0.003  pop=1.343
+   13   32.0916   29.3416   9.1668   25.0291  geo=9.890  ag=0.833  tech=0.000  poleco=12.546  epi=0.004  pop=6.068
+   14   25.2007   23.5845   5.3875   25.0291  geo=9.890  ag=0.833  tech=0.000  poleco=12.559  epi=0.005  pop=0.297
+   15   24.9632   23.3815   5.2724   24.9632  geo=9.890  ag=0.833  tech=0.000  poleco=12.569  epi=0.003  pop=0.086 *
+   16   31.1031   28.4632   8.7995   24.9632  geo=9.890  ag=0.833  tech=0.000  poleco=12.548  epi=0.007  pop=5.185
+   17   26.2749   24.4913   5.9453   24.9632  geo=9.890  ag=0.833  tech=0.000  poleco=12.592  epi=0.002  pop=1.174
+   18   27.9326   25.8559   6.9223   24.9632  geo=9.890  ag=0.833  tech=0.000  poleco=12.601  epi=0.006  pop=2.526
+   19   32.0760   29.3239   9.1736   24.9632  geo=9.890  ag=0.833  tech=0.000  poleco=12.572  epi=0.003  pop=6.026
+   20   29.5041   27.0413   8.2093   24.9632  geo=9.890  ag=0.833  tech=0.000  poleco=12.597  epi=0.002  pop=3.720
+   21   30.4280   27.8396   8.6280   24.9632  geo=9.890  ag=0.833  tech=0.000  poleco=12.549  epi=0.003  pop=4.565
+   22   27.3581   25.3557   6.6747   24.9632  geo=9.890  ag=0.833  tech=0.000  poleco=12.583  epi=0.003  pop=2.046
+   23   31.8307   29.0987   9.1067   24.9632  geo=9.890  ag=0.833  tech=0.000  poleco=12.552  epi=0.006  pop=5.818
+   24   25.5063   23.8553   5.5034   24.9632  geo=9.890  ag=0.833  tech=0.000  poleco=12.578  epi=0.008  pop=0.547
+   25   28.3952   26.1666   7.4288   24.9632  geo=9.890  ag=0.833  tech=0.000  poleco=12.576  epi=0.006  pop=2.861
+   26   30.9679   28.3382   8.7656   24.9632  geo=9.890  ag=0.833  tech=0.000  poleco=12.541  epi=0.004  pop=5.071
+   27   32.2129   29.5434   8.8984   24.9632  geo=9.890  ag=0.833  tech=0.000  poleco=12.557  epi=0.002  pop=6.262
+   28   30.3281   27.7412   8.6228   24.9632  geo=9.890  ag=0.833  tech=0.000  poleco=12.557  epi=0.003  pop=4.458
+   29   30.0904   27.5219   8.5618   24.9632  geo=9.890  ag=0.833  tech=0.000  poleco=12.592  epi=0.003  pop=4.204
+   30   26.7526   24.8616   6.3033   24.9632  geo=9.890  ag=0.833  tech=0.000  poleco=12.567  epi=0.003  pop=1.569
+   31   26.6376   24.7490   6.2953   24.9632  geo=9.890  ag=0.833  tech=0.000  poleco=12.548  epi=0.008  pop=1.470
+   32   30.6183   28.0369   8.6046   24.9632  geo=9.890  ag=0.833  tech=0.000  poleco=12.583  epi=0.012  pop=4.720
+   33   32.1703   29.4693   9.0032   24.9632  geo=9.890  ag=0.833  tech=0.000  poleco=12.572  epi=0.004  pop=6.170
+   34   26.5836   24.7173   6.2209   24.9632  geo=9.890  ag=0.833  tech=0.000  poleco=12.562  epi=0.006  pop=1.426
+   35   25.7063   23.9980   5.6946   24.9632  geo=9.890  ag=0.833  tech=0.000  poleco=12.553  epi=0.004  pop=0.718
+   36   31.2139   28.5718   8.8070   24.9632  geo=9.890  ag=0.833  tech=0.000  poleco=12.559  epi=0.003  pop=5.286
+   37   25.5452   23.8704   5.5826   24.9632  geo=9.890  ag=0.833  tech=0.000  poleco=12.558  epi=0.001  pop=0.589
+   38   32.0733   29.3200   9.1774   24.9632  geo=9.890  ag=0.833  tech=0.000  poleco=12.563  epi=0.003  pop=6.030
+   39   31.3323   28.6938   8.7950   24.9632  geo=9.890  ag=0.833  tech=0.000  poleco=12.589  epi=0.009  pop=5.373
+   40   25.2899   23.6540   5.4528   24.9632  geo=9.890  ag=0.833  tech=0.000  poleco=12.556  epi=0.003  pop=0.372
+   41   24.9493   23.3767   5.2419   24.9493  geo=9.890  ag=0.833  tech=0.000  poleco=12.574  epi=0.003  pop=0.077 *
+   42   25.0059   23.4270   5.2629   24.9493  geo=9.890  ag=0.833  tech=0.000  poleco=12.574  epi=0.003  pop=0.127
+   43   25.2279   23.6074   5.4015   24.9493  geo=9.890  ag=0.833  tech=0.000  poleco=12.573  epi=0.003  pop=0.309
+   44   25.0125   23.4321   5.2680   24.9493  geo=9.890  ag=0.833  tech=0.000  poleco=12.577  epi=0.003  pop=0.129
+   45   24.9177   23.3421   5.2521   24.9177  geo=9.890  ag=0.833  tech=0.000  poleco=12.564  epi=0.003  pop=0.052 *
+   46   24.9260   23.3443   5.2722   24.9177  geo=9.890  ag=0.833  tech=0.000  poleco=12.558  epi=0.003  pop=0.060
+   47   24.9421   23.3645   5.2586   24.9177  geo=9.890  ag=0.833  tech=0.000  poleco=12.568  epi=0.003  pop=0.070
+   48   24.9640   23.3778   5.2873   24.9177  geo=9.890  ag=0.833  tech=0.000  poleco=12.562  epi=0.003  pop=0.090
+   49   24.9883   23.3998   5.2949   24.9177  geo=9.890  ag=0.833  tech=0.000  poleco=12.565  epi=0.003  pop=0.109
+   50   24.9102   23.3378   5.2416   24.9102  geo=9.890  ag=0.833  tech=0.000  poleco=12.565  epi=0.003  pop=0.047 *
+
+Completed 50 trials in 4.3s (0.1s/trial)
+Best total loss: 24.9102  (baseline: 28.2664, improvement: 3.3562)
+
+Saved: /Users/terrace/Labs/Aeolia/aeolia-godot/optimization/results/best_params.json
+Saved: /Users/terrace/Labs/Aeolia/aeolia-godot/optimization/results/loss_breakdown.json
+Saved: /Users/terrace/Labs/Aeolia/aeolia-godot/optimization/results/convergence.json
+Saved: /Users/terrace/Labs/Aeolia/aeolia-godot/optimization/results/convergence_summary.txt
+
+Aeolia History Engine — Optimization Results
+============================================================
+Trials         : 50  (40 random LHS + 10 exploit)
+Seeds          : [17, 42, 97, 137, 256]
+Parameters     : 30
+Variance λ     : 0.3
+Total time     : 4.3s
+
+Baseline (default params):
+  total=28.2664  mean=26.0844  std=7.2734
+  geo=9.8903  ag=0.8326  tech=0.0000  poleco=12.5542  epi=0.0041  pop=2.8032
+
+Best (trial #50):
+  total=24.9102  mean=23.3378  std=5.2416
+  geo=9.8903  ag=0.8326  tech=0.0000  poleco=12.5651  epi=0.0028  pop=0.0469
+  Improvement vs baseline: 3.3562
+
+Per-seed losses (best params):
+  seed=17: total=25.5991  geo=10.0000  ag=0.5046  tech=0.0000  poleco=15.0000  epi=0.0000  pop=0.0945
+  seed=42: total=12.8654  geo=9.4517  ag=0.4903  tech=0.0000  poleco=2.8257  epi=0.0140  pop=0.0837
+  seed=97: total=25.8595  geo=10.0000  ag=0.8471  tech=0.0000  poleco=15.0000  epi=0.0000  pop=0.0124
+  seed=137: total=26.3328  geo=10.0000  ag=1.3279  tech=0.0000  poleco=15.0000  epi=0.0000  pop=0.0048
+  seed=256: total=26.0320  geo=10.0000  ag=0.9928  tech=0.0000  poleco=15.0000  epi=0.0000  pop=0.0393
+
+Best parameter values (vs defaults):
+  antiquity_base_growth                best=  0.003354  default=  0.002000  delta=+0.001354 (+67.7%) <<<
+  antiquity_lattice_pop_mult           best=  1.603923  default=  2.500000  delta=-0.896077 (-35.8%) <<<
+  serial_shock_base_min                best=  0.337920  default=  0.200000  delta=+0.137920 (+69.0%) <<<
+  serial_shock_base_range              best=  0.223976  default=  0.250000  delta=-0.026024 (-10.4%)
+  serial_trade_rate                    best=  0.000989  default=  0.000400  delta=+0.000589 (+147.3%) <<<
+  reach_serial_base_mult               best=  2.173644  default=  1.300000  delta=+0.873644 (+67.2%) <<<
+  reach_serial_log_coeff               best=  0.124289  default=  0.300000  delta=-0.175711 (-58.6%) <<<
+  lattice_serial_base_mult             best=  1.939434  default=  1.900000  delta=+0.039434 (+2.1%)
+  lattice_serial_log_coeff             best=  0.113583  default=  0.120000  delta=-0.006417 (-5.3%)
+  extraction_base                      best=  0.157468  default=  0.150000  delta=+0.007468 (+5.0%)
+  extraction_per_year                  best=  0.000155  default=  0.000100  delta=+0.000055 (+54.7%) <<<
+  garrison_absorb_base                 best=  0.277605  default=  0.150000  delta=+0.127605 (+85.1%) <<<
+  reach_colony_surplus                 best=  0.129703  default=  0.120000  delta=+0.009703 (+8.1%)
+  lattice_garrison_bonus               best=  0.065501  default=  0.150000  delta=-0.084499 (-56.3%) <<<
+  lattice_trib_bonus                   best=  0.075022  default=  0.080000  delta=-0.004978 (-6.2%)
+  reach_ind_tech_mult                  best=  0.126198  default=  0.120000  delta=+0.006198 (+5.2%)
+  reach_ind_pot_mult                   best=  0.041671  default=  0.140000  delta=-0.098329 (-70.2%) <<<
+  reach_ind_log_coeff                  best=  0.060163  default=  0.140000  delta=-0.079837 (-57.0%) <<<
+  reach_ind_tech_growth                best=  1.403895  default=  0.900000  delta=+0.503895 (+56.0%) <<<
+  lattice_ind_tech_mult                best=  0.089376  default=  0.060000  delta=+0.029376 (+49.0%) <<<
+  lattice_ind_pot_mult                 best=  0.160871  default=  0.220000  delta=-0.059129 (-26.9%) <<<
+  lattice_ind_log_coeff                best=  0.142713  default=  0.100000  delta=+0.042713 (+42.7%) <<<
+  lattice_ind_tech_growth              best=  0.827983  default=  0.600000  delta=+0.227983 (+38.0%) <<<
+  tech_floor_reach_ind                 best=  6.695246  default=  7.000000  delta=-0.304754 (-4.4%)
+  tech_floor_lattice_ind               best=  6.438379  default=  6.500000  delta=-0.061621 (-0.9%)
+  reach_nuclear_pop_mult               best=  1.888490  default=  1.400000  delta=+0.488490 (+34.9%) <<<
+  lattice_nuclear_pop_mult             best=  1.428754  default=  1.350000  delta=+0.078754 (+5.8%)
+  nuclear_access_colony                best=  0.616490  default=  0.700000  delta=-0.083510 (-11.9%)
+  nuclear_access_garrison              best=  0.750000  default=  0.500000  delta=+0.250000 (+50.0%) <<<
+  nuclear_access_independent           best=  0.339460  default=  0.300000  delta=+0.039460 (+13.2%)
+
