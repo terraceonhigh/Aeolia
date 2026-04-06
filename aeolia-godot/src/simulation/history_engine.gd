@@ -56,6 +56,16 @@ static func assign_politics(archs: Array, plateau_edges: Array, p_seed: int, rea
 		var pot = (p / 20.0 * 0.4 + avg_h * 0.3 + sz / 2.2 * 0.3) * (0.6 + rng.next_float() * 0.4)
 		potential.append(pot)
 
+	# ── Substrate computation ──
+	# computeSubstrate is already ported to substrate.gd; call it here so
+	# downstream phases can use crop zones, trade goods, and political culture.
+	var substrate := Substrate.compute_substrate(archs, plateau_edges, p_seed)
+	# Contactor crop comes from the actual substrate of the hegemon arch, not a
+	# hardcoded assumption.  Different seeds place hegemons at different latitudes,
+	# so their primary crop genuinely varies.
+	var reach_crop: String = substrate[reach_arch]["crops"]["primary_crop"]
+	var lattice_crop: String = substrate[lattice_arch]["crops"]["primary_crop"]
+
 	# ── Name assignment ──
 	var names := []
 	names.resize(N)
@@ -349,8 +359,13 @@ static func assign_politics(archs: Array, plateau_edges: Array, p_seed: int, rea
 
 		var yr = arrival_yr[i]
 		if yr != null and yr >= -5000 and yr < -2000:
-			var shock = 0.25 + rng.next_float() * 0.35
 			var pre_pop = roundi(pop[i])
+			# Crop-distance disease modifier (DESIGN_SPEC §10a)
+			var contactor_crop = reach_crop if claimed[i] == "reach" else lattice_crop
+			var contacted_crop = substrate[i]["crops"]["primary_crop"]
+			var crop_dist = _crop_distance(contactor_crop, contacted_crop)
+			var base_severity = 0.20 + rng.next_float() * 0.25   # 20–45% mortality at max distance
+			var shock = 1.0 - base_severity * crop_dist
 			pop[i] *= shock
 			var trade_years = maxi(0, -2000 - yr)
 			pop[i] *= 1.0 + float(trade_years) * 0.0004
@@ -364,15 +379,17 @@ static func assign_politics(archs: Array, plateau_edges: Array, p_seed: int, rea
 			log.append({
 				"arch": i, "name": names[i],
 				"faction": claimed[i], "status": status_data[i]["status"],
-				"label": "Contacted ~%d BP · pop %d→%d · %d%% shock" % [abs(yr), pre_pop, roundi(pop[i]), roundi(shock * 100)],
+				"label": "Contacted ~%d BP · pop %d→%d · %d%% mortality (%s/%s)" % [abs(yr), pre_pop, roundi(pop[i]), roundi((1.0 - shock) * 100), contactor_crop, contacted_crop],
 				"rDist": r_dist[i], "lDist": l_dist[i], "contactYr": yr
 			})
 		elif not yr or yr >= -2000:
 			pop[i] *= 1.0 + 0.001 * potential[i] * 30.0
 
-	pop[reach_arch] *= 1.5 * (1.0 + _log2(1.0 + float(reach_network)) * 0.20)
+	# Reach: higher log₂ coefficient (A₀=1.2, δ=0.08 — knowledge compounds faster per contact)
+	pop[reach_arch] *= 1.3 * (1.0 + _log2(1.0 + float(reach_network)) * 0.30)
 	tech[reach_arch] = minf(6.0, tech[reach_arch] + 1.2)
-	pop[lattice_arch] *= 1.6 * (1.0 + _log2(1.0 + float(lattice_network)) * 0.30)
+	# Lattice: larger base (paddi surplus), lower log₂ coefficient (stable surplus, not scaling)
+	pop[lattice_arch] *= 1.9 * (1.0 + _log2(1.0 + float(lattice_network)) * 0.12)
 	tech[lattice_arch] = minf(6.0, tech[lattice_arch] + 1.0)
 
 	# ── ERA 3: COLONIAL EMPIRES ──
@@ -388,6 +405,9 @@ static func assign_politics(archs: Array, plateau_edges: Array, p_seed: int, rea
 	var lattice_tribs = 0
 	var total_extracted = 0.0
 	var total_enslaved = 0.0
+	var extraction_rate_for := []
+	extraction_rate_for.resize(N)
+	extraction_rate_for.fill(0.0)
 
 	for i in range(N):
 		if i == reach_arch or i == lattice_arch:
@@ -404,6 +424,7 @@ static func assign_politics(archs: Array, plateau_edges: Array, p_seed: int, rea
 			if sd["status"] == "colony":
 				var col_years = maxi(0, -500 - (colony_yr[i] if colony_yr[i] else yr))
 				var extraction_rate = 0.15 + float(col_years) * 0.0001
+				extraction_rate_for[i] = extraction_rate   # tracked for post-ERA-4 sovereignty drift
 				var extracted = pop[i] * extraction_rate
 				pop[i] -= extracted
 				total_extracted += extracted
@@ -425,6 +446,7 @@ static func assign_politics(archs: Array, plateau_edges: Array, p_seed: int, rea
 				})
 			elif sd["status"] == "garrison":
 				var absorbed = pop[i] * (0.15 + rng.next_float() * 0.10)
+				pop[i] -= absorbed          # demographic relocation — people leave the source
 				pop[lattice_arch] += absorbed
 				lattice_garrisons += 1
 				log.append({
@@ -465,9 +487,13 @@ static func assign_politics(archs: Array, plateau_edges: Array, p_seed: int, rea
 
 		# New contacts in this era
 		if yr >= -2000 and yr < -500:
-			var shock = 0.30 + rng.next_float() * 0.35
 			var pre_pop = roundi(pop[i])
-			pop[i] *= shock
+			var contactor_crop2 = reach_crop if power == "reach" else lattice_crop
+			var contacted_crop2 = substrate[i]["crops"]["primary_crop"]
+			var crop_dist2 = _crop_distance(contactor_crop2, contacted_crop2)
+			var base_severity2 = 0.20 + rng.next_float() * 0.25
+			var shock2 = 1.0 - base_severity2 * crop_dist2
+			pop[i] *= shock2
 			tech[i] += 0.3
 
 			if power == "reach":
@@ -478,8 +504,8 @@ static func assign_politics(archs: Array, plateau_edges: Array, p_seed: int, rea
 			log.append({
 				"arch": i, "name": names[i],
 				"faction": power, "status": sd["status"],
-				"label": "Contacted ~%d BP · pop %d→%d · %d%% shock" % [
-					abs(yr), pre_pop, roundi(pop[i]), roundi(shock * 100)
+				"label": "Contacted ~%d BP · pop %d→%d · %d%% mortality (%s/%s)" % [
+					abs(yr), pre_pop, roundi(pop[i]), roundi((1.0 - shock2) * 100), contactor_crop2, contacted_crop2
 				],
 				"rDist": r_dist[i], "lDist": l_dist[i], "contactYr": yr
 			})
@@ -507,13 +533,15 @@ static func assign_politics(archs: Array, plateau_edges: Array, p_seed: int, rea
 
 	for i in range(N):
 		if i == reach_arch:
-			pop[i] *= (1.0 + tech[i] * 0.08 + potential[i] * 0.15) * (1.0 + _log2(1.0 + float(total_network)) * 0.12)
-			tech[i] = minf(8.0, tech[i] + potential[i] * 0.8)
+			# A₀=1.2, δ=0.08: higher tech leverage, faster knowledge compounding (log₂ network)
+			pop[i] *= (1.0 + tech[i] * 0.12 + potential[i] * 0.14) * (1.0 + _log2(1.0 + float(total_network)) * 0.14)
+			tech[i] = minf(8.0, tech[i] + potential[i] * 0.9)
 			continue
 
 		if i == lattice_arch:
-			pop[i] *= (1.0 + tech[i] * 0.10 + potential[i] * 0.18) * (1.0 + float(lattice_integrated) * 0.08)
-			tech[i] = minf(8.0, tech[i] + potential[i] * 0.7)
+			# A₀=0.8, β=0.6: lower tech leverage, higher resource leverage (agricultural surplus)
+			pop[i] *= (1.0 + tech[i] * 0.06 + potential[i] * 0.22) * (1.0 + _log2(1.0 + float(lattice_integrated)) * 0.10)
+			tech[i] = minf(8.0, tech[i] + potential[i] * 0.6)
 			continue
 
 		if not claimed[i]:
@@ -542,6 +570,19 @@ static func assign_politics(archs: Array, plateau_edges: Array, p_seed: int, rea
 
 	tech[reach_arch] = maxf(tech[reach_arch], 7.0)
 	tech[lattice_arch] = maxf(tech[lattice_arch], 6.5)
+
+	# ── ERA 4→5 TRANSITION: Sovereignty/trade integration drift ──
+	# Extraction strain builds colonial resistance; long client contact builds autonomy.
+	# This implements the minimum-viable per-era drift from the static one-time assignment.
+	for i in range(N):
+		if not claimed[i] or i == reach_arch or i == lattice_arch:
+			continue
+		var sd4 = status_data[i]
+		if sd4["status"] == "colony":
+			sd4["sovereignty"] = minf(0.45, sd4["sovereignty"] + extraction_rate_for[i] * 0.3)
+		elif sd4["status"] == "client":
+			var contact_age = maxi(0, -500 - (arrival_yr[i] if arrival_yr[i] else -500))
+			sd4["sovereignty"] = minf(0.80, sd4["sovereignty"] + float(contact_age) * 0.00005)
 
 	# ── ERA 5: NUCLEAR ──
 	log.append({
@@ -586,6 +627,19 @@ static func assign_politics(archs: Array, plateau_edges: Array, p_seed: int, rea
 				],
 				"rDist": r_dist[i], "lDist": l_dist[i], "contactYr": yr
 			})
+
+	# ── Post-nuclear sovereignty/trade recovery ──
+	# Post-colonial autonomy: sovereignty rises toward self-determination.
+	# Trade links persist but shift from extractive to negotiated.
+	for i in range(N):
+		if not claimed[i] or i == reach_arch or i == lattice_arch:
+			continue
+		var sd5 = status_data[i]
+		if sd5["status"] == "colony":
+			sd5["sovereignty"] = minf(0.75, sd5["sovereignty"] + 0.35)
+			sd5["tradeIntegration"] = sd5["tradeIntegration"] * 0.85   # retains links, less extractive
+		elif sd5["status"] == "garrison":
+			sd5["sovereignty"] = minf(0.65, sd5["sovereignty"] + 0.20)
 
 	# ═══════════════════════════════════════════════════════════
 	# PHASE 5: FINAL STATE + LOG
@@ -795,3 +849,27 @@ static func _log2(x: float) -> float:
 	if x <= 0.0:
 		return 0.0
 	return log(x) / log(2.0)
+
+
+## Crop-zone ecological distance for epidemiological shock (DESIGN_SPEC §10a).
+## Returns the fractional severity multiplier applied to base mortality:
+##   0.2 = same crop type        (similar pathogen pools — mild)
+##   0.5 = adjacent climate zone
+##   0.8 = distant climate zone
+##   1.0 = maximum distance      (paddi ↔ papa — catastrophic)
+static func _crop_distance(contactor_crop: String, contacted_crop: String) -> float:
+	if contactor_crop == contacted_crop:
+		return 0.2
+	var tropical: Array = ["paddi", "taro", "sago"]
+	var temperate: Array = ["emmer", "papa"]
+	var con_tropical = contactor_crop in tropical
+	var ted_tropical = contacted_crop in tropical
+	var con_temperate = contactor_crop in temperate
+	var ted_temperate = contacted_crop in temperate
+	if (con_tropical and ted_tropical) or (con_temperate and ted_temperate):
+		return 0.5
+	# Maximum ecological distance: paddi (tropical hydraulic) meets papa (subpolar)
+	if (contactor_crop == "papa" and contacted_crop == "paddi") or \
+	   (contactor_crop == "paddi" and contacted_crop == "papa"):
+		return 1.0
+	return 0.8

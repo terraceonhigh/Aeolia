@@ -1,0 +1,4 @@
+[submodule "aeolia-godot/gdextension/godot-cpp"]
+	path = aeolia-godot/gdextension/godot-cpp
+	url = https://github.com/godotengine/godot-cpp
+	branch = 4.5

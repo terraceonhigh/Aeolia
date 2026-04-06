@@ -10,6 +10,7 @@ signal sea_level_changed(value: float)
 signal bridge_width_changed(value: float)
 signal sun_dimmer_changed(value: float)
 signal urban_mode_changed(mode: int)
+signal zoom_speed_changed(value: float)
 
 # ── Color palette (matches React original) ──
 const C_BG        := Color(0.012, 0.024, 0.063)  # #030610
@@ -43,6 +44,9 @@ var stats_label: Label
 var seed_input: SpinBox
 var left_scroll_vbox: VBoxContainer
 
+## Debug overlay label (FPS + tile count). Updated externally via update_debug().
+var _debug_label: Label
+
 var _world_data: Dictionary = {}
 
 
@@ -50,10 +54,12 @@ func setup(world_data: Dictionary) -> void:
 	_world_data = world_data
 	for child in get_children():
 		child.queue_free()
+	_debug_label = null  # reset — will be recreated in _build_debug_overlay
 	_build_header()
 	_build_left_sidebar()
 	_build_right_sidebar()
 	_build_detail_panel()
+	_build_debug_overlay()
 
 
 # ═══════════════════════════════════════════════════════════
@@ -154,8 +160,10 @@ func _build_left_sidebar() -> void:
 		("%d BP" % absi(df_year)) if df_year != null else "at present"
 	]
 
+	# JSX shows: `{world.history.log.length - 1} archipelagos · Dark Forest breaks …`
+	# The -1 excludes the terminal "⚠ CONTACT" DF event entry from the count.
 	var sh_sub := Label.new()
-	sh_sub.text = "%d entries · %s" % [log_count, df_text]
+	sh_sub.text = "%d archipelagos · %s" % [log_count - 1, df_text]
 	_style_label(sh_sub, 8, C_TEXT_DIM)
 	sh_sub.autowrap_mode = TextServer.AUTOWRAP_WORD
 	sh_vbox.add_child(sh_sub)
@@ -357,6 +365,22 @@ func _build_right_sidebar() -> void:
 	cam_info.text = "Scroll to zoom · Drag to rotate"
 	_style_label(cam_info, 9, C_TEXT_SEC)
 	vbox.add_child(cam_info)
+
+	var zoom_val_label := Label.new()
+	zoom_val_label.text = "Zoom: 0.10"
+	_style_label(zoom_val_label, 9, C_TEXT)
+	vbox.add_child(zoom_val_label)
+
+	var zoom_slider := HSlider.new()
+	zoom_slider.min_value = 1
+	zoom_slider.max_value = 20
+	zoom_slider.step = 1
+	zoom_slider.value = 10
+	zoom_slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	zoom_slider.value_changed.connect(func(val: float):
+		zoom_val_label.text = "Zoom: %.2f" % (val * 0.01)
+		zoom_speed_changed.emit(val * 0.01))
+	vbox.add_child(zoom_slider)
 
 	# ── Sea Level ──
 	_add_section_header(vbox, "SEA LEVEL")
@@ -783,6 +807,34 @@ func _status_icon(status: String) -> String:
 		"unknown", "uncontacted": return "•"
 		"contact": return "⚠"
 		_: return "●"
+
+
+## Build a small debug overlay in the bottom-right corner of the viewport.
+## Shows FPS and active tile count. Updated each frame via update_debug().
+func _build_debug_overlay() -> void:
+	_debug_label = Label.new()
+	_debug_label.name = "DebugOverlay"
+	# Anchor to bottom-right corner
+	_debug_label.anchor_left = 1.0
+	_debug_label.anchor_right = 1.0
+	_debug_label.anchor_top = 1.0
+	_debug_label.anchor_bottom = 1.0
+	_debug_label.offset_left = -200
+	_debug_label.offset_right = -8
+	_debug_label.offset_top = -44
+	_debug_label.offset_bottom = -8
+	_debug_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_debug_label.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
+	_debug_label.text = "FPS: — | tiles: —"
+	_style_label(_debug_label, 9, C_TEXT_MUTE)
+	# Semi-transparent background effect: just use a darker text color, no panel needed
+	add_child(_debug_label)
+
+
+## Called from main._process() to update FPS and tile count each frame.
+func update_debug(fps: int, tile_count: int) -> void:
+	if _debug_label:
+		_debug_label.text = "FPS: %d | tiles: %d" % [fps, tile_count]
 
 
 func _style_label(lbl: Label, size: int, color: Color) -> void:

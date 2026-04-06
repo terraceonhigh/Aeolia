@@ -5,14 +5,21 @@
 class_name PlateauRenderer
 extends Node3D
 
-## Radius offset for drawing arcs and markers above the globe surface
-var surface_offset: float = 1.002
+## Radius offset for drawing arcs above the globe surface.
+## JSX uses R*1.003 for arch graph lines. R=1 here → 1.003.
+var surface_offset: float = 1.003
 
-## Number of samples along each great-circle arc
-var arc_samples: int = 20
+## Number of samples along each great-circle arc.
+## JSX uses ARC_SEGS = 48.
+var arc_samples: int = 48
 
-## Radius of archipelago center marker spheres
-var marker_radius: float = 0.008
+## Radius of archipelago center marker spheres.
+## JSX uses SphereGeometry(0.02, 6, 6) at R=5. Scaled to R=1: 0.02/5 = 0.004.
+var marker_radius: float = 0.004
+
+## Radius offset for marker dot placement.
+## JSX: world.archs[i].cx * R * 1.004 → 1.004 at R=1.
+var marker_offset: float = 1.004
 
 ## Material for the great-circle arcs
 var arc_material: StandardMaterial3D
@@ -66,13 +73,17 @@ func setup(world_data: Dictionary) -> void:
 	add_child(arc_mesh_instance)
 	_rebuild_arcs(Vector3.FORWARD, 0.0)
 
+	print("PlateauRenderer: %d archs, %d edges, arc_samples=%d, marker_radius=%.4f" % [
+		_archs.size(), _edges.size(), arc_samples, marker_radius])
+
 
 func _setup_arc_material() -> void:
 	arc_material = StandardMaterial3D.new()
 	arc_material.vertex_color_use_as_albedo = true
 	arc_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	arc_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	arc_material.no_depth_test = true
+	# JSX uses depthTest: true for the plateau graph lines, so don't disable depth test.
+	arc_material.no_depth_test = false
 
 
 ## Geometric horizon threshold.
@@ -164,7 +175,15 @@ func _rebuild_arcs(cam_dir: Vector3, cutoff: float) -> void:
 		arc_mesh_instance.set_surface_override_material(0, arc_material)
 
 
-## Edge color based on faction pair.
+## Edge color based on faction pair — mirrors JSX edgeFactionColor exactly.
+## JSX:
+##   reach+reach   → 0xffccaa (1.0, 0.8, 0.667)      opacity 0.45
+##   lattice+lat   → 0xaaccff (0.667, 0.8, 1.0)       opacity 0.45
+##   reach+lattice → 0xff6644 (1.0, 0.4, 0.267)       opacity 0.45  (contact edge)
+##   reach+other   → 0x996644 (0.6, 0.4, 0.267)       opacity 0.45
+##   lattice+other → 0x446688 (0.267, 0.4, 0.533)     opacity 0.45
+##   unknown+any   → 0x282828 (0.157, 0.157, 0.157)   opacity 0.15
+##   other         → 0x556677 (0.333, 0.4, 0.467)     opacity 0.45
 func _get_edge_color(i: int, j: int) -> Color:
 	var fi := "unknown"
 	var fj := "unknown"
@@ -173,12 +192,23 @@ func _get_edge_color(i: int, j: int) -> Color:
 	if j < _states.size():
 		fj = _states[j].get("faction", "unknown")
 
+	var is_unknown := (fi == "unknown" or fj == "unknown")
+	var alpha := 0.15 if is_unknown else 0.45
+
 	if fi == "reach" and fj == "reach":
-		return Color(0.7, 0.3, 0.2, 0.5)
+		return Color(1.0, 0.8, 0.667, alpha)       # 0xffccaa
 	elif fi == "lattice" and fj == "lattice":
-		return Color(0.2, 0.4, 0.7, 0.5)
+		return Color(0.667, 0.8, 1.0, alpha)        # 0xaaccff
+	elif (fi == "reach" or fj == "reach") and (fi == "lattice" or fj == "lattice"):
+		return Color(1.0, 0.4, 0.267, alpha)        # 0xff6644 — the contact edge
+	elif fi == "reach" or fj == "reach":
+		return Color(0.6, 0.4, 0.267, alpha)        # 0x996644
+	elif fi == "lattice" or fj == "lattice":
+		return Color(0.267, 0.4, 0.533, alpha)      # 0x446688
+	elif is_unknown:
+		return Color(0.157, 0.157, 0.157, alpha)    # 0x282828
 	else:
-		return Color(0.4, 0.4, 0.4, 0.3)
+		return Color(0.333, 0.4, 0.467, alpha)      # 0x556677
 
 
 ## Create small sphere markers at each archipelago center.
@@ -206,17 +236,20 @@ func _build_arch_markers() -> void:
 		var inst := MeshInstance3D.new()
 		inst.mesh = sphere_mesh
 		inst.set_surface_override_material(0, mat)
-		inst.position = Vector3(arch.cx, arch.cy, arch.cz) * surface_offset
+		inst.position = Vector3(arch.cx, arch.cy, arch.cz) * marker_offset
 		add_child(inst)
 		marker_instances[arch_idx] = inst
 
 
-## Marker color by faction.
+## Marker dot color by faction — mirrors JSX dot colors exactly.
+## JSX: reach→0xffccaa, lattice→0xaaccff, unknown→0x383838, other→0x8899aa
 func _get_faction_color(faction: String) -> Color:
 	match faction:
 		"reach":
-			return Color(0.7, 0.3, 0.2, 1.0)
+			return Color(1.0, 0.8, 0.667)       # 0xffccaa
 		"lattice":
-			return Color(0.2, 0.4, 0.7, 1.0)
+			return Color(0.667, 0.8, 1.0)        # 0xaaccff
+		"unknown":
+			return Color(0.22, 0.22, 0.22)       # 0x383838
 		_:
-			return Color(0.4, 0.4, 0.4, 0.8)
+			return Color(0.533, 0.6, 0.667)      # 0x8899aa

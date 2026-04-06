@@ -6,13 +6,23 @@
 - [ ] Progressive LOD fill-in — base tiles first, subdivide over frames
 - [ ] Loading indicator during initial tile population
 
-## Phase 2: GDExtension C Module
-- [ ] Port compute_height to C
-- [ ] Port smooth_noise / hash / fbm to C
-- [ ] Build system (SCons/CMake) for .dylib/.so
-- [ ] GDScript wrapper class
-- [ ] Verify bit-identical output vs GDScript version
+## Phase 2: GDExtension C Module ← CURRENT
+- [x] Port compute_height to C
+- [x] Port smooth_noise / hash / fbm to C
+- [x] Build system (SCons) for .dylib/.so — gdextension/SConstruct
+- [x] GDScript wrapper class — Engine singleton "TerrainMathExt" via gdextension/
+- [ ] Verify bit-identical output vs GDScript version  ← needs dylib built first
 - [ ] Benchmark: target <1ms per tile at depth 4
+
+### Build instructions (macOS)
+```
+cd aeolia-godot/gdextension
+git submodule add -b godot-4.6-stable https://github.com/godotengine/godot-cpp
+git submodule update --init --recursive
+scons platform=macos target=template_debug
+```
+The .dylib goes to `gdextension/bin/` which is referenced by `bin/terrain_math.gdextension`.
+Godot will auto-load the extension and TerrainMath will use C automatically.
 
 ## Phase 3: Compute Shader (Orbital Scale)
 - [ ] GLSL compute shader for height map generation

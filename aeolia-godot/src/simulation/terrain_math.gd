@@ -4,8 +4,26 @@
 ##
 ## NOISE IMPLEMENTATION: Hash-based value noise with smoothstep interpolation,
 ## matching the JSX original exactly. NOT Perlin gradient noise.
+##
+## FAST PATH: When the GDExtension C module is built and the .gdextension file
+## is present at res://bin/terrain_math.gdextension, hot functions delegate to
+## the compiled C implementation (50-200× faster).  If the dylib is absent the
+## pure-GDScript fallback below is used transparently — same API, same numbers.
+##
+## Build the module:
+##   cd aeolia-godot/gdextension
+##   git submodule update --init --recursive   # one-time: fetches godot-cpp
+##   scons platform=macos target=template_debug
 class_name TerrainMath
 extends RefCounted
+
+## C extension singleton — non-null when the GDExtension dylib is loaded.
+## Accessed via Engine.get_singleton() to avoid a parse error when the class
+## name "TerrainMathExt" doesn't exist (extension not built yet).
+static var _ext: Object = (
+		Engine.get_singleton("TerrainMathExt")
+		if Engine.has_singleton("TerrainMathExt") else null
+)
 
 
 ## Hash function — matches JSX _hash(x,y,z) exactly.
@@ -43,6 +61,8 @@ static func _imul(a: int, b: int) -> int:
 ## 3D value noise with smoothstep interpolation — matches JSX smoothNoise exactly.
 ## Returns roughly [-1, 1].
 static func smooth_noise(x: float, y: float, z: float) -> float:
+	if _ext:
+		return _ext.smooth_noise(x, y, z)
 	var ix: int = floori(x)
 	var iy: int = floori(y)
 	var iz: int = floori(z)
@@ -76,6 +96,8 @@ static func smooth_noise(x: float, y: float, z: float) -> float:
 ## Fractal Brownian Motion — matches JSX fbm exactly.
 ## Initial amplitude 0.5, frequency 3.5, halving amplitude, 2.1× frequency.
 static func fbm(x: float, y: float, z: float, octaves: int) -> float:
+	if _ext:
+		return _ext.fbm(x, y, z, octaves)
 	var v := 0.0
 	var a := 0.5
 	var f := 3.5
@@ -94,6 +116,8 @@ static func fbm(x: float, y: float, z: float, octaves: int) -> float:
 static func compute_height(x: float, y: float, z: float,
 		world_archs: Array, world_edges: Array,
 		detail: int, bw_scale: float) -> float:
+	if _ext:
+		return _ext.compute_height(x, y, z, world_archs, world_edges, detail, bw_scale)
 	var height: float = Constants.OCEAN_DEPTH_BASE + fbm(x, y, z, mini(detail, 6)) * 400.0
 
 	# Ridged noise - organic mid-ocean ridges

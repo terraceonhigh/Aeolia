@@ -1,0 +1,11 @@
+Port computeSubstrate, fix Reach/Lattice inversion, garrison double-count, epi crop-distance, sovereignty drift, add lore optimizer
+
+- Port computeSubstrate from MONOLITH_REFERENCE.jsx into substrate.gd; history_engine now uses real crop zones, trade goods, and political culture per-arch
+- Fix network effect inversion: Reach now has higher log2 coefficient (delta=0.08), Lattice has larger base multiplier (paddi surplus)
+- Fix garrison absorption double-count: absorbed population now decremented from source arch
+- Fix industrial multiplier inversion: Reach higher tech leverage (A0=1.2), Lattice higher resource leverage (beta=0.6)
+- Implement crop-distance epidemiological shock (DESIGN_SPEC §10a): severity scales with ecological distance between contactor and contacted crop zones
+- Add sovereignty drift: colony sovereignty rises with extraction pressure; post-nuclear decolonisation recovery
+- Add optimization/ pipeline: loss.py (6-component lore-fidelity loss), loss_function.py (multi-seed mean+variance penalty), runner.py (Optuna harness, 26-param PARAM_SPACE), HISTORY_ENGINE_ANALYSIS.md
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>

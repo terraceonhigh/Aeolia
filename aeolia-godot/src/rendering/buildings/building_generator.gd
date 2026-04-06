@@ -57,7 +57,7 @@ func setup(world_data: Dictionary) -> void:
 			if loc_right.length_squared() < 0.001:
 				loc_right = Vector3.RIGHT.cross(loc_up)
 			loc_right = loc_right.normalized()
-			var loc_fwd := loc_up.cross(loc_right).normalized()
+			var loc_fwd := loc_right.cross(loc_up).normalized()
 
 			var basis := Basis(loc_right * w, loc_up * h, loc_fwd * d)
 			faction_transforms[faction].append(Transform3D(basis, pos))

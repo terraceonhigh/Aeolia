@@ -244,7 +244,9 @@ static func compute_substrate(archs: Array, plateau_edges: Array, p_seed: int) -
 		var crop_entries = []
 		for crop_name in yields.keys():
 			crop_entries.append([crop_name, yields[crop_name]])
-		crop_entries.sort_custom(func(a, b): return a[1] > b[1])
+		# Stable sort: tiebreak on crop name so equal-yield results are deterministic
+		# across seeds and platforms (GDScript sort_custom is not stable).
+		crop_entries.sort_custom(func(a, b): return a[1] > b[1] if a[1] != b[1] else a[0] < b[0])
 
 		var primary_crop = "foraging"
 		var secondary_crop = null

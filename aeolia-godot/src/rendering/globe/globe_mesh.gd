@@ -30,6 +30,11 @@ const MIN_DEPTH: int = 3
 ## which gives sensible LOD across the full zoom range for an R=1 globe.
 const SPLIT_FACTOR: float = 0.06
 
+## GPU compute tile path toggle.
+## Set true to use the compute shader (faster); false forces the CPU path (always works).
+## Default is false until the compute path is verified on this platform.
+@export var use_gpu_tiles: bool = false
+
 ## Bridge width scale for TerrainMath
 var bw_scale: float = 0.13
 
@@ -64,13 +69,38 @@ var _build_queue: Array = []
 var _queued_keys: Dictionary = {}
 ## Keys desired by the most recent LOD pass (stale-check at dequeue time).
 var _desired_keys: Dictionary = {}
+## Tiles removed from _active_tiles but kept visible while replacement children build.
+## Key → MeshInstance3D. Freed once no queued tile overlaps the covered region.
+var _phantom_tiles: Dictionary = {}
 ## Maximum number of new tile meshes built per frame.
 const TILES_PER_FRAME: int = 4
+
+# ── Compute shader state ──────────────────────────────────────────────────────
+# All null/invalid until _cs_init() succeeds.  Set to null when unavailable
+# (Compatibility renderer, Web export, compile failure) so every code path
+# safely falls back to _build_tile_cpu().
+
+## Local RenderingDevice — isolated from the render thread.
+var _rd: RenderingDevice = null
+## Compiled shader and compute pipeline.
+var _cs_shader:   RID = RID()
+var _cs_pipeline: RID = RID()
+## World-data SSBOs (arch, peak, edge) — recreated on each generate() call.
+var _cs_arch_buf: RID = RID()
+var _cs_peak_buf: RID = RID()
+var _cs_edge_buf: RID = RID()
+## Pre-allocated output buffer — 81 verts × 12 floats × 4 bytes = 3888 bytes.
+## Reused across every tile dispatch (we sync before reading back).
+var _cs_out_buf:  RID = RID()
+## Single uniform set (set 0) binding all 4 SSBOs.  Recreated on world change.
+var _cs_set:      RID = RID()
+## True when the compute path is compiled and world data is uploaded.
+var _cs_ready: bool = false
 
 func _init() -> void:
 	_material = StandardMaterial3D.new()
 	_material.vertex_color_use_as_albedo = true
-	_material.roughness = 0.85
+	_material.roughness = 0.95  # JSX: MeshPhongMaterial(shininess:5) — near-fully diffuse/matte
 	_material.cull_mode = BaseMaterial3D.CULL_BACK
 
 	# Ocean backdrop sphere — matches JSX IcosahedronGeometry(R*0.998, 5) with MeshPhongMaterial.
@@ -84,7 +114,9 @@ func _init() -> void:
 	ocean_mesh.radial_segments = 48
 	ocean_mesh.rings = 24
 	var ocean_mat := StandardMaterial3D.new()
-	ocean_mat.albedo_color = Color(0.02, 0.05, 0.12)
+	# LUT at OCEAN_DEPTH_BASE (-4200m): interpolating between -5000m and -4000m stops
+	# gives approximately (0.017, 0.034, 0.098). Previous Color(0.02, 0.05, 0.12) was too bright.
+	ocean_mat.albedo_color = Color(0.017, 0.034, 0.098)
 	ocean_mat.roughness = 0.95
 	ocean_mat.metallic = 0.0
 	var ocean_mi := MeshInstance3D.new()
@@ -117,6 +149,14 @@ func generate(world_data: Dictionary, _subdiv: int = 5) -> void:
 	_building = false
 	_needs_rebuild = true
 
+	# Lazy init compute pipeline (no-op if already done or unavailable).
+	_cs_init()
+	# Upload world geometry to GPU (no-op when _rd is null).
+	_cs_upload_world_data(
+		world_data.get("archs", []),
+		world_data.get("edges", [])
+	)
+
 	# Seed 6 base faces at depth 0 — covers the whole globe in one quad each.
 	# Very fast (~6 × 81 verts). The LOD system will subdivide over frames.
 	for fi in 6:
@@ -134,10 +174,17 @@ func generate(world_data: Dictionary, _subdiv: int = 5) -> void:
 
 ## Invalidate the cache (call when world data changes, e.g. new seed).
 func clear_cache() -> void:
+	_cs_free_world_bufs()  # Drop stale world SSBOs; shader/pipeline stay alive.
 	_tile_cache.clear()
 	_build_queue.clear()
 	_queued_keys.clear()
 	_desired_keys.clear()
+	for key in _phantom_tiles:
+		var t: MeshInstance3D = _phantom_tiles[key]
+		if is_instance_valid(t):
+			remove_child(t)
+			t.queue_free()
+	_phantom_tiles.clear()
 	# Remove all active tile meshes from the scene
 	for tile in _active_tiles:
 		if is_instance_valid(tile):
@@ -150,6 +197,35 @@ func clear_cache() -> void:
 ## Legacy compatibility: LOD is now handled by quadtree, not distance table
 func get_lod_for_distance(_dist: float) -> int:
 	return 5  # Dummy; quadtree handles LOD internally
+
+
+## Parse a tile key into its face/depth/bounds. Returns empty dict on failure.
+func _tile_bounds_from_key(key: String) -> Dictionary:
+	var parts := key.split("_")
+	if parts.size() < 5:
+		return {}
+	var fi := int(parts[1])
+	var depth := int(parts[2])
+	var u_min := float(parts[3])
+	var v_min := float(parts[4])
+	var tile_size: float = 2.0 / pow(2.0, float(depth))
+	return {"fi": fi, "u_min": u_min, "u_max": u_min + tile_size,
+			"v_min": v_min, "v_max": v_min + tile_size}
+
+
+## True if any tile currently in _queued_keys overlaps the given bounds.
+## Used to decide whether to keep a phantom tile visible as coverage.
+func _queued_covers_bounds(bounds: Dictionary) -> bool:
+	if bounds.is_empty():
+		return false
+	for key in _queued_keys:
+		var b := _tile_bounds_from_key(key)
+		if b.is_empty() or b.fi != bounds.fi:
+			continue
+		if b.u_min < bounds.u_max and b.u_max > bounds.u_min and \
+				b.v_min < bounds.v_max and b.v_max > bounds.v_min:
+			return true
+	return false
 
 
 ## Update LOD based on camera position. Called from main._process().
@@ -178,14 +254,35 @@ func update_lod(cam_pos: Vector3) -> void:
 	# Publish so _process() can skip builds that are no longer wanted
 	_desired_keys = needed_keys
 
-	# Remove tiles that are no longer needed
+	# Handle existing phantom tiles: re-promote if desired again, or release if no
+	# queued tiles overlap their region any more.
+	var phantoms_to_remove: Array = []
+	for pk in _phantom_tiles:
+		if needed_keys.has(pk):
+			_active_tiles.append(_phantom_tiles[pk])
+			phantoms_to_remove.append(pk)
+		elif not _queued_covers_bounds(_tile_bounds_from_key(pk)):
+			var pt: MeshInstance3D = _phantom_tiles[pk]
+			remove_child(pt)
+			pt.queue_free()
+			phantoms_to_remove.append(pk)
+	for pk in phantoms_to_remove:
+		_phantom_tiles.erase(pk)
+
+	# Remove or phantomize tiles that are no longer needed.
+	# Tiles whose region is still being rebuilt become phantoms (stay visible as
+	# coverage) rather than being freed immediately, preventing holes.
 	var i := 0
 	while i < _active_tiles.size():
 		var tile: MeshInstance3D = _active_tiles[i]
 		if not needed_keys.has(tile.name):
-			remove_child(tile)
-			tile.queue_free()
 			_active_tiles.remove_at(i)
+			var bounds := _tile_bounds_from_key(tile.name)
+			if not bounds.is_empty() and _queued_covers_bounds(bounds):
+				_phantom_tiles[tile.name] = tile  # keep rendering as coverage
+			else:
+				remove_child(tile)
+				tile.queue_free()
 		else:
 			# Already visible — mark as satisfied
 			needed_keys.erase(tile.name)
@@ -237,6 +334,21 @@ func _process(_delta: float) -> void:
 			_active_tiles.append(mi)
 
 		built += 1
+
+	# After each build batch, release any phantom tiles whose region is now covered.
+	if built > 0 and not _phantom_tiles.is_empty():
+		var phantoms_to_remove: Array = []
+		for pk in _phantom_tiles:
+			if _desired_keys.has(pk):
+				_active_tiles.append(_phantom_tiles[pk])
+				phantoms_to_remove.append(pk)
+			elif not _queued_covers_bounds(_tile_bounds_from_key(pk)):
+				var pt: MeshInstance3D = _phantom_tiles[pk]
+				remove_child(pt)
+				pt.queue_free()
+				phantoms_to_remove.append(pk)
+		for pk in phantoms_to_remove:
+			_phantom_tiles.erase(pk)
 
 
 ## Quadtree traversal — recursively collect leaf tiles
@@ -295,8 +407,312 @@ func _get_or_build_tile(leaf: Dictionary) -> ArrayMesh:
 	return tile_mesh
 
 
-## Build a single tile mesh (TILE_RES × TILE_RES grid on one cube face)
+# ── Compute shader helpers ────────────────────────────────────────────────────
+
+## Try to initialise the local RenderingDevice and compile the compute shader.
+## Called lazily from generate().  Safe to call multiple times — returns
+## immediately if already initialised or if the GPU path is unavailable.
+## Returns true on success.
+func _cs_init() -> bool:
+	if _cs_ready or _cs_shader.is_valid():
+		return _cs_pipeline.is_valid()
+	# Require Vulkan (Forward+ / Mobile renderer) — not available on Web / Compat.
+	if not RenderingServer.get_rendering_device():
+		push_warning("GlobeMesh: no RenderingDevice — using CPU tile path")
+		return false
+	_rd = RenderingServer.create_local_rendering_device()
+	if not _rd:
+		push_warning("GlobeMesh: create_local_rendering_device failed — using CPU tile path")
+		return false
+
+	var shader_file: RDShaderFile = load("res://src/rendering/globe/terrain_tile.glsl")
+	if not shader_file:
+		push_warning("GlobeMesh: terrain_tile.glsl not found — using CPU tile path")
+		_rd = null
+		return false
+
+	var spirv: RDShaderSPIRV = shader_file.get_spirv()
+	if spirv.compile_error_compute != "":
+		push_warning("GlobeMesh: compute shader error: " + spirv.compile_error_compute)
+		_rd = null
+		return false
+
+	_cs_shader = _rd.shader_create_from_spirv(spirv)
+	if not _cs_shader.is_valid():
+		push_warning("GlobeMesh: shader_create_from_spirv failed — using CPU tile path")
+		_rd = null
+		return false
+
+	_cs_pipeline = _rd.compute_pipeline_create(_cs_shader)
+	if not _cs_pipeline.is_valid():
+		push_warning("GlobeMesh: compute_pipeline_create failed — using CPU tile path")
+		_rd.free_rid(_cs_shader)
+		_cs_shader = RID()
+		_rd = null
+		return false
+
+	# Pre-allocate output buffer: 81 verts × 12 floats × 4 bytes = 3888 bytes.
+	var out_bytes := TILE_RES * TILE_RES * 12 * 4
+	_cs_out_buf = _rd.storage_buffer_create(out_bytes)
+	if not _cs_out_buf.is_valid():
+		push_warning("GlobeMesh: output buffer allocation failed — using CPU tile path")
+		_rd.free_rid(_cs_pipeline)
+		_rd.free_rid(_cs_shader)
+		_cs_pipeline = RID()
+		_cs_shader = RID()
+		_rd = null
+		return false
+
+	print("GlobeMesh: compute shader compiled OK — waiting for world data upload")
+	return true  # World uniform set created later in _cs_upload_world_data()
+
+
+## Pack arch + flattened peak data into byte arrays.
+## Returns [arch_bytes: PackedByteArray, peak_bytes: PackedByteArray].
+## Arch layout (32 bytes): cx cy cz shelf_r | peak_start(u32) peak_count(u32) pad pad
+## Peak layout (32 bytes): px py pz w | h w2inv pad pad
+func _cs_pack_arch_peak(archs: Array) -> Array:
+	var arch_bytes := PackedByteArray()
+	arch_bytes.resize(maxi(archs.size(), 1) * 32)
+	var peak_total := 0
+	for ar in archs:
+		peak_total += ar.peaks.size()
+	var peak_bytes := PackedByteArray()
+	peak_bytes.resize(maxi(peak_total, 1) * 32)
+
+	var pk_cursor := 0
+	for a in archs.size():
+		var ar: Dictionary = archs[a]
+		var ab := a * 32
+		arch_bytes.encode_float(ab +  0, ar.cx)
+		arch_bytes.encode_float(ab +  4, ar.cy)
+		arch_bytes.encode_float(ab +  8, ar.cz)
+		arch_bytes.encode_float(ab + 12, ar.shelf_r)
+		arch_bytes.encode_u32  (ab + 16, pk_cursor)
+		arch_bytes.encode_u32  (ab + 20, ar.peaks.size())
+		arch_bytes.encode_float(ab + 24, 0.0)
+		arch_bytes.encode_float(ab + 28, 0.0)
+		for pk in ar.peaks:
+			var pb := pk_cursor * 32
+			peak_bytes.encode_float(pb +  0, pk.px)
+			peak_bytes.encode_float(pb +  4, pk.py)
+			peak_bytes.encode_float(pb +  8, pk.pz)
+			peak_bytes.encode_float(pb + 12, pk.w)
+			peak_bytes.encode_float(pb + 16, pk.h)
+			peak_bytes.encode_float(pb + 20, pk.w2inv)
+			peak_bytes.encode_float(pb + 24, 0.0)
+			peak_bytes.encode_float(pb + 28, 0.0)
+			pk_cursor += 1
+	return [arch_bytes, peak_bytes]
+
+
+## Pack edge data into a byte array.
+## Edge layout (48 bytes): ax ay az w | bx by bz dot_ab | nx ny nz pad
+func _cs_pack_edges(edges: Array) -> PackedByteArray:
+	var edge_bytes := PackedByteArray()
+	edge_bytes.resize(maxi(edges.size(), 1) * 48)
+	for e in edges.size():
+		var ed: Dictionary = edges[e]
+		var eb := e * 48
+		edge_bytes.encode_float(eb +  0, ed.ax)
+		edge_bytes.encode_float(eb +  4, ed.ay)
+		edge_bytes.encode_float(eb +  8, ed.az)
+		edge_bytes.encode_float(eb + 12, ed.w)
+		edge_bytes.encode_float(eb + 16, ed.bx)
+		edge_bytes.encode_float(eb + 20, ed.by)
+		edge_bytes.encode_float(eb + 24, ed.bz)
+		edge_bytes.encode_float(eb + 28, ed.dot_ab)
+		edge_bytes.encode_float(eb + 32, ed.nx)
+		edge_bytes.encode_float(eb + 36, ed.ny)
+		edge_bytes.encode_float(eb + 40, ed.nz)
+		edge_bytes.encode_float(eb + 44, 0.0)
+	return edge_bytes
+
+
+## Upload world geometry to GPU SSBOs and (re)build the uniform set.
+## Called from generate() after _cs_init() succeeds.
+func _cs_upload_world_data(archs: Array, edges: Array) -> void:
+	if not _rd:
+		return
+	_cs_free_world_bufs()
+
+	var ap    := _cs_pack_arch_peak(archs)
+	var a_buf: PackedByteArray = ap[0]
+	var p_buf: PackedByteArray = ap[1]
+	var e_buf := _cs_pack_edges(edges)
+
+	_cs_arch_buf = _rd.storage_buffer_create(a_buf.size(), a_buf)
+	_cs_peak_buf = _rd.storage_buffer_create(p_buf.size(), p_buf)
+	_cs_edge_buf = _rd.storage_buffer_create(e_buf.size(), e_buf)
+
+	if not (_cs_arch_buf.is_valid() and _cs_peak_buf.is_valid() and _cs_edge_buf.is_valid()):
+		push_warning("GlobeMesh: SSBO creation failed — disabling GPU tile path")
+		_cs_free_world_bufs()
+		return
+
+	# Build the single uniform set (set 0): arch=0, peak=1, edge=2, output=3
+	var u_arch := RDUniform.new()
+	u_arch.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
+	u_arch.binding = 0
+	u_arch.add_id(_cs_arch_buf)
+
+	var u_peak := RDUniform.new()
+	u_peak.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
+	u_peak.binding = 1
+	u_peak.add_id(_cs_peak_buf)
+
+	var u_edge := RDUniform.new()
+	u_edge.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
+	u_edge.binding = 2
+	u_edge.add_id(_cs_edge_buf)
+
+	var u_out := RDUniform.new()
+	u_out.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
+	u_out.binding = 3
+	u_out.add_id(_cs_out_buf)
+
+	_cs_set = _rd.uniform_set_create([u_arch, u_peak, u_edge, u_out], _cs_shader, 0)
+	if not _cs_set.is_valid():
+		push_warning("GlobeMesh: uniform_set_create failed — disabling GPU tile path")
+		_cs_free_world_bufs()
+		return
+
+	_cs_ready = true
+	print("GlobeMesh: GPU tile path ready (archs=%d, edges=%d)" % [archs.size(), edges.size()])
+
+
+## Free world-data SSBOs and the uniform set, but keep shader/pipeline alive.
+func _cs_free_world_bufs() -> void:
+	_cs_ready = false
+	if not _rd:
+		return
+	if _cs_set.is_valid():
+		_rd.free_rid(_cs_set)
+		_cs_set = RID()
+	for rid in [_cs_arch_buf, _cs_peak_buf, _cs_edge_buf]:
+		if rid.is_valid():
+			_rd.free_rid(rid)
+	_cs_arch_buf = RID()
+	_cs_peak_buf = RID()
+	_cs_edge_buf = RID()
+
+
+## Free all GPU resources (called from clear_cache and _exit_tree).
+func _cs_free_all() -> void:
+	_cs_free_world_bufs()
+	if not _rd:
+		return
+	if _cs_out_buf.is_valid():
+		_rd.free_rid(_cs_out_buf)
+		_cs_out_buf = RID()
+	if _cs_pipeline.is_valid():
+		_rd.free_rid(_cs_pipeline)
+		_cs_pipeline = RID()
+	if _cs_shader.is_valid():
+		_rd.free_rid(_cs_shader)
+		_cs_shader = RID()
+	_rd = null
+
+
+func _exit_tree() -> void:
+	_cs_free_all()
+
+
+## GPU tile builder — dispatches the compute shader and reads back the result.
+## Returns null on any error (caller falls back to CPU path).
+func _build_tile_gpu(fi: int, u_min: float, u_max: float,
+		v_min: float, v_max: float, depth: int) -> ArrayMesh:
+	var archs: Array = _world_data.get("archs", [])
+	var edges: Array = _world_data.get("edges", [])
+
+	# Push constant: 10 × int/float = 40 bytes
+	var pc := PackedByteArray()
+	pc.resize(40)
+	pc.encode_s32  ( 0, fi)
+	pc.encode_s32  ( 4, depth)
+	pc.encode_float( 8, u_min)
+	pc.encode_float(12, u_max)
+	pc.encode_float(16, v_min)
+	pc.encode_float(20, v_max)
+	pc.encode_float(24, sea_level)
+	pc.encode_float(28, bw_scale)
+	pc.encode_s32  (32, archs.size())
+	pc.encode_s32  (36, edges.size())
+
+	var cl := _rd.compute_list_begin()
+	_rd.compute_list_bind_compute_pipeline(cl, _cs_pipeline)
+	_rd.compute_list_bind_uniform_set(cl, _cs_set, 0)
+	_rd.compute_list_set_push_constant(cl, pc, pc.size())
+	_rd.compute_list_dispatch(cl, 1, 1, 1)  # one work group of 9×9 invocations
+	_rd.compute_list_end()
+	_rd.submit()
+	_rd.sync()
+
+	var out := _rd.buffer_get_data(_cs_out_buf)
+	if out.size() < TILE_RES * TILE_RES * 48:
+		push_warning("GlobeMesh: GPU tile readback too small (%d bytes) — falling back to CPU" % out.size())
+		return null
+
+	# Sanity-check first vertex position: if all zeros the shader ran but wrote nothing
+	# (silent compile failure, wrong binding, barrier issue). Return null → CPU fallback.
+	var p0x := out.decode_float(0)
+	var p0y := out.decode_float(4)
+	var p0z := out.decode_float(8)
+	if p0x == 0.0 and p0y == 0.0 and p0z == 0.0:
+		push_warning("GlobeMesh: GPU tile first vertex is (0,0,0) — shader output looks degenerate, falling back to CPU")
+		return null
+
+	# Parse output: 12 floats (48 bytes) per vertex
+	var N    := TILE_RES
+	var vpos := PackedVector3Array(); vpos.resize(N * N)
+	var vnrm := PackedVector3Array(); vnrm.resize(N * N)
+	var vcol := PackedColorArray();   vcol.resize(N * N)
+	for idx in N * N:
+		var b := idx * 48
+		vpos[idx] = Vector3(out.decode_float(b     ), out.decode_float(b +  4), out.decode_float(b +  8))
+		vnrm[idx] = Vector3(out.decode_float(b + 16), out.decode_float(b + 20), out.decode_float(b + 24))
+		vcol[idx] = Color  (out.decode_float(b + 32), out.decode_float(b + 36), out.decode_float(b + 40))
+
+	# Index buffer — same winding as CPU path (a,c,b then b,c,d)
+	var indices := PackedInt32Array(); indices.resize((N - 1) * (N - 1) * 6)
+	var ii := 0
+	for j in range(N - 1):
+		for i in range(N - 1):
+			var a := j * N + i
+			var b := a + 1
+			var c := a + N
+			var d := c + 1
+			indices[ii    ] = a; indices[ii + 1] = c; indices[ii + 2] = b
+			indices[ii + 3] = b; indices[ii + 4] = c; indices[ii + 5] = d
+			ii += 6
+
+	var arrays: Array = []
+	arrays.resize(Mesh.ARRAY_MAX)
+	arrays[Mesh.ARRAY_VERTEX] = vpos
+	arrays[Mesh.ARRAY_NORMAL] = vnrm
+	arrays[Mesh.ARRAY_COLOR]  = vcol
+	arrays[Mesh.ARRAY_INDEX]  = indices
+
+	var mesh := ArrayMesh.new()
+	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+	return mesh
+
+
+# ── Tile builders ─────────────────────────────────────────────────────────────
+
+## Route tile building: GPU path for depth ≤ 7 when use_gpu_tiles is true, CPU otherwise.
+## Bypasses GPU when urban_mode > 0 — the settlement overlay runs CPU-only.
+## Falls back to CPU on any GPU error or degenerate output.
 func _build_tile(fi: int, u_min: float, u_max: float, v_min: float, v_max: float, depth: int) -> ArrayMesh:
+	if use_gpu_tiles and _cs_ready and depth <= 7 and urban_mode == 0:
+		var gpu_mesh := _build_tile_gpu(fi, u_min, u_max, v_min, v_max, depth)
+		if gpu_mesh != null:
+			return gpu_mesh
+	return _build_tile_cpu(fi, u_min, u_max, v_min, v_max, depth)
+
+
+## CPU tile builder — original SurfaceTool path, unchanged.
+func _build_tile_cpu(fi: int, u_min: float, u_max: float, v_min: float, v_max: float, depth: int) -> ArrayMesh:
 	var archs: Array = _world_data.get("archs", [])
 	var edges: Array = _world_data.get("edges", [])
 	var settlements: Array = _world_data.get("settlements", [])

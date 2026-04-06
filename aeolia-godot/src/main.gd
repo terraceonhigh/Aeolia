@@ -23,12 +23,33 @@ var env: WorldEnvironment
 # -- Loading --
 var loading: LoadingScreen
 
+# -- FPS overlay --
+var _fps_label: Label
+
 
 func _ready() -> void:
 	# Create a persistent loading screen (lives outside the regeneration cycle)
 	loading = LoadingScreen.new()
 	loading.name = "LoadingScreen"
 	add_child(loading)
+
+	# FPS counter — top-right corner, persists across seed regenerations
+	var fps_canvas := CanvasLayer.new()
+	fps_canvas.name = "FPSOverlay"
+	add_child(fps_canvas)
+	_fps_label = Label.new()
+	_fps_label.anchor_left = 1.0
+	_fps_label.anchor_right = 1.0
+	_fps_label.anchor_top = 0.0
+	_fps_label.anchor_bottom = 0.0
+	_fps_label.offset_left = -180.0  # wider to fit "FPS: 60 | tiles: 24"
+	_fps_label.offset_top = 4.0
+	_fps_label.offset_right = -4.0
+	_fps_label.offset_bottom = 22.0
+	_fps_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_fps_label.add_theme_font_size_override("font_size", 11)
+	_fps_label.add_theme_color_override("font_color", Color(0.855, 0.647, 0.251, 0.7))  # gold, dim
+	fps_canvas.add_child(_fps_label)
 
 	_generate_world(world_seed)
 
@@ -87,11 +108,12 @@ func _generate_world(p_seed: int) -> void:
 	await globe.generate(world, 5)
 	print("Globe mesh generated in %d ms" % (Time.get_ticks_msec() - t1))
 
-	# ── Phase 4: Atmosphere ── (disabled — JSX has no atmosphere effect)
-	# atmosphere = Atmosphere.new()
-	# atmosphere.name = "Atmosphere"
-	# add_child(atmosphere)
-	# atmosphere.setup()
+	# ── Phase 4: Atmosphere ── matches JSX:
+	# IcosahedronGeometry(R*1.02, 3) + MeshBasicMaterial({color:0x3366aa, transparent:true, opacity:0.03, side:BackSide})
+	atmosphere = Atmosphere.new()
+	atmosphere.name = "Atmosphere"
+	add_child(atmosphere)
+	atmosphere.setup()
 
 	# ── Phase 5: Network + labels + buildings ──
 	loading.set_phase("Placing civilizations...")
@@ -144,6 +166,7 @@ func _generate_world(p_seed: int) -> void:
 	ui.sea_level_changed.connect(_on_sea_level_changed)
 	ui.bridge_width_changed.connect(_on_bridge_width_changed)
 	ui.urban_mode_changed.connect(_on_urban_mode_changed)
+	ui.zoom_speed_changed.connect(_on_zoom_speed_changed)
 
 	# ── Done ──
 	var reach_name: String = world.history.states[world.reach_arch].name
@@ -165,6 +188,16 @@ func _generate_world(p_seed: int) -> void:
 var _lod_cooldown: float = 0.0  # seconds remaining before next LOD update
 
 func _process(delta: float) -> void:
+	# ── Debug overlay: FPS + active tile count ──
+	var _dbg_tiles: int = globe._active_tiles.size() if globe else 0
+	var _dbg_phantoms: int = globe._phantom_tiles.size() if globe else 0
+	if _fps_label:
+		_fps_label.text = "%d FPS | tiles: %d" % [Engine.get_frames_per_second(), _dbg_tiles]
+		if _dbg_phantoms > 0:
+			_fps_label.text += " | ph:%d" % _dbg_phantoms
+	if ui:
+		ui.update_debug(Engine.get_frames_per_second(), _dbg_tiles)
+
 	# ── LOD: cube-sphere quadtree updates based on camera position ──
 	# Cooldown prevents frame drops from rapid zoom.
 	if _lod_cooldown > 0.0:
@@ -175,31 +208,37 @@ func _process(delta: float) -> void:
 
 
 func _setup_lighting() -> void:
-	# Sun — will be reparented to camera later so it always lights from behind
+	# Sun — will be reparented to camera later so it always lights from behind.
+	# Matches JSX: DirectionalLight(0xffeedd, 0.9). Position updated each frame
+	# in JSX as camera.position + (2,3,0); here we attach to camera with a slight
+	# upward offset angle which gives the same "light from slightly above viewer" look.
 	sun = DirectionalLight3D.new()
 	sun.name = "Sun"
-	sun.light_energy = 1.2
-	sun.light_color = Color(1.0, 0.97, 0.92)
+	sun.light_energy = 0.9          # JSX: dirLight intensity = 0.9
+	sun.light_color = Color(1.0, 0.933, 0.867)  # JSX: 0xffeedd
 	sun.shadow_enabled = false
-	# Point straight down the camera's -Z (toward the globe) with a slight angle
+	# Slight upward angle (JSX offsets dirLight.position by +Y=3 from camera)
 	sun.rotation_degrees = Vector3(-15, 0, 0)
 	# Don't add to scene yet — _attach_sun_to_camera() adds it to camera
 
-	# Environment — maritime atmosphere
+	# Environment — matches JSX: AmbientLight(0x445566, 0.5), no bloom/glow.
+	# 0x445566 = rgb(0.267, 0.333, 0.4)
 	var env_res := Environment.new()
 	env_res.background_mode = Environment.BG_COLOR
-	env_res.background_color = Color(0.02, 0.02, 0.06)
+	env_res.background_color = Color(0.012, 0.024, 0.063)  # JSX: setClearColor(0x030610) = rgb(3,6,16)/255
 	env_res.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env_res.ambient_light_color = Color(0.15, 0.18, 0.25)
-	env_res.ambient_light_energy = 0.4
-	env_res.glow_enabled = true
-	env_res.glow_intensity = 0.3
-	env_res.glow_bloom = 0.1
+	env_res.ambient_light_color = Color(0.267, 0.333, 0.4)  # JSX: 0x445566
+	env_res.ambient_light_energy = 0.5                       # JSX: ambLight.intensity = 0.5
+	env_res.glow_enabled = false  # JSX has no post-processing bloom; glow was washing out contrast
+	# Godot defaults to Filmic tone mapping which lifts shadows and brightens midtones.
+	# JSX / Three.js uses no tone mapping (linear passthrough), so we match that here.
+	env_res.tonemap_mode = Environment.TONE_MAPPER_LINEAR
 
 	env = WorldEnvironment.new()
 	env.name = "Environment"
 	env.environment = env_res
 	add_child(env)
+	print("Lighting: sun=%.2f, ambient=%.2f (no glow)" % [sun.light_energy, env_res.ambient_light_energy])
 
 
 func _attach_sun_to_camera() -> void:
@@ -268,6 +307,11 @@ func _try_select_arch(screen_pos: Vector2) -> void:
 	if best_idx >= 0 and ui:
 		ui.show_arch(best_idx, world)
 		print("Selected: %s (#%d)" % [world.history.states[best_idx].name, best_idx])
+
+
+func _on_zoom_speed_changed(value: float) -> void:
+	if camera:
+		camera.zoom_speed = value
 
 
 func _on_seed_changed(new_seed: int) -> void:

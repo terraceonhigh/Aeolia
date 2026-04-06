@@ -13,10 +13,10 @@ const FACTION_COLORS = {
 	"other": Color(0.7, 0.7, 0.6)
 }
 
-const LABEL_FONT_SIZE: int = 6
-const LABEL_PIXEL_SIZE: float = 0.005
+const LABEL_FONT_SIZE: int = 48
+const LABEL_PIXEL_SIZE: float = 0.000625  # = old 0.005 * (6/48): same visual size, 8x resolution
 const LABEL_OUTLINE_SIZE: int = 3
-const LABEL_POSITION_SCALE: float = 1.008
+const LABEL_POSITION_SCALE: float = 1.02  # JSX uses 1.02; was 1.008 which caused z-clipping
 const LABEL_RENDER_PRIORITY: int = 10
 
 
@@ -58,6 +58,7 @@ func setup(world_data: Dictionary) -> void:
 		label.modulate = color
 
 		label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+		label.no_depth_test = true
 		label.render_priority = LABEL_RENDER_PRIORITY
 
 		add_child(label)
