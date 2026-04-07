@@ -1,39 +1,43 @@
 """
-Emergent-outcome loss function for Aeolia history engine parameter optimizer.
+Baseline Earth loss function for Aeolia history engine v2.
 
-28 individual loss terms (spec calls them "27" but counts 28 across categories)
-covering geography, agriculture, technology, ore access, historical shape,
-political economy, population, and epidemiology.
+12-term loss function encoding the specific narrative requirements of the
+Aeolia worldbuilding project.  This is the ONLY file that mentions "Reach"
+and "Lattice" — the simulator is faction-agnostic; hegemons are mapped to
+narrative labels here based on political culture type.
 
 Design principles
 -----------------
 - sq_relu(x) = max(0, x)^2 for ALL penalty terms
-- All 28 unweighted terms produce loss in [0, ~5] range
-- No crop name identity checks, no absolute tech level targets (except emergent
-  nuclear test), no sovereignty band targets, no era distribution percentages
-- compute_loss accepts the expanded sim_output dict from sim_proxy.simulate()
-- Multi-seed: evaluate_seeds evaluates across 5+ seeds and penalises variance
+- All 12 unweighted terms produce loss in [0, ~5] range
+- Hegemon->Reach/Lattice mapping by culture type (Civic->Reach, Subject->Lattice)
+- Structure supports swappable loss functions (see LOSS_FUNCTION_LIBRARY.md)
+- compute_loss accepts the output dict from sim_proxy.simulate()
+- baseline_earth_loss accepts 21-element param vector, returns scalar (optimizer API)
 
 Typical usage
 -------------
-    from loss import compute_loss, LossWeights, evaluate_seeds
-    result = simulate(world, params, seed=42)
+    from sim_proxy import SimParams, simulate, load_godot_world
+    from loss import compute_loss, baseline_earth_loss
+
+    # Option A: two-step (inspect intermediate sim output)
+    world = load_godot_world("worlds/candidate_0216089.json")
+    result = simulate(world, SimParams(), seed=216089)
     lr = compute_loss(result)
-    print(lr.total, lr.components)
+    print(lr.summary())
+
+    # Option B: one-step (optimizer API — 21 params in, scalar out)
+    world = load_godot_world("worlds/candidate_0216089.json")
+    from sim_proxy import pack_params
+    x = pack_params(SimParams())  # default 21-element vector
+    loss_value = baseline_earth_loss(x, world, seed=216089)
 """
 
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Optional
-
-
-# ---------------------------------------------------------------------------
-# Backward-compat stub
-# ---------------------------------------------------------------------------
-
-DEFAULT_TARGETS = None
 
 
 # ---------------------------------------------------------------------------
@@ -41,12 +45,8 @@ DEFAULT_TARGETS = None
 # ---------------------------------------------------------------------------
 
 def sq_relu(x: float) -> float:
-    """Squared ReLU — zero inside the acceptable range, quadratic outside."""
+    """Squared ReLU -- zero inside the acceptable range, quadratic outside."""
     return max(0.0, x) ** 2
-
-
-# Keep internal alias
-_sq_relu = sq_relu
 
 
 def _clamp(x: float, lo: float, hi: float) -> float:
@@ -64,59 +64,14 @@ def _std(values: list) -> float:
     return math.sqrt(_mean([(v - m) ** 2 for v in values]))
 
 
-def _gini(values: list) -> float:
-    """Gini coefficient over a list of non-negative values."""
-    if not values or sum(values) == 0:
-        return 0.0
-    n = len(values)
-    s = sorted(float(v) for v in values)
-    total = sum(s)
-    cumsum = sum((2 * (i + 1) - n - 1) * v for i, v in enumerate(s))
-    return cumsum / (n * total)
-
-
-def _spearman(xs: list, ys: list) -> float:
-    """Spearman rank correlation for two equal-length lists."""
-    n = len(xs)
-    if n < 3:
-        return 0.0
-
-    def _ranks(vals):
-        indexed = sorted(enumerate(vals), key=lambda iv: iv[1])
-        ranks = [0.0] * n
-        i = 0
-        while i < n:
-            j = i
-            while j < n - 1 and indexed[j + 1][1] == indexed[j][1]:
-                j += 1
-            avg_rank = (i + j) / 2.0 + 1.0
-            for k in range(i, j + 1):
-                ranks[indexed[k][0]] = avg_rank
-            i = j + 1
-        return ranks
-
-    rx, ry = _ranks(xs), _ranks(ys)
-    mx = sum(rx) / n
-    my = sum(ry) / n
-    num = sum((rx[i] - mx) * (ry[i] - my) for i in range(n))
-    denom = math.sqrt(
-        sum((rx[i] - mx) ** 2 for i in range(n))
-        * sum((ry[i] - my) ** 2 for i in range(n))
-    )
-    return num / denom if denom > 1e-9 else 0.0
-
-
 # ---------------------------------------------------------------------------
-# Geometry helper
+# Geometry helpers
 # ---------------------------------------------------------------------------
 
 def _gc_dist(archs: list, i: int, j: int) -> float:
     """Great-circle distance in radians between arch i and arch j."""
-    dot = (
-        archs[i]["cx"] * archs[j]["cx"]
-        + archs[i]["cy"] * archs[j]["cy"]
-        + archs[i]["cz"] * archs[j]["cz"]
-    )
+    ai, aj = archs[i], archs[j]
+    dot = ai["cx"] * aj["cx"] + ai["cy"] * aj["cy"] + ai["cz"] * aj["cz"]
     return math.acos(max(-1.0, min(1.0, dot)))
 
 
@@ -129,70 +84,128 @@ def _mean_pairwise_gc(archs: list, indices: list) -> float:
     return _mean(dists) if dists else 0.0
 
 
-# ---------------------------------------------------------------------------
-# Crop distance helper (mirrors history_engine._crop_distance exactly)
-# ---------------------------------------------------------------------------
-
-_TROPICAL = frozenset(["paddi", "taro", "sago"])
-_TEMPERATE = frozenset(["emmer", "papa"])
-
-
-def crop_distance(contactor: str, contacted: str) -> float:
-    if contactor == contacted:
-        return 0.2
-    ct = contactor in _TROPICAL
-    cd = contacted in _TROPICAL
-    ce = contactor in _TEMPERATE
-    de = contacted in _TEMPERATE
-    if (ct and cd) or (ce and de):
-        return 0.5
-    if frozenset([contactor, contacted]) == frozenset(["paddi", "papa"]):
-        return 1.0
-    return 0.8
+def _centroid_lat(archs: list, indices: list) -> float:
+    """Mean absolute latitude (degrees) of a set of arch indices."""
+    lats = []
+    for i in indices:
+        cy = max(-1.0, min(1.0, archs[i]["cy"]))
+        lats.append(abs(math.asin(cy) * 180.0 / math.pi))
+    return _mean(lats) if lats else 30.0
 
 
 # ---------------------------------------------------------------------------
-# LossWeights — per-term
+# Hegemon -> Reach/Lattice mapping
+# ---------------------------------------------------------------------------
+
+def _map_hegemons(sim_output: dict) -> dict:
+    """Map the two largest polities to Reach/Lattice narrative labels.
+
+    Mapping rules (this is the ONLY place faction names are assigned):
+      1. If one hegemon is Civic and one is Subject -> Civic=Reach, Subject=Lattice
+      2. If both are same culture -> more spread-out = Reach, denser = Lattice
+      3. If only one hegemon exists -> it becomes Reach, Lattice is None
+      4. If no hegemons -> both None
+
+    Returns dict with keys: reach_core, lattice_core, reach_members,
+    lattice_members, reach_culture, lattice_culture, mapping_note.
+    """
+    hegemons = sim_output.get("hegemons", [])
+    polities = sim_output.get("polities", [])
+    polity_members = sim_output.get("polity_members", {})
+    archs = sim_output.get("archs", [])
+
+    result = {
+        "reach_core": None, "lattice_core": None,
+        "reach_members": [], "lattice_members": [],
+        "reach_culture": None, "lattice_culture": None,
+        "mapping_note": "",
+    }
+
+    if len(hegemons) == 0:
+        result["mapping_note"] = "no hegemons"
+        return result
+
+    def _get_polity(core):
+        for p in polities:
+            if p["core"] == core:
+                return p
+        return None
+
+    if len(hegemons) == 1:
+        h = hegemons[0]
+        hp = _get_polity(h)
+        result["reach_core"] = h
+        result["reach_members"] = polity_members.get(h, [h])
+        result["reach_culture"] = hp["culture_type"] if hp else "unknown"
+        result["mapping_note"] = "single hegemon -> Reach"
+        return result
+
+    # Two hegemons
+    h0, h1 = hegemons[0], hegemons[1]
+    p0, p1 = _get_polity(h0), _get_polity(h1)
+    c0 = p0["culture_type"] if p0 else "parochial"
+    c1 = p1["culture_type"] if p1 else "parochial"
+    m0 = polity_members.get(h0, [h0])
+    m1 = polity_members.get(h1, [h1])
+
+    # Rule 1: Civic=Reach, Subject=Lattice
+    if c0 == "civic" and c1 != "civic":
+        reach_idx, lattice_idx = 0, 1
+        note = "civic->Reach, other->Lattice"
+    elif c1 == "civic" and c0 != "civic":
+        reach_idx, lattice_idx = 1, 0
+        note = "civic->Reach, other->Lattice"
+    elif c0 == "subject" and c1 != "subject":
+        reach_idx, lattice_idx = 1, 0
+        note = "subject->Lattice, other->Reach"
+    elif c1 == "subject" and c0 != "subject":
+        reach_idx, lattice_idx = 0, 1
+        note = "subject->Lattice, other->Reach"
+    else:
+        # Rule 2: same culture -- more spread = Reach
+        spread0 = _mean_pairwise_gc(archs, m0) if len(m0) >= 2 and archs else 0.0
+        spread1 = _mean_pairwise_gc(archs, m1) if len(m1) >= 2 and archs else 0.0
+        if spread0 >= spread1:
+            reach_idx, lattice_idx = 0, 1
+        else:
+            reach_idx, lattice_idx = 1, 0
+        note = f"same culture ({c0}) -- spread tiebreak"
+
+    cores = [h0, h1]
+    cultures = [c0, c1]
+    members = [m0, m1]
+
+    result["reach_core"] = cores[reach_idx]
+    result["lattice_core"] = cores[lattice_idx]
+    result["reach_members"] = members[reach_idx]
+    result["lattice_members"] = members[lattice_idx]
+    result["reach_culture"] = cultures[reach_idx]
+    result["lattice_culture"] = cultures[lattice_idx]
+    result["mapping_note"] = note
+    return result
+
+
+# ---------------------------------------------------------------------------
+# LossWeights -- per-term weights for Baseline Earth
 # ---------------------------------------------------------------------------
 
 @dataclass
 class LossWeights:
-    # Geography
-    lattice_density:    float = 1.0
-    reach_spread:       float = 1.0
-    lattice_latitude:   float = 1.0
-    reach_latitude:     float = 1.0
-    lattice_shelf:      float = 1.0
-    civ_gap:            float = 1.0
-    peak_asymmetry:     float = 0.5
-    edge_topology:      float = 0.5
-    # Agriculture
-    climate_crop:       float = 1.0
-    yield_asymmetry:    float = 1.0
-    # Technology
-    industrial_convergence: float = 1.5
-    nav_weapons_coupling:   float = 1.0
-    security_dilemma:       float = 1.5
-    nuclear_emergence:      float = 2.0
-    # Ore access
-    pu_gate:            float = 2.0
-    supply_chain:       float = 1.5
-    cu_tech_lead:       float = 1.0
-    au_priority:        float = 0.5
-    # Historical shape
-    serial_horizon:     float = 1.0
-    maritime_asymmetry: float = 1.0
-    colonial_extraction: float = 1.5
-    nuclear_convergence: float = 1.0
-    # Political economy
-    df_timing:          float = 2.0
-    sov_ordering:       float = 1.5
-    sov_recovery:       float = 1.5
-    # Population
-    pop_ratio:          float = 1.0
-    pop_inequality:     float = 0.5
-    # Epidemiology
-    epi_correlation:    float = 1.5
+    # Structural preconditions (geography)
+    latitude_separation:  float = 1.0
+    civ_gap:              float = 1.0
+    density_asymmetry:    float = 1.0
+    two_hegemons:         float = 2.0
+    # Energy outcomes
+    naphtha_peak:         float = 1.5
+    energy_transition:    float = 1.5
+    pu_acquisition:       float = 1.5
+    # Civilizational outcomes
+    nuclear_fleets:       float = 2.0
+    fleet_asymmetry:      float = 1.0
+    sovereignty_gradient: float = 1.5
+    dark_forest_timing:   float = 2.0
+    el_dorados:           float = 1.0
 
 
 DEFAULT_WEIGHTS = LossWeights()
@@ -206,16 +219,26 @@ DEFAULT_WEIGHTS = LossWeights()
 class LossResult:
     total:      float
     components: dict   # term_name -> weighted scalar
-    details:    dict   # term_name -> raw diagnostics
+    raw:        dict   # term_name -> unweighted scalar
+    details:    dict   # term_name -> diagnostic dict
+    mapping:    dict   # hegemon mapping info
 
     def __repr__(self) -> str:
         comp_str = "  ".join(f"{k}={v:.4f}" for k, v in self.components.items())
         return f"LossResult(total={self.total:.4f}  [{comp_str}])"
 
     def summary(self) -> str:
-        lines = [f"Total loss: {self.total:.4f}"]
-        for k, v in self.components.items():
-            lines.append(f"  {k:24s}: {v:.4f}")
+        lines = [f"Total loss: {self.total:.4f}",
+                 f"Hegemon mapping: {self.mapping.get('mapping_note', '?')}"]
+        lines.append(f"  Reach  -> arch {self.mapping.get('reach_core')} "
+                     f"({self.mapping.get('reach_culture', '?')})")
+        lines.append(f"  Lattice -> arch {self.mapping.get('lattice_core')} "
+                     f"({self.mapping.get('lattice_culture', '?')})")
+        lines.append("")
+        for k in self.components:
+            w = self.components[k]
+            r = self.raw.get(k, 0.0)
+            lines.append(f"  {k:24s}: {w:7.4f}  (raw {r:.4f})")
         return "\n".join(lines)
 
 
@@ -233,13 +256,6 @@ class MultiSeedResult:
         keys = list(all_seeds[0].components.keys())
         return {k: _mean([lr.components[k] for lr in all_seeds]) for k in keys}
 
-    def component_stds(self) -> dict:
-        all_seeds = list(self.per_seed.values())
-        if not all_seeds:
-            return {}
-        keys = list(all_seeds[0].components.keys())
-        return {k: _std([lr.components[k] for lr in all_seeds]) for k in keys}
-
     def __repr__(self) -> str:
         return (
             f"MultiSeedResult(total={self.total:.4f}  mean={self.mean:.4f}"
@@ -248,909 +264,501 @@ class MultiSeedResult:
 
 
 # ---------------------------------------------------------------------------
-# GEOGRAPHY — terms 1–8
+# Term 1: latitude_separation
 # ---------------------------------------------------------------------------
 
-def _term_lattice_density(archs: list, states: list) -> tuple:
-    """Term 1: mean pairwise gc_dist between Lattice-faction archs < 0.6 rad."""
-    lat_idxs = [i for i, s in enumerate(states) if s["faction"] == "lattice"]
-    if len(lat_idxs) < 2:
-        return 2.0, {"note": "fewer than 2 lattice archs", "n_lattice": len(lat_idxs)}
-    mean_dist = _mean_pairwise_gc(archs, lat_idxs)
-    loss = sq_relu(mean_dist - 0.6) * 4.0
-    return min(loss, 10.0), {"mean_dist_rad": mean_dist, "n_lattice": len(lat_idxs)}
+def _term_latitude_separation(archs, mapping):
+    """Civic hegemon centroid in mid-latitudes [35, 55],
+    Subject hegemon centroid tropical [<28]."""
+    reach_members = mapping["reach_members"]
+    lattice_members = mapping["lattice_members"]
+
+    if not reach_members or not lattice_members:
+        return 3.0, {"note": "missing hegemon(s)"}
+
+    reach_lat = _centroid_lat(archs, reach_members)
+    lattice_lat = _centroid_lat(archs, lattice_members)
+
+    # Reach (Civic): centroid should be in [35, 55]
+    loss_r = sq_relu(35.0 - reach_lat) + sq_relu(reach_lat - 55.0)
+    # Lattice (Subject): centroid should be < 28
+    loss_l = sq_relu(lattice_lat - 28.0)
+    # Scale to [0, ~5]
+    loss = (loss_r + loss_l) * 0.01
+    return min(loss, 5.0), {
+        "reach_centroid_lat": round(reach_lat, 1),
+        "lattice_centroid_lat": round(lattice_lat, 1),
+    }
 
 
-def _term_reach_spread(archs: list, states: list) -> tuple:
-    """Term 2: mean pairwise gc_dist between Reach-faction archs > 0.8 rad."""
-    reach_idxs = [i for i, s in enumerate(states) if s["faction"] == "reach"]
-    if len(reach_idxs) < 2:
-        return 2.0, {"note": "fewer than 2 reach archs", "n_reach": len(reach_idxs)}
-    mean_dist = _mean_pairwise_gc(archs, reach_idxs)
-    loss = sq_relu(0.8 - mean_dist) * 4.0
-    return min(loss, 10.0), {"mean_dist_rad": mean_dist, "n_reach": len(reach_idxs)}
+# ---------------------------------------------------------------------------
+# Term 2: civ_gap
+# ---------------------------------------------------------------------------
 
+def _term_civ_gap(archs, mapping):
+    """Min GC distance between the two dominant polities' members > 0.5 rad."""
+    reach_members = mapping["reach_members"]
+    lattice_members = mapping["lattice_members"]
 
-def _term_lattice_latitude(substrate: list, states: list) -> tuple:
-    """Term 3: centroid abs_latitude of Lattice-faction archs in tropical band (<= 28 deg)."""
-    lat_idxs = [i for i, s in enumerate(states) if s["faction"] == "lattice"]
-    if not lat_idxs or not substrate:
-        return 1.0, {"note": "no lattice archs or no substrate"}
-    centroid_lat = _mean([
-        substrate[i]["climate"]["abs_latitude"]
-        for i in lat_idxs if i < len(substrate)
-    ])
-    loss = sq_relu(centroid_lat - 28.0) * 0.01
-    return min(loss, 10.0), {"centroid_abs_lat": centroid_lat}
+    if not reach_members or not lattice_members:
+        return 3.0, {"note": "missing hegemon(s)"}
 
-
-def _term_reach_latitude(substrate: list, states: list) -> tuple:
-    """Term 4: centroid abs_latitude of Reach-faction archs in mid-latitude band (35–55 deg)."""
-    reach_idxs = [i for i, s in enumerate(states) if s["faction"] == "reach"]
-    if not reach_idxs or not substrate:
-        return 1.0, {"note": "no reach archs or no substrate"}
-    centroid_lat = _mean([
-        substrate[i]["climate"]["abs_latitude"]
-        for i in reach_idxs if i < len(substrate)
-    ])
-    loss = (sq_relu(35.0 - centroid_lat) + sq_relu(centroid_lat - 55.0)) * 0.01
-    return min(loss, 10.0), {"centroid_abs_lat": centroid_lat}
-
-
-def _term_lattice_shelf(substrate: list, states: list, archs: list) -> tuple:
-    """Term 5: fraction of Lattice-faction archs with shelf_r >= 0.08 AND tidal_range >= 2.0."""
-    lat_idxs = [i for i, s in enumerate(states) if s["faction"] == "lattice"]
-    if not lat_idxs or not substrate or not archs:
-        return 2.0, {"note": "no lattice archs, substrate, or archs geometry"}
-    qualifying = 0
-    for i in lat_idxs:
-        if i >= len(substrate) or i >= len(archs):
-            continue
-        shelf_r = archs[i].get("shelf_r", 0.0)
-        tidal = substrate[i]["climate"].get("tidal_range", 0.0)
-        if shelf_r >= 0.08 and tidal >= 2.0:
-            qualifying += 1
-    frac = qualifying / len(lat_idxs)
-    loss = sq_relu(0.5 - frac) * 4.0
-    return min(loss, 10.0), {"frac_qualifying": frac, "qualifying": qualifying, "n_lattice": len(lat_idxs)}
-
-
-def _term_civ_gap(archs: list, states: list) -> tuple:
-    """Term 6: min pairwise gc_dist between any Reach-faction arch and any Lattice-faction arch > 0.5 rad."""
-    reach_idxs = [i for i, s in enumerate(states) if s["faction"] == "reach"]
-    lat_idxs = [i for i, s in enumerate(states) if s["faction"] == "lattice"]
-    if not reach_idxs or not lat_idxs:
-        return 2.0, {"note": "missing reach or lattice archs"}
     min_cross = min(
         _gc_dist(archs, i, j)
-        for i in reach_idxs
-        for j in lat_idxs
+        for i in reach_members
+        for j in lattice_members
     )
     loss = sq_relu(0.5 - min_cross) * 4.0
-    return min(loss, 10.0), {"min_cross_dist_rad": min_cross}
-
-
-def _term_peak_asymmetry(archs: list, states: list) -> tuple:
-    """Term 7: mean peak count of Lattice-faction > mean peak count of Reach-faction."""
-    lat_idxs = [i for i, s in enumerate(states) if s["faction"] == "lattice"]
-    reach_idxs = [i for i, s in enumerate(states) if s["faction"] == "reach"]
-    if not lat_idxs or not reach_idxs or not archs:
-        return 0.5, {"note": "insufficient faction archs or no archs geometry"}
-    lattice_peaks = _mean([len(archs[i].get("peaks", [])) for i in lat_idxs if i < len(archs)])
-    reach_peaks = _mean([len(archs[i].get("peaks", [])) for i in reach_idxs if i < len(archs)])
-    # Penalty if Reach has more peaks than Lattice
-    loss = sq_relu(reach_peaks - lattice_peaks) * 0.1
-    return min(loss, 10.0), {"lattice_mean_peaks": lattice_peaks, "reach_mean_peaks": reach_peaks}
-
-
-def _term_edge_topology(archs: list, states: list) -> tuple:
-    """Term 8: mean pairwise gc_dist of Reach > mean pairwise gc_dist of Lattice (Reach more spread, Lattice denser)."""
-    lat_idxs = [i for i, s in enumerate(states) if s["faction"] == "lattice"]
-    reach_idxs = [i for i, s in enumerate(states) if s["faction"] == "reach"]
-    if len(lat_idxs) < 2 or len(reach_idxs) < 2:
-        return 1.0, {"note": "insufficient faction archs for pairwise distance"}
-    lattice_mean = _mean_pairwise_gc(archs, lat_idxs)
-    reach_mean = _mean_pairwise_gc(archs, reach_idxs)
-    # Penalty if Lattice mean dist >= Reach mean dist (Lattice should be denser)
-    loss = sq_relu(lattice_mean - reach_mean) * 4.0
-    return min(loss, 10.0), {"lattice_mean_dist": lattice_mean, "reach_mean_dist": reach_mean}
+    return min(loss, 5.0), {"min_cross_dist_rad": round(min_cross, 3)}
 
 
 # ---------------------------------------------------------------------------
-# AGRICULTURE — terms 9–10
+# Term 3: density_asymmetry
 # ---------------------------------------------------------------------------
 
-def _term_climate_crop(substrate: list, states: list) -> tuple:
-    """Term 9: climate->crop emergence coherence."""
-    hydraulic_crops = {"paddi", "taro", "sago"}
-    dryland_crops = {"emmer", "papa"}
-    hydraulic_zones = {"tropical_wet", "tropical_dry"}
-    dryland_zones = {"temperate_wet", "temperate_dry", "subpolar"}
+def _term_density_asymmetry(archs, mapping):
+    """Subject polity's cluster denser than Civic polity's spread.
+    Lattice mean pairwise GC < Reach mean pairwise GC.
+    Relaxed: Lattice mean < 1.1 rad."""
+    reach_members = mapping["reach_members"]
+    lattice_members = mapping["lattice_members"]
 
-    non_foraging = []
-    incoherent = 0
+    if len(reach_members) < 2 or len(lattice_members) < 2:
+        return 2.0, {"note": "need >=2 members per hegemon for pairwise"}
 
-    for i, sub in enumerate(substrate):
-        if i >= len(states):
-            break
-        crop = sub["crops"].get("primary_crop", "")
-        if not crop or crop == "forage" or crop == "":
-            continue
-        non_foraging.append(i)
-        zone = sub["climate"].get("climate_zone", "")
-        if crop in hydraulic_crops and zone not in hydraulic_zones:
-            incoherent += 1
-        elif crop in dryland_crops and zone not in dryland_zones:
-            incoherent += 1
-        # nori is always coherent; unknown crops are skipped
+    reach_spread = _mean_pairwise_gc(archs, reach_members)
+    lattice_spread = _mean_pairwise_gc(archs, lattice_members)
 
-    if not non_foraging:
-        return 0.0, {"note": "no non-foraging archs"}
-
-    incoherent_frac = incoherent / len(non_foraging)
-    loss = sq_relu(incoherent_frac - 0.15) * 5.0
-    return min(loss, 10.0), {
-        "incoherent_frac": incoherent_frac,
-        "incoherent": incoherent,
-        "n_non_foraging": len(non_foraging),
-    }
-
-
-def _term_yield_asymmetry(substrate: list) -> tuple:
-    """Term 10: mean yield of hydraulic-primary-crop archs > mean yield of dryland-primary-crop archs."""
-    hydraulic_set = {"paddi", "taro", "sago"}
-    dryland_set = {"emmer", "papa"}
-
-    hydraulic_yields = []
-    dryland_yields = []
-
-    for sub in substrate:
-        crop = sub["crops"].get("primary_crop", "")
-        y = sub["crops"].get("primary_yield", 0.0)
-        if crop in hydraulic_set:
-            hydraulic_yields.append(y)
-        elif crop in dryland_set:
-            dryland_yields.append(y)
-
-    if not hydraulic_yields or not dryland_yields:
-        return 1.0, {"note": "missing hydraulic or dryland yield data"}
-
-    ratio = _mean(hydraulic_yields) / max(_mean(dryland_yields), 1e-9)
-    loss = sq_relu(1.0 - ratio) * 2.0
-    return min(loss, 10.0), {
-        "hydraulic_mean_yield": _mean(hydraulic_yields),
-        "dryland_mean_yield": _mean(dryland_yields),
-        "ratio": ratio,
+    # Lattice should be denser (smaller spread) AND below 1.1 rad
+    loss_order = sq_relu(lattice_spread - reach_spread) * 4.0
+    loss_abs = sq_relu(lattice_spread - 1.1) * 4.0
+    loss = (loss_order + loss_abs) * 0.5
+    return min(loss, 5.0), {
+        "reach_spread_rad": round(reach_spread, 3),
+        "lattice_spread_rad": round(lattice_spread, 3),
     }
 
 
 # ---------------------------------------------------------------------------
-# TECHNOLOGY — terms 11–14
+# Term 4: two_hegemons
 # ---------------------------------------------------------------------------
 
-def _term_industrial_convergence(
-    tech_snapshots: dict,
-    reach_arch: int,
-    lattice_arch: int,
-) -> tuple:
-    """Term 11: when either hegemon crosses tech > 7, the other is within 1.5 points."""
-    r_ind = tech_snapshots["after_industrial"][reach_arch]
-    l_ind = tech_snapshots["after_industrial"][lattice_arch]
-    gap = abs(r_ind - l_ind)
+def _term_two_hegemons(sim_output, mapping):
+    """Exactly two polities achieve hegemon status (>15% of total pop each),
+    one Civic, one Subject."""
+    polities = sim_output.get("polities", [])
 
-    if r_ind > 7 or l_ind > 7:
-        loss = sq_relu(gap - 1.5) * 2.0
+    total_pop = sum(p["total_pop"] for p in polities) if polities else 1
+    big_polities = [p for p in polities
+                    if p["total_pop"] > total_pop * 0.15]
+
+    loss = 0.0
+
+    # Penalty for not having exactly 2
+    n_big = len(big_polities)
+    if n_big != 2:
+        loss += sq_relu(abs(n_big - 2)) * 2.0
+
+    # Penalty for not having one Civic and one Subject
+    rc = mapping.get("reach_culture")
+    lc = mapping.get("lattice_culture")
+    if rc == "civic" and lc == "subject":
+        pass  # ideal
+    elif rc == "subject" and lc == "civic":
+        pass  # also fine (mapping handles it)
     else:
-        loss = sq_relu(7.0 - max(r_ind, l_ind)) * 0.5
+        culture_penalty = 1.0
+        if rc == "civic" or lc == "civic":
+            culture_penalty = 0.3
+        elif rc == "subject" or lc == "subject":
+            culture_penalty = 0.5
+        loss += culture_penalty
 
-    return min(loss, 10.0), {
-        "r_tech_ind": r_ind,
-        "l_tech_ind": l_ind,
-        "gap_at_ind": gap,
-        "either_crosses_7": r_ind > 7 or l_ind > 7,
+    return min(loss, 5.0), {
+        "n_big_polities": n_big,
+        "reach_culture": rc,
+        "lattice_culture": lc,
     }
 
 
-def _term_nav_weapons_coupling(
-    tech_snapshots: dict,
-    states: list,
-    epi_log: list,
-    reach_arch: int,
-    lattice_arch: int,
-) -> tuple:
-    """Term 12: correlation between serial-era Reach network size and tech growth."""
-    dtech = (
-        tech_snapshots["after_industrial"][reach_arch]
-        - tech_snapshots["after_antiquity"][reach_arch]
-    )
-    # Serial contacts: non-hegemon archs with eraOfContact=="sail" and faction=="reach"
-    n_serial = sum(
-        1
-        for i, s in enumerate(states)
-        if i not in (reach_arch, lattice_arch)
-        and s.get("eraOfContact") == "sail"
-        and s.get("faction") == "reach"
-    )
-    coupling = dtech * n_serial / max(1, n_serial + dtech)
-    loss = sq_relu(0.5 - coupling) * 2.0
-    return min(loss, 10.0), {
-        "dtech_reach": dtech,
-        "n_serial_reach": n_serial,
-        "coupling": coupling,
+# ---------------------------------------------------------------------------
+# Term 5: naphtha_peak
+# ---------------------------------------------------------------------------
+
+def _term_naphtha_peak(sim_output, mapping, naphtha_richness: float = 2.0):
+    """At least one hegemon exhausts >50% of its C reserves before nuclear era.
+
+    Uses per-arch c_remaining from states and reconstructs initial C from
+    archs[j].shelf_r * substrate[j].climate.tidal_range * naphtha_richness.
+    """
+    states = sim_output.get("states", [])
+    substrate = sim_output.get("substrate", [])
+    archs = sim_output.get("archs", [])
+
+    def _hegemon_c_depletion(members):
+        if not members:
+            return 0.0
+        remaining = 0.0
+        initial = 0.0
+        for j in members:
+            if j >= len(states) or j >= len(archs) or j >= len(substrate):
+                continue
+            shelf_r = archs[j].get("shelf_r", 0.0)
+            if shelf_r < 0.04:
+                continue
+            tidal = substrate[j].get("climate", {}).get("tidal_range",
+                    substrate[j].get("tidal_range", 2.0))
+            c_init_j = shelf_r * tidal * naphtha_richness
+            initial += c_init_j
+            remaining += states[j].get("c_remaining", 0)
+        if initial <= 0:
+            return 0.0
+        return 1.0 - (remaining / initial)
+
+    reach_depl = _hegemon_c_depletion(mapping["reach_members"])
+    lattice_depl = _hegemon_c_depletion(mapping["lattice_members"])
+    max_depl = max(reach_depl, lattice_depl)
+
+    loss = sq_relu(0.50 - max_depl) * 8.0
+    return min(loss, 5.0), {
+        "reach_c_depletion": round(reach_depl, 3),
+        "lattice_c_depletion": round(lattice_depl, 3),
+        "max_depletion": round(max_depl, 3),
     }
 
 
-def _term_security_dilemma(
-    tech_snapshots: dict,
-    df_year: Optional[int],
-    reach_arch: int,
-    lattice_arch: int,
-) -> tuple:
-    """Term 13: Dark Forest break year < first year either hegemon crosses tech > 7."""
-    # Approximate year Reach crosses tech 7 by lerping colonial->industrial era
-    # Era boundaries: serial->colonial is ~-5000 to -2000; colonial->industrial is -2000 to -500
-    def _crossing_year(col_val, ind_val):
-        if col_val <= 7.0 <= ind_val:
-            # lerp: colonial era is -2000, industrial era ends at -500
-            frac = (7.0 - col_val) / max(1e-6, ind_val - col_val)
-            return -2000 + frac * 1500
-        elif ind_val > 7.0:
-            return -2000.0  # already crossed by colonial era
-        else:
-            return 0.0  # never crossed
+# ---------------------------------------------------------------------------
+# Term 6: energy_transition
+# ---------------------------------------------------------------------------
 
-    r_col = tech_snapshots["after_colonial"][reach_arch]
-    r_ind = tech_snapshots["after_industrial"][reach_arch]
-    l_col = tech_snapshots["after_colonial"][lattice_arch]
-    l_ind = tech_snapshots["after_industrial"][lattice_arch]
+def _term_energy_transition(sim_output):
+    """Total world C >70% depleted at story present."""
+    c_init = sim_output.get("c_total_initial", 0)
+    c_final = sim_output.get("c_total_final", 0)
 
-    t_r = _crossing_year(r_col, r_ind)
-    t_l = _crossing_year(l_col, l_ind)
+    if c_init <= 0:
+        return 2.0, {"note": "no initial C"}
 
-    t_tech7 = min(t for t in [t_r, t_l] if t != 0.0) if any(t != 0.0 for t in [t_r, t_l]) else 0.0
+    depletion = 1.0 - (c_final / c_init)
+    loss = sq_relu(0.70 - depletion) * 8.0
+    return min(loss, 5.0), {
+        "c_initial": round(c_init, 2),
+        "c_final": round(c_final, 2),
+        "depletion_frac": round(depletion, 3),
+    }
 
-    if df_year is None or t_tech7 == 0.0:
-        loss = 3.0
-        details = {"note": "no DF or neither hegemon crosses tech 7", "df_year": df_year, "t_tech7": t_tech7}
-    elif df_year >= t_tech7:
+
+# ---------------------------------------------------------------------------
+# Term 7: pu_acquisition
+# ---------------------------------------------------------------------------
+
+def _term_pu_acquisition(sim_output, mapping):
+    """Both hegemons control >=1 Pu island by story present."""
+    polities = sim_output.get("polities", [])
+
+    def _has_pu(core):
+        for p in polities:
+            if p["core"] == core:
+                return p.get("has_pu", False)
+        return False
+
+    reach_pu = _has_pu(mapping["reach_core"]) if mapping["reach_core"] is not None else False
+    lattice_pu = _has_pu(mapping["lattice_core"]) if mapping["lattice_core"] is not None else False
+
+    if reach_pu and lattice_pu:
         loss = 0.0
-        details = {"note": "DF broke before tech 7 — correct", "df_year": df_year, "t_tech7": t_tech7}
+    elif reach_pu or lattice_pu:
+        loss = 1.5
     else:
-        loss = sq_relu(t_tech7 - df_year) / (200.0 ** 2) * 5.0
-        details = {"df_year": df_year, "t_tech7": t_tech7}
+        loss = 4.0
 
-    return min(loss, 10.0), details
+    return min(loss, 5.0), {
+        "reach_has_pu": reach_pu,
+        "lattice_has_pu": lattice_pu,
+    }
 
 
-def _term_nuclear_emergence(nuclear_emergence: Optional[bool]) -> tuple:
-    """Term 14: emergent nuclear test — did both hegemons reach tech > 9 without floors?"""
-    if nuclear_emergence is None:
+# ---------------------------------------------------------------------------
+# Term 8: nuclear_fleets
+# ---------------------------------------------------------------------------
+
+def _term_nuclear_fleets(sim_output, mapping):
+    """Both hegemons at tech >=9.0 with nuclear fleet capability."""
+    polities = sim_output.get("polities", [])
+
+    def _get_tech(core):
+        for p in polities:
+            if p["core"] == core:
+                return p.get("tech", 0)
+        return 0.0
+
+    def _get_fleet(core):
+        for p in polities:
+            if p["core"] == core:
+                return p.get("fleet_scale", 0)
+        return 0.0
+
+    r_tech = _get_tech(mapping["reach_core"]) if mapping["reach_core"] is not None else 0.0
+    l_tech = _get_tech(mapping["lattice_core"]) if mapping["lattice_core"] is not None else 0.0
+    r_fleet = _get_fleet(mapping["reach_core"]) if mapping["reach_core"] is not None else 0.0
+    l_fleet = _get_fleet(mapping["lattice_core"]) if mapping["lattice_core"] is not None else 0.0
+
+    loss_tech = sq_relu(9.0 - r_tech) * 0.5 + sq_relu(9.0 - l_tech) * 0.5
+    loss_fleet = (0.0 if r_fleet > 0 else 1.5) + (0.0 if l_fleet > 0 else 1.5)
+
+    loss = loss_tech + loss_fleet
+    return min(loss, 5.0), {
+        "reach_tech": round(r_tech, 2),
+        "lattice_tech": round(l_tech, 2),
+        "reach_fleet": round(r_fleet, 2),
+        "lattice_fleet": round(l_fleet, 2),
+    }
+
+
+# ---------------------------------------------------------------------------
+# Term 9: fleet_asymmetry
+# ---------------------------------------------------------------------------
+
+def _term_fleet_asymmetry(sim_output, mapping):
+    """Pu-rich hegemon has larger fleet_scale than Pu-poor hegemon."""
+    polities = sim_output.get("polities", [])
+
+    def _get_info(core):
+        for p in polities:
+            if p["core"] == core:
+                return p.get("has_pu", False), p.get("fleet_scale", 0)
+        return False, 0.0
+
+    r_pu, r_fleet = _get_info(mapping["reach_core"]) if mapping["reach_core"] is not None else (False, 0.0)
+    l_pu, l_fleet = _get_info(mapping["lattice_core"]) if mapping["lattice_core"] is not None else (False, 0.0)
+
+    if r_pu == l_pu:
         loss = 0.0
-        details = {"note": "not evaluated"}
-    elif nuclear_emergence is False:
-        loss = 3.0
-        details = {"note": "preconditions insufficient for nuclear emergence"}
+        note = "same Pu status"
+    elif r_pu and not l_pu:
+        loss = sq_relu(l_fleet - r_fleet + 0.1) * 5.0
+        note = "Reach has Pu"
     else:
-        loss = 0.0
-        details = {"note": "nuclear emerged organically"}
-    return min(loss, 10.0), details
+        loss = sq_relu(r_fleet - l_fleet + 0.1) * 5.0
+        note = "Lattice has Pu"
 
-
-# ---------------------------------------------------------------------------
-# ORE ACCESS — terms 15–18
-# ---------------------------------------------------------------------------
-
-def _term_pu_gate(reach_pu_access: bool, lattice_pu_access: bool) -> tuple:
-    """Term 15: both hegemons have Pu access."""
-    loss = (0.0 if reach_pu_access else 2.0) + (0.0 if lattice_pu_access else 2.0)
-    return min(loss, 10.0), {
-        "reach_pu": reach_pu_access,
-        "lattice_pu": lattice_pu_access,
+    return min(loss, 5.0), {
+        "reach_pu": r_pu, "reach_fleet": round(r_fleet, 2),
+        "lattice_pu": l_pu, "lattice_fleet": round(l_fleet, 2),
+        "note": note,
     }
 
 
-def _term_supply_chain(
-    substrate: list,
-    states: list,
-    adj: dict,
-    reach_arch: int,
-    lattice_arch: int,
-    reach_pu_access: bool,
-    lattice_pu_access: bool,
-) -> tuple:
-    """Term 16: no hegemon's ONLY Pu source has sovereignty < 0.2."""
+# ---------------------------------------------------------------------------
+# Term 10: sovereignty_gradient
+# ---------------------------------------------------------------------------
 
-    def _is_robust(hegemon_idx):
-        # If hegemon owns Pu itself, robust
-        if substrate and hegemon_idx < len(substrate):
-            if substrate[hegemon_idx]["minerals"].get("Pu", False):
-                return True
-        # Otherwise check neighbors
-        neighbors = adj.get(hegemon_idx, [])
-        pu_neighbors = [
-            nb for nb in neighbors
-            if nb < len(substrate) and substrate[nb]["minerals"].get("Pu", False)
-        ]
-        if not pu_neighbors:
-            return True  # no Pu neighbors to assess
-        # Robust if at least one neighbor has sovereignty >= 0.2
-        return any(
-            states[nb]["sovereignty"] >= 0.2
-            for nb in pu_neighbors
-            if nb < len(states)
-        )
+def _term_sovereignty_gradient(sim_output, mapping):
+    """Colonies have lower sovereignty than core; gradient visible."""
+    states = sim_output.get("states", [])
+    polity_members = sim_output.get("polity_members", {})
 
-    reach_robust = _is_robust(reach_arch)
-    lattice_robust = _is_robust(lattice_arch)
-    loss = (0.0 if reach_robust else 2.0) + (0.0 if lattice_robust else 2.0)
-    return min(loss, 10.0), {
-        "reach_robust": reach_robust,
-        "lattice_robust": lattice_robust,
-    }
+    if not mapping["reach_core"] and not mapping["lattice_core"]:
+        return 3.0, {"note": "no hegemons"}
 
+    loss = 0.0
+    details = {}
 
-def _term_cu_tech_lead(substrate: list, states: list) -> tuple:
-    """Term 17: Cu-bearing serial-era archs have measurably higher tech than non-Cu serial-era archs."""
-    cu_tech = []
-    non_cu_tech = []
-    for i, s in enumerate(states):
-        if i >= len(substrate):
-            break
-        if s.get("eraOfContact") != "sail":
+    for label, core in [("reach", mapping["reach_core"]),
+                        ("lattice", mapping["lattice_core"])]:
+        if core is None:
             continue
-        has_cu = substrate[i]["minerals"].get("Cu", False)
-        if has_cu:
-            cu_tech.append(s["tech"])
-        else:
-            non_cu_tech.append(s["tech"])
-
-    if not cu_tech or not non_cu_tech:
-        return 0.0, {"note": "insufficient data for Cu tech lead"}
-
-    delta = _mean(cu_tech) - _mean(non_cu_tech)
-    loss = sq_relu(0.3 - delta) * 2.0
-    return min(loss, 10.0), {
-        "cu_serial_mean_tech": _mean(cu_tech),
-        "non_cu_serial_mean_tech": _mean(non_cu_tech),
-        "delta": delta,
-        "n_cu": len(cu_tech),
-        "n_non_cu": len(non_cu_tech),
-    }
-
-
-def _term_au_priority(
-    substrate: list,
-    states: list,
-    contact_years: dict,
-    reach_arch: int,
-    lattice_arch: int,
-) -> tuple:
-    """Term 18: Au-bearing archs contacted earlier on average than non-Au archs (excluding cores)."""
-    core_set = {reach_arch, lattice_arch}
-    au_years = []
-    non_au_years = []
-
-    for i, s in enumerate(states):
-        if i in core_set:
+        members = polity_members.get(core, [core])
+        if len(members) <= 1:
+            details[f"{label}_note"] = "single-arch polity"
             continue
-        if i not in contact_years:
+
+        core_sov = states[core]["sovereignty"] if core < len(states) else 1.0
+        periphery = [j for j in members if j != core and j < len(states)]
+        if not periphery:
             continue
-        if i >= len(substrate):
-            continue
-        has_au = substrate[i]["minerals"].get("Au", False)
-        yr = contact_years[i]
-        if has_au:
-            au_years.append(yr)
-        else:
-            non_au_years.append(yr)
 
-    if not au_years or not non_au_years:
-        return 0.0, {"note": "insufficient data for Au contact priority"}
+        peri_sovs = [states[j]["sovereignty"] for j in periphery]
+        mean_peri = _mean(peri_sovs)
 
-    # Positive delta means Au was contacted earlier (more negative year = older = earlier)
-    delta = _mean(non_au_years) - _mean(au_years)
-    loss = sq_relu(-delta) * 0.0001
-    return min(loss, 10.0), {
-        "au_mean_year": _mean(au_years),
-        "non_au_mean_year": _mean(non_au_years),
-        "delta_years": delta,
-        "n_au": len(au_years),
-        "n_non_au": len(non_au_years),
-    }
+        loss += sq_relu(mean_peri - core_sov + 0.05) * 3.0
+
+        details[f"{label}_core_sov"] = round(core_sov, 3)
+        details[f"{label}_periphery_mean_sov"] = round(mean_peri, 3)
+
+    return min(loss, 5.0), details
 
 
 # ---------------------------------------------------------------------------
-# HISTORICAL SHAPE — terms 19–22
+# Term 11: dark_forest_timing
 # ---------------------------------------------------------------------------
 
-def _term_serial_horizon(states: list) -> tuple:
-    """Term 19: max hop_count achieved by serial-era contacts > 3."""
-    serial_hops = [
-        s["hopCount"]
-        for s in states
-        if s.get("eraOfContact") == "sail"
-    ]
-    max_hops = max(serial_hops) if serial_hops else 0
-    loss = sq_relu(3 - max_hops) * 1.0
-    return min(loss, 10.0), {
-        "max_serial_hops": max_hops,
-        "n_serial": len(serial_hops),
-    }
+def _term_dark_forest_timing(sim_output, mapping):
+    """DF break between the two hegemons in nuclear era (-200 to -40 BP)."""
+    df_year = sim_output.get("df_year")
+    df_a = sim_output.get("df_polity_a")
+    df_b = sim_output.get("df_polity_b")
 
-
-def _term_maritime_asymmetry(states: list, reach_arch: int, lattice_arch: int) -> tuple:
-    """Term 20: for Reach, the known/governed ratio (contacted / colonized) in colonial era > 1.5."""
-    reach_colonial_contacts = sum(
-        1
-        for s in states
-        if s.get("faction") == "reach"
-        and s.get("eraOfContact") in ("sail", "colonial")
-    )
-    reach_colonial_colonies = sum(
-        1
-        for s in states
-        if s.get("status") == "colony"
-        and s.get("faction") == "reach"
-    )
-
-    if reach_colonial_colonies == 0:
-        return 2.0, {
-            "note": "no reach colonies",
-            "reach_contacts": reach_colonial_contacts,
-            "reach_colonies": reach_colonial_colonies,
-        }
-
-    ratio = reach_colonial_contacts / reach_colonial_colonies
-    loss = sq_relu(1.5 - ratio) * 1.0
-    return min(loss, 10.0), {
-        "reach_contacts": reach_colonial_contacts,
-        "reach_colonies": reach_colonial_colonies,
-        "ratio": ratio,
-    }
-
-
-def _term_colonial_extraction(
-    states: list,
-    colony_sov_pre_nuclear: dict,
-    pop_snapshots: dict,
-    epi_log: list,
-    reach_arch: int,
-) -> tuple:
-    """Term 21: three sub-conditions — colony sovereignty, pop flows, epi correlation."""
-    # a) Mean colony sovereignty (at colonial era) < 0.3
-    if colony_sov_pre_nuclear:
-        mean_col_sov = _mean(list(colony_sov_pre_nuclear.values()))
-        loss_a = sq_relu(mean_col_sov - 0.3) * 5.0
-    else:
-        loss_a = 2.0
-        mean_col_sov = None
-
-    # b) Pop flows toward metropole: reach pop growth ratio vs colony mean
-    try:
-        reach_pop_serial = pop_snapshots["after_serial"][reach_arch]
-        reach_pop_colonial = pop_snapshots["after_colonial"][reach_arch]
-        ratio = reach_pop_colonial / max(1, reach_pop_serial)
-    except (KeyError, IndexError, TypeError):
-        ratio = 1.0
-
-    if ratio > 1.2:
-        loss_b = 0.0
-    else:
-        loss_b = sq_relu(1.2 - ratio) * 2.0
-
-    # c) Epi mortality correlates with crop distance in colonial era
-    colonial_entries = [e for e in (epi_log or []) if e.get("era") == "colonial"]
-    if len(colonial_entries) >= 5:
-        distances = [crop_distance(e["contactor_crop"], e["contacted_crop"]) for e in colonial_entries]
-        mortalities = [e["mortality_rate"] for e in colonial_entries]
-        rho = _spearman(distances, mortalities)
-        loss_c = sq_relu(0.3 - rho) * 3.0
-    else:
-        loss_c = 1.0
-        rho = None
-
-    loss = (loss_a + loss_b + loss_c) / 3.0
-    return min(loss, 10.0), {
-        "mean_col_sov_pre_nuclear": mean_col_sov,
-        "loss_a": loss_a,
-        "reach_pop_growth_ratio": ratio,
-        "loss_b": loss_b,
-        "colonial_epi_spearman": rho,
-        "n_colonial_epi": len(colonial_entries),
-        "loss_c": loss_c,
-    }
-
-
-def _term_nuclear_convergence(
-    tech_snapshots: dict,
-    states: list,
-    reach_arch: int,
-    lattice_arch: int,
-) -> tuple:
-    """Term 22: tech gap at nuclear era < tech gap at peak colonial era."""
-    gap_colonial = abs(
-        tech_snapshots["after_colonial"][reach_arch]
-        - tech_snapshots["after_colonial"][lattice_arch]
-    )
-    gap_nuclear = abs(states[reach_arch]["tech"] - states[lattice_arch]["tech"])
-    loss = sq_relu(gap_nuclear - gap_colonial) * 2.0
-    return min(loss, 10.0), {
-        "gap_colonial": gap_colonial,
-        "gap_nuclear": gap_nuclear,
-    }
-
-
-# ---------------------------------------------------------------------------
-# POLITICAL ECONOMY — terms 23–25
-# ---------------------------------------------------------------------------
-
-def _term_df_timing(df_year: Optional[int]) -> tuple:
-    """Term 23: Dark Forest break within -200 to -40 BP."""
     if df_year is None:
         return 4.0, {"note": "no Dark Forest break"}
-    loss = (
+
+    hegemon_set = set()
+    if mapping["reach_core"] is not None:
+        hegemon_set.add(mapping["reach_core"])
+    if mapping["lattice_core"] is not None:
+        hegemon_set.add(mapping["lattice_core"])
+
+    between_hegemons = (df_a in hegemon_set and df_b in hegemon_set)
+
+    # Timing penalty: should be in [-200, -40]
+    loss_timing = (
         sq_relu(-200 - df_year) + sq_relu(df_year - (-40))
     ) / (80.0 ** 2) * 4.0
-    return min(loss, 10.0), {"df_year": df_year}
 
+    loss_actors = 0.0 if between_hegemons else 1.5
 
-def _term_sov_ordering(states: list) -> tuple:
-    """Term 24: monotonic mean(colonies) < mean(garrisons) < mean(clients) < mean(tributaries) < mean(contacted/pulse)."""
-    STATUS_ORDER = ["colony", "garrison", "tributary", "client", "pulse", "contacted", "core"]
-    sov_by_status = {}
-    for st in STATUS_ORDER:
-        vals = [s["sovereignty"] for s in states if s["status"] == st]
-        if vals:
-            sov_by_status[st] = _mean(vals)
-
-    ordered = [st for st in STATUS_ORDER if st in sov_by_status]
-    loss = 0.0
-    for k in range(len(ordered) - 1):
-        lo_st = ordered[k]
-        hi_st = ordered[k + 1]
-        sov_lo = sov_by_status[lo_st]
-        sov_hi = sov_by_status[hi_st]
-        loss += sq_relu(sov_lo - sov_hi) * 2.0
-
-    n_pairs = max(len(ordered) - 1, 1)
-    loss = loss / n_pairs
-    return min(loss, 10.0), {
-        "sov_by_status": {k: round(v, 3) for k, v in sov_by_status.items()},
-        "n_ordered_groups": len(ordered),
-    }
-
-
-def _term_sov_recovery(
-    states: list,
-    colony_sov_pre_nuclear: dict,
-) -> tuple:
-    """Term 25: nuclear-era colony sovereignty > colonial-era colony sovereignty."""
-    nuclear_col = [s["sovereignty"] for s in states if s["status"] == "colony"]
-    if not nuclear_col or not colony_sov_pre_nuclear:
-        return 0.0, {"note": "no colonies or no pre-nuclear snapshot"}
-
-    nuclear_sov = _mean(nuclear_col)
-    colonial_sov = _mean(list(colony_sov_pre_nuclear.values()))
-    loss = sq_relu(colonial_sov - nuclear_sov) * 5.0
-    return min(loss, 10.0), {
-        "nuclear_colony_sov": nuclear_sov,
-        "colonial_colony_sov": colonial_sov,
+    loss = loss_timing + loss_actors
+    return min(loss, 5.0), {
+        "df_year": df_year,
+        "between_hegemons": between_hegemons,
+        "df_polity_a": df_a,
+        "df_polity_b": df_b,
     }
 
 
 # ---------------------------------------------------------------------------
-# POPULATION — terms 26–27
+# Term 12: el_dorados
 # ---------------------------------------------------------------------------
 
-def _term_pop_ratio(states: list, reach_arch: int, lattice_arch: int) -> tuple:
-    """Term 26: Lattice > Reach population ratio > 1.0."""
-    r_pop = states[reach_arch]["population"]
-    l_pop = states[lattice_arch]["population"]
-    ratio = l_pop / max(1, r_pop)
-    loss = sq_relu(1.0 - ratio) * 2.0
-    return min(loss, 10.0), {
-        "lattice_pop": l_pop,
-        "reach_pop": r_pop,
-        "ratio": ratio,
-    }
-
-
-def _term_pop_inequality(states: list) -> tuple:
-    """Term 27: Gini of all arch populations in [0.25, 0.80]."""
-    pops = [float(s["population"]) for s in states if s["population"] > 0]
-    if not pops:
-        return 2.0, {"note": "no population data"}
-    gini = _gini(pops)
-    loss = sq_relu(0.25 - gini) * 4.0 + sq_relu(gini - 0.80) * 4.0
-    return min(loss, 10.0), {"gini": gini, "n_archs": len(pops)}
+def _term_el_dorados(sim_output):
+    """>=10 archs uncontacted at story present."""
+    uncontacted = sim_output.get("uncontacted", 0)
+    loss = sq_relu(10 - uncontacted) * 0.05
+    return min(loss, 5.0), {"uncontacted": uncontacted}
 
 
 # ---------------------------------------------------------------------------
-# EPIDEMIOLOGY — term 28
-# ---------------------------------------------------------------------------
-
-def _term_epi_correlation(epi_log: list) -> tuple:
-    """Term 28: Spearman rank correlation of mortality with crop distance > 0.3."""
-    if not epi_log or len(epi_log) < 5:
-        return 1.0, {"note": "fewer than 5 epi events", "n_events": len(epi_log) if epi_log else 0}
-
-    distances = [
-        crop_distance(e.get("contactor_crop", ""), e.get("contacted_crop", ""))
-        for e in epi_log
-    ]
-    mortalities = [e.get("mortality_rate", 0.0) for e in epi_log]
-    rho = _spearman(distances, mortalities)
-    loss = sq_relu(0.3 - rho) * 3.0
-    return min(loss, 10.0), {
-        "spearman_rho": rho,
-        "n_events": len(epi_log),
-    }
-
-
-# ---------------------------------------------------------------------------
-# Nuclear emergence check helper
-# ---------------------------------------------------------------------------
-
-def run_nuclear_emergence_check(world: dict, params, seed: int = 42) -> bool:
-    """
-    Run sim without tech floors; returns True if both hegemons reach tech > 9,
-    indicating nuclear capability emerged from preconditions alone.
-    """
-    from sim_proxy import simulate, SimParams
-    import copy
-
-    params_nofloor = copy.copy(params)
-    for attr in ["tech_floor_reach_ind", "tech_floor_lattice_ind"]:
-        if hasattr(params_nofloor, attr):
-            setattr(params_nofloor, attr, 0.0)
-
-    result = simulate(world, params_nofloor, seed=seed)
-    r_tech = result["states"][result["reach_arch"]]["tech"]
-    l_tech = result["states"][result["lattice_arch"]]["tech"]
-    return r_tech > 9.0 and l_tech > 9.0
-
-
-# ---------------------------------------------------------------------------
-# Adjacency helper
-# ---------------------------------------------------------------------------
-
-def _build_adj(plateau_edges: list) -> dict:
-    """Build adjacency dict {arch_idx: [neighbors]} from plateau_edges."""
-    adj = {}
-    for edge in plateau_edges:
-        a, b = int(edge[0]), int(edge[1])
-        adj.setdefault(a, []).append(b)
-        adj.setdefault(b, []).append(a)
-    return adj
-
-
-# ---------------------------------------------------------------------------
-# Main entry point
+# compute_loss -- Baseline Earth loss from sim output dict
 # ---------------------------------------------------------------------------
 
 def compute_loss(
     sim_output: dict,
     weights: Optional[LossWeights] = None,
-    nuclear_emergence: Optional[bool] = None,
-    # Legacy keyword arguments kept for backward compatibility — unused
-    substrate: Optional[list] = None,
-    targets: Optional[object] = None,
-    reach_arch: Optional[int] = None,
-    lattice_arch: Optional[int] = None,
-    world: Optional[dict] = None,
-    params: Optional[object] = None,
+    naphtha_richness: float = 2.0,
 ) -> LossResult:
     """
-    Compute composite emergent-outcome loss from simulation output.
+    Compute 12-term Baseline Earth loss from sim_proxy.simulate() output.
+
+    This is the only loss function that maps hegemons to Reach/Lattice.
+    The simulator is faction-agnostic; narrative labels are applied here.
 
     Parameters
     ----------
-    sim_output : dict
-        Output from sim_proxy.simulate(). Required keys: states, df_year.
-        Also consumes: epi_log, substrate, reach_arch, lattice_arch, archs,
-        plateau_edges, contact_years, hop_count, mineral_access, tech_snapshots,
-        pop_snapshots, colony_sov_pre_nuclear, reach_pu_access, lattice_pu_access.
-    weights : LossWeights | None
-    nuclear_emergence : bool | None
-        Pre-computed result of run_nuclear_emergence_check, or None to skip.
+    sim_output : dict from sim_proxy.simulate()
+    weights : per-term weights (default: all 1.0-2.0)
+    naphtha_richness : the naphtha_richness param used in the sim run,
+                       needed to reconstruct initial C per arch for naphtha_peak
     """
     if weights is None:
         weights = DEFAULT_WEIGHTS
 
-    # Extract all data from sim_output
-    states = sim_output["states"]
-    df_year = sim_output.get("df_year")
-    epi_log = sim_output.get("epi_log") or []
+    archs = sim_output.get("archs", [])
+    mapping = _map_hegemons(sim_output)
 
-    # substrate — accept from kwarg (legacy) or sim_output
-    if substrate is None:
-        substrate = sim_output.get("substrate") or []
+    # Evaluate all 12 terms
+    terms = {}
+    terms["latitude_separation"] = _term_latitude_separation(archs, mapping)
+    terms["civ_gap"]             = _term_civ_gap(archs, mapping)
+    terms["density_asymmetry"]   = _term_density_asymmetry(archs, mapping)
+    terms["two_hegemons"]        = _term_two_hegemons(sim_output, mapping)
+    terms["naphtha_peak"]        = _term_naphtha_peak(sim_output, mapping, naphtha_richness)
+    terms["energy_transition"]   = _term_energy_transition(sim_output)
+    terms["pu_acquisition"]      = _term_pu_acquisition(sim_output, mapping)
+    terms["nuclear_fleets"]      = _term_nuclear_fleets(sim_output, mapping)
+    terms["fleet_asymmetry"]     = _term_fleet_asymmetry(sim_output, mapping)
+    terms["sovereignty_gradient"] = _term_sovereignty_gradient(sim_output, mapping)
+    terms["dark_forest_timing"]  = _term_dark_forest_timing(sim_output, mapping)
+    terms["el_dorados"]          = _term_el_dorados(sim_output)
 
-    # Normalize flat substrate format to nested if needed
-    def _norm_sub(sub_list):
-        if not sub_list:
-            return sub_list
-        if "crops" in (sub_list[0] or {}):
-            return sub_list
-        return [
-            {
-                "crops": {
-                    "primary_crop":  s.get("primary_crop", "emmer"),
-                    "primary_yield": s.get("primary_yield", 0.5),
-                },
-                "climate": {
-                    "abs_latitude":       s.get("abs_latitude", 30.0),
-                    "latitude":           s.get("latitude", 30.0),
-                    "mean_temp":          s.get("mean_temp", 18.0),
-                    "effective_rainfall": s.get("effective_rainfall", 1000.0),
-                    "tidal_range":        s.get("tidal_range", 2.0),
-                    "climate_zone":       s.get("climate_zone", "temperate_wet"),
-                    "wind_belt":          s.get("wind_belt", "westerlies"),
-                    "upwelling":          s.get("upwelling", 0.1),
-                },
-                "minerals": s.get("minerals", {}),
-            }
-            for s in sub_list
-        ]
+    # Assemble
+    raw = {k: v[0] for k, v in terms.items()}
+    details = {k: v[1] for k, v in terms.items()}
 
-    substrate = _norm_sub(substrate)
-
-    archs = sim_output.get("archs") or []
-    plateau_edges = sim_output.get("plateau_edges") or []
-    contact_years = sim_output.get("contact_years") or {}
-    tech_snapshots = sim_output.get("tech_snapshots") or {}
-    pop_snapshots = sim_output.get("pop_snapshots") or {}
-    colony_sov_pre_nuclear = sim_output.get("colony_sov_pre_nuclear") or {}
-    reach_pu_access = sim_output.get("reach_pu_access", False)
-    lattice_pu_access = sim_output.get("lattice_pu_access", False)
-
-    # Infer core arch indices
-    if reach_arch is None:
-        reach_arch = sim_output.get("reach_arch")
-        if reach_arch is None:
-            reach_arch = next(
-                (i for i, s in enumerate(states)
-                 if s["faction"] == "reach" and s["status"] == "core"), 0)
-    if lattice_arch is None:
-        lattice_arch = sim_output.get("lattice_arch")
-        if lattice_arch is None:
-            lattice_arch = next(
-                (i for i, s in enumerate(states)
-                 if s["faction"] == "lattice" and s["status"] == "core"), 1)
-
-    # Build adjacency from plateau_edges
-    adj = _build_adj(plateau_edges)
-
-    # Provide default tech_snapshots structure if absent
-    def _safe_snapshot(key, idx, fallback=0.0):
-        snap = tech_snapshots.get(key)
-        if snap is None:
-            return fallback
-        if isinstance(snap, list) and idx < len(snap):
-            return snap[idx]
-        return fallback
-
-    # Ensure tech_snapshots dicts have list entries (synthesize from states if missing)
-    n = len(states)
-    for snap_key in ["after_antiquity", "after_serial", "after_colonial", "after_industrial"]:
-        if snap_key not in tech_snapshots or tech_snapshots[snap_key] is None:
-            tech_snapshots[snap_key] = [s["tech"] * 0.5 for s in states]
-
-    for snap_key in ["after_serial", "after_colonial", "after_industrial"]:
-        if snap_key not in pop_snapshots or pop_snapshots[snap_key] is None:
-            pop_snapshots[snap_key] = [s["population"] for s in states]
-
-    # --- Evaluate all 28 terms ---
-
-    # Geography (1–8)
-    t1_loss, t1_det = _term_lattice_density(archs, states) if archs else (1.0, {"note": "no archs"})
-    t2_loss, t2_det = _term_reach_spread(archs, states) if archs else (1.0, {"note": "no archs"})
-    t3_loss, t3_det = _term_lattice_latitude(substrate, states)
-    t4_loss, t4_det = _term_reach_latitude(substrate, states)
-    t5_loss, t5_det = _term_lattice_shelf(substrate, states, archs) if archs else (1.0, {"note": "no archs"})
-    t6_loss, t6_det = _term_civ_gap(archs, states) if archs else (1.0, {"note": "no archs"})
-    t7_loss, t7_det = _term_peak_asymmetry(archs, states) if archs else (0.5, {"note": "no archs"})
-    t8_loss, t8_det = _term_edge_topology(archs, states) if archs else (0.5, {"note": "no archs"})
-
-    # Agriculture (9–10)
-    t9_loss, t9_det = _term_climate_crop(substrate, states)
-    t10_loss, t10_det = _term_yield_asymmetry(substrate)
-
-    # Technology (11–14)
-    t11_loss, t11_det = _term_industrial_convergence(tech_snapshots, reach_arch, lattice_arch)
-    t12_loss, t12_det = _term_nav_weapons_coupling(tech_snapshots, states, epi_log, reach_arch, lattice_arch)
-    t13_loss, t13_det = _term_security_dilemma(tech_snapshots, df_year, reach_arch, lattice_arch)
-    t14_loss, t14_det = _term_nuclear_emergence(nuclear_emergence)
-
-    # Ore access (15–18)
-    t15_loss, t15_det = _term_pu_gate(reach_pu_access, lattice_pu_access)
-    t16_loss, t16_det = _term_supply_chain(substrate, states, adj, reach_arch, lattice_arch, reach_pu_access, lattice_pu_access)
-    t17_loss, t17_det = _term_cu_tech_lead(substrate, states)
-    t18_loss, t18_det = _term_au_priority(substrate, states, contact_years, reach_arch, lattice_arch)
-
-    # Historical shape (19–22)
-    t19_loss, t19_det = _term_serial_horizon(states)
-    t20_loss, t20_det = _term_maritime_asymmetry(states, reach_arch, lattice_arch)
-    t21_loss, t21_det = _term_colonial_extraction(states, colony_sov_pre_nuclear, pop_snapshots, epi_log, reach_arch)
-    t22_loss, t22_det = _term_nuclear_convergence(tech_snapshots, states, reach_arch, lattice_arch)
-
-    # Political economy (23–25)
-    t23_loss, t23_det = _term_df_timing(df_year)
-    t24_loss, t24_det = _term_sov_ordering(states)
-    t25_loss, t25_det = _term_sov_recovery(states, colony_sov_pre_nuclear)
-
-    # Population (26–27)
-    t26_loss, t26_det = _term_pop_ratio(states, reach_arch, lattice_arch)
-    t27_loss, t27_det = _term_pop_inequality(states)
-
-    # Epidemiology (28)
-    t28_loss, t28_det = _term_epi_correlation(epi_log)
-
-    # Assemble weighted components
-    components = {
-        "lattice_density":       t1_loss  * weights.lattice_density,
-        "reach_spread":          t2_loss  * weights.reach_spread,
-        "lattice_latitude":      t3_loss  * weights.lattice_latitude,
-        "reach_latitude":        t4_loss  * weights.reach_latitude,
-        "lattice_shelf":         t5_loss  * weights.lattice_shelf,
-        "civ_gap":               t6_loss  * weights.civ_gap,
-        "peak_asymmetry":        t7_loss  * weights.peak_asymmetry,
-        "edge_topology":         t8_loss  * weights.edge_topology,
-        "climate_crop":          t9_loss  * weights.climate_crop,
-        "yield_asymmetry":       t10_loss * weights.yield_asymmetry,
-        "industrial_convergence": t11_loss * weights.industrial_convergence,
-        "nav_weapons_coupling":  t12_loss * weights.nav_weapons_coupling,
-        "security_dilemma":      t13_loss * weights.security_dilemma,
-        "nuclear_emergence":     t14_loss * weights.nuclear_emergence,
-        "pu_gate":               t15_loss * weights.pu_gate,
-        "supply_chain":          t16_loss * weights.supply_chain,
-        "cu_tech_lead":          t17_loss * weights.cu_tech_lead,
-        "au_priority":           t18_loss * weights.au_priority,
-        "serial_horizon":        t19_loss * weights.serial_horizon,
-        "maritime_asymmetry":    t20_loss * weights.maritime_asymmetry,
-        "colonial_extraction":   t21_loss * weights.colonial_extraction,
-        "nuclear_convergence":   t22_loss * weights.nuclear_convergence,
-        "df_timing":             t23_loss * weights.df_timing,
-        "sov_ordering":          t24_loss * weights.sov_ordering,
-        "sov_recovery":          t25_loss * weights.sov_recovery,
-        "pop_ratio":             t26_loss * weights.pop_ratio,
-        "pop_inequality":        t27_loss * weights.pop_inequality,
-        "epi_correlation":       t28_loss * weights.epi_correlation,
+    weight_map = {
+        "latitude_separation":  weights.latitude_separation,
+        "civ_gap":              weights.civ_gap,
+        "density_asymmetry":    weights.density_asymmetry,
+        "two_hegemons":         weights.two_hegemons,
+        "naphtha_peak":         weights.naphtha_peak,
+        "energy_transition":    weights.energy_transition,
+        "pu_acquisition":       weights.pu_acquisition,
+        "nuclear_fleets":       weights.nuclear_fleets,
+        "fleet_asymmetry":      weights.fleet_asymmetry,
+        "sovereignty_gradient": weights.sovereignty_gradient,
+        "dark_forest_timing":   weights.dark_forest_timing,
+        "el_dorados":           weights.el_dorados,
     }
+
+    components = {k: raw[k] * weight_map[k] for k in raw}
     total = sum(components.values())
 
-    details = {
-        "lattice_density":       t1_det,
-        "reach_spread":          t2_det,
-        "lattice_latitude":      t3_det,
-        "reach_latitude":        t4_det,
-        "lattice_shelf":         t5_det,
-        "civ_gap":               t6_det,
-        "peak_asymmetry":        t7_det,
-        "edge_topology":         t8_det,
-        "climate_crop":          t9_det,
-        "yield_asymmetry":       t10_det,
-        "industrial_convergence": t11_det,
-        "nav_weapons_coupling":  t12_det,
-        "security_dilemma":      t13_det,
-        "nuclear_emergence":     t14_det,
-        "pu_gate":               t15_det,
-        "supply_chain":          t16_det,
-        "cu_tech_lead":          t17_det,
-        "au_priority":           t18_det,
-        "serial_horizon":        t19_det,
-        "maritime_asymmetry":    t20_det,
-        "colonial_extraction":   t21_det,
-        "nuclear_convergence":   t22_det,
-        "df_timing":             t23_det,
-        "sov_ordering":          t24_det,
-        "sov_recovery":          t25_det,
-        "pop_ratio":             t26_det,
-        "pop_inequality":        t27_det,
-        "epi_correlation":       t28_det,
-    }
+    return LossResult(
+        total=total,
+        components=components,
+        raw=raw,
+        details=details,
+        mapping=mapping,
+    )
 
-    return LossResult(total=total, components=components, details=details)
+
+# ---------------------------------------------------------------------------
+# baseline_earth_loss -- optimizer API (21 params in, scalar out)
+# ---------------------------------------------------------------------------
+
+def baseline_earth_loss(
+    x,
+    world: dict,
+    seed: int = 42,
+    weights: Optional[LossWeights] = None,
+) -> float:
+    """
+    End-to-end loss: 21-element parameter vector -> scalar.
+
+    This is the function the optimizer calls.  It:
+      1. Unpacks x into SimParams
+      2. Runs simulate()
+      3. Computes 12-term Baseline Earth loss
+      4. Returns the scalar total
+
+    Parameters
+    ----------
+    x : list/array of 21 floats (order matches PARAM_BOUNDS)
+    world : pre-loaded world dict from load_godot_world()
+    seed : RNG seed for the simulation
+    weights : optional per-term weights
+    """
+    from sim_proxy import unpack_params, simulate
+
+    params = unpack_params(x)
+    sim_output = simulate(world, params, seed=seed)
+    lr = compute_loss(sim_output, weights=weights,
+                      naphtha_richness=params.naphtha_richness)
+    return lr.total
+
+
+def baseline_earth_loss_detailed(
+    x,
+    world: dict,
+    seed: int = 42,
+    weights: Optional[LossWeights] = None,
+) -> LossResult:
+    """Like baseline_earth_loss but returns full LossResult for diagnostics."""
+    from sim_proxy import unpack_params, simulate
+
+    params = unpack_params(x)
+    sim_output = simulate(world, params, seed=seed)
+    return compute_loss(sim_output, weights=weights,
+                        naphtha_richness=params.naphtha_richness)
 
 
 # ---------------------------------------------------------------------------
@@ -1160,46 +768,28 @@ def compute_loss(
 def evaluate_seeds(
     sim_outputs_by_seed: dict,
     weights: Optional[LossWeights] = None,
+    naphtha_richness: float = 2.0,
     variance_weight: float = 0.30,
-    fail_penalty: float = 2.0,
-    nuclear_emergence_by_seed: Optional[dict] = None,
+    fail_penalty: float = 5.0,
 ) -> MultiSeedResult:
-    """
-    Evaluate loss across multiple seeds and penalise variance.
-
-    Parameters
-    ----------
-    sim_outputs_by_seed : dict
-        {seed: sim_output} mapping. At least 5 seeds recommended.
-    weights : LossWeights | None
-    variance_weight : float
-        Weight applied to std(total_losses) in the aggregate score.
-    fail_penalty : float
-        Loss added for any seed that raised an exception.
-    nuclear_emergence_by_seed : dict | None
-        {seed: bool | None} mapping for nuclear emergence results.
-
-    Returns
-    -------
-    MultiSeedResult
-    """
+    """Evaluate loss across multiple seeds and penalise variance."""
     if weights is None:
         weights = DEFAULT_WEIGHTS
 
     per_seed = {}
     for seed, sim_out in sim_outputs_by_seed.items():
-        ne = None
-        if nuclear_emergence_by_seed is not None:
-            ne = nuclear_emergence_by_seed.get(seed)
         try:
-            lr = compute_loss(sim_out, weights=weights, nuclear_emergence=ne)
+            lr = compute_loss(sim_out, weights=weights,
+                              naphtha_richness=naphtha_richness)
         except Exception as e:
-            # Synthesize a failed LossResult with penalty
-            failed_components = {k: fail_penalty for k in LossWeights.__dataclass_fields__}
+            failed_components = {f.name: fail_penalty
+                                 for f in LossWeights.__dataclass_fields__.values()}
             lr = LossResult(
                 total=fail_penalty * len(failed_components),
                 components=failed_components,
+                raw=failed_components,
                 details={"error": str(e)},
+                mapping={"mapping_note": f"error: {e}"},
             )
         per_seed[seed] = lr
 
@@ -1214,3 +804,82 @@ def evaluate_seeds(
         std=std_total,
         per_seed=per_seed,
     )
+
+
+def evaluate_seeds_from_params(
+    x,
+    world: dict,
+    seeds: list,
+    weights: Optional[LossWeights] = None,
+    variance_weight: float = 0.30,
+) -> MultiSeedResult:
+    """Multi-seed evaluation from a 21-element param vector."""
+    from sim_proxy import unpack_params, simulate
+
+    params = unpack_params(x)
+    outputs = {}
+    for seed in seeds:
+        outputs[seed] = simulate(world, params, seed=seed)
+    return evaluate_seeds(outputs, weights=weights,
+                          naphtha_richness=params.naphtha_richness,
+                          variance_weight=variance_weight)
+
+
+# ---------------------------------------------------------------------------
+# Test entry point
+# ---------------------------------------------------------------------------
+
+if __name__ == "__main__":
+    import os
+    import sys
+    import time
+
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    sys.path.insert(0, script_dir)
+
+    from sim_proxy import SimParams, simulate, load_godot_world, pack_params
+
+    world_path = os.path.join(script_dir, "worlds", "candidate_0216089.json")
+    if not os.path.exists(world_path):
+        print(f"ERROR: world file not found at {world_path}")
+        sys.exit(1)
+
+    world = load_godot_world(world_path)
+    params = SimParams()
+
+    # --- Two-step: simulate then compute_loss ---
+    t0 = time.perf_counter()
+    result = simulate(world, params, seed=216089)
+    sim_ms = (time.perf_counter() - t0) * 1000
+
+    t1 = time.perf_counter()
+    lr = compute_loss(result, naphtha_richness=params.naphtha_richness)
+    loss_ms = (time.perf_counter() - t1) * 1000
+
+    print("=" * 65)
+    print("  BASELINE EARTH LOSS -- seed 216089")
+    print(f"  Sim: {sim_ms:.1f} ms  |  Loss: {loss_ms:.1f} ms")
+    print("=" * 65)
+    print()
+    print(lr.summary())
+    print()
+    print("-" * 65)
+    print("DETAILS:")
+    print("-" * 65)
+    for term, det in lr.details.items():
+        print(f"\n  {term}:")
+        for k, v in det.items():
+            print(f"    {k}: {v}")
+
+    # --- One-step: optimizer API ---
+    print()
+    print("=" * 65)
+    print("  OPTIMIZER API VERIFICATION")
+    print("=" * 65)
+    x = pack_params(params)
+    t2 = time.perf_counter()
+    scalar = baseline_earth_loss(x, world, seed=216089)
+    api_ms = (time.perf_counter() - t2) * 1000
+    print(f"  baseline_earth_loss(defaults, seed=216089) = {scalar:.4f}")
+    print(f"  End-to-end: {api_ms:.1f} ms")
+    print(f"  Match: {'YES' if abs(scalar - lr.total) < 1e-10 else 'NO'}")
