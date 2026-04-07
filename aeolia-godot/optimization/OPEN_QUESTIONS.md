@@ -1,0 +1,101 @@
+# Open Questions: Remaining Prescriptions in the Simulator
+
+These are assumptions currently hardcoded into sim_proxy_v2.py or the V2 plan that constrain outcomes rather than letting them emerge. Each question should be resolved before or during implementation to determine whether the prescription should be kept (with justification), softened (add variance), or removed.
+
+---
+
+## Q1. Crop → Culture Determinism
+
+**Current behavior:** Crop type deterministically assigns political culture. emmer → Civic, paddi → Subject, taro/sago/papa → Parochial, nori → Civic hybrid.
+
+**The problem:** This is Wittfogel's hydraulic hypothesis encoded as a lookup table. It says "if you grow rice, you develop authoritarian institutions." Scott's *Against the Grain* and *The Art of Not Being Governed* argue that the same crop can produce radically different political cultures depending on geography, population density, and state-evading strategies. A rice-growing archipelago polity faces very different institutional pressures than a rice-growing river valley empire.
+
+**The question:** Should crop → culture be a deterministic mapping, a weighted probability distribution, or a tendency with additional geographic inputs (island size, neighbor count, trade connectivity)?
+
+**Stakes:** If deterministic, the optimizer can only find worlds where rice-growers are always authoritarian. If probabilistic, the same seed can produce different cultural outcomes on different runs, which changes what "optimizing a seed" means.
+
+---
+
+## Q2. Static Allocation Shares
+
+**Current behavior:** A Civic polity always allocates high expansion, high tech, low consolidation. The shares are fixed by culture type for the entire simulation.
+
+**The problem:** Real civilizations oscillate. Ming China was Civic-expansionist under Yongle (Zheng He voyages) and Subject-isolationist under his successors, with the same crop base throughout. The Roman Republic was expansionist; the late Empire was consolidationist. Political culture sets a tendency, but internal dynamics (succession crises, military defeats, resource windfalls) cause regimes to deviate from type.
+
+**The question:** Should allocation shares drift stochastically over time, with culture type as an attractor rather than a fixed point? If so, what drives the drift — random shocks, military outcomes, resource changes, or all three?
+
+**Stakes:** Static shares mean the optimizer finds a single "personality" per culture type that works across all ticks. Drifting shares mean polities can surprise themselves and each other, producing richer emergent narratives but harder optimization (stochastic outcomes per seed).
+
+---
+
+## Q3. Monotonic Tech Progress
+
+**Current behavior:** Tech never decreases. The soft cap slows growth above 9.0, but a polity at tech 8 will never fall back to tech 7.
+
+**The problem:** Civilizations regress. The Roman withdrawal from Britain. The Late Bronze Age Collapse. The Khmer Empire's abandonment of Angkor. The Maya Classic period collapse. On Aeolia, a polity that loses its naphtha supply at tech 8 should experience tech decay as its industrial base contracts. A polity that loses population to epidemic after first contact should lose the labor force that sustains its tech level.
+
+**The question:** Should tech have a maintenance cost — a minimum energy surplus or population threshold below which tech decays? If so, how fast? And can a polity that collapses from tech 8 to tech 5 re-industrialize, or is the resource base (depleted naphtha) gone?
+
+**Stakes:** Without regression, the simulation can't produce collapse events — one of the most studied phenomena in historical social science. With regression, the optimizer must find parameters robust to collapse risk, and the loss function library gains access to scenarios like Total Collapse and Resource Curse that currently can't fully express themselves.
+
+---
+
+## Q4. Fixed Resource Unlock Sequence
+
+**Current behavior:** Fe always available → Cu at tech ~3 → Au at tech ~4 → C at tech ~7 → Pu at tech ~9. This is hardcoded and identical for all polities regardless of geography.
+
+**The problem:** This is Earth's sequence. A civilization on a volcanic island with surface naphtha seeps could plausibly discover hydrocarbons before copper metallurgy — they literally step in the stuff. A civilization on an island with no copper ore but abundant gold alluvial deposits might work gold before copper (as happened in parts of pre-Columbian South America). The unlock sequence assumes a Eurasian continental development path.
+
+**The question:** Should unlock thresholds be geography-dependent? For example: if an arch has high naphtha_richness and surface geology, lower the C unlock tech. If an arch has gold but no copper, swap the Cu/Au order. Or should the sequence remain fixed as a simplifying assumption?
+
+**Stakes:** Fixed sequence is simpler to optimize and produces more predictable outcomes. Geography-dependent unlocks produce more diverse civilizational paths but add complexity and may require per-arch parameter tuning.
+
+---
+
+## Q5. Neoclassical Production Function
+
+**Current behavior:** Y = A × K^0.3 × L^0.7 (Solow-Romer). Diminishing returns to capital, constant returns to scale, labor-dominant.
+
+**The problem:** This is a reasonable model for industrial economies but a poor fit for pre-agricultural maritime-trade economies (where returns to scale are increasing due to network effects of trade routes) or subsistence economies (where capital is negligible and output is roughly linear in labor). A Parochial fishing chieftaincy and a Civic industrial empire use the same production function with the same exponents.
+
+**The question:** Should the production function exponents vary by tech level (pre-industrial vs. industrial vs. nuclear) or by culture type (trade-oriented vs. labor-intensive vs. capital-intensive)? Or is the Solow-Romer model "good enough" as a simplifying assumption given that the production function is an intermediate calculation, not a direct output?
+
+**Stakes:** Variable exponents would make the model more theoretically defensible but add parameters and complexity. Fixed exponents are standard in the computational social science literature and defensible as a simplification. The question is whether the production function's inaccuracy at low tech levels materially affects the simulation's high-tech-level outcomes that the loss function actually cares about.
+
+---
+
+## Q6. Two-Hegemon Prescription
+
+**Current behavior:** The Baseline Earth loss function rewards exactly two hegemons at DF break. The simulator is faction-agnostic, but the optimizer converges on bipolarity because that's what the loss function demands.
+
+**The problem:** This is a narrative choice (Aeolia parallels US-China bipolarity), not an emergent result. A world where three or four roughly equal powers maintain a multipolar equilibrium gets penalized. The simulator *can* produce multipolarity — the loss function won't let it.
+
+**The question:** Is this intentional and should remain as-is for Baseline Earth? (Almost certainly yes.) Is it sufficiently clear in the documentation that bipolarity is prescribed, not emergent? Do the alternative loss functions (especially Multipolar) properly remove this constraint?
+
+**Stakes:** Low for implementation — this is already handled correctly by the faction-agnostic design. The risk is presentational: if bipolarity is presented as an emergent result of the model rather than an optimization target, the academic credibility of the project suffers.
+
+---
+
+## Q7. Dark Forest as Terminal Event
+
+**Current behavior:** The simulation effectively ends at or shortly after DF break. Post-DF dynamics (deterrence, arms control, proxy warfare, normalization, potential nuclear war) are not modeled.
+
+**The problem:** The post-DF world is where most of the interesting political science lives. Deterrence theory (Schelling), arms control (Waltz's stability-instability paradox), proxy warfare (Westad), eventual normalization (détente). The simulation generates the conditions for these dynamics and then stops.
+
+**The question:** Should the simulation continue for N ticks after DF break, modeling post-DF dynamics? If so, what mechanics change after DF? (Deterrence freezes expansion, arms race accelerates tech in narrow band, proxy competition through client states, potential for nuclear exchange as a terminal catastrophic event.) Or is post-DF modeling a separate project that takes DF-break state as initial conditions?
+
+**Stakes:** Extending past DF adds significant mechanical complexity (deterrence logic, proxy mechanics, nuclear war probability) but opens up the most policy-relevant research questions. Keeping DF as terminal is simpler and sufficient for the Vanilla Aeolia narrative (which begins at DF break). This may be best addressed as a future phase.
+
+---
+
+## Resolution Tracking
+
+| Question | Status | Resolution | Date |
+|----------|--------|------------|------|
+| Q1. Crop → Culture | Resolved | Replaced with continuous Collective↔Individual / Inward↔Outward space. Culture is a position, not a type. | 2026-04-06 |
+| Q2. Static Allocation | Resolved | Dissolved by continuous culture space — allocation shares are continuous functions of position that drift every tick. | 2026-04-06 |
+| Q3. Monotonic Tech | Resolved | Tech maintenance cost + desperation mechanic. Layered energy balance (food → industrial → nuclear). Resource pressure overrides culture-based allocation. Collapse cascades and recovery mechanics. | 2026-04-06 |
+| Q4. Resource Unlock | Open | | |
+| Q5. Production Function | Open | | |
+| Q6. Two-Hegemon | Open | | |
+| Q7. Post-DF Dynamics | Open | | |
