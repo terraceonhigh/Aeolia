@@ -106,43 +106,70 @@ func _export(world: Dictionary) -> Dictionary:
 	for k in N:
 		var arch = archs[k]
 		var peaks = arch["peaks"]
-		var p_count := peaks.size()
-		var sz := arch["shelf_r"] / 0.12
-		var avg_h := 0.0
+		var p_count : int = peaks.size()
+		var sz : float = float(arch["shelf_r"]) / 0.12
+		var avg_h : float = 0.0
 		if p_count > 0:
 			for pk in peaks:
-				avg_h += pk["h"]
+				avg_h += float(pk["h"])
 			avg_h /= float(p_count) * Constants.ISLAND_MAX_HEIGHT
-		var pot := (float(p_count) / 20.0 * 0.4
+		var pot : float = (float(p_count) / 20.0 * 0.4
 				  + avg_h * 0.3
 				  + sz / 2.2 * 0.3) * (0.6 + rng.next_float() * 0.4)
 		potentials.append(pot)
 
-	# ── Arch export (lat, size, shelf_r, peak_count, potential) ──────────
+	# ── Arch export (lat, size, shelf_r, peak_count, avg_h, potential) ──
 	var arch_out : Array = []
 	for k in N:
 		var arch = archs[k]
-		var cy := clampf(arch["cy"], -1.0, 1.0)
-		var lat := rad_to_deg(asin(cy))
+		var cy : float = clampf(float(arch["cy"]), -1.0, 1.0)
+		var lat : float = rad_to_deg(asin(cy))
+		var peaks_k = arch["peaks"]
+		var pc : int = peaks_k.size()
+		var ah : float = 0.0
+		if pc > 0:
+			for pk in peaks_k:
+				ah += float(pk["h"])
+			ah /= float(pc) * Constants.ISLAND_MAX_HEIGHT
+		var lon : float = rad_to_deg(atan2(float(arch["cz"]), float(arch["cx"])))
 		arch_out.append({
 			"index":      k,
 			"lat":        snappedf(lat, 0.01),
-			"size":       snappedf(arch["shelf_r"] / 0.12, 0.001),
+			"lon":        snappedf(lon, 0.01),
+			"cx":         snappedf(float(arch["cx"]), 0.00001),
+			"cy":         snappedf(float(arch["cy"]), 0.00001),
+			"cz":         snappedf(float(arch["cz"]), 0.00001),
+			"size":       snappedf(float(arch["shelf_r"]) / 0.12, 0.001),
 			"shelf_r":    arch["shelf_r"],
-			"peak_count": arch["peaks"].size(),
+			"peak_count": pc,
+			"avg_h":      snappedf(ah, 0.0001),
 			"potential":  snappedf(potentials[k], 0.0001),
 		})
 
-	# ── Substrate: only the fields thin_sim.py actually uses ─────────────
+	# ── Substrate: all fields sim_proxy.py and loss.py need ─────────────
 	var sub_out : Array = []
 	for k in N:
 		var s = substrate_raw[k] if k < substrate_raw.size() else {}
-		var crops : Dictionary = s.get("crops", {})
+		var crops   : Dictionary = s.get("crops",    {})
+		var climate : Dictionary = s.get("climate",  {})
+		var mins    : Dictionary = s.get("minerals", {})
 		sub_out.append({
-			"primary_crop":  crops.get("primary_crop",  "emmer"),
-			"primary_yield": crops.get("primary_yield", 0.5),
-			"secondary_crop": crops.get("secondary_crop", null),
-			"total_trade_value": s.get("trade_goods", {}).get("total_trade_value", 0.0),
+			"primary_crop":       crops.get("primary_crop",   "emmer"),
+			"primary_yield":      crops.get("primary_yield",  0.5),
+			"secondary_crop":     crops.get("secondary_crop", null),
+			"total_trade_value":  s.get("trade_goods", {}).get("total_trade_value", 0.0),
+			"latitude":           snappedf(climate.get("latitude",       0.0), 0.01),
+			"abs_latitude":       snappedf(climate.get("abs_latitude",  30.0), 0.01),
+			"tidal_range":        snappedf(climate.get("tidal_range",    2.0), 0.001),
+			"mean_temp":          snappedf(climate.get("mean_temp",     18.0), 0.01),
+			"effective_rainfall": snappedf(climate.get("effective_rainfall", 1000.0), 1.0),
+			"upwelling":          snappedf(climate.get("upwelling",      0.1), 0.001),
+			"minerals": {
+				"Fe": mins.get("Fe", true),
+				"Cu": mins.get("Cu", false),
+				"Au": mins.get("Au", false),
+				"Pu": mins.get("Pu", false),
+			},
 		})
 
 	# ── Names from history states ─────────────────────────────────────────

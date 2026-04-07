@@ -1,0 +1,649 @@
+/Users/terrace/Library/Python/3.9/lib/python/site-packages/optuna/_experimental.py:33: ExperimentalWarning: Argument ``multivariate`` is an experimental feature. The interface can change in the future.
+  optuna_warn(
+Aeolia History Engine Optimizer (Optuna TPE)
+  Trials       : 500
+  Seeds        : [17, 42, 97, 137, 256]
+  Params       : 33
+  Variance λ   : 0.3
+  Results dir  : /Users/terrace/Labs/Aeolia/aeolia-godot/optimization/results
+
+Generating worlds...
+  seed=17: 42 archs, 144 edges
+  seed=42: 42 archs, 141 edges
+  seed=97: 42 archs, 143 edges
+  seed=137: 42 archs, 141 edges
+  seed=256: 42 archs, 141 edges
+
+Evaluating default params (baseline)...
+  Baseline total=20.6058  mean=19.7650  std=2.8026
+  Components: geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.431  poleco=7.500  pop=2.069  epi=0.300
+
+Trial     Total      Mean      Std      Best  Components
+-----------------------------------------------------------------------------------------------
+    1   21.8086   20.8413   3.2245   21.8086  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.429  poleco=7.500  pop=3.147  epi=0.300 *
+    2   20.7869   19.9621   2.7494   20.7869  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.409  poleco=7.500  pop=2.288  epi=0.300 *
+    3   21.8619   20.9111   3.1695   20.7869  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.424  poleco=7.500  pop=3.222  epi=0.300
+    4   18.2977   17.9549   1.1427   18.2977  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=0.262  epi=0.300 *
+    5   19.1357   18.6694   1.5540   18.2977  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.435  poleco=7.500  pop=0.970  epi=0.300
+    6   21.3628   20.4609   3.0062   18.2977  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.432  poleco=7.500  pop=2.764  epi=0.300
+    7   18.5655   18.1886   1.2562   18.2977  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.429  poleco=7.500  pop=0.495  epi=0.300
+    8   21.3154   20.4277   2.9591   18.2977  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.353  poleco=7.500  pop=2.810  epi=0.300
+    9   20.8241   20.0166   2.6917   18.2977  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.455  poleco=7.500  pop=2.297  epi=0.300
+   10   20.8942   20.0685   2.7526   18.2977  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.434  poleco=7.500  pop=2.369  epi=0.300
+   11   21.7760   20.7887   3.2911   18.2977  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.432  poleco=7.500  pop=3.092  epi=0.300
+   12   21.7915   20.8098   3.2723   18.2977  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.439  poleco=7.500  pop=3.106  epi=0.300
+   13   18.7484   18.4351   1.0444   18.2977  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.447  poleco=7.500  pop=0.723  epi=0.300
+   14   18.7566   18.3499   1.3556   18.2977  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.430  poleco=7.500  pop=0.655  epi=0.300
+   15   21.8876   20.9633   3.0807   18.2977  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.434  poleco=7.500  pop=3.265  epi=0.300
+   16   18.4741   18.1681   1.0200   18.2977  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.432  poleco=7.500  pop=0.471  epi=0.300
+   17   21.9148   21.0058   3.0299   18.2977  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.433  poleco=7.500  pop=3.308  epi=0.300
+   18   20.9732   20.1083   2.8827   18.2977  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.418  poleco=7.500  pop=2.426  epi=0.300
+   19   20.6487   19.7965   2.8406   18.2977  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=2.104  epi=0.300
+   20   18.1883   17.8531   1.1175   18.1883  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.432  poleco=7.500  pop=0.156  epi=0.300 *
+   21   21.7794   20.7959   3.2784   18.1883  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=3.103  epi=0.300
+   22   20.8597   20.0043   2.8514   18.1883  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=2.311  epi=0.300
+   23   20.9362   20.1532   2.6100   18.1883  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.447  poleco=7.500  pop=2.442  epi=0.300
+   24   21.7991   20.8170   3.2736   18.1883  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.414  poleco=7.500  pop=3.138  epi=0.300
+   25   20.9301   20.1189   2.7041   18.1883  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.435  poleco=7.500  pop=2.419  epi=0.300
+   26   21.7281   20.7116   3.3884   18.1883  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.437  poleco=7.500  pop=3.010  epi=0.300
+   27   21.3868   20.4516   3.1172   18.1883  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.411  poleco=7.500  pop=2.776  epi=0.300
+   28   20.7379   19.9028   2.7835   18.1883  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=2.210  epi=0.300
+   29   21.7506   20.7498   3.3360   18.1883  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.430  poleco=7.500  pop=3.055  epi=0.300
+   30   18.5986   18.1936   1.3497   18.1883  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.437  poleco=7.500  pop=0.491  epi=0.300
+   31   20.1466   19.4515   2.3170   18.1883  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.430  poleco=7.500  pop=1.757  epi=0.300
+   32   19.6276   19.0201   2.0251   18.1883  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=1.327  epi=0.300
+   33   20.5042   19.7132   2.6367   18.1883  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.436  poleco=7.500  pop=2.013  epi=0.300
+   34   20.8972   20.0799   2.7245   18.1883  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.441  poleco=7.500  pop=2.374  epi=0.300
+   35   20.8735   20.0548   2.7288   18.1883  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.429  poleco=7.500  pop=2.361  epi=0.300
+   36   18.4258   18.1025   1.0778   18.1883  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.410  poleco=7.500  pop=0.428  epi=0.300
+   37   21.6281   20.7453   2.9428   18.1883  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.430  poleco=7.500  pop=3.050  epi=0.300
+   38   21.7980   20.8204   3.2587   18.1883  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.439  poleco=7.500  pop=3.117  epi=0.300
+   39   20.8788   20.0500   2.7627   18.1883  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=2.357  epi=0.300
+   40   20.7652   19.9382   2.7564   18.1883  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=2.246  epi=0.300
+   41   19.7073   19.1215   1.9527   18.1883  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.432  poleco=7.500  pop=1.425  epi=0.300
+   42   18.3668   18.0234   1.1446   18.1883  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=0.331  epi=0.300
+   43   18.4276   18.1013   1.0876   18.1883  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.407  poleco=7.500  pop=0.429  epi=0.300
+   44   18.8108   18.3999   1.3696   18.1883  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=0.707  epi=0.300
+   45   18.4633   18.1567   1.0218   18.1883  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.410  poleco=7.500  pop=0.482  epi=0.300
+   46   18.1784   17.8513   1.0903   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.429  poleco=7.500  pop=0.157  epi=0.300 *
+   47   18.5394   18.1508   1.2954   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.429  poleco=7.500  pop=0.457  epi=0.300
+   48   18.4943   18.1166   1.2591   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.433  poleco=7.500  pop=0.419  epi=0.300
+   49   18.3772   18.0234   1.1795   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.430  poleco=7.500  pop=0.329  epi=0.300
+   50   18.3230   17.9756   1.1579   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.430  poleco=7.500  pop=0.281  epi=0.300
+   51   20.6094   19.8143   2.6506   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.429  poleco=7.500  pop=2.120  epi=0.300
+   52   20.0759   19.3639   2.3733   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.429  poleco=7.500  pop=1.670  epi=0.300
+   53   20.6021   19.8102   2.6398   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.430  poleco=7.500  pop=2.115  epi=0.300
+   54   18.5409   18.1568   1.2803   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.430  poleco=7.500  pop=0.462  epi=0.300
+   55   19.0925   18.5894   1.6770   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.434  poleco=7.500  pop=0.891  epi=0.300
+   56   18.4260   18.0695   1.1885   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=0.377  epi=0.300
+   57   18.6366   18.2322   1.3480   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.429  poleco=7.500  pop=0.539  epi=0.300
+   58   20.2457   19.4891   2.5220   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.441  poleco=7.500  pop=1.783  epi=0.300
+   59   18.2952   17.9625   1.1089   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.430  poleco=7.500  pop=0.267  epi=0.300
+   60   18.5435   18.2318   1.0388   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.435  poleco=7.500  pop=0.532  epi=0.300
+   61   18.1949   17.8817   1.0443   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.440  poleco=7.500  pop=0.177  epi=0.300
+   62   19.1541   18.6463   1.6925   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.442  poleco=7.500  pop=0.939  epi=0.300
+   63   19.2614   18.7614   1.6665   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=1.069  epi=0.300
+   64   18.2246   17.9247   0.9998   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.440  poleco=7.500  pop=0.220  epi=0.300
+   65   18.2499   17.9212   1.0955   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.441  poleco=7.500  pop=0.216  epi=0.300
+   66   18.4840   18.1194   1.2152   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.405  poleco=7.500  pop=0.450  epi=0.300
+   67   18.2721   17.9607   1.0381   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.407  poleco=7.500  pop=0.289  epi=0.300
+   68   18.2019   17.9037   0.9939   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.411  poleco=7.500  pop=0.228  epi=0.300
+   69   18.2286   17.9320   0.9887   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.432  poleco=7.500  pop=0.235  epi=0.300
+   70   18.3452   17.9889   1.1876   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.417  poleco=7.500  pop=0.307  epi=0.300
+   71   18.2944   17.9787   1.0523   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.408  poleco=7.500  pop=0.306  epi=0.300
+   72   18.3746   18.0326   1.1401   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.411  poleco=7.500  pop=0.357  epi=0.300
+   73   18.3093   17.9576   1.1723   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.415  poleco=7.500  pop=0.277  epi=0.300
+   74   18.2943   18.0189   0.9178   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.434  poleco=7.500  pop=0.320  epi=0.300
+   75   18.2257   17.9285   0.9904   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.436  poleco=7.500  pop=0.227  epi=0.300
+   76   18.1974   17.8744   1.0766   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.409  poleco=7.500  pop=0.201  epi=0.300
+   77   18.1935   17.8945   0.9966   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.433  poleco=7.500  pop=0.196  epi=0.300
+   78   18.2821   17.9763   1.0194   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.434  poleco=7.500  pop=0.278  epi=0.300
+   79   18.4015   18.0555   1.1533   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.430  poleco=7.500  pop=0.360  epi=0.300
+   80   18.1929   17.8480   1.1498   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.410  poleco=7.500  pop=0.173  epi=0.300
+   81   18.2191   17.8989   1.0671   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.410  poleco=7.500  pop=0.224  epi=0.300
+   82   18.5895   18.2312   1.1944   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.410  poleco=7.500  pop=0.557  epi=0.300
+   83   20.1404   19.4462   2.3142   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.435  poleco=7.500  pop=1.747  epi=0.300
+   84   18.5005   18.1177   1.2760   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.432  poleco=7.500  pop=0.421  epi=0.300
+   85   21.0082   20.1437   2.8816   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.427  hist_shape=0.411  poleco=7.500  pop=2.374  epi=0.300
+   86   18.3378   18.0055   1.1077   18.1784  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.430  poleco=7.500  pop=0.311  epi=0.300
+   87   18.1619   17.8453   1.0555   18.1619  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.408  poleco=7.500  pop=0.173  epi=0.300 *
+   88   18.2088   17.8802   1.0953   18.1619  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.419  poleco=7.500  pop=0.197  epi=0.300
+   89   18.5144   18.1342   1.2673   18.1619  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.439  poleco=7.500  pop=0.431  epi=0.300
+   90   18.5692   18.1671   1.3404   18.1619  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.415  poleco=7.500  pop=0.487  epi=0.300
+   91   18.4616   18.1366   1.0831   18.1619  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.420  poleco=7.500  pop=0.451  epi=0.300
+   92   19.6260   18.9912   2.1159   18.1619  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.409  poleco=7.500  pop=1.318  epi=0.300
+   93   18.3056   17.9694   1.1205   18.1619  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.412  poleco=7.500  pop=0.293  epi=0.300
+   94   18.0924   17.7825   1.0330   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.433  poleco=7.500  pop=0.084  epi=0.300 *
+   95   18.2066   17.8529   1.1789   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.427  hist_shape=0.430  poleco=7.500  pop=0.064  epi=0.300
+   96   20.8873   20.0155   2.9058   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.430  poleco=7.500  pop=2.321  epi=0.300
+   97   18.1309   17.8292   1.0056   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.430  poleco=7.500  pop=0.135  epi=0.300
+   98   18.2990   18.0013   0.9922   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.416  poleco=7.500  pop=0.320  epi=0.300
+   99   20.0888   19.3603   2.4284   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=1.667  epi=0.300
+  100   18.1249   17.8289   0.9865   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.432  poleco=7.500  pop=0.132  epi=0.300
+  101   18.0924   17.7809   1.0386   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.435  poleco=7.500  pop=0.081  epi=0.300 *
+  102   19.1945   18.6397   1.8492   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.407  poleco=7.500  pop=0.968  epi=0.300
+  103   18.1708   17.8629   1.0266   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.407  poleco=7.500  pop=0.191  epi=0.300
+  104   18.1716   17.8648   1.0228   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.449  poleco=7.500  pop=0.151  epi=0.300
+  105   18.2607   17.9203   1.1348   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.421  poleco=7.500  pop=0.234  epi=0.300
+  106   18.5432   18.1542   1.2967   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.431  poleco=7.500  pop=0.458  epi=0.300
+  107   18.2001   17.8933   1.0227   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.431  poleco=7.500  pop=0.197  epi=0.300
+  108   18.2319   17.9097   1.0738   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.424  poleco=7.500  pop=0.221  epi=0.300
+  109   20.6948   19.8467   2.8269   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.412  poleco=7.500  pop=2.170  epi=0.300
+  110   18.0929   17.7900   1.0096   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.432  poleco=7.500  pop=0.093  epi=0.300
+  111   18.1283   17.8190   1.0310   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.433  poleco=7.500  pop=0.121  epi=0.300
+  112   18.1949   17.9071   0.9593   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.431  poleco=7.500  pop=0.211  epi=0.300
+  113   18.2170   17.8855   1.1051   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.432  poleco=7.500  pop=0.189  epi=0.300
+  114   18.1837   17.8767   1.0232   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.432  poleco=7.500  pop=0.180  epi=0.300
+  115   19.3896   18.8048   1.9494   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.407  poleco=7.500  pop=1.133  epi=0.300
+  116   18.2074   17.8879   1.0653   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.430  poleco=7.500  pop=0.193  epi=0.300
+  117   18.3024   17.9444   1.1934   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.408  poleco=7.500  pop=0.272  epi=0.300
+  118   18.2238   17.9367   0.9569   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.433  poleco=7.500  pop=0.238  epi=0.300
+  119   18.1597   17.8728   0.9563   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.437  poleco=7.500  pop=0.170  epi=0.300
+  120   18.2794   17.9877   0.9723   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.411  poleco=7.500  pop=0.312  epi=0.300
+  121   18.1326   17.8439   0.9624   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.434  poleco=7.500  pop=0.145  epi=0.300
+  122   18.2406   17.9020   1.1288   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.429  poleco=7.500  pop=0.208  epi=0.300
+  123   18.2382   17.9304   1.0260   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.438  poleco=7.500  pop=0.228  epi=0.300
+  124   18.5195   18.1469   1.2422   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.440  poleco=7.500  pop=0.442  epi=0.300
+  125   18.4338   18.0710   1.2093   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.432  poleco=7.500  pop=0.375  epi=0.300
+  126   18.0925   17.7827   1.0328   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.407  poleco=7.500  pop=0.111  epi=0.300
+  127   18.4940   18.1023   1.3058   18.0924  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.406  poleco=7.500  pop=0.431  epi=0.300
+  128   18.0818   17.7878   0.9799   18.0818  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.433  poleco=7.500  pop=0.090  epi=0.300 *
+  129   18.1203   17.8178   1.0083   18.0818  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.431  poleco=7.500  pop=0.122  epi=0.300
+  130   18.2951   17.9504   1.1491   18.0818  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.430  poleco=7.500  pop=0.255  epi=0.300
+  131   18.4365   18.0667   1.2327   18.0818  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.433  poleco=7.500  pop=0.369  epi=0.300
+  132   18.1830   17.8695   1.0452   18.0818  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.430  poleco=7.500  pop=0.175  epi=0.300
+  133   20.0301   19.2933   2.4557   18.0818  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.431  poleco=7.500  pop=1.597  epi=0.300
+  134   18.1472   17.8388   1.0280   18.0818  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.409  poleco=7.500  pop=0.165  epi=0.300
+  135   18.1251   17.8478   0.9242   18.0818  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.441  poleco=7.500  pop=0.142  epi=0.300
+  136   18.1975   17.9196   0.9264   18.0818  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.443  poleco=7.500  pop=0.211  epi=0.300
+  137   18.2004   17.8743   1.0869   18.0818  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.407  poleco=7.500  pop=0.203  epi=0.300
+  138   18.3150   17.9799   1.1173   18.0818  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.440  poleco=7.500  pop=0.275  epi=0.300
+  139   18.1165   17.8136   1.0096   18.0818  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.433  poleco=7.500  pop=0.116  epi=0.300
+  140   18.4560   18.0886   1.2248   18.0818  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.431  poleco=7.500  pop=0.393  epi=0.300
+  141   18.1544   17.8348   1.0653   18.0818  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.430  poleco=7.500  pop=0.140  epi=0.300
+  142   18.0603   17.7571   1.0107   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.409  poleco=7.500  pop=0.083  epi=0.300 *
+  143   18.2273   17.8961   1.1038   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.437  poleco=7.500  pop=0.195  epi=0.300
+  144   18.3859   18.0724   1.0452   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.431  poleco=7.500  pop=0.376  epi=0.300
+  145   18.1087   17.8272   0.9384   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.434  poleco=7.500  pop=0.128  epi=0.300
+  146   18.1293   17.8089   1.0679   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.412  poleco=7.500  pop=0.133  epi=0.300
+  147   18.1140   17.7951   1.0629   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.418  poleco=7.500  pop=0.112  epi=0.300
+  148   19.2083   18.7111   1.6573   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.436  poleco=7.500  pop=1.010  epi=0.300
+  149   18.1005   17.7894   1.0369   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.407  poleco=7.500  pop=0.117  epi=0.300
+  150   18.9654   18.4973   1.5607   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.420  poleco=7.500  pop=0.813  epi=0.300
+  151   18.5503   18.1488   1.3385   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.415  poleco=7.500  pop=0.469  epi=0.300
+  152   18.1356   17.8272   1.0282   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.417  poleco=7.500  pop=0.145  epi=0.300
+  153   18.3919   18.0300   1.2064   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.436  poleco=7.500  pop=0.329  epi=0.300
+  154   18.1567   17.8390   1.0590   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.407  poleco=7.500  pop=0.167  epi=0.300
+  155   18.4953   18.1051   1.3006   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.413  poleco=7.500  pop=0.427  epi=0.300
+  156   18.1644   17.8306   1.1128   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.405  poleco=7.500  pop=0.161  epi=0.300
+  157   18.1246   17.7946   1.1001   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.409  poleco=7.500  pop=0.120  epi=0.300
+  158   19.6803   19.0487   2.1056   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.416  poleco=7.500  pop=1.368  epi=0.300
+  159   18.5153   18.1394   1.2530   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.411  poleco=7.500  pop=0.463  epi=0.300
+  160   18.3238   17.9458   1.2600   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.427  hist_shape=0.434  poleco=7.500  pop=0.153  epi=0.300
+  161   18.0963   17.7728   1.0785   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.416  poleco=7.500  pop=0.092  epi=0.300
+  162   18.1221   17.8360   0.9537   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.436  poleco=7.500  pop=0.135  epi=0.300
+  163   18.1394   17.8441   0.9844   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.436  poleco=7.500  pop=0.143  epi=0.300
+  164   21.6790   20.6559   3.4103   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.412  poleco=7.500  pop=2.979  epi=0.300
+  165   18.4769   18.0868   1.3004   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.417  poleco=7.500  pop=0.405  epi=0.300
+  166   18.1356   17.8217   1.0463   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.434  poleco=7.500  pop=0.123  epi=0.300
+  167   19.3755   18.7993   1.9206   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.446  poleco=7.500  pop=1.088  epi=0.300
+  168   18.2065   17.9068   0.9990   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.438  poleco=7.500  pop=0.204  epi=0.300
+  169   18.1782   17.8525   1.0857   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.410  poleco=7.500  pop=0.177  epi=0.300
+  170   18.1291   17.8205   1.0284   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.432  poleco=7.500  pop=0.123  epi=0.300
+  171   18.0968   17.8030   0.9794   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.433  poleco=7.500  pop=0.106  epi=0.300
+  172   18.1387   17.8049   1.1129   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.412  poleco=7.500  pop=0.128  epi=0.300
+  173   18.2064   17.8939   1.0417   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.432  poleco=7.500  pop=0.197  epi=0.300
+  174   18.1079   17.8111   0.9892   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.434  poleco=7.500  pop=0.112  epi=0.300
+  175   18.2880   17.9770   1.0367   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.432  poleco=7.500  pop=0.281  epi=0.300
+  176   18.4543   18.0956   1.1956   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.442  poleco=7.500  pop=0.389  epi=0.300
+  177   18.0866   17.7779   1.0292   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.433  poleco=7.500  pop=0.080  epi=0.300
+  178   19.3492   18.7836   1.8853   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.431  poleco=7.500  pop=1.088  epi=0.300
+  179   18.1294   17.8230   1.0213   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.433  poleco=7.500  pop=0.125  epi=0.300
+  180   18.7922   18.3642   1.4267   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.439  poleco=7.500  pop=0.661  epi=0.300
+  181   18.0969   17.7708   1.0872   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.407  poleco=7.500  pop=0.099  epi=0.300
+  182   18.6542   18.2359   1.3945   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.436  poleco=7.500  pop=0.535  epi=0.300
+  183   18.7048   18.2907   1.3803   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.410  poleco=7.500  pop=0.616  epi=0.300
+  184   18.1173   17.8119   1.0178   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.438  poleco=7.500  pop=0.109  epi=0.300
+  185   20.7502   19.8989   2.8379   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.429  poleco=7.500  pop=2.205  epi=0.300
+  186   18.1460   17.8617   0.9477   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.432  poleco=7.500  pop=0.165  epi=0.300
+  187   18.2048   17.9208   0.9469   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.444  poleco=7.500  pop=0.211  epi=0.300
+  188   19.6790   19.0411   2.1262   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.443  poleco=7.500  pop=1.334  epi=0.300
+  189   19.9806   19.2510   2.4319   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.439  poleco=7.500  pop=1.547  epi=0.300
+  190   19.3049   18.7226   1.9411   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.406  poleco=7.500  pop=1.052  epi=0.300
+  191   18.1196   17.8085   1.0371   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.440  poleco=7.500  pop=0.104  epi=0.300
+  192   18.7062   18.2957   1.3684   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.442  poleco=7.500  pop=0.589  epi=0.300
+  193   19.1559   18.6361   1.7325   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.441  poleco=7.500  pop=0.930  epi=0.300
+  194   18.2318   17.9178   1.0465   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.418  poleco=7.500  pop=0.235  epi=0.300
+  195   18.1502   17.8409   1.0312   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.431  poleco=7.500  pop=0.145  epi=0.300
+  196   18.0862   17.7621   1.0805   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.408  poleco=7.500  pop=0.089  epi=0.300
+  197   18.1939   17.8639   1.0998   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.438  poleco=7.500  pop=0.161  epi=0.300
+  198   18.1127   17.8167   0.9866   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.429  poleco=7.500  pop=0.123  epi=0.300
+  199   20.1159   19.3661   2.4993   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.437  poleco=7.500  pop=1.665  epi=0.300
+  200   18.2383   17.8974   1.1365   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.437  poleco=7.500  pop=0.196  epi=0.300
+  201   19.3725   18.8556   1.7231   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.443  poleco=7.500  pop=1.148  epi=0.300
+  202   18.3211   17.9819   1.1308   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.432  poleco=7.500  pop=0.285  epi=0.300
+  203   18.0903   17.7753   1.0499   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.434  poleco=7.500  pop=0.076  epi=0.300
+  204   20.7421   19.8930   2.8301   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.427  hist_shape=0.446  poleco=7.500  pop=2.088  epi=0.300
+  205   19.4522   18.8546   1.9921   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.414  poleco=7.500  pop=1.176  epi=0.300
+  206   18.3063   17.9785   1.0925   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.437  poleco=7.500  pop=0.277  epi=0.300
+  207   18.1320   17.8437   0.9610   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.440  poleco=7.500  pop=0.139  epi=0.300
+  208   18.4047   18.0346   1.2335   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.433  poleco=7.500  pop=0.337  epi=0.300
+  209   18.1787   17.8656   1.0434   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.435  poleco=7.500  pop=0.166  epi=0.300
+  210   18.1603   17.8649   0.9848   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.436  poleco=7.500  pop=0.164  epi=0.300
+  211   18.1563   17.8602   0.9872   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.434  poleco=7.500  pop=0.162  epi=0.300
+  212   18.3549   18.0183   1.1219   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.442  poleco=7.500  pop=0.311  epi=0.300
+  213   18.1343   17.8208   1.0450   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.410  poleco=7.500  pop=0.146  epi=0.300
+  214   18.1498   17.8635   0.9545   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.434  poleco=7.500  pop=0.165  epi=0.300
+  215   18.1132   17.8073   1.0195   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.446  poleco=7.500  pop=0.097  epi=0.300
+  216   18.2307   17.9479   0.9427   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.430  poleco=7.500  pop=0.253  epi=0.300
+  217   18.1745   17.8526   1.0728   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.437  poleco=7.500  pop=0.151  epi=0.300
+  218   18.1446   17.8456   0.9966   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=0.153  epi=0.300
+  219   18.1766   17.8621   1.0481   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.432  poleco=7.500  pop=0.166  epi=0.300
+  220   18.0640   17.7687   0.9843   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.431  poleco=7.500  pop=0.073  epi=0.300
+  221   18.4314   18.0775   1.1796   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.429  poleco=7.500  pop=0.384  epi=0.300
+  222   18.1128   17.8230   0.9660   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.450  poleco=7.500  pop=0.108  epi=0.300
+  223   18.2304   17.9300   1.0012   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.454  poleco=7.500  pop=0.211  epi=0.300
+  224   20.7225   19.8637   2.8626   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.418  poleco=7.500  pop=2.181  epi=0.300
+  225   18.1215   17.8234   0.9935   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.436  poleco=7.500  pop=0.123  epi=0.300
+  226   18.3267   17.9777   1.1631   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.427  hist_shape=0.430  poleco=7.500  pop=0.189  epi=0.300
+  227   18.5082   18.1302   1.2598   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.437  poleco=7.500  pop=0.429  epi=0.300
+  228   18.7483   18.3303   1.3935   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.415  poleco=7.500  pop=0.651  epi=0.300
+  229   19.3337   18.7575   1.9207   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.419  poleco=7.500  pop=1.074  epi=0.300
+  230   18.0727   17.7505   1.0739   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.412  poleco=7.500  pop=0.074  epi=0.300
+  231   18.2775   17.9389   1.1284   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.420  poleco=7.500  pop=0.254  epi=0.300
+  232   18.4232   18.0470   1.2541   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.417  poleco=7.500  pop=0.365  epi=0.300
+  233   19.8187   19.1776   2.1370   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.442  poleco=7.500  pop=1.471  epi=0.300
+  234   18.1212   17.8103   1.0362   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.408  poleco=7.500  pop=0.138  epi=0.300
+  235   18.0922   17.8027   0.9648   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.447  poleco=7.500  pop=0.091  epi=0.300
+  236   18.3160   17.9607   1.1844   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.433  poleco=7.500  pop=0.263  epi=0.300
+  237   18.3930   18.0351   1.1927   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.448  poleco=7.500  pop=0.322  epi=0.300
+  238   21.0049   20.1427   2.8743   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.444  poleco=7.500  pop=2.434  epi=0.300
+  239   18.2532   17.9493   1.0130   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.441  poleco=7.500  pop=0.243  epi=0.300
+  240   18.1527   17.8381   1.0486   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.439  poleco=7.500  pop=0.134  epi=0.300
+  241   18.1063   17.7977   1.0284   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=0.105  epi=0.300
+  242   18.1283   17.8106   1.0591   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.440  poleco=7.500  pop=0.106  epi=0.300
+  243   19.7636   19.0905   2.2438   18.0603  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.434  poleco=7.500  pop=1.392  epi=0.300
+  244   18.0403   17.7263   1.0467   18.0403  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.434  poleco=7.500  pop=0.028  epi=0.300 *
+  245   18.7726   18.3363   1.4540   18.0403  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.429  poleco=7.500  pop=0.642  epi=0.300
+  246   18.7068   18.2831   1.4123   18.0403  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.437  poleco=7.500  pop=0.581  epi=0.300
+  247   20.2928   19.5278   2.5500   18.0403  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=1.835  epi=0.300
+  248   18.5959   18.1980   1.3264   18.0403  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.441  poleco=7.500  pop=0.492  epi=0.300
+  249   18.0850   17.7594   1.0855   18.0403  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.407  poleco=7.500  pop=0.088  epi=0.300
+  250   18.4571   18.0732   1.2798   18.0403  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.418  poleco=7.500  pop=0.390  epi=0.300
+  251   18.1493   17.8374   1.0396   18.0403  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.434  poleco=7.500  pop=0.139  epi=0.300
+  252   18.0506   17.7307   1.0665   18.0403  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.430  poleco=7.500  pop=0.036  epi=0.300
+  253   18.1008   17.7896   1.0375   18.0403  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.438  poleco=7.500  pop=0.086  epi=0.300
+  254   18.1343   17.8280   1.0213   18.0403  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.440  poleco=7.500  pop=0.123  epi=0.300
+  255   18.3258   17.9854   1.1347   18.0403  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.438  poleco=7.500  pop=0.283  epi=0.300
+  256   18.2067   17.8844   1.0742   18.0403  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=0.192  epi=0.300
+  257   18.0164   17.7031   1.0444   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.432  poleco=7.500  pop=0.006  epi=0.300 *
+  258   18.3848   18.0208   1.2132   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.433  poleco=7.500  pop=0.323  epi=0.300
+  259   19.0806   18.5652   1.7180   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.434  poleco=7.500  pop=0.866  epi=0.300
+  260   18.1914   17.8527   1.1288   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.431  poleco=7.500  pop=0.157  epi=0.300
+  261   18.1595   17.8276   1.1064   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.437  poleco=7.500  pop=0.126  epi=0.300
+  262   18.0386   17.7231   1.0516   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.409  poleco=7.500  pop=0.049  epi=0.300
+  263   18.1433   17.8391   1.0142   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.442  poleco=7.500  pop=0.132  epi=0.300
+  264   18.7306   18.3128   1.3926   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.450  poleco=7.500  pop=0.598  epi=0.300
+  265   18.7084   18.2779   1.4350   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.427  hist_shape=0.436  poleco=7.500  pop=0.483  epi=0.300
+  266   18.8958   18.4537   1.4738   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.424  poleco=7.500  pop=0.765  epi=0.300
+  267   20.5751   19.7078   2.8911   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.418  poleco=7.500  pop=2.025  epi=0.300
+  268   18.1255   17.8130   1.0417   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.435  poleco=7.500  pop=0.113  epi=0.300
+  269   18.0965   17.7738   1.0758   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=0.081  epi=0.300
+  270   19.0714   18.5577   1.7124   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=0.865  epi=0.300
+  271   18.0507   17.7456   1.0169   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.437  poleco=7.500  pop=0.044  epi=0.300
+  272   18.1779   17.8429   1.1167   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.431  poleco=7.500  pop=0.147  epi=0.300
+  273   18.1828   17.8670   1.0528   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.408  poleco=7.500  pop=0.194  epi=0.300
+  274   20.6371   19.7813   2.8528   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.441  poleco=7.500  pop=2.076  epi=0.300
+  275   20.6120   19.7543   2.8590   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.432  poleco=7.500  pop=2.058  epi=0.300
+  276   20.6354   19.7806   2.8496   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.430  poleco=7.500  pop=2.086  epi=0.300
+  277   18.0624   17.7649   0.9915   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.439  poleco=7.500  pop=0.061  epi=0.300
+  278   18.0855   17.7815   1.0132   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.422  poleco=7.500  pop=0.094  epi=0.300
+  279   18.1295   17.8254   1.0135   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.452  poleco=7.500  pop=0.109  epi=0.300
+  280   18.0460   17.7328   1.0438   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.417  poleco=7.500  pop=0.051  epi=0.300
+  281   18.7486   18.3221   1.4218   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.443  poleco=7.500  pop=0.614  epi=0.300
+  282   20.6296   19.7752   2.8480   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.431  poleco=7.500  pop=2.079  epi=0.300
+  283   18.0375   17.7172   1.0679   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.408  poleco=7.500  pop=0.044  epi=0.300
+  284   18.2938   17.9400   1.1793   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.419  poleco=7.500  pop=0.257  epi=0.300
+  285   18.0423   17.7182   1.0805   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=0.026  epi=0.300
+  286   18.0700   17.7482   1.0727   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.424  poleco=7.500  pop=0.060  epi=0.300
+  287   20.8243   19.9521   2.9075   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.427  hist_shape=0.430  poleco=7.500  pop=2.163  epi=0.300
+  288   18.5553   18.1448   1.3685   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.409  poleco=7.500  pop=0.471  epi=0.300
+  289   20.5259   19.6720   2.8464   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.425  poleco=7.500  pop=1.982  epi=0.300
+  290   18.1478   17.8352   1.0420   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.422  poleco=7.500  pop=0.148  epi=0.300
+  291   18.0690   17.7677   1.0044   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.411  poleco=7.500  pop=0.091  epi=0.300
+  292   18.1474   17.8519   0.9849   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.447  poleco=7.500  pop=0.140  epi=0.300
+  293   18.0871   17.7746   1.0416   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.429  poleco=7.500  pop=0.081  epi=0.300
+  294   18.0808   17.7731   1.0257   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.434  poleco=7.500  pop=0.074  epi=0.300
+  295   18.4983   18.1167   1.2719   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.417  poleco=7.500  pop=0.435  epi=0.300
+  296   18.1186   17.8052   1.0448   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.417  poleco=7.500  pop=0.123  epi=0.300
+  297   18.6075   18.2349   1.2419   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.431  poleco=7.500  pop=0.539  epi=0.300
+  298   20.6501   19.7987   2.8382   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.451  poleco=7.500  pop=2.083  epi=0.300
+  299   18.0494   17.7448   1.0151   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.450  poleco=7.500  pop=0.030  epi=0.300
+  300   20.5912   19.7319   2.8644   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.432  poleco=7.500  pop=2.035  epi=0.300
+  301   18.0750   17.7823   0.9756   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.442  poleco=7.500  pop=0.075  epi=0.300
+  302   19.8134   19.1369   2.2549   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.452  poleco=7.500  pop=1.420  epi=0.300
+  303   18.6644   18.2430   1.4045   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.427  hist_shape=0.426  poleco=7.500  pop=0.458  epi=0.300
+  304   19.1566   18.6436   1.7099   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.427  hist_shape=0.446  poleco=7.500  pop=0.839  epi=0.300
+  305   18.0709   17.7789   0.9732   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.442  poleco=7.500  pop=0.072  epi=0.300
+  306   18.1087   17.8231   0.9521   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.445  poleco=7.500  pop=0.113  epi=0.300
+  307   18.0852   17.7664   1.0627   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.423  poleco=7.500  pop=0.078  epi=0.300
+  308   18.1205   17.7963   1.0804   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.420  poleco=7.500  pop=0.111  epi=0.300
+  309   21.0218   20.1373   2.9485   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.436  poleco=7.500  pop=2.436  epi=0.300
+  310   18.3254   17.9771   1.1611   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=0.284  epi=0.300
+  311   18.0508   17.7384   1.0415   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.413  poleco=7.500  pop=0.060  epi=0.300
+  312   18.2362   17.9026   1.1119   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.438  poleco=7.500  pop=0.200  epi=0.300
+  313   18.1299   17.7928   1.1239   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.414  poleco=7.500  pop=0.114  epi=0.300
+  314   19.1465   18.6065   1.7999   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.417  poleco=7.500  pop=0.924  epi=0.300
+  315   18.1856   17.8567   1.0961   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.409  poleco=7.500  pop=0.183  epi=0.300
+  316   18.0476   17.7332   1.0479   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.435  poleco=7.500  pop=0.033  epi=0.300
+  317   20.7503   19.8931   2.8572   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.432  poleco=7.500  pop=2.196  epi=0.300
+  318   18.1384   17.8334   1.0165   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.437  poleco=7.500  pop=0.132  epi=0.300
+  319   18.1260   17.8239   1.0069   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.412  poleco=7.500  pop=0.147  epi=0.300
+  320   18.1981   17.8687   1.0980   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.430  poleco=7.500  pop=0.173  epi=0.300
+  321   18.8288   18.3733   1.5181   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.434  poleco=7.500  pop=0.675  epi=0.300
+  322   18.0802   17.7529   1.0910   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.416  poleco=7.500  pop=0.072  epi=0.300
+  323   18.2388   17.8861   1.1755   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.420  poleco=7.500  pop=0.201  epi=0.300
+  324   18.1377   17.7974   1.1343   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.406  poleco=7.500  pop=0.126  epi=0.300
+  325   18.1399   17.8333   1.0220   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.415  poleco=7.500  pop=0.153  epi=0.300
+  326   18.1298   17.8167   1.0439   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.439  poleco=7.500  pop=0.113  epi=0.300
+  327   18.3879   18.0427   1.1508   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.442  poleco=7.500  pop=0.335  epi=0.300
+  328   18.0854   17.7796   1.0192   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.434  poleco=7.500  pop=0.081  epi=0.300
+  329   18.2470   17.9051   1.1398   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.437  poleco=7.500  pop=0.203  epi=0.300
+  330   18.0477   17.7394   1.0275   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.432  poleco=7.500  pop=0.042  epi=0.300
+  331   18.7615   18.3187   1.4759   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.431  poleco=7.500  pop=0.623  epi=0.300
+  332   18.1738   17.8390   1.1159   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.422  poleco=7.500  pop=0.152  epi=0.300
+  333   21.7169   20.6980   3.3966   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=3.005  epi=0.300
+  334   18.1552   17.8298   1.0845   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.421  poleco=7.500  pop=0.144  epi=0.300
+  335   20.8168   19.9528   2.8799   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.427  hist_shape=0.431  poleco=7.500  pop=2.163  epi=0.300
+  336   18.0852   17.7865   0.9958   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.432  poleco=7.500  pop=0.090  epi=0.300
+  337   18.0377   17.7210   1.0556   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.430  poleco=7.500  pop=0.026  epi=0.300
+  338   18.1590   17.7981   1.2030   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.427  hist_shape=0.431  poleco=7.500  pop=0.008  epi=0.300
+  339   20.5421   19.6951   2.8232   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.433  poleco=7.500  pop=1.997  epi=0.300
+  340   20.1651   19.4004   2.5489   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.433  poleco=7.500  pop=1.702  epi=0.300
+  341   20.0282   19.2818   2.4877   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.412  poleco=7.500  pop=1.605  epi=0.300
+  342   18.0606   17.7613   0.9977   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.439  poleco=7.500  pop=0.058  epi=0.300
+  343   18.0918   17.7664   1.0847   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.406  poleco=7.500  pop=0.096  epi=0.300
+  344   20.8969   20.0283   2.8952   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.430  poleco=7.500  pop=2.334  epi=0.300
+  345   18.2221   17.8792   1.1430   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.432  poleco=7.500  pop=0.182  epi=0.300
+  346   18.2123   17.8835   1.0962   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.436  poleco=7.500  pop=0.182  epi=0.300
+  347   18.0750   17.7770   0.9935   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.438  poleco=7.500  pop=0.074  epi=0.300
+  348   18.0725   17.7617   1.0360   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.410  poleco=7.500  pop=0.087  epi=0.300
+  349   18.0905   17.8058   0.9490   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=0.113  epi=0.300
+  350   18.6449   18.2328   1.3738   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.431  poleco=7.500  pop=0.537  epi=0.300
+  351   18.1706   17.8472   1.0781   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.418  poleco=7.500  pop=0.164  epi=0.300
+  352   19.8428   19.1424   2.3347   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.437  poleco=7.500  pop=1.441  epi=0.300
+  353   18.1106   17.7859   1.0825   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.433  poleco=7.500  pop=0.088  epi=0.300
+  354   19.2083   18.6653   1.8099   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.438  poleco=7.500  pop=0.963  epi=0.300
+  355   18.1065   17.7959   1.0353   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.443  poleco=7.500  pop=0.088  epi=0.300
+  356   18.0771   17.7613   1.0525   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.414  poleco=7.500  pop=0.082  epi=0.300
+  357   19.8846   19.1791   2.3517   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.414  poleco=7.500  pop=1.500  epi=0.300
+  358   18.1486   17.8362   1.0415   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.412  poleco=7.500  pop=0.159  epi=0.300
+  359   19.2988   18.7386   1.8672   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.430  poleco=7.500  pop=1.044  epi=0.300
+  360   18.0815   17.7679   1.0455   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.435  poleco=7.500  pop=0.068  epi=0.300
+  361   18.1454   17.8124   1.1099   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.417  poleco=7.500  pop=0.130  epi=0.300
+  362   18.0903   17.7785   1.0391   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.442  poleco=7.500  pop=0.071  epi=0.300
+  363   20.0621   19.3061   2.5198   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.423  poleco=7.500  pop=1.619  epi=0.300
+  364   18.1586   17.8385   1.0668   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.424  poleco=7.500  pop=0.150  epi=0.300
+  365   18.1930   17.8565   1.1215   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.422  poleco=7.500  pop=0.170  epi=0.300
+  366   18.0893   17.7758   1.0450   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.413  poleco=7.500  pop=0.098  epi=0.300
+  367   18.0683   17.7467   1.0719   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.430  poleco=7.500  pop=0.052  epi=0.300
+  368   19.0459   18.5516   1.6477   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.432  poleco=7.500  pop=0.855  epi=0.300
+  369   18.1471   17.8232   1.0795   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.440  poleco=7.500  pop=0.118  epi=0.300
+  370   18.1857   17.9003   0.9513   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.444  poleco=7.500  pop=0.192  epi=0.300
+  371   18.2618   17.9163   1.1515   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.438  poleco=7.500  pop=0.213  epi=0.300
+  372   18.1664   17.8523   1.0467   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.437  poleco=7.500  pop=0.150  epi=0.300
+  373   18.1311   17.7969   1.1141   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.422  poleco=7.500  pop=0.110  epi=0.300
+  374   18.0483   17.7304   1.0595   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.427  poleco=7.500  pop=0.039  epi=0.300
+  375   20.6778   19.8165   2.8708   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.426  poleco=7.500  pop=2.125  epi=0.300
+  376   18.1286   17.7972   1.1046   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.426  poleco=7.500  pop=0.106  epi=0.300
+  377   18.0701   17.7123   1.1927   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.355  poleco=7.500  pop=0.093  epi=0.300
+  378   18.7194   18.2941   1.4174   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.426  poleco=7.500  pop=0.603  epi=0.300
+  379   18.0680   17.7656   1.0081   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.410  poleco=7.500  pop=0.090  epi=0.300
+  380   18.0946   17.7786   1.0532   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.410  poleco=7.500  pop=0.104  epi=0.300
+  381   19.9071   19.1890   2.3938   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.433  poleco=7.500  pop=1.491  epi=0.300
+  382   18.2860   17.9267   1.1977   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.410  poleco=7.500  pop=0.252  epi=0.300
+  383   18.2253   17.8874   1.1262   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.429  poleco=7.500  pop=0.193  epi=0.300
+  384   18.1344   17.8274   1.0230   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.417  poleco=7.500  pop=0.146  epi=0.300
+  385   18.4430   18.0273   1.3859   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.352  poleco=7.500  pop=0.411  epi=0.300
+  386   18.5569   18.1462   1.3689   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.416  poleco=7.500  pop=0.466  epi=0.300
+  387   18.0928   17.7802   1.0419   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.407  poleco=7.500  pop=0.108  epi=0.300
+  388   20.6224   19.7618   2.8686   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.416  poleco=7.500  pop=2.081  epi=0.300
+  389   18.3185   17.9786   1.1327   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.434  poleco=7.500  pop=0.280  epi=0.300
+  390   18.3338   17.9662   1.2254   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.412  poleco=7.500  pop=0.289  epi=0.300
+  391   19.4253   18.8113   2.0467   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.412  poleco=7.500  pop=1.134  epi=0.300
+  392   18.0963   17.7621   1.1141   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.433  poleco=7.500  pop=0.064  epi=0.300
+  393   18.0360   17.7252   1.0359   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.432  poleco=7.500  pop=0.028  epi=0.300
+  394   18.2906   17.9438   1.1557   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.431  poleco=7.500  pop=0.248  epi=0.300
+  395   18.0782   17.7808   0.9914   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.438  poleco=7.500  pop=0.078  epi=0.300
+  396   18.1429   17.8168   1.0869   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.434  poleco=7.500  pop=0.118  epi=0.300
+  397   18.1417   17.8282   1.0450   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.451  poleco=7.500  pop=0.112  epi=0.300
+  398   18.8724   18.4131   1.5310   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.433  poleco=7.500  pop=0.715  epi=0.300
+  399   18.1164   17.8232   0.9774   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.430  poleco=7.500  pop=0.128  epi=0.300
+  400   18.2357   17.8872   1.1619   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.425  poleco=7.500  pop=0.197  epi=0.300
+  401   18.0889   17.7665   1.0748   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.437  poleco=7.500  pop=0.064  epi=0.300
+  402   18.0838   17.7737   1.0336   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.434  poleco=7.500  pop=0.075  epi=0.300
+  403   18.0462   17.7432   1.0098   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.441  poleco=7.500  pop=0.037  epi=0.300
+  404   18.0925   17.7725   1.0666   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.413  poleco=7.500  pop=0.095  epi=0.300
+  405   20.0756   19.3282   2.4910   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.434  poleco=7.500  pop=1.629  epi=0.300
+  406   18.0759   17.7430   1.1096   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.412  poleco=7.500  pop=0.066  epi=0.300
+  407   18.3654   18.0036   1.2061   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.439  poleco=7.500  pop=0.300  epi=0.300
+  408   18.0838   17.7832   1.0020   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.445  poleco=7.500  pop=0.073  epi=0.300
+  409   19.1993   18.6731   1.7538   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.425  poleco=7.500  pop=0.983  epi=0.300
+  410   20.0376   19.2932   2.4813   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=1.600  epi=0.300
+  411   18.1527   17.8205   1.1073   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.436  poleco=7.500  pop=0.120  epi=0.300
+  412   18.0566   17.7523   1.0143   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.437  poleco=7.500  pop=0.050  epi=0.300
+  413   20.7252   19.8857   2.7983   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.422  poleco=7.500  pop=2.199  epi=0.300
+  414   18.1029   17.7772   1.0857   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.429  poleco=7.500  pop=0.084  epi=0.300
+  415   20.4324   19.6075   2.7494   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.410  poleco=7.500  pop=1.932  epi=0.300
+  416   18.0830   17.7500   1.1100   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.422  poleco=7.500  pop=0.064  epi=0.300
+  417   18.1086   17.7948   1.0459   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.421  poleco=7.500  pop=0.109  epi=0.300
+  418   19.2070   18.6720   1.7835   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.439  poleco=7.500  pop=0.968  epi=0.300
+  419   19.2371   18.6864   1.8356   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.429  poleco=7.500  pop=0.992  epi=0.300
+  420   18.1358   17.8098   1.0868   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.434  poleco=7.500  pop=0.111  epi=0.300
+  421   18.3747   18.0145   1.2009   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.440  poleco=7.500  pop=0.309  epi=0.300
+  422   18.0338   17.7267   1.0236   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.433  poleco=7.500  pop=0.029  epi=0.300
+  423   18.0796   17.7638   1.0528   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.412  poleco=7.500  pop=0.087  epi=0.300
+  424   18.1027   17.7783   1.0812   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=0.085  epi=0.300
+  425   18.0727   17.7543   1.0612   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.452  poleco=7.500  pop=0.037  epi=0.300
+  426   18.1232   17.8124   1.0362   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.439  poleco=7.500  pop=0.108  epi=0.300
+  427   18.1212   17.8214   0.9994   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.418  poleco=7.500  pop=0.138  epi=0.300
+  428   18.5283   18.1388   1.2986   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.435  poleco=7.500  pop=0.439  epi=0.300
+  429   19.7824   19.0950   2.2911   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.435  poleco=7.500  pop=1.395  epi=0.300
+  430   18.1210   17.8028   1.0607   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.417  poleco=7.500  pop=0.121  epi=0.300
+  431   18.0718   17.7525   1.0642   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=0.060  epi=0.300
+  432   18.1446   17.8160   1.0953   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.432  poleco=7.500  pop=0.119  epi=0.300
+  433   18.1109   17.8102   1.0022   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.412  poleco=7.500  pop=0.133  epi=0.300
+  434   18.0725   17.7525   1.0665   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.424  poleco=7.500  pop=0.064  epi=0.300
+  435   18.7398   18.2939   1.4864   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.425  poleco=7.500  pop=0.604  epi=0.300
+  436   18.0381   17.7205   1.0588   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=0.028  epi=0.300
+  437   18.3295   17.9716   1.1930   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=0.279  epi=0.300
+  438   18.2904   17.9396   1.1694   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.434  poleco=7.500  pop=0.240  epi=0.300
+  439   18.0425   17.7184   1.0806   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.410  poleco=7.500  pop=0.044  epi=0.300
+  440   18.0664   17.7729   0.9784   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.443  poleco=7.500  pop=0.065  epi=0.300
+  441   18.8296   18.3786   1.5033   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.438  poleco=7.500  pop=0.676  epi=0.300
+  442   18.0642   17.7481   1.0538   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.412  poleco=7.500  pop=0.072  epi=0.300
+  443   18.1059   17.7889   1.0566   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.432  poleco=7.500  pop=0.092  epi=0.300
+  444   20.6677   19.8139   2.8462   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=2.121  epi=0.300
+  445   18.1357   17.8292   1.0217   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.414  poleco=7.500  pop=0.150  epi=0.300
+  446   18.0267   17.7182   1.0282   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.429  poleco=7.500  pop=0.024  epi=0.300
+  447   18.2836   17.9303   1.1776   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.415  poleco=7.500  pop=0.251  epi=0.300
+  448   18.4949   18.1021   1.3093   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=0.409  epi=0.300
+  449   18.1015   17.7973   1.0139   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=0.104  epi=0.300
+  450   18.0703   17.7612   1.0304   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.427  poleco=7.500  pop=0.069  epi=0.300
+  451   18.1277   17.7965   1.1043   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=0.103  epi=0.300
+  452   20.4430   19.6116   2.7714   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.418  poleco=7.500  pop=1.929  epi=0.300
+  453   18.0545   17.7442   1.0346   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=0.051  epi=0.300
+  454   18.1418   17.8113   1.1019   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=0.119  epi=0.300
+  455   18.2716   17.9219   1.1656   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.431  poleco=7.500  pop=0.227  epi=0.300
+  456   18.0966   17.7694   1.0906   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.430  poleco=7.500  pop=0.075  epi=0.300
+  457   18.1191   17.8205   0.9953   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.444  poleco=7.500  pop=0.112  epi=0.300
+  458   18.2439   17.8986   1.1512   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.429  poleco=7.500  pop=0.205  epi=0.300
+  459   18.2848   17.9335   1.1708   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.431  poleco=7.500  pop=0.238  epi=0.300
+  460   18.7719   18.3292   1.4757   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=0.637  epi=0.300
+  461   19.3443   18.7734   1.9031   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.443  poleco=7.500  pop=1.065  epi=0.300
+  462   20.9267   20.0431   2.9453   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.417  poleco=7.500  pop=2.362  epi=0.300
+  463   18.1486   17.8256   1.0767   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.412  poleco=7.500  pop=0.149  epi=0.300
+  464   18.1781   17.8408   1.1246   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.429  poleco=7.500  pop=0.147  epi=0.300
+  465   18.0473   17.7349   1.0414   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.424  poleco=7.500  pop=0.046  epi=0.300
+  466   18.0438   17.7343   1.0318   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.434  poleco=7.500  pop=0.036  epi=0.300
+  467   19.4834   18.8870   1.9882   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.430  poleco=7.500  pop=1.192  epi=0.300
+  468   18.0238   17.7175   1.0211   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.430  poleco=7.500  pop=0.023  epi=0.300
+  469   18.0509   17.7540   0.9896   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.431  poleco=7.500  pop=0.058  epi=0.300
+  470   18.4997   18.1125   1.2905   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.434  poleco=7.500  pop=0.413  epi=0.300
+  471   18.0386   17.7319   1.0221   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.429  poleco=7.500  pop=0.038  epi=0.300
+  472   18.0618   17.7508   1.0368   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.435  poleco=7.500  pop=0.051  epi=0.300
+  473   18.1412   17.8504   0.9694   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.441  poleco=7.500  pop=0.145  epi=0.300
+  474   18.0613   17.7455   1.0526   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.406  poleco=7.500  pop=0.075  epi=0.300
+  475   20.7119   19.8486   2.8775   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.422  poleco=7.500  pop=2.161  epi=0.300
+  476   18.0337   17.7248   1.0296   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.437  poleco=7.500  pop=0.023  epi=0.300
+  477   18.0960   17.7739   1.0736   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.423  poleco=7.500  pop=0.086  epi=0.300
+  478   19.4089   18.8222   1.9556   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.442  poleco=7.500  pop=1.115  epi=0.300
+  479   18.0530   17.7476   1.0183   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.431  poleco=7.500  pop=0.052  epi=0.300
+  480   18.0362   17.7295   1.0224   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.438  poleco=7.500  pop=0.026  epi=0.300
+  481   18.0346   17.7305   1.0136   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.436  poleco=7.500  pop=0.030  epi=0.300
+  482   18.1158   17.7865   1.0975   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.430  poleco=7.500  pop=0.092  epi=0.300
+  483   18.1189   17.7963   1.0755   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.442  poleco=7.500  pop=0.089  epi=0.300
+  484   18.3089   17.9633   1.1521   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.442  poleco=7.500  pop=0.256  epi=0.300
+  485   18.3146   17.9600   1.1821   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.432  poleco=7.500  pop=0.263  epi=0.300
+  486   20.7995   19.9380   2.8714   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=2.245  epi=0.300
+  487   20.9737   20.1072   2.8883   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=2.415  epi=0.300
+  488   18.2538   17.9078   1.1532   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.429  poleco=7.500  pop=0.214  epi=0.300
+  489   18.7015   18.2600   1.4716   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.414  poleco=7.500  pop=0.581  epi=0.300
+  490   18.1252   17.7989   1.0877   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=0.106  epi=0.300
+  491   21.7135   20.6927   3.4025   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.428  poleco=7.500  pop=3.000  epi=0.300
+  492   18.0574   17.7405   1.0564   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.411  poleco=7.500  pop=0.064  epi=0.300
+  493   18.0385   17.7291   1.0312   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.440  poleco=7.500  pop=0.024  epi=0.300
+  494   18.1134   17.7933   1.0668   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.430  poleco=7.500  pop=0.098  epi=0.300
+  495   18.0784   17.7536   1.0825   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.430  poleco=7.500  pop=0.058  epi=0.300
+  496   18.0486   17.7367   1.0397   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.435  poleco=7.500  pop=0.037  epi=0.300
+  497   18.0321   17.7163   1.0529   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.430  poleco=7.500  pop=0.021  epi=0.300
+  498   20.6250   19.8167   2.6942   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.429  poleco=7.500  pop=2.123  epi=0.300
+  499   18.1035   17.7806   1.0762   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.436  poleco=7.500  pop=0.079  epi=0.300
+  500   18.1227   17.8270   0.9855   18.0164  geo=0.995  ag=0.070  tech=7.067  ore=1.333  hist_shape=0.452  poleco=7.500  pop=0.110  epi=0.300
+
+Completed 500 trials in 6.0s (0.0s/trial)
+Best total loss: 18.0164  (baseline: 20.6058, improvement: 2.5894)
+
+Saved: /Users/terrace/Labs/Aeolia/aeolia-godot/optimization/results/best_params.json
+Saved: /Users/terrace/Labs/Aeolia/aeolia-godot/optimization/results/loss_breakdown.json
+Saved: /Users/terrace/Labs/Aeolia/aeolia-godot/optimization/results/convergence.json
+Saved: /Users/terrace/Labs/Aeolia/aeolia-godot/optimization/results/convergence_summary.txt
+
+Aeolia History Engine — Optimization Results
+============================================================
+Backend        : Optuna TPE (multivariate, n_startup=20)
+Trials         : 500
+Seeds          : [17, 42, 97, 137, 256]
+Parameters     : 33
+Variance λ     : 0.3
+Total time     : 6.0s  (0.0s/trial)
+
+Baseline (default params):
+  total=20.6058  mean=19.7650  std=2.8026
+  geo=0.9946  ag=0.0702  tech=7.0667  ore=1.3333  hist_shape=0.4313  poleco=7.5000  pop=2.0688  epi=0.3000
+
+Best (trial #257):
+  total=18.0164  mean=17.7031  std=1.0444
+  geo=0.9946  ag=0.0702  tech=7.0667  ore=1.3333  hist_shape=0.4325  poleco=7.5000  pop=0.0058  epi=0.3000
+  Improvement vs baseline: 2.5894
+
+Per-seed losses (best params):
+  seed=17: total=16.5858  geo=0.6667  ag=0.0357  tech=7.5000  ore=0.3333  hist_shape=0.5431  poleco=7.5000  pop=0.0070  epi=0.0000
+  seed=42: total=16.5761  geo=2.3065  ag=0.0485  tech=5.3333  ore=1.1111  hist_shape=0.2760  poleco=7.5000  pop=0.0007  epi=0.0000
+  seed=97: total=19.3657  geo=0.6667  ag=0.0388  tech=7.5000  ore=3.1111  hist_shape=0.5432  poleco=7.5000  pop=0.0059  epi=0.0000
+  seed=137: total=18.0223  geo=0.6667  ag=0.1445  tech=7.5000  ore=1.0556  hist_shape=0.4000  poleco=7.5000  pop=0.0056  epi=0.7500
+  seed=256: total=17.9657  geo=0.6667  ag=0.0836  tech=7.5000  ore=1.0556  hist_shape=0.4000  poleco=7.5000  pop=0.0098  epi=0.7500
+
+Convergence (best-so-far):
+  trial   1: best_so_far=21.8086
+  trial   5: best_so_far=18.2977
+  trial  10: best_so_far=18.2977
+  trial  20: best_so_far=18.1883
+  trial  50: best_so_far=18.1784
+  trial 100: best_so_far=18.0924
+  trial 200: best_so_far=18.0603
+  trial 300: best_so_far=18.0164
+  trial 400: best_so_far=18.0164
+  trial 500: best_so_far=18.0164
+
+Best parameter values (vs defaults):
+  antiquity_base_growth                best=  0.008652  default=  0.002000  delta=+0.006652 (+74% of range) <<<
+  antiquity_lattice_pop_mult           best=  1.664285  default=  2.500000  delta=-0.835715 (-33% of range) <<<
+  serial_shock_base_min                best=  0.145425  default=  0.200000  delta=-0.054575 (-22% of range) <<<
+  serial_shock_base_range              best=  0.140136  default=  0.250000  delta=-0.109864 (-37% of range) <<<
+  serial_trade_rate                    best=  0.000420  default=  0.000400  delta=+0.000020 (+2% of range)
+  reach_serial_base_mult               best=  1.409682  default=  1.300000  delta=+0.109682 (+6% of range)
+  reach_serial_log_coeff               best=  0.175524  default=  0.300000  delta=-0.124476 (-25% of range) <<<
+  lattice_serial_base_mult             best=  1.331544  default=  1.900000  delta=-0.568456 (-25% of range) <<<
+  lattice_serial_log_coeff             best=  0.274622  default=  0.120000  delta=+0.154622 (+57% of range) <<<
+  extraction_base                      best=  0.262139  default=  0.150000  delta=+0.112139 (+37% of range) <<<
+  extraction_per_year                  best=  0.000047  default=  0.000100  delta=-0.000053 (-18% of range)
+  garrison_absorb_base                 best=  0.217127  default=  0.150000  delta=+0.067127 (+22% of range) <<<
+  reach_colony_surplus                 best=  0.052664  default=  0.120000  delta=-0.067336 (-34% of range) <<<
+  lattice_garrison_bonus               best=  0.227429  default=  0.150000  delta=+0.077429 (+31% of range) <<<
+  lattice_trib_bonus                   best=  0.127179  default=  0.080000  delta=+0.047179 (+26% of range) <<<
+  reach_ind_tech_mult                  best=  0.059488  default=  0.120000  delta=-0.060512 (-29% of range) <<<
+  reach_ind_pot_mult                   best=  0.197198  default=  0.140000  delta=+0.057198 (+22% of range) <<<
+  reach_ind_log_coeff                  best=  0.171281  default=  0.140000  delta=+0.031281 (+13% of range)
+  reach_ind_tech_growth                best=  1.464845  default=  0.900000  delta=+0.564845 (+40% of range) <<<
+  lattice_ind_tech_mult                best=  0.052866  default=  0.060000  delta=-0.007134 (-5% of range)
+  lattice_ind_pot_mult                 best=  0.219860  default=  0.220000  delta=-0.000140 (-0% of range)
+  lattice_ind_log_coeff                best=  0.142408  default=  0.100000  delta=+0.042408 (+25% of range) <<<
+  lattice_ind_tech_growth              best=  1.220281  default=  0.600000  delta=+0.620281 (+56% of range) <<<
+  tech_floor_reach_ind                 best=  6.708769  default=  7.000000  delta=-0.291231 (-29% of range) <<<
+  tech_floor_lattice_ind               best=  6.421864  default=  6.500000  delta=-0.078136 (-8% of range)
+  reach_nuclear_pop_mult               best=  1.167447  default=  1.400000  delta=-0.232553 (-26% of range) <<<
+  lattice_nuclear_pop_mult             best=  1.149898  default=  1.350000  delta=-0.200102 (-22% of range) <<<
+  nuclear_access_colony                best=  0.457571  default=  0.700000  delta=-0.242429 (-48% of range) <<<
+  nuclear_access_garrison              best=  0.733859  default=  0.500000  delta=+0.233859 (+47% of range) <<<
+  nuclear_access_independent           best=  0.167483  default=  0.300000  delta=-0.132517 (-33% of range) <<<
+  cu_serial_year_bonus                 best=226.788758  default=150.000000  delta=+76.788758 (+19% of range)
+  au_contact_year_bonus                best=190.105086  default= 80.000000  delta=+110.105086 (+44% of range) <<<
+  pu_nuclear_tech_fraction             best=  0.370985  default=  0.600000  delta=-0.229015 (-33% of range) <<<
+
+STRUCTURAL DIAGNOSIS
+------------------------------------------------------------
+Seeds 17, 97, 137, 256: geo=10.0 (capped), poleco=15.0 (capped).
+Only seed=42 produces uncapped losses.
+Root cause: generate_test_world() synthetic worlds have contact
+  fractions and era distributions outside the lore target window
+  regardless of history-engine parameters. geo/poleco losses are
+  determined by world topology (plateau graph), not sim params.
+Implication: these params are optimised primarily against seed=42.
+  To optimise robustly, use Godot-exported worlds (run_headless.gd)
+  where the full gyre/substrate model produces valid starting state.
+  See README.md 'Third path: offline JSON worlds + thin_sim.py'.
+
+GDScript constants (changed params, |Δ| > 5% of range):
+  var antiquity_base_growth := 0.008652
+  var antiquity_lattice_pop_mult := 1.664285
+  var serial_shock_base_min := 0.145425
+  var serial_shock_base_range := 0.140136
+  var reach_serial_base_mult := 1.409682
+  var reach_serial_log_coeff := 0.175524
+  var lattice_serial_base_mult := 1.331544
+  var lattice_serial_log_coeff := 0.274622
+  var extraction_base := 0.262139
+  var extraction_per_year := 0.000047
+  var garrison_absorb_base := 0.217127
+  var reach_colony_surplus := 0.052664
+  var lattice_garrison_bonus := 0.227429
+  var lattice_trib_bonus := 0.127179
+  var reach_ind_tech_mult := 0.059488
+  var reach_ind_pot_mult := 0.197198
+  var reach_ind_log_coeff := 0.171281
+  var reach_ind_tech_growth := 1.464845
+  var lattice_ind_tech_mult := 0.052866
+  var lattice_ind_log_coeff := 0.142408
+  var lattice_ind_tech_growth := 1.220281
+  var tech_floor_reach_ind := 6.708769
+  var tech_floor_lattice_ind := 6.421864
+  var reach_nuclear_pop_mult := 1.167447
+  var lattice_nuclear_pop_mult := 1.149898
+  var nuclear_access_colony := 0.457571
+  var nuclear_access_garrison := 0.733859
+  var nuclear_access_independent := 0.167483
+  var cu_serial_year_bonus := 226.788758
+  var au_contact_year_bonus := 190.105086
+  var pu_nuclear_tech_fraction := 0.370985
+
