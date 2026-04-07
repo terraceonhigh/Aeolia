@@ -713,3 +713,39 @@ No new parameters required. Communication channel properties are derived from:
 - Existing cooperation_growth_rate → cooperation accumulation
 
 The communication model is fully emergent from the trade model and culture space.
+
+---
+
+## 15. Production Function & Resource Threshold Decisions (Resolves Q4 & Q5)
+
+### Production Function: Keep Y = A × K^0.3 × E^0.7
+
+The neoclassical production function is unchanged across all tech levels. The energy-budget formulation (E replaces L) is already in place; no further modification is warranted.
+
+**What was tested (exponent_sweep_results.md):** The sweep explored variable exponents by tech regime (three-regime: pre-industrial / industrial / nuclear), interpolated exponents, and population-augmented accelerators. Results:
+
+- Three-regime exponents: nominally 37% better on mean loss. Achieved by breaking DF timing and naphtha scramble timing — not better civilizational dynamics. The improvement is a loss-function artifact.
+- Interpolated exponents: 8% better than baseline. Insufficient to justify the parameter overhead and instability.
+- Population exponent on tech-growth accelerator (pop^0.5): causes runaway expansion, suppresses Dark Forest, fires the naphtha scramble in the Mesolithic. Fails all timing targets. Rejected.
+
+**Why population doesn't need an explicit term:** Population enters the model indirectly through energy surplus → budget → expansion. Adding it to the production function or accelerator double-counts the effect and breaks competitive balance.
+
+**Why the `accel_rate` table is sufficient:** The five-level table (0 / 0.002 / 0.008 / 0.025 / 0.120) already encodes five implicit growth regimes. Energy composition shifts (food → food+naphtha → food+naphtha+nuclear) produce the regime transitions through the budget. The production function does not need to track eras.
+
+**One justified addition — Malthusian clamp in the energy layer:** For tech < 4, when population approaches carrying capacity, food surplus is clamped downward. This produces the Malthusian trap (population growth constrained by food ceiling, not by production function degeneracy) without requiring regime boundaries anywhere in the production or tech-growth logic. The clamp belongs in the food energy calculation and nowhere else.
+
+### Resource Thresholds: Three-Stage Model (Detection → Exploitation → Strategic Valuation)
+
+The fixed unlock sequence is retained for Exploitation thresholds only. Resources now have three decoupled stages:
+
+**Stage 1 — Detection** (geology-dependent, any tech): A polity can observe surface deposits — bitumen seeps, alluvial gold, exposed pyra outcrops — long before it has the technology to exploit them. This is the stage at which sacred and cultural associations form. Historical analogues: Baku's eternal flames (natural gas seeps worshipped for millennia before petroleum), Mesopotamian bitumen waterproofing (surface tar pits exploited before distillation), salt licks as ritual sites before salt extraction infrastructure.
+
+*Sacralization preservation:* Cultural encodings formed at Detection persist after industrial exploitation begins. A naphtha island that spent 800 ticks as a sacred flame site before industrialization retains that cultural texture in the simulation — detectable in the cultural layer as historical residue, potentially affecting inference_depth accumulation and contact posture for polities aware of the site's history.
+
+**Stage 2 — Exploitation** (fixed tech sequence: naphtha ~5, pyra ~8): Tech-gated, not geology-gated. Detection and Exploitation are deliberately decoupled. A polity sitting on surface naphtha for millennia before tech 5 cannot yet refine it; the gap between Detection and Exploitation is where the sacred/cultural associations form and deepen.
+
+**Stage 3 — Strategic Valuation** (event-triggered): The global fission discovery event (§2) instantly revalues pyra regardless of prior detection or exploitation state. A polity that has been mining pyra for industrial applications (catalysis, specialty alloys, high-temperature metallurgy) wakes up to find existing holdings are now existentially strategic. A polity with no pyra holdings wakes up to find it must acquire them or accept nuclear dependency. This is not gradual appreciation — it is a phase transition, identical in character to the overnight revaluation of every uranium deposit on Earth after Trinity.
+
+**Interaction with §1 (Three-Regime Pyra Value):** The Strategic Valuation stage is the mechanism that drives pyra's value from "moderate industrial" to "maximum (3–5×)" at tech ≥ 8.5. The resource_value function's discontinuity at 8.5 is the simulation expression of the Strategic Valuation event. The two models are consistent.
+
+**Interaction with §4 (Pyra Scramble as Narrative Engine):** The three-stage model deepens the human cost narrative. Parochial-culture polities on pyra-rich islands may have been in a Detection relationship with those deposits for centuries — the volcanic geology is woven into their cosmology, ritual practice, and cultural identity. Strategic Valuation, when it arrives via distant hegemon fission discovery, transforms geology they considered sacred into a target they had no hand in marking. The sacralization preservation mechanic makes this visible: the simulation records what those islands meant before they became strategic, and that record persists into the post-scramble state.

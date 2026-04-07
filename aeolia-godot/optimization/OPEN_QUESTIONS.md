@@ -50,6 +50,16 @@ These are assumptions currently hardcoded into sim_proxy_v2.py or the V2 plan th
 
 **Stakes:** Fixed sequence is simpler to optimize and produces more predictable outcomes. Geography-dependent unlocks produce more diverse civilizational paths but add complexity and may require per-arch parameter tuning.
 
+**RESOLVED 2026-04-07:** Three-threshold model. Resources progress through three decoupled stages:
+
+1. **Detection** — geology-dependent, can happen at any tech level. A polity can observe bitumen seeps, surface pyra outcrops, or alluvial gold without the technology to exploit them. Sacred/cultural associations form at Detection: Baku's eternal flames from natural gas seeps, Mesopotamian bitumen used for waterproofing, salt licks becoming ritual sites. These associations are permanent — they persist as cultural texture even after industrial exploitation begins (*sacralization preservation*: early cultural encodings of a resource site leave traces in the simulation's cultural layer regardless of later exploitation state).
+
+2. **Exploitation** — fixed tech sequence: naphtha ~5, pyra ~8. Tech-gated, not geology-gated. A polity sitting on surface naphtha can know about it for millennia before they can refine it. Detection and Exploitation are deliberately decoupled to allow exactly this gap.
+
+3. **Strategic Valuation** — triggered by discovery events, not tech level. The fission discovery event (§2 of this document) makes pyra strategically critical regardless of whether a polity has previously detected or exploited it. A polity with zero pyra deposits suddenly needs to acquire them. A polity that has been mining pyra for industrial uses (catalysis, specialty alloys) undergoes a revaluation of existing holdings overnight.
+
+The unlock sequence is not abolished — it describes Exploitation thresholds only. Detection is always geography-dependent. Strategic Valuation is always event-triggered. The three stages can be separated by hundreds of ticks on the same island.
+
 ---
 
 ## Q5. Neoclassical Production Function
@@ -61,6 +71,14 @@ These are assumptions currently hardcoded into sim_proxy_v2.py or the V2 plan th
 **The question:** Should the production function exponents vary by tech level (pre-industrial vs. industrial vs. nuclear) or by culture type (trade-oriented vs. labor-intensive vs. capital-intensive)? Or is the Solow-Romer model "good enough" as a simplifying assumption given that the production function is an intermediate calculation, not a direct output?
 
 **Stakes:** Variable exponents would make the model more theoretically defensible but add parameters and complexity. Fixed exponents are standard in the computational social science literature and defensible as a simplification. The question is whether the production function's inaccuracy at low tech levels materially affects the simulation's high-tech-level outcomes that the loss function actually cares about.
+
+**RESOLVED 2026-04-07:** Keep Y = A × K^0.3 × E^0.7 unchanged across all tech levels. (Note: the active formula uses energy E, not labor L — this is the energy-budget formulation from §11/12.)
+
+Do **not** add a population exponent to the tech-growth accelerator. Population already enters indirectly via energy surplus → budget → expansion. Adding it explicitly double-counts and breaks competitive balance: sweep results (exponent_sweep_results.md) showed that pop^0.5 causes runaway expansion, suppresses Dark Forest, and fires the naphtha scramble in the Mesolithic. Three-regime variable exponents scored nominally 37% better on mean loss but achieved this by breaking DF timing and scramble timing — the improvement is an artifact of the loss function, not better dynamics. Interpolated exponents were only 8% better than baseline, insufficient to justify the added complexity and instability.
+
+The existing `accel_rate` table (0 / 0.002 / 0.008 / 0.025 / 0.120) already encodes five implicit growth regimes. The production function does not need to know what era it is in. Energy composition changes (food → food+naphtha → food+naphtha+nuclear) naturally produce regime transitions through the energy budget.
+
+**One justified addition:** a Malthusian carrying-capacity clamp applied to energy surplus in the **energy layer** (not the production function) for tech < 4. When population approaches carrying capacity, food surplus shrinks — producing the Malthusian trap without requiring regime boundaries in the production function or the tech-growth accelerator. The clamp belongs in the food energy calculation, not in Y.
 
 ---
 
@@ -95,7 +113,7 @@ These are assumptions currently hardcoded into sim_proxy_v2.py or the V2 plan th
 | Q1. Crop → Culture | Resolved | Replaced with continuous Collective↔Individual / Inward↔Outward space. Culture is a position, not a type. | 2026-04-06 |
 | Q2. Static Allocation | Resolved | Dissolved by continuous culture space — allocation shares are continuous functions of position that drift every tick. | 2026-04-06 |
 | Q3. Monotonic Tech | Resolved | Tech maintenance cost + desperation mechanic. Layered energy balance (food → industrial → nuclear). Resource pressure overrides culture-based allocation. Collapse cascades and recovery mechanics. | 2026-04-06 |
-| Q4. Resource Unlock | Open | | |
-| Q5. Production Function | Open | | |
+| Q4. Resource Unlock | Resolved | Three-threshold model: Detection (geology-dependent, any tech) → Exploitation (fixed tech: naphtha ~5, pyra ~8) → Strategic Valuation (event-triggered). Sacralization preservation: early cultural associations persist after industrial exploitation. | 2026-04-07 |
+| Q5. Production Function | Resolved | Keep Y = A × K^0.3 × E^0.7 unchanged. No population exponent — double-counts and breaks DF/scramble timing (sweep: pop^0.5 fires naphtha scramble in Mesolithic). `accel_rate` table encodes growth regimes implicitly. Malthusian clamp added to food energy layer (not production function) for tech < 4. | 2026-04-07 |
 | Q6. Two-Hegemon | Open | | |
 | Q7. Post-DF Dynamics | Open | | |
