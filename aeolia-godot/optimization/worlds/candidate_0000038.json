@@ -1,0 +1,2860 @@
+{
+	"seed": 38,
+	"n": 42,
+	"reach_arch": 5,
+	"lattice_arch": 35,
+	"archs": [
+		{
+			"index": 0,
+			"lat": 75.0,
+			"lon": 8.36,
+			"cx": 0.25607,
+			"cy": 0.96593,
+			"cz": 0.03762,
+			"size": 2.019,
+			"shelf_r": 0.2422459799693897,
+			"peak_count": 14,
+			"avg_h": 0.8558,
+			"potential": 0.7457
+		},
+		{
+			"index": 1,
+			"lat": 64.4,
+			"lon": 136.15,
+			"cx": -0.31161,
+			"cy": 0.90183,
+			"cz": 0.29933,
+			"size": 1.274,
+			"shelf_r": 0.15285022438690066,
+			"peak_count": 6,
+			"avg_h": 0.5506,
+			"potential": 0.2926
+		},
+		{
+			"index": 2,
+			"lat": 62.22,
+			"lon": -94.04,
+			"cx": -0.03281,
+			"cy": 0.88471,
+			"cz": -0.46498,
+			"size": 0.457,
+			"shelf_r": 0.05489737068861723,
+			"peak_count": 2,
+			"avg_h": 0.2131,
+			"potential": 0.1074
+		},
+		{
+			"index": 3,
+			"lat": 65.83,
+			"lon": 43.14,
+			"cx": 0.29879,
+			"cy": 0.91231,
+			"cz": 0.28002,
+			"size": 0.682,
+			"shelf_r": 0.08186349266627803,
+			"peak_count": 4,
+			"avg_h": 0.2635,
+			"potential": 0.1924
+		},
+		{
+			"index": 4,
+			"lat": 62.1,
+			"lon": -171.27,
+			"cx": -0.46256,
+			"cy": 0.88374,
+			"cz": -0.07104,
+			"size": 1.076,
+			"shelf_r": 0.1291079078335315,
+			"peak_count": 6,
+			"avg_h": 0.4923,
+			"potential": 0.2618
+		},
+		{
+			"index": 5,
+			"lat": 47.17,
+			"lon": -37.3,
+			"cx": 0.54073,
+			"cy": 0.7334,
+			"cz": -0.41199,
+			"size": 1.8,
+			"shelf_r": 0.216,
+			"peak_count": 14,
+			"avg_h": 0.8309,
+			"potential": 0.5566
+		},
+		{
+			"index": 6,
+			"lat": 49.88,
+			"lon": 107.08,
+			"cx": -0.18929,
+			"cy": 0.76464,
+			"cz": 0.61603,
+			"size": 0.676,
+			"shelf_r": 0.08109142141649499,
+			"peak_count": 5,
+			"avg_h": 0.3363,
+			"potential": 0.2588
+		},
+		{
+			"index": 7,
+			"lat": 36.63,
+			"lon": -116.52,
+			"cx": -0.35836,
+			"cy": 0.59661,
+			"cz": -0.71808,
+			"size": 0.254,
+			"shelf_r": 0.030459229290951042,
+			"peak_count": 2,
+			"avg_h": 0.1091,
+			"potential": 0.0959
+		},
+		{
+			"index": 8,
+			"lat": 40.0,
+			"lon": 25.26,
+			"cx": 0.69279,
+			"cy": 0.64279,
+			"cz": 0.32691,
+			"size": 0.997,
+			"shelf_r": 0.11967762377299367,
+			"peak_count": 7,
+			"avg_h": 0.4783,
+			"potential": 0.2765
+		},
+		{
+			"index": 9,
+			"lat": 35.68,
+			"lon": 156.06,
+			"cx": -0.74234,
+			"cy": 0.58333,
+			"cz": 0.32965,
+			"size": 1.145,
+			"shelf_r": 0.1373779209293425,
+			"peak_count": 8,
+			"avg_h": 0.5895,
+			"potential": 0.2999
+		},
+		{
+			"index": 10,
+			"lat": 40.45,
+			"lon": -66.45,
+			"cx": 0.30407,
+			"cy": 0.64876,
+			"cz": -0.6976,
+			"size": 0.65,
+			"shelf_r": 0.07800050728255882,
+			"peak_count": 3,
+			"avg_h": 0.2072,
+			"potential": 0.1839
+		},
+		{
+			"index": 11,
+			"lat": 24.65,
+			"lon": 81.49,
+			"cx": 0.13455,
+			"cy": 0.41711,
+			"cz": 0.89884,
+			"size": 0.796,
+			"shelf_r": 0.09556727553717792,
+			"peak_count": 6,
+			"avg_h": 0.3347,
+			"potential": 0.2586
+		},
+		{
+			"index": 12,
+			"lat": 11.91,
+			"lon": -151.53,
+			"cx": -0.86019,
+			"cy": 0.20634,
+			"cz": -0.46637,
+			"size": 2.185,
+			"shelf_r": 0.2621509965257719,
+			"peak_count": 12,
+			"avg_h": 0.9066,
+			"potential": 0.5427
+		},
+		{
+			"index": 13,
+			"lat": 24.66,
+			"lon": -22.14,
+			"cx": 0.84183,
+			"cy": 0.4172,
+			"cz": -0.34244,
+			"size": 0.323,
+			"shelf_r": 0.03871286650327965,
+			"peak_count": 2,
+			"avg_h": 0.1317,
+			"potential": 0.1085
+		},
+		{
+			"index": 14,
+			"lat": 16.34,
+			"lon": 134.39,
+			"cx": -0.67123,
+			"cy": 0.28139,
+			"cz": 0.68576,
+			"size": 1.021,
+			"shelf_r": 0.12250558156147598,
+			"peak_count": 7,
+			"avg_h": 0.5272,
+			"potential": 0.4373
+		},
+		{
+			"index": 15,
+			"lat": 15.65,
+			"lon": -108.16,
+			"cx": -0.30015,
+			"cy": 0.26982,
+			"cz": -0.91494,
+			"size": 0.612,
+			"shelf_r": 0.07347346234694123,
+			"peak_count": 4,
+			"avg_h": 0.3081,
+			"potential": 0.2107
+		},
+		{
+			"index": 16,
+			"lat": 7.27,
+			"lon": 41.22,
+			"cx": 0.7461,
+			"cy": 0.12653,
+			"cz": 0.6537,
+			"size": 0.318,
+			"shelf_r": 0.03811103718867525,
+			"peak_count": 2,
+			"avg_h": 0.1493,
+			"potential": 0.1079
+		},
+		{
+			"index": 17,
+			"lat": -1.31,
+			"lon": 178.45,
+			"cx": -0.99938,
+			"cy": -0.0228,
+			"cz": 0.02697,
+			"size": 1.35,
+			"shelf_r": 0.1619497266802937,
+			"peak_count": 5,
+			"avg_h": 0.7122,
+			"potential": 0.3225
+		},
+		{
+			"index": 18,
+			"lat": 7.22,
+			"lon": -36.16,
+			"cx": 0.80102,
+			"cy": 0.1256,
+			"cz": -0.58532,
+			"size": 1.455,
+			"shelf_r": 0.1746369641153142,
+			"peak_count": 10,
+			"avg_h": 0.7086,
+			"potential": 0.3767
+		},
+		{
+			"index": 19,
+			"lat": -6.01,
+			"lon": 91.75,
+			"cx": -0.03034,
+			"cy": -0.1047,
+			"cz": 0.99404,
+			"size": 1.879,
+			"shelf_r": 0.22549120432231573,
+			"peak_count": 11,
+			"avg_h": 0.8212,
+			"potential": 0.6241
+		},
+		{
+			"index": 20,
+			"lat": -4.13,
+			"lon": -136.82,
+			"cx": -0.72733,
+			"cy": -0.07205,
+			"cz": -0.6825,
+			"size": 0.445,
+			"shelf_r": 0.053390273124910896,
+			"peak_count": 3,
+			"avg_h": 0.1867,
+			"potential": 0.1099
+		},
+		{
+			"index": 21,
+			"lat": -9.26,
+			"lon": -2.04,
+			"cx": 0.98633,
+			"cy": -0.161,
+			"cz": -0.03521,
+			"size": 0.605,
+			"shelf_r": 0.07262846814980731,
+			"peak_count": 4,
+			"avg_h": 0.2554,
+			"potential": 0.1861
+		},
+		{
+			"index": 22,
+			"lat": -2.74,
+			"lon": 148.59,
+			"cx": -0.85248,
+			"cy": -0.04787,
+			"cz": 0.52056,
+			"size": 0.689,
+			"shelf_r": 0.0826234372719191,
+			"peak_count": 3,
+			"avg_h": 0.3325,
+			"potential": 0.2058
+		},
+		{
+			"index": 23,
+			"lat": 0.5,
+			"lon": -69.72,
+			"cx": 0.34655,
+			"cy": 0.00875,
+			"cz": -0.93799,
+			"size": 0.44,
+			"shelf_r": 0.05281555390264839,
+			"peak_count": 3,
+			"avg_h": 0.1781,
+			"potential": 0.1104
+		},
+		{
+			"index": 24,
+			"lat": -13.77,
+			"lon": 51.07,
+			"cx": 0.61034,
+			"cy": -0.23802,
+			"cz": 0.75553,
+			"size": 0.351,
+			"shelf_r": 0.0420922770104371,
+			"peak_count": 2,
+			"avg_h": 0.1471,
+			"potential": 0.1318
+		},
+		{
+			"index": 25,
+			"lat": -4.63,
+			"lon": -161.15,
+			"cx": -0.94326,
+			"cy": -0.0808,
+			"cz": -0.32208,
+			"size": 0.578,
+			"shelf_r": 0.06930624133720995,
+			"peak_count": 4,
+			"avg_h": 0.2779,
+			"potential": 0.1516
+		},
+		{
+			"index": 26,
+			"lat": -15.35,
+			"lon": -16.72,
+			"cx": 0.92358,
+			"cy": -0.26465,
+			"cz": -0.27743,
+			"size": 0.618,
+			"shelf_r": 0.07419965452048927,
+			"peak_count": 4,
+			"avg_h": 0.2243,
+			"potential": 0.1687
+		},
+		{
+			"index": 27,
+			"lat": -26.14,
+			"lon": 113.76,
+			"cx": -0.36174,
+			"cy": -0.44052,
+			"cz": 0.82163,
+			"size": 0.677,
+			"shelf_r": 0.08124307091580704,
+			"peak_count": 4,
+			"avg_h": 0.3144,
+			"potential": 0.2365
+		},
+		{
+			"index": 28,
+			"lat": -23.92,
+			"lon": -114.27,
+			"cx": -0.37567,
+			"cy": -0.40552,
+			"cz": -0.83332,
+			"size": 0.679,
+			"shelf_r": 0.08142062653088943,
+			"peak_count": 4,
+			"avg_h": 0.3277,
+			"potential": 0.1684
+		},
+		{
+			"index": 29,
+			"lat": -22.15,
+			"lon": 26.71,
+			"cx": 0.82743,
+			"cy": -0.37696,
+			"cz": 0.41625,
+			"size": 1.164,
+			"shelf_r": 0.13972955935075876,
+			"peak_count": 8,
+			"avg_h": 0.5295,
+			"potential": 0.4565
+		},
+		{
+			"index": 30,
+			"lat": -19.96,
+			"lon": 154.22,
+			"cx": -0.8464,
+			"cy": -0.34129,
+			"cz": 0.40881,
+			"size": 0.52,
+			"shelf_r": 0.062404965930618346,
+			"peak_count": 3,
+			"avg_h": 0.2292,
+			"potential": 0.1385
+		},
+		{
+			"index": 31,
+			"lat": -27.69,
+			"lon": -47.35,
+			"cx": 0.59992,
+			"cy": -0.4647,
+			"cz": -0.65126,
+			"size": 0.294,
+			"shelf_r": 0.03530368752451613,
+			"peak_count": 2,
+			"avg_h": 0.1402,
+			"potential": 0.0846
+		},
+		{
+			"index": 32,
+			"lat": -25.37,
+			"lon": 81.97,
+			"cx": 0.12616,
+			"cy": -0.42851,
+			"cz": 0.89469,
+			"size": 0.916,
+			"shelf_r": 0.10997182430885731,
+			"peak_count": 7,
+			"avg_h": 0.4651,
+			"potential": 0.3122
+		},
+		{
+			"index": 33,
+			"lat": -29.62,
+			"lon": -141.46,
+			"cx": -0.68,
+			"cy": -0.49419,
+			"cz": -0.54164,
+			"size": 0.368,
+			"shelf_r": 0.04413757438072934,
+			"peak_count": 2,
+			"avg_h": 0.185,
+			"potential": 0.1128
+		},
+		{
+			"index": 34,
+			"lat": -29.34,
+			"lon": 5.7,
+			"cx": 0.86738,
+			"cy": -0.49005,
+			"cz": 0.08663,
+			"size": 0.7,
+			"shelf_r": 0.08394470857037233,
+			"peak_count": 2,
+			"avg_h": 0.2861,
+			"potential": 0.18
+		},
+		{
+			"index": 35,
+			"lat": -47.56,
+			"lon": 140.26,
+			"cx": -0.51889,
+			"cy": -0.73798,
+			"cz": 0.43144,
+			"size": 0.8,
+			"shelf_r": 0.096,
+			"peak_count": 22,
+			"avg_h": 0.6775,
+			"potential": 0.615
+		},
+		{
+			"index": 36,
+			"lat": -56.16,
+			"lon": -77.96,
+			"cx": 0.11614,
+			"cy": -0.83061,
+			"cz": -0.54461,
+			"size": 1.005,
+			"shelf_r": 0.1205539424791932,
+			"peak_count": 5,
+			"avg_h": 0.5296,
+			"potential": 0.2999
+		},
+		{
+			"index": 37,
+			"lat": -53.91,
+			"lon": 36.49,
+			"cx": 0.47355,
+			"cy": -0.80812,
+			"cz": 0.35026,
+			"size": 0.625,
+			"shelf_r": 0.07505428645201027,
+			"peak_count": 4,
+			"avg_h": 0.3481,
+			"potential": 0.1661
+		},
+		{
+			"index": 38,
+			"lat": -51.16,
+			"lon": -178.4,
+			"cx": -0.62691,
+			"cy": -0.77889,
+			"cz": -0.01752,
+			"size": 0.569,
+			"shelf_r": 0.06829275260539724,
+			"peak_count": 3,
+			"avg_h": 0.2905,
+			"potential": 0.1573
+		},
+		{
+			"index": 39,
+			"lat": -68.6,
+			"lon": -33.01,
+			"cx": 0.30595,
+			"cy": -0.93106,
+			"cz": -0.19879,
+			"size": 0.287,
+			"shelf_r": 0.034389822963159525,
+			"peak_count": 2,
+			"avg_h": 0.1235,
+			"potential": 0.1153
+		},
+		{
+			"index": 40,
+			"lat": -64.49,
+			"lon": 92.26,
+			"cx": -0.01697,
+			"cy": -0.90249,
+			"cz": 0.43038,
+			"size": 1.281,
+			"shelf_r": 0.15370879127830264,
+			"peak_count": 4,
+			"avg_h": 0.6149,
+			"potential": 0.3242
+		},
+		{
+			"index": 41,
+			"lat": -75.0,
+			"lon": -117.49,
+			"cx": -0.11947,
+			"cy": -0.96593,
+			"cz": -0.2296,
+			"size": 0.319,
+			"shelf_r": 0.03831442056549713,
+			"peak_count": 2,
+			"avg_h": 0.1368,
+			"potential": 0.0792
+		}
+	],
+	"plateau_edges": [
+		[
+			0,
+			3
+		],
+		[
+			21,
+			26
+		],
+		[
+			22,
+			30
+		],
+		[
+			12,
+			25
+		],
+		[
+			29,
+			34
+		],
+		[
+			17,
+			25
+		],
+		[
+			1,
+			6
+		],
+		[
+			21,
+			34
+		],
+		[
+			19,
+			32
+		],
+		[
+			12,
+			20
+		],
+		[
+			5,
+			10
+		],
+		[
+			13,
+			18
+		],
+		[
+			7,
+			15
+		],
+		[
+			1,
+			4
+		],
+		[
+			16,
+			24
+		],
+		[
+			36,
+			39
+		],
+		[
+			14,
+			22
+		],
+		[
+			36,
+			41
+		],
+		[
+			20,
+			25
+		],
+		[
+			24,
+			29
+		],
+		[
+			39,
+			41
+		],
+		[
+			28,
+			33
+		],
+		[
+			26,
+			34
+		],
+		[
+			5,
+			13
+		],
+		[
+			20,
+			33
+		],
+		[
+			35,
+			38
+		],
+		[
+			9,
+			14
+		],
+		[
+			2,
+			10
+		],
+		[
+			3,
+			8
+		],
+		[
+			27,
+			32
+		],
+		[
+			19,
+			27
+		],
+		[
+			2,
+			7
+		],
+		[
+			37,
+			40
+		],
+		[
+			20,
+			28
+		],
+		[
+			18,
+			26
+		],
+		[
+			30,
+			35
+		],
+		[
+			17,
+			22
+		],
+		[
+			35,
+			40
+		],
+		[
+			26,
+			31
+		],
+		[
+			1,
+			9
+		],
+		[
+			6,
+			11
+		],
+		[
+			11,
+			19
+		],
+		[
+			29,
+			37
+		],
+		[
+			16,
+			29
+		],
+		[
+			4,
+			9
+		],
+		[
+			0,
+			5
+		],
+		[
+			38,
+			41
+		],
+		[
+			18,
+			23
+		],
+		[
+			15,
+			20
+		],
+		[
+			23,
+			31
+		],
+		[
+			8,
+			16
+		],
+		[
+			27,
+			35
+		],
+		[
+			17,
+			30
+		],
+		[
+			21,
+			29
+		],
+		[
+			25,
+			33
+		],
+		[
+			24,
+			32
+		],
+		[
+			12,
+			17
+		],
+		[
+			34,
+			37
+		],
+		[
+			2,
+			4
+		],
+		[
+			0,
+			2
+		],
+		[
+			37,
+			39
+		],
+		[
+			2,
+			5
+		],
+		[
+			33,
+			38
+		],
+		[
+			3,
+			6
+		],
+		[
+			1,
+			3
+		],
+		[
+			0,
+			8
+		],
+		[
+			31,
+			36
+		],
+		[
+			18,
+			31
+		],
+		[
+			0,
+			1
+		],
+		[
+			27,
+			30
+		],
+		[
+			18,
+			21
+		],
+		[
+			6,
+			9
+		],
+		[
+			30,
+			38
+		],
+		[
+			7,
+			10
+		],
+		[
+			9,
+			22
+		],
+		[
+			13,
+			21
+		],
+		[
+			40,
+			41
+		],
+		[
+			32,
+			40
+		],
+		[
+			5,
+			18
+		],
+		[
+			7,
+			12
+		],
+		[
+			15,
+			28
+		],
+		[
+			10,
+			13
+		],
+		[
+			10,
+			23
+		],
+		[
+			6,
+			14
+		],
+		[
+			13,
+			26
+		],
+		[
+			19,
+			24
+		],
+		[
+			27,
+			40
+		],
+		[
+			22,
+			27
+		],
+		[
+			15,
+			23
+		],
+		[
+			14,
+			30
+		],
+		[
+			39,
+			40
+		],
+		[
+			26,
+			29
+		],
+		[
+			28,
+			36
+		],
+		[
+			24,
+			37
+		],
+		[
+			31,
+			39
+		],
+		[
+			4,
+			7
+		],
+		[
+			11,
+			16
+		],
+		[
+			12,
+			15
+		],
+		[
+			8,
+			13
+		],
+		[
+			9,
+			17
+		],
+		[
+			12,
+			33
+		],
+		[
+			10,
+			18
+		],
+		[
+			0,
+			4
+		],
+		[
+			10,
+			15
+		],
+		[
+			4,
+			6
+		],
+		[
+			32,
+			37
+		],
+		[
+			3,
+			5
+		],
+		[
+			0,
+			6
+		],
+		[
+			24,
+			34
+		],
+		[
+			5,
+			8
+		],
+		[
+			17,
+			20
+		],
+		[
+			7,
+			20
+		],
+		[
+			38,
+			40
+		],
+		[
+			34,
+			39
+		],
+		[
+			22,
+			35
+		],
+		[
+			25,
+			30
+		],
+		[
+			16,
+			21
+		],
+		[
+			31,
+			34
+		],
+		[
+			21,
+			31
+		],
+		[
+			33,
+			41
+		],
+		[
+			14,
+			17
+		],
+		[
+			14,
+			27
+		],
+		[
+			0,
+			10
+		],
+		[
+			17,
+			33
+		],
+		[
+			35,
+			41
+		],
+		[
+			2,
+			15
+		],
+		[
+			14,
+			19
+		],
+		[
+			3,
+			11
+		],
+		[
+			1,
+			2
+		],
+		[
+			1,
+			14
+		],
+		[
+			2,
+			3
+		],
+		[
+			11,
+			24
+		],
+		[
+			25,
+			38
+		],
+		[
+			25,
+			28
+		],
+		[
+			8,
+			11
+		],
+		[
+			3,
+			4
+		],
+		[
+			23,
+			28
+		],
+		[
+			17,
+			38
+		],
+		[
+			37,
+			41
+		],
+		[
+			11,
+			14
+		],
+		[
+			11,
+			32
+		],
+		[
+			16,
+			34
+		],
+		[
+			22,
+			25
+		],
+		[
+			29,
+			32
+		],
+		[
+			32,
+			35
+		],
+		[
+			12,
+			28
+		],
+		[
+			28,
+			41
+		],
+		[
+			33,
+			36
+		],
+		[
+			16,
+			32
+		]
+	],
+	"adj": [
+		[
+			3,
+			5,
+			2,
+			8,
+			1,
+			4,
+			6,
+			10
+		],
+		[
+			6,
+			4,
+			9,
+			3,
+			0,
+			2,
+			14
+		],
+		[
+			10,
+			7,
+			4,
+			0,
+			5,
+			15,
+			1,
+			3
+		],
+		[
+			0,
+			8,
+			6,
+			1,
+			5,
+			11,
+			2,
+			4
+		],
+		[
+			1,
+			9,
+			2,
+			7,
+			0,
+			6,
+			3
+		],
+		[
+			10,
+			13,
+			0,
+			2,
+			18,
+			3,
+			8
+		],
+		[
+			1,
+			11,
+			3,
+			9,
+			14,
+			4,
+			0
+		],
+		[
+			15,
+			2,
+			10,
+			12,
+			4,
+			20
+		],
+		[
+			3,
+			16,
+			0,
+			13,
+			5,
+			11
+		],
+		[
+			14,
+			1,
+			4,
+			6,
+			22,
+			17
+		],
+		[
+			5,
+			2,
+			7,
+			13,
+			23,
+			18,
+			15,
+			0
+		],
+		[
+			6,
+			19,
+			16,
+			3,
+			24,
+			8,
+			14,
+			32
+		],
+		[
+			25,
+			20,
+			17,
+			7,
+			15,
+			33,
+			28
+		],
+		[
+			18,
+			5,
+			21,
+			10,
+			26,
+			8
+		],
+		[
+			22,
+			9,
+			6,
+			30,
+			17,
+			27,
+			19,
+			1,
+			11
+		],
+		[
+			7,
+			20,
+			28,
+			23,
+			12,
+			10,
+			2
+		],
+		[
+			24,
+			29,
+			8,
+			11,
+			21,
+			34,
+			32
+		],
+		[
+			25,
+			22,
+			30,
+			12,
+			9,
+			20,
+			14,
+			33,
+			38
+		],
+		[
+			13,
+			26,
+			23,
+			31,
+			21,
+			5,
+			10
+		],
+		[
+			32,
+			27,
+			11,
+			24,
+			14
+		],
+		[
+			12,
+			25,
+			33,
+			28,
+			15,
+			17,
+			7
+		],
+		[
+			26,
+			34,
+			29,
+			18,
+			13,
+			16,
+			31
+		],
+		[
+			30,
+			14,
+			17,
+			9,
+			27,
+			35,
+			25
+		],
+		[
+			18,
+			31,
+			10,
+			15,
+			28
+		],
+		[
+			16,
+			29,
+			32,
+			19,
+			37,
+			34,
+			11
+		],
+		[
+			12,
+			17,
+			20,
+			33,
+			30,
+			38,
+			28,
+			22
+		],
+		[
+			21,
+			34,
+			18,
+			31,
+			13,
+			29
+		],
+		[
+			32,
+			19,
+			35,
+			30,
+			40,
+			22,
+			14
+		],
+		[
+			33,
+			20,
+			15,
+			36,
+			25,
+			23,
+			12,
+			41
+		],
+		[
+			34,
+			24,
+			37,
+			16,
+			21,
+			26,
+			32
+		],
+		[
+			22,
+			35,
+			17,
+			27,
+			38,
+			14,
+			25
+		],
+		[
+			26,
+			23,
+			36,
+			18,
+			39,
+			34,
+			21
+		],
+		[
+			19,
+			27,
+			24,
+			40,
+			37,
+			11,
+			29,
+			35,
+			16
+		],
+		[
+			28,
+			20,
+			25,
+			38,
+			12,
+			41,
+			17,
+			36
+		],
+		[
+			29,
+			21,
+			26,
+			37,
+			24,
+			39,
+			31,
+			16
+		],
+		[
+			38,
+			30,
+			40,
+			27,
+			22,
+			41,
+			32
+		],
+		[
+			39,
+			41,
+			31,
+			28,
+			33
+		],
+		[
+			40,
+			29,
+			34,
+			39,
+			24,
+			32,
+			41
+		],
+		[
+			35,
+			41,
+			33,
+			30,
+			40,
+			25,
+			17
+		],
+		[
+			36,
+			41,
+			37,
+			40,
+			31,
+			34
+		],
+		[
+			37,
+			35,
+			41,
+			32,
+			27,
+			39,
+			38
+		],
+		[
+			36,
+			39,
+			38,
+			40,
+			33,
+			35,
+			37,
+			28
+		]
+	],
+	"substrate": [
+		{
+			"primary_crop": "foraging",
+			"primary_yield": 0.5,
+			"secondary_crop": null,
+			"total_trade_value": 0.0,
+			"latitude": 75.0,
+			"abs_latitude": 75.0,
+			"tidal_range": 11.944,
+			"mean_temp": -5.59,
+			"effective_rainfall": 1127.0,
+			"upwelling": 0.64,
+			"minerals": {
+				"Fe": true,
+				"Cu": true,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "foraging",
+			"primary_yield": 0.5,
+			"secondary_crop": null,
+			"total_trade_value": 0.0,
+			"latitude": 64.4,
+			"abs_latitude": 64.4,
+			"tidal_range": 7.644,
+			"mean_temp": 1.02,
+			"effective_rainfall": 3802.0,
+			"upwelling": 0.56,
+			"minerals": {
+				"Fe": true,
+				"Cu": false,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "foraging",
+			"primary_yield": 0.5,
+			"secondary_crop": null,
+			"total_trade_value": 0.0,
+			"latitude": 62.22,
+			"abs_latitude": 62.22,
+			"tidal_range": 4.208,
+			"mean_temp": 0.11,
+			"effective_rainfall": 2240.0,
+			"upwelling": 0.64,
+			"minerals": {
+				"Fe": true,
+				"Cu": true,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "foraging",
+			"primary_yield": 0.5,
+			"secondary_crop": null,
+			"total_trade_value": 0.0,
+			"latitude": 65.83,
+			"abs_latitude": 65.83,
+			"tidal_range": 6.123,
+			"mean_temp": -0.34,
+			"effective_rainfall": 723.0,
+			"upwelling": 0.64,
+			"minerals": {
+				"Fe": true,
+				"Cu": false,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "foraging",
+			"primary_yield": 0.5,
+			"secondary_crop": null,
+			"total_trade_value": 0.0,
+			"latitude": 62.1,
+			"abs_latitude": 62.1,
+			"tidal_range": 6.775,
+			"mean_temp": -0.0,
+			"effective_rainfall": 3004.0,
+			"upwelling": 0.56,
+			"minerals": {
+				"Fe": true,
+				"Cu": false,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "nori",
+			"primary_yield": 3.0,
+			"secondary_crop": "papa",
+			"total_trade_value": 0.335231474423781,
+			"latitude": 47.17,
+			"abs_latitude": 47.17,
+			"tidal_range": 9.272,
+			"mean_temp": 8.76,
+			"effective_rainfall": 6060.0,
+			"upwelling": 0.56,
+			"minerals": {
+				"Fe": true,
+				"Cu": false,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "papa",
+			"primary_yield": 1.7032129617530798,
+			"secondary_crop": null,
+			"total_trade_value": 0.2909247616445646,
+			"latitude": 49.88,
+			"abs_latitude": 49.88,
+			"tidal_range": 4.902,
+			"mean_temp": 4.3,
+			"effective_rainfall": 3146.0,
+			"upwelling": 0.96,
+			"minerals": {
+				"Fe": true,
+				"Cu": false,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "papa",
+			"primary_yield": 3.308230650983134,
+			"secondary_crop": "nori",
+			"total_trade_value": 0.443186042290181,
+			"latitude": 36.63,
+			"abs_latitude": 36.63,
+			"tidal_range": 3.026,
+			"mean_temp": 12.82,
+			"effective_rainfall": 2745.0,
+			"upwelling": 0.48,
+			"minerals": {
+				"Fe": true,
+				"Cu": false,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "nori",
+			"primary_yield": 3.0,
+			"secondary_crop": "papa",
+			"total_trade_value": 0.32999919560272245,
+			"latitude": 40.0,
+			"abs_latitude": 40.0,
+			"tidal_range": 5.91,
+			"mean_temp": 8.7,
+			"effective_rainfall": 3648.0,
+			"upwelling": 0.88,
+			"minerals": {
+				"Fe": true,
+				"Cu": false,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "papa",
+			"primary_yield": 3.470213014434826,
+			"secondary_crop": "nori",
+			"total_trade_value": 0.5157125434651971,
+			"latitude": 35.68,
+			"abs_latitude": 35.68,
+			"tidal_range": 6.325,
+			"mean_temp": 11.87,
+			"effective_rainfall": 4173.0,
+			"upwelling": 0.48,
+			"minerals": {
+				"Fe": true,
+				"Cu": true,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "papa",
+			"primary_yield": 3.374551254372021,
+			"secondary_crop": "nori",
+			"total_trade_value": 0.4383451670059003,
+			"latitude": 40.45,
+			"abs_latitude": 40.45,
+			"tidal_range": 4.598,
+			"mean_temp": 11.46,
+			"effective_rainfall": 3246.0,
+			"upwelling": 0.64,
+			"minerals": {
+				"Fe": true,
+				"Cu": false,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "nori",
+			"primary_yield": 3.0,
+			"secondary_crop": null,
+			"total_trade_value": 0.33474713826086366,
+			"latitude": 24.65,
+			"abs_latitude": 24.65,
+			"tidal_range": 4.706,
+			"mean_temp": 15.14,
+			"effective_rainfall": 4936.0,
+			"upwelling": 1.04,
+			"minerals": {
+				"Fe": true,
+				"Cu": false,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "paddi",
+			"primary_yield": 1.5008148659105642,
+			"secondary_crop": "taro",
+			"total_trade_value": 0.5543215622473509,
+			"latitude": 11.91,
+			"abs_latitude": 11.91,
+			"tidal_range": 8.706,
+			"mean_temp": 22.5,
+			"effective_rainfall": 10586.0,
+			"upwelling": 0.56,
+			"minerals": {
+				"Fe": true,
+				"Cu": true,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "nori",
+			"primary_yield": 2.88,
+			"secondary_crop": null,
+			"total_trade_value": 0.36015592435374855,
+			"latitude": 24.66,
+			"abs_latitude": 24.66,
+			"tidal_range": 3.057,
+			"mean_temp": 17.03,
+			"effective_rainfall": 4010.0,
+			"upwelling": 0.48,
+			"minerals": {
+				"Fe": true,
+				"Cu": false,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "paddi",
+			"primary_yield": 1.4009297150763835,
+			"secondary_crop": "taro",
+			"total_trade_value": 0.6138945936900564,
+			"latitude": 16.34,
+			"abs_latitude": 16.34,
+			"tidal_range": 5.179,
+			"mean_temp": 22.2,
+			"effective_rainfall": 7178.0,
+			"upwelling": 0.72,
+			"minerals": {
+				"Fe": true,
+				"Cu": true,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "nori",
+			"primary_yield": 3.0,
+			"secondary_crop": null,
+			"total_trade_value": 0.38358940116595475,
+			"latitude": 15.65,
+			"abs_latitude": 15.65,
+			"tidal_range": 3.817,
+			"mean_temp": 20.89,
+			"effective_rainfall": 4947.0,
+			"upwelling": 0.56,
+			"minerals": {
+				"Fe": true,
+				"Cu": false,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "taro",
+			"primary_yield": 1.7134817948691383,
+			"secondary_crop": null,
+			"total_trade_value": 0.3831249250215478,
+			"latitude": 7.27,
+			"abs_latitude": 7.27,
+			"tidal_range": 2.674,
+			"mean_temp": 24.57,
+			"effective_rainfall": 5093.0,
+			"upwelling": 0.56,
+			"minerals": {
+				"Fe": true,
+				"Cu": true,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "sago",
+			"primary_yield": 4.0,
+			"secondary_crop": "paddi",
+			"total_trade_value": 0.6227189710899257,
+			"latitude": -1.31,
+			"abs_latitude": 1.31,
+			"tidal_range": 5.549,
+			"mean_temp": 27.54,
+			"effective_rainfall": 9419.0,
+			"upwelling": 1.02,
+			"minerals": {
+				"Fe": true,
+				"Cu": false,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "sago",
+			"primary_yield": 4.0,
+			"secondary_crop": "paddi",
+			"total_trade_value": 0.49196085343370216,
+			"latitude": 7.22,
+			"abs_latitude": 7.22,
+			"tidal_range": 6.155,
+			"mean_temp": 26.3,
+			"effective_rainfall": 10652.0,
+			"upwelling": 0.56,
+			"minerals": {
+				"Fe": true,
+				"Cu": false,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "sago",
+			"primary_yield": 4.0,
+			"secondary_crop": "paddi",
+			"total_trade_value": 0.4730409445962869,
+			"latitude": -6.01,
+			"abs_latitude": 6.01,
+			"tidal_range": 7.379,
+			"mean_temp": 24.49,
+			"effective_rainfall": 9714.0,
+			"upwelling": 0.8,
+			"minerals": {
+				"Fe": true,
+				"Cu": false,
+				"Au": false,
+				"Pu": true
+			}
+		},
+		{
+			"primary_crop": "taro",
+			"primary_yield": 2.851082338478084,
+			"secondary_crop": "sago",
+			"total_trade_value": 0.4168050671368837,
+			"latitude": -4.13,
+			"abs_latitude": 4.13,
+			"tidal_range": 2.985,
+			"mean_temp": 27.6,
+			"effective_rainfall": 6213.0,
+			"upwelling": 0.86,
+			"minerals": {
+				"Fe": true,
+				"Cu": false,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "sago",
+			"primary_yield": 2.905138725992292,
+			"secondary_crop": "taro",
+			"total_trade_value": 0.49892312771873554,
+			"latitude": -9.26,
+			"abs_latitude": 9.26,
+			"tidal_range": 4.304,
+			"mean_temp": 25.75,
+			"effective_rainfall": 7051.0,
+			"upwelling": 0.56,
+			"minerals": {
+				"Fe": true,
+				"Cu": false,
+				"Au": false,
+				"Pu": true
+			}
+		},
+		{
+			"primary_crop": "sago",
+			"primary_yield": 3.304937490876764,
+			"secondary_crop": "paddi",
+			"total_trade_value": 0.4757962111779489,
+			"latitude": -2.74,
+			"abs_latitude": 2.74,
+			"tidal_range": 4.324,
+			"mean_temp": 25.33,
+			"effective_rainfall": 6266.0,
+			"upwelling": 1.26,
+			"minerals": {
+				"Fe": true,
+				"Cu": true,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "taro",
+			"primary_yield": 2.943321904432897,
+			"secondary_crop": "sago",
+			"total_trade_value": 0.627698361936491,
+			"latitude": 0.5,
+			"abs_latitude": 0.5,
+			"tidal_range": 2.88,
+			"mean_temp": 27.85,
+			"effective_rainfall": 5422.0,
+			"upwelling": 0.7,
+			"minerals": {
+				"Fe": true,
+				"Cu": false,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "nori",
+			"primary_yield": 3.0,
+			"secondary_crop": null,
+			"total_trade_value": 0.382375526370015,
+			"latitude": -13.77,
+			"abs_latitude": 13.77,
+			"tidal_range": 2.921,
+			"mean_temp": 20.25,
+			"effective_rainfall": 3896.0,
+			"upwelling": 0.96,
+			"minerals": {
+				"Fe": true,
+				"Cu": true,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "taro",
+			"primary_yield": 1.4710055278771925,
+			"secondary_crop": null,
+			"total_trade_value": 0.5560031772241928,
+			"latitude": -4.63,
+			"abs_latitude": 4.63,
+			"tidal_range": 3.395,
+			"mean_temp": 23.92,
+			"effective_rainfall": 5881.0,
+			"upwelling": 1.34,
+			"minerals": {
+				"Fe": true,
+				"Cu": false,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "nori",
+			"primary_yield": 3.0,
+			"secondary_crop": null,
+			"total_trade_value": 0.42366646964102983,
+			"latitude": -15.35,
+			"abs_latitude": 15.35,
+			"tidal_range": 4.553,
+			"mean_temp": 20.29,
+			"effective_rainfall": 4323.0,
+			"upwelling": 0.88,
+			"minerals": {
+				"Fe": true,
+				"Cu": false,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "nori",
+			"primary_yield": 3.0,
+			"secondary_crop": null,
+			"total_trade_value": 0.39039165429538114,
+			"latitude": -26.14,
+			"abs_latitude": 26.14,
+			"tidal_range": 4.332,
+			"mean_temp": 16.09,
+			"effective_rainfall": 4942.0,
+			"upwelling": 0.56,
+			"minerals": {
+				"Fe": true,
+				"Cu": false,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "nori",
+			"primary_yield": 3.0,
+			"secondary_crop": null,
+			"total_trade_value": 0.47813216656213625,
+			"latitude": -23.92,
+			"abs_latitude": 23.92,
+			"tidal_range": 4.275,
+			"mean_temp": 17.15,
+			"effective_rainfall": 5053.0,
+			"upwelling": 0.64,
+			"minerals": {
+				"Fe": true,
+				"Cu": false,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "nori",
+			"primary_yield": 3.0,
+			"secondary_crop": null,
+			"total_trade_value": 0.41033956887898965,
+			"latitude": -22.15,
+			"abs_latitude": 22.15,
+			"tidal_range": 5.887,
+			"mean_temp": 16.87,
+			"effective_rainfall": 6016.0,
+			"upwelling": 0.96,
+			"minerals": {
+				"Fe": true,
+				"Cu": false,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "nori",
+			"primary_yield": 3.0,
+			"secondary_crop": null,
+			"total_trade_value": 0.4682264745910652,
+			"latitude": -19.96,
+			"abs_latitude": 19.96,
+			"tidal_range": 4.376,
+			"mean_temp": 20.8,
+			"effective_rainfall": 5298.0,
+			"upwelling": 0.56,
+			"minerals": {
+				"Fe": true,
+				"Cu": false,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "nori",
+			"primary_yield": 3.0,
+			"secondary_crop": null,
+			"total_trade_value": 0.44334357434883714,
+			"latitude": -27.69,
+			"abs_latitude": 27.69,
+			"tidal_range": 3.016,
+			"mean_temp": 14.15,
+			"effective_rainfall": 3857.0,
+			"upwelling": 0.96,
+			"minerals": {
+				"Fe": true,
+				"Cu": false,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "nori",
+			"primary_yield": 3.0,
+			"secondary_crop": null,
+			"total_trade_value": 0.3275334369437769,
+			"latitude": -25.37,
+			"abs_latitude": 25.37,
+			"tidal_range": 5.148,
+			"mean_temp": 14.81,
+			"effective_rainfall": 5658.0,
+			"upwelling": 1.12,
+			"minerals": {
+				"Fe": true,
+				"Cu": false,
+				"Au": true,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "nori",
+			"primary_yield": 3.0,
+			"secondary_crop": "emmer",
+			"total_trade_value": 0.4300792257185094,
+			"latitude": -29.62,
+			"abs_latitude": 29.62,
+			"tidal_range": 3.316,
+			"mean_temp": 14.74,
+			"effective_rainfall": 1172.0,
+			"upwelling": 0.64,
+			"minerals": {
+				"Fe": true,
+				"Cu": false,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "nori",
+			"primary_yield": 3.0,
+			"secondary_crop": "emmer",
+			"total_trade_value": 0.37073518803343175,
+			"latitude": -29.34,
+			"abs_latitude": 29.34,
+			"tidal_range": 4.5,
+			"mean_temp": 12.81,
+			"effective_rainfall": 1273.0,
+			"upwelling": 1.04,
+			"minerals": {
+				"Fe": true,
+				"Cu": false,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "nori",
+			"primary_yield": 3.0,
+			"secondary_crop": "papa",
+			"total_trade_value": 0.40039844910381356,
+			"latitude": -47.56,
+			"abs_latitude": 47.56,
+			"tidal_range": 5.345,
+			"mean_temp": 6.75,
+			"effective_rainfall": 4590.0,
+			"upwelling": 0.56,
+			"minerals": {
+				"Fe": true,
+				"Cu": false,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "papa",
+			"primary_yield": 1.364772804024866,
+			"secondary_crop": null,
+			"total_trade_value": 0.4199476250237786,
+			"latitude": -56.16,
+			"abs_latitude": 56.16,
+			"tidal_range": 6.359,
+			"mean_temp": 2.85,
+			"effective_rainfall": 3165.0,
+			"upwelling": 0.4,
+			"minerals": {
+				"Fe": true,
+				"Cu": false,
+				"Au": true,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "foraging",
+			"primary_yield": 0.5,
+			"secondary_crop": null,
+			"total_trade_value": 0.0,
+			"latitude": -53.91,
+			"abs_latitude": 53.91,
+			"tidal_range": 4.776,
+			"mean_temp": 1.86,
+			"effective_rainfall": 3188.0,
+			"upwelling": 0.96,
+			"minerals": {
+				"Fe": true,
+				"Cu": false,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "nori",
+			"primary_yield": 3.0,
+			"secondary_crop": "papa",
+			"total_trade_value": 0.3694015062251128,
+			"latitude": -51.16,
+			"abs_latitude": 51.16,
+			"tidal_range": 4.5,
+			"mean_temp": 6.26,
+			"effective_rainfall": 3488.0,
+			"upwelling": 0.56,
+			"minerals": {
+				"Fe": true,
+				"Cu": false,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "foraging",
+			"primary_yield": 0.5,
+			"secondary_crop": null,
+			"total_trade_value": 0.0,
+			"latitude": -68.6,
+			"abs_latitude": 68.6,
+			"tidal_range": 3.554,
+			"mean_temp": -4.11,
+			"effective_rainfall": 513.0,
+			"upwelling": 0.88,
+			"minerals": {
+				"Fe": true,
+				"Cu": true,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "foraging",
+			"primary_yield": 0.5,
+			"secondary_crop": null,
+			"total_trade_value": 0.0,
+			"latitude": -64.49,
+			"abs_latitude": 64.49,
+			"tidal_range": 7.676,
+			"mean_temp": 0.81,
+			"effective_rainfall": 3968.0,
+			"upwelling": 0.56,
+			"minerals": {
+				"Fe": true,
+				"Cu": false,
+				"Au": false,
+				"Pu": false
+			}
+		},
+		{
+			"primary_crop": "foraging",
+			"primary_yield": 0.5,
+			"secondary_crop": null,
+			"total_trade_value": 0.0,
+			"latitude": -75.0,
+			"abs_latitude": 75.0,
+			"tidal_range": 3.736,
+			"mean_temp": -5.87,
+			"effective_rainfall": 538.0,
+			"upwelling": 0.64,
+			"minerals": {
+				"Fe": true,
+				"Cu": false,
+				"Au": false,
+				"Pu": false
+			}
+		}
+	],
+	"states": [
+		{
+			"faction": "reach",
+			"status": "territory",
+			"name": "The Caldera",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "reach",
+			"status": "territory",
+			"name": "The Tidemark",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "reach",
+			"status": "territory",
+			"name": "The Floe",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "reach",
+			"status": "territory",
+			"name": "The Isthmus",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "reach",
+			"status": "territory",
+			"name": "The Estuary",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "reach",
+			"status": "core",
+			"name": "The Reach",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 1.0,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "reach",
+			"status": "territory",
+			"name": "The Shelf",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "reach",
+			"status": "territory",
+			"name": "The Cairn",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "reach",
+			"status": "territory",
+			"name": "The Forge",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "lattice",
+			"status": "territory",
+			"name": "The Shoal",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "reach",
+			"status": "territory",
+			"name": "The Gyre",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "reach",
+			"status": "territory",
+			"name": "The Polder",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "reach",
+			"status": "territory",
+			"name": "The Shingle",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "reach",
+			"status": "territory",
+			"name": "The Mooring",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "lattice",
+			"status": "territory",
+			"name": "The Rime",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "reach",
+			"status": "territory",
+			"name": "The Bight",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "reach",
+			"status": "territory",
+			"name": "The Narrows",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "lattice",
+			"status": "territory",
+			"name": "The Swell",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "reach",
+			"status": "territory",
+			"name": "The Brine",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "lattice",
+			"status": "territory",
+			"name": "The Trench",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "reach",
+			"status": "territory",
+			"name": "The Current",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "reach",
+			"status": "territory",
+			"name": "The Reef",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "lattice",
+			"status": "territory",
+			"name": "The Spindle",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "reach",
+			"status": "territory",
+			"name": "The Wake",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "lattice",
+			"status": "territory",
+			"name": "The Cay",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "lattice",
+			"status": "territory",
+			"name": "The Passage",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "reach",
+			"status": "territory",
+			"name": "The Eddy",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "lattice",
+			"status": "territory",
+			"name": "The Loom",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "lattice",
+			"status": "territory",
+			"name": "The Atoll",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "lattice",
+			"status": "territory",
+			"name": "The Quay",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "lattice",
+			"status": "territory",
+			"name": "The Strand",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "reach",
+			"status": "territory",
+			"name": "The Basalt",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "lattice",
+			"status": "territory",
+			"name": "The Fathom",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "lattice",
+			"status": "territory",
+			"name": "The Meridian",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "reach",
+			"status": "territory",
+			"name": "The Drift",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "lattice",
+			"status": "core",
+			"name": "The Lattice",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 1.0,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "lattice",
+			"status": "territory",
+			"name": "The Cordage",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "lattice",
+			"status": "territory",
+			"name": "The Sargasso",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "lattice",
+			"status": "territory",
+			"name": "The Berth",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "lattice",
+			"status": "territory",
+			"name": "The Breakwater",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "lattice",
+			"status": "territory",
+			"name": "The Windward",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		},
+		{
+			"faction": "lattice",
+			"status": "territory",
+			"name": "The Traverse",
+			"population": 0,
+			"tech": 0.0,
+			"sovereignty": 0.7,
+			"tradeIntegration": 0.0,
+			"eraOfContact": null,
+			"hopCount": 0,
+			"urbanization": 0.0
+		}
+	],
+	"names": [
+		"The Caldera",
+		"The Tidemark",
+		"The Floe",
+		"The Isthmus",
+		"The Estuary",
+		"The Reach",
+		"The Shelf",
+		"The Cairn",
+		"The Forge",
+		"The Shoal",
+		"The Gyre",
+		"The Polder",
+		"The Shingle",
+		"The Mooring",
+		"The Rime",
+		"The Bight",
+		"The Narrows",
+		"The Swell",
+		"The Brine",
+		"The Trench",
+		"The Current",
+		"The Reef",
+		"The Spindle",
+		"The Wake",
+		"The Cay",
+		"The Passage",
+		"The Eddy",
+		"The Loom",
+		"The Atoll",
+		"The Quay",
+		"The Strand",
+		"The Basalt",
+		"The Fathom",
+		"The Meridian",
+		"The Drift",
+		"The Lattice",
+		"The Cordage",
+		"The Sargasso",
+		"The Berth",
+		"The Breakwater",
+		"The Windward",
+		"The Traverse"
+	],
+	"prefilter": {
+		"reach_centroid_lat": 32.786,
+		"lattice_centroid_lat": 32.226,
+		"min_cross_gc_rad": 0.3335,
+		"reach_has_pu": true,
+		"lattice_has_pu": true,
+		"lattice_mean_gc_rad": 1.2908,
+		"reach_mean_gc_rad": 1.3587,
+		"h1_loss": 0.2276,
+		"h2_loss": 0.1109,
+		"h3_loss": 0.0,
+		"h4_loss": 1.9089,
+		"total_loss": 2.2474,
+		"composite_score": -2.2474,
+		"hard_pass": false
+	}
+}

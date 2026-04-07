@@ -1,0 +1,439 @@
+================================================================================
+AEOLIA PROJECT — WORLD SEED CHARACTERISTICS
+================================================================================
+Seeds analyzed: 17, 42, 97, 137, 256
+Source: /Labs/Aeolia/aeolia-godot/optimization/worlds/
+
+================================================================================
+1. BASIC TOPOLOGY
+================================================================================
+
+SEED 17:
+  Total archipelagos: 42
+  Reach spheres: 9
+  Lattice spheres: 34
+  Detection year: -24
+  Detected arches: 0
+  Plateau edges: 151
+  Unique archs with edges: 42
+
+SEED 42:
+  Total archipelagos: 42
+  Reach spheres: 23
+  Lattice spheres: 19
+  Detection year: -82
+  Detected arches: 28
+  Plateau edges: 150
+  Unique archs with edges: 42
+
+SEED 97:
+  Total archipelagos: 42
+  Reach spheres: 12
+  Lattice spheres: 29
+  Detection year: -153
+  Detected arches: 20
+  Plateau edges: 142
+  Unique archs with edges: 42
+
+SEED 137:
+  Total archipelagos: 42
+  Reach spheres: 2
+  Lattice spheres: 40
+  Detection year: -129
+  Detected arches: 3
+  Plateau edges: 151
+  Unique archs with edges: 42
+
+SEED 256:
+  Total archipelagos: 42
+  Reach spheres: 2
+  Lattice spheres: 40
+  Detection year: -59
+  Detected arches: 1
+  Plateau edges: 143
+  Unique archs with edges: 42
+
+================================================================================
+2. LATITUDE DISTRIBUTION
+================================================================================
+
+SEED 17:
+  Min latitude: -75.000000
+  Max latitude: 75.000000
+  Mean latitude: 1.300000
+  Stdev: 41.621286
+
+SEED 42:
+  Min latitude: -75.000000
+  Max latitude: 75.000000
+  Mean latitude: -0.765952
+  Stdev: 39.130670
+
+SEED 97:
+  Min latitude: -75.000000
+  Max latitude: 75.000000
+  Mean latitude: -1.034762
+  Stdev: 39.412616
+
+SEED 137:
+  Min latitude: -71.820000
+  Max latitude: 75.000000
+  Mean latitude: -2.073333
+  Stdev: 40.297979
+
+SEED 256:
+  Min latitude: -75.000000
+  Max latitude: 75.000000
+  Mean latitude: -0.043810
+  Stdev: 38.008357
+
+================================================================================
+3. CLIMATE METRICS
+================================================================================
+
+MEAN TEMPERATURE (°C):
+  Seed 17:  min=-7.47, max=29.26, mean=12.36
+  Seed 42:  min=-5.87, max=29.35, mean=13.42
+  Seed 97:  min=-7.67, max=28.09, mean=13.51
+  Seed 137: min=-5.66, max=27.82, mean=12.96
+  Seed 256: min=-7.66, max=27.19, mean=13.66
+
+EFFECTIVE RAINFALL (mm):
+  Seed 17:  min=545.00, max=10778.00, mean=4332.83
+  Seed 42:  min=626.00, max=11146.00, mean=4132.05
+  Seed 97:  min=550.00, max=10213.00, mean=4283.50
+  Seed 137: min=627.00, max=11038.00, mean=4186.31
+  Seed 256: min=481.00, max=7780.00, mean=4319.55
+
+UPWELLING INDEX:
+  Seed 17:  min=0.4800, max=1.1200, mean=0.7490
+  Seed 42:  min=0.4000, max=1.3400, mean=0.7071
+  Seed 97:  min=0.4000, max=1.2600, mean=0.6743
+  Seed 137: min=0.4000, max=1.2600, mean=0.6919
+  Seed 256: min=0.4000, max=1.2600, mean=0.6995
+
+PRIMARY CROP YIELD:
+  Seed 17:  min=0.5000, max=3.3733, mean=2.2934
+  Seed 42:  min=0.5000, max=4.0000, mean=2.4006
+  Seed 97:  min=0.5000, max=4.0000, mean=2.2936
+  Seed 137: min=0.5000, max=4.0000, mean=2.4987
+  Seed 256: min=0.5000, max=4.0000, mean=2.4439
+
+TIDAL RANGE (meters):
+  Seed 17:  min=2.3720, max=10.9060, mean=5.3644
+  Seed 42:  min=2.6080, max=10.1500, mean=4.7755
+  Seed 97:  min=2.4890, max=12.1500, mean=5.1222
+  Seed 137: min=2.9960, max=10.0070, mean=5.2664
+  Seed 256: min=2.3560, max=9.7260, mean=4.7554
+
+================================================================================
+4. CROP ASSIGNMENTS
+================================================================================
+
+SEED 17:
+  foraging: 7
+  nori: 20
+  paddi: 3
+  papa: 7
+  taro: 5
+  Secondary crops: emmer(1), nori(3), paddi(4), papa(7), sago(2), taro(3)
+
+SEED 42:
+  foraging: 6
+  nori: 17
+  paddi: 2
+  papa: 9
+  sago: 5
+  taro: 3
+  Secondary crops: emmer(5), nori(5), paddi(3), papa(3), taro(5)
+
+SEED 97:
+  foraging: 6
+  nori: 16
+  paddi: 3
+  papa: 8
+  sago: 4
+  taro: 5
+  Secondary crops: emmer(4), nori(4), paddi(3), papa(5), sago(2), taro(5)
+
+SEED 137:
+  foraging: 6
+  nori: 21
+  papa: 8
+  sago: 6
+  taro: 1
+  Secondary crops: emmer(4), nori(4), paddi(2), papa(4), taro(7)
+
+SEED 256:
+  foraging: 4
+  nori: 22
+  paddi: 1
+  papa: 8
+  sago: 3
+  taro: 4
+  Secondary crops: emmer(1), nori(3), paddi(3), papa(6), sago(1), taro(3)
+
+================================================================================
+5. MINERAL DISTRIBUTION (Fe, Cu, Au, Pu)
+================================================================================
+
+SEED 17:
+  Fe: 42 archs (all)
+  Cu: 10 archs — [1, 10, 12, 13, 16, 17, 21, 26, 27, 31]
+  Au: 5 archs — [6, 18, 24, 30, 31]
+  Pu: 2 archs — [3, 7]
+
+SEED 42:
+  Fe: 42 archs (all)
+  Cu: 7 archs — [0, 5, 9, 13, 16, 24, 34]
+  Au: 3 archs — [0, 3, 35]
+  Pu: None
+
+SEED 97:
+  Fe: 42 archs (all)
+  Cu: 6 archs — [1, 2, 8, 21, 22, 28]
+  Au: 1 arch — [40]
+  Pu: None
+
+SEED 137:
+  Fe: 42 archs (all)
+  Cu: 7 archs — [2, 6, 19, 23, 25, 32, 35]
+  Au: 3 archs — [6, 15, 38]
+  Pu: 3 archs — [2, 9, 31]
+
+SEED 256:
+  Fe: 42 archs (all)
+  Cu: 8 archs — [0, 2, 7, 15, 16, 31, 34, 38]
+  Au: 4 archs — [6, 12, 14, 19]
+  Pu: 2 archs — [10, 18]
+
+================================================================================
+6. LOSS FUNCTION TOPOLOGY CHECKS (loss.py)
+================================================================================
+
+The loss function evaluates 28 unweighted terms across 8 categories:
+
+GEOGRAPHY (8 terms):
+1. lattice_density — mean pairwise great-circle distance (GC) between Lattice archs < 0.6 rad
+2. reach_spread — mean pairwise GC distance between Reach archs > 0.8 rad
+3. lattice_latitude — centroid abs_latitude of Lattice archs <= 28 deg (tropical band)
+4. reach_latitude — centroid abs_latitude of Reach archs in 35-55 deg (mid-latitude band)
+5. lattice_shelf — fraction of Lattice archs with shelf_r >= 0.08 AND tidal_range >= 2.0
+6. civ_gap — min pairwise GC distance between any Reach and Lattice arch > 0.5 rad
+7. peak_asymmetry — mean peak count of Lattice-faction > Reach-faction
+8. edge_topology — mean pairwise GC distance of Reach > Lattice (Reach more spread)
+
+AGRICULTURE (2 terms):
+9. climate_crop — climate->crop emergence coherence (hydraulic crops in tropical/tropical zones, dryland in temperate/subpolar)
+10. yield_asymmetry — ratio of hydraulic crop mean yield to dryland mean yield
+
+TECHNOLOGY (4 terms):
+11. industrial_convergence — either faction reaches tech level 7; checks tech gap at industrialization
+12. nav_weapons_coupling — naval tech advancement with weapons tech coupling strength
+13. security_dilemma — frontier defense tech advancement before tech 7
+14. nuclear_emergence — (not fully evaluated across seeds)
+
+ORE ACCESS (4 terms):
+15. pu_gate — Plutonium access asymmetry between factions
+16. supply_chain — Copper supply chain robustness for both factions
+17. cu_tech_lead — Copper-mining archs' tech advancement vs non-Cu archs
+18. au_priority — Gold detection timing asymmetry between factions
+
+HISTORICAL SHAPE (4 terms):
+19. serial_horizon — serial contact maximum hops (should be low)
+20. maritime_asymmetry — naval contacts vs colonies ratio for Reach faction
+21. colonial_extraction — mean colonial sovereignty, pre-nuclear colonial epi correlation
+22. nuclear_convergence — sovereignty and nuclear tech convergence between factions
+
+POLITICAL ECONOMY (3 terms):
+23. df_timing — Drake Frontier timing (earlier = better)
+24. sov_ordering — sovereignty ordering by status (colony, garrison, core)
+25. sov_recovery — sovereignty recovery post-nuclear for colonial polities
+
+POPULATION (2 terms):
+26. pop_ratio — population ratio between Lattice and Reach factions
+27. pop_inequality — Gini coefficient for population distribution (inequality)
+
+EPIDEMIOLOGY (1 term):
+28. epi_correlation — Spearman rank correlation between colonial arches and disease log
+
+================================================================================
+7. PER-SEED LOSS BREAKDOWN
+================================================================================
+
+SEED 17 — Total Loss: 18.606909
+  Key contributors to loss:
+    pu_gate: 8.0 (Pu access missing for both)
+    serial_horizon: 4.0
+    pop_ratio: 2.0
+    colonial_extraction: 1.44
+    civ_gap: 0.946966
+    df_timing: 0.98
+    lattice_latitude: 0.495872
+    
+  Best components (low loss):
+    lattice_shelf: 0.0
+    reach_latitude: 0.0
+    peak_asymmetry: 0.0
+    industrial_convergence: 0.0
+    nav_weapons_coupling: 0.0
+    security_dilemma: 0.0
+    nuclear_emergence: 0.0
+    supply_chain: 0.0
+    cu_tech_lead: 0.0
+    au_priority: 0.0
+    nuclear_convergence: 0.0
+    sov_recovery: 0.0
+    epi_correlation: 0.0
+    
+  Details:
+    Lattice archs: 22 (mean GC dist=0.686448 rad)
+    Reach archs: 10 (mean GC dist=0.632922 rad)
+    Min reach-lattice distance: 0.013439 rad (very close, penalized)
+    Climate-crop coherence: 35.7% incoherent (15/42)
+    Detected archs: 0/42
+    Detection timing: -24 years
+
+SEED 42 — Total Loss: 20.173366
+  Key contributors:
+    pu_gate: 8.0
+    pop_ratio: 2.0
+    colonial_extraction: 1.44
+    reach_latitude: 1.952008 (outside 35-55 deg target)
+    serial_horizon: 4.0
+    civ_gap: 0.989555
+    climate_crop: 0.457171
+    
+  Lattice archs: 13 (mean GC dist=0.712434 rad)
+  Reach archs: 7 (mean GC dist=0.542149 rad)
+  Reach centroid latitude: 21.03 deg (too tropical, penalized)
+  Climate-crop coherence: 45.2% incoherent (19/42)
+  Detected archs: 28/42
+  Detection timing: -82 years
+
+SEED 97 — Total Loss: 19.380893
+  Key contributors:
+    pu_gate: 8.0
+    pop_ratio: 2.0
+    serial_horizon: 4.0
+    colonial_extraction: 1.44
+    reach_latitude: 1.463409 (too tropical)
+    climate_crop: 0.532001
+    reach_spread: 0.310906
+    
+  Lattice archs: 14 (mean GC dist=0.599494 rad)
+  Reach archs: 7 (mean GC dist=0.521205 rad)
+  Reach centroid latitude: 22.90 deg (outside target range)
+  Climate-crop coherence: 47.6% incoherent (20/42)
+  Detected archs: 20/42
+  Detection timing: -153 years
+
+SEED 137 — Total Loss: 26.625159 [HIGHEST]
+  Key contributors:
+    nuclear_convergence: 10.0 (gap_colonial=0.1, gap_nuclear=2.9)
+    pu_gate: 4.0 (Reach has Pu, Lattice doesn't)
+    pop_ratio: 2.0
+    colonial_extraction: 1.44
+    serial_horizon: 4.0
+    maritime_asymmetry: 0.694444
+    reach_spread: 0.763221
+    lattice_latitude: 2.826722 (centroid at 44.81 deg, outside tropical band)
+    
+  Lattice archs: 14 (mean GC dist=0.486272 rad, very dense)
+  Reach archs: 10 (mean GC dist=0.363188 rad, even denser)
+  Both reach and lattice densities violate spread targets significantly
+  Lattice centroid: 44.81 deg (outside tropical <28 deg target)
+  Reach centroid: 49.57 deg (outside 35-55 deg target)
+  Detected archs: 3/42
+  Detection timing: -129 years
+
+SEED 256 — Total Loss: 17.978833 [LOWEST]
+  Key contributors:
+    pu_gate: 8.0
+    pop_ratio: 2.0
+    serial_horizon: 4.0
+    colonial_extraction: 1.453788
+    reach_spread: 0.52177
+    climate_crop: 0.266695
+    
+  Lattice archs: 20 (mean GC dist=0.557053 rad)
+  Reach archs: 8 (mean GC dist=0.438832 rad)
+  Min reach-lattice distance: 0.000698 rad (extremely close, heavily penalized)
+  Mineral advantage: Pu present (2 archs), Cu present (8 archs)
+  Climate-crop coherence: 38.1% incoherent (16/42)
+  Detected archs: 1/42
+  Detection timing: -59 years
+
+================================================================================
+8. CROSS-SEED PATTERNS
+================================================================================
+
+MOST CONSISTENT LOSS PENALTIES:
+  - pu_gate: 4.0-8.0 (all seeds have limited Pu access)
+  - pop_ratio: 2.0 (all seeds)
+  - serial_horizon: 4.0 (all seeds)
+  - colonial_extraction: 1.44 (consistent across all)
+
+SPHERE DISTRIBUTION VARIATION:
+  - Seeds 17, 42, 97: Balanced or Reach-leaning (9-23 Reach, 12-34 Lattice)
+  - Seeds 137, 256: Lattice-dominated (2 Reach, 40 Lattice each)
+
+LATITUDE CHARACTERISTICS:
+  - All seeds span -71.8 to 75 degrees
+  - Mean latitudes cluster near 0 (-2.07 to 1.30 degrees)
+  - Stdev ranges: 38.0-41.6 (fairly consistent)
+
+PLATEAU EDGES:
+  - Range: 142-151 edges
+  - Seed 97 has fewest (142), Seeds 17 & 137 have most (151)
+
+MINERAL DISTRIBUTION DIVERSITY:
+  - Fe: Universal (42 archs in all seeds)
+  - Cu: 6-10 archs per seed
+  - Au: 1-5 archs per seed (Seed 97 has minimum)
+  - Pu: 0-3 archs (Seeds 42 & 97 have none)
+  - Seed 17 has most total minerals (17 Cu+Au+Pu), Seed 97 has least (7)
+
+DETECTION ANOMALIES:
+  - Seed 137: Only 3 detected archs despite -129 year timing
+  - Seed 256: Only 1 detected arch despite -59 year timing
+  - Seed 42: 28 detected archs (most) at -82 years
+
+================================================================================
+9. SEED SELECTION LOGIC (run_optimization.py)
+================================================================================
+
+Optimizer Configuration:
+  - Trials: 500 (N_TRIALS = 500)
+  - Seeds: [17, 42, 97, 137, 256] (hardcoded list)
+  - Variance weight λ: 0.30 (multi-seed evaluation penalty)
+  - Fail penalty: 2.0
+  - Loss formula: total = mean_loss + λ * std(per-seed losses)
+  
+The 5 seeds are:
+  - Pre-generated in /optimization/worlds/ as seed_*.json
+  - Each seed loads 42 archipelagos with consistent topology
+  - Optimization evaluates parameters across all 5 seeds simultaneously
+  - Multi-seed loss = mean of per-seed losses + 0.30 * standard deviation
+  - This penalizes parameter solutions that work well on some seeds but fail on others
+
+Optimization Backend:
+  - Optuna TPE sampler (Tree-structured Parzen Estimator)
+  - Multivariate sampling (optimize all params together)
+  - 20 startup trials (explore space randomly)
+  - 480 trials of TPE-guided search
+
+Results Saved:
+  - best_params.json: optimized parameter values
+  - loss_breakdown.json: per-seed loss components for best params
+  - convergence.json: trial history, baseline vs best, per-seed losses
+  - convergence_summary.txt: human-readable report
+
+Seed Selection Rationale (inferred from characteristics):
+  - Seeds represent diverse sphere distributions (2-34 Lattice, 2-23 Reach)
+  - Seeds span varied detection timing (-24 to -153 years)
+  - Seeds test different mineral availability (0-3 Pu sources)
+  - Seeds challenge climate-crop coherence (35-47% incoherent)
+  - No seeds have all factions at target latitude bands
+
+================================================================================
