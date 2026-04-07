@@ -1,112 +1,109 @@
 Aeolia History Engine — Optimization Results
 ============================================================
 Backend        : Optuna TPE (multivariate, n_startup=20)
-Trials         : 200
-Seeds          : [17, 42, 97, 137, 256]
-Parameters     : 30
+Trials         : 10000
+Seeds          : [216089, 51, 73, 74, 11, 66, 17, 42, 97, 137, 256]
+Parameters     : 33
 Variance λ     : 0.3
-Total time     : 87.0s  (0.4s/trial)
+Total time     : 1033.9s  (0.1s/trial)
 
 Baseline (default params):
-  total=28.2664  mean=26.0844  std=7.2734
-  geo=9.8903  ag=0.8326  tech=0.0000  poleco=12.5542  epi=0.0041  pop=2.8032
+  total=35.5117  mean=32.8878  std=8.7463
+  lattice_density=0.0217  reach_spread=0.1805  lattice_latitude=0.3386  reach_latitude=1.0890  lattice_shelf=0.0899  civ_gap=0.4082  peak_asymmetry=0.0000  edge_topology=0.1353  climate_crop=0.3268  yield_asymmetry=0.0069  industrial_convergence=0.0000  nav_weapons_coupling=0.0000  security_dilemma=0.0000  nuclear_emergence=0.0000  pu_dependency=1.1591  pu_convergence=10.7273  supply_chain=0.0000  cu_tech_lead=0.0364  au_priority=2.7273  serial_horizon=4.0000  maritime_asymmetry=0.3349  colonial_extraction=1.6673  nuclear_convergence=7.3600  df_timing=0.2128  sov_ordering=0.0077  sov_recovery=0.0000  pop_ratio=2.0000  pop_inequality=0.0198  epi_correlation=0.0383
 
-Best (trial #111):
-  total=24.8822  mean=23.2919  std=5.3011
-  geo=9.8903  ag=0.8326  tech=0.0000  poleco=12.5393  epi=0.0031  pop=0.0265
-  Improvement vs baseline: 3.3842
+Best (trial #8488):
+  total=21.6756  mean=20.5730  std=3.6753
+  lattice_density=0.0217  reach_spread=0.1805  lattice_latitude=0.3386  reach_latitude=1.0890  lattice_shelf=0.0899  civ_gap=0.4082  peak_asymmetry=0.0000  edge_topology=0.1353  climate_crop=0.3268  yield_asymmetry=0.0069  industrial_convergence=0.0000  nav_weapons_coupling=0.0000  security_dilemma=0.0000  nuclear_emergence=0.0000  pu_dependency=2.7273  pu_convergence=3.9545  supply_chain=0.0000  cu_tech_lead=0.1226  au_priority=0.0000  serial_horizon=2.0909  maritime_asymmetry=0.3292  colonial_extraction=1.8159  nuclear_convergence=4.6964  df_timing=0.2128  sov_ordering=0.0017  sov_recovery=0.0000  pop_ratio=2.0000  pop_inequality=0.0247  epi_correlation=0.0000
+  Improvement vs baseline: 13.8361
 
 Per-seed losses (best params):
-  seed=17: total=25.5763  geo=10.0000  ag=0.5046  tech=0.0000  poleco=15.0000  epi=0.0011  pop=0.0706
-  seed=42: total=12.7009  geo=9.4517  ag=0.4903  tech=0.0000  poleco=2.6965  epi=0.0126  pop=0.0498
-  seed=97: total=25.8543  geo=10.0000  ag=0.8471  tech=0.0000  poleco=15.0000  epi=0.0021  pop=0.0051
-  seed=137: total=26.3319  geo=10.0000  ag=1.3279  tech=0.0000  poleco=15.0000  epi=0.0000  pop=0.0039
-  seed=256: total=25.9959  geo=10.0000  ag=0.9928  tech=0.0000  poleco=15.0000  epi=0.0000  pop=0.0032
+  seed=216089: total=24.9696  lattice_density=0.0000  reach_spread=0.0000  lattice_latitude=0.0000  reach_latitude=1.1949  lattice_shelf=0.0000  civ_gap=0.0000  peak_asymmetry=0.0000  edge_topology=0.0280  climate_crop=0.6987  yield_asymmetry=0.0000  industrial_convergence=0.0000  nav_weapons_coupling=0.0000  security_dilemma=0.0000  nuclear_emergence=0.0000  pu_dependency=0.0000  pu_convergence=4.2500  supply_chain=0.0000  cu_tech_lead=0.6050  au_priority=0.0000  serial_horizon=4.0000  maritime_asymmetry=0.2500  colonial_extraction=1.9400  nuclear_convergence=10.0000  df_timing=0.0000  sov_ordering=0.0014  sov_recovery=0.0000  pop_ratio=2.0000  pop_inequality=0.0016  epi_correlation=0.0000
+  seed=51: total=21.1145  lattice_density=0.0964  reach_spread=0.0029  lattice_latitude=0.0123  reach_latitude=2.1517  lattice_shelf=0.0000  civ_gap=0.0000  peak_asymmetry=0.0000  edge_topology=0.4650  climate_crop=0.1681  yield_asymmetry=0.0000  industrial_convergence=0.0000  nav_weapons_coupling=0.0000  security_dilemma=0.0000  nuclear_emergence=0.0000  pu_dependency=0.0000  pu_convergence=2.7500  supply_chain=0.0000  cu_tech_lead=0.0450  au_priority=0.0000  serial_horizon=4.0000  maritime_asymmetry=0.2500  colonial_extraction=1.9400  nuclear_convergence=7.2200  df_timing=0.0000  sov_ordering=0.0021  sov_recovery=0.0000  pop_ratio=2.0000  pop_inequality=0.0111  epi_correlation=0.0000
+  seed=73: total=16.5767  lattice_density=0.1058  reach_spread=0.0000  lattice_latitude=0.0002  reach_latitude=0.6958  lattice_shelf=0.0000  civ_gap=0.0000  peak_asymmetry=0.0000  edge_topology=0.3390  climate_crop=0.2667  yield_asymmetry=0.0000  industrial_convergence=0.0000  nav_weapons_coupling=0.0000  security_dilemma=0.0000  nuclear_emergence=0.0000  pu_dependency=0.0000  pu_convergence=2.7500  supply_chain=0.0000  cu_tech_lead=0.0000  au_priority=0.0000  serial_horizon=1.0000  maritime_asymmetry=0.2500  colonial_extraction=1.9400  nuclear_convergence=7.2200  df_timing=0.0000  sov_ordering=0.0014  sov_recovery=0.0000  pop_ratio=2.0000  pop_inequality=0.0078  epi_correlation=0.0000
+  seed=74: total=19.4254  lattice_density=0.0000  reach_spread=0.0097  lattice_latitude=0.0103  reach_latitude=1.4586  lattice_shelf=0.0000  civ_gap=0.0000  peak_asymmetry=0.0000  edge_topology=0.1882  climate_crop=0.1272  yield_asymmetry=0.0000  industrial_convergence=0.0000  nav_weapons_coupling=0.0000  security_dilemma=0.0000  nuclear_emergence=0.0000  pu_dependency=6.0000  pu_convergence=4.5000  supply_chain=0.0000  cu_tech_lead=0.5689  au_priority=0.0000  serial_horizon=1.0000  maritime_asymmetry=0.2500  colonial_extraction=1.9400  nuclear_convergence=0.0000  df_timing=1.3613  sov_ordering=0.0020  sov_recovery=0.0000  pop_ratio=2.0000  pop_inequality=0.0093  epi_correlation=0.0000
+  seed=11: total=26.0254  lattice_density=0.0064  reach_spread=0.0000  lattice_latitude=0.0000  reach_latitude=2.0693  lattice_shelf=0.6694  civ_gap=0.0000  peak_asymmetry=0.0000  edge_topology=0.1885  climate_crop=0.3245  yield_asymmetry=0.0277  industrial_convergence=0.0000  nav_weapons_coupling=0.0000  security_dilemma=0.0000  nuclear_emergence=0.0000  pu_dependency=0.0000  pu_convergence=4.2500  supply_chain=0.0000  cu_tech_lead=0.1250  au_priority=0.0000  serial_horizon=4.0000  maritime_asymmetry=0.4133  colonial_extraction=1.9400  nuclear_convergence=10.0000  df_timing=0.0000  sov_ordering=0.0015  sov_recovery=0.0000  pop_ratio=2.0000  pop_inequality=0.0098  epi_correlation=0.0000
+  seed=66: total=16.3920  lattice_density=0.0299  reach_spread=0.0000  lattice_latitude=0.0000  reach_latitude=0.9931  lattice_shelf=0.0000  civ_gap=0.0000  peak_asymmetry=0.0000  edge_topology=0.1453  climate_crop=0.3245  yield_asymmetry=0.0441  industrial_convergence=0.0000  nav_weapons_coupling=0.0000  security_dilemma=0.0000  nuclear_emergence=0.0000  pu_dependency=0.0000  pu_convergence=2.7500  supply_chain=0.0000  cu_tech_lead=0.0000  au_priority=0.0000  serial_horizon=1.0000  maritime_asymmetry=0.3906  colonial_extraction=1.4400  nuclear_convergence=7.2200  df_timing=0.0000  sov_ordering=0.0016  sov_recovery=0.0000  pop_ratio=2.0000  pop_inequality=0.0528  epi_correlation=0.0000
+  seed=17: total=18.1118  lattice_density=0.0000  reach_spread=0.1117  lattice_latitude=0.4959  reach_latitude=0.0000  lattice_shelf=0.0000  civ_gap=0.9470  peak_asymmetry=0.0000  edge_topology=0.0057  climate_crop=0.2145  yield_asymmetry=0.0006  industrial_convergence=0.0000  nav_weapons_coupling=0.0000  security_dilemma=0.0000  nuclear_emergence=0.0000  pu_dependency=6.0000  pu_convergence=4.5000  supply_chain=0.0000  cu_tech_lead=0.0022  au_priority=0.0000  serial_horizon=1.0000  maritime_asymmetry=0.3735  colonial_extraction=1.4400  nuclear_convergence=0.0000  df_timing=0.9800  sov_ordering=0.0016  sov_recovery=0.0000  pop_ratio=2.0000  pop_inequality=0.0391  epi_correlation=0.0000
+  seed=42: total=19.6283  lattice_density=0.0000  reach_spread=0.2659  lattice_latitude=0.0389  reach_latitude=1.9520  lattice_shelf=0.1479  civ_gap=0.9896  peak_asymmetry=0.0000  edge_topology=0.0580  climate_crop=0.4572  yield_asymmetry=0.0001  industrial_convergence=0.0000  nav_weapons_coupling=0.0000  security_dilemma=0.0000  nuclear_emergence=0.0000  pu_dependency=6.0000  pu_convergence=4.5000  supply_chain=0.0000  cu_tech_lead=0.0000  au_priority=0.0000  serial_horizon=1.0000  maritime_asymmetry=0.2500  colonial_extraction=1.9400  nuclear_convergence=0.0000  df_timing=0.0000  sov_ordering=0.0020  sov_recovery=0.0000  pop_ratio=2.0000  pop_inequality=0.0266  epi_correlation=0.0000
+  seed=97: total=19.0776  lattice_density=0.0000  reach_spread=0.3109  lattice_latitude=0.0000  reach_latitude=1.4634  lattice_shelf=0.0000  civ_gap=0.9889  peak_asymmetry=0.0000  edge_topology=0.0123  climate_crop=0.5320  yield_asymmetry=0.0033  industrial_convergence=0.0000  nav_weapons_coupling=0.0000  security_dilemma=0.0000  nuclear_emergence=0.0000  pu_dependency=6.0000  pu_convergence=4.5000  supply_chain=0.0000  cu_tech_lead=0.0000  au_priority=0.0000  serial_horizon=1.0000  maritime_asymmetry=0.2500  colonial_extraction=1.9400  nuclear_convergence=0.0000  df_timing=0.0000  sov_ordering=0.0020  sov_recovery=0.0000  pop_ratio=2.0000  pop_inequality=0.0748  epi_correlation=0.0000
+  seed=137: total=27.3860  lattice_density=0.0000  reach_spread=0.7632  lattice_latitude=2.8267  reach_latitude=0.0000  lattice_shelf=0.0816  civ_gap=0.5679  peak_asymmetry=0.0000  edge_topology=0.0303  climate_crop=0.2145  yield_asymmetry=0.0000  industrial_convergence=0.0000  nav_weapons_coupling=0.0000  security_dilemma=0.0000  nuclear_emergence=0.0000  pu_dependency=0.0000  pu_convergence=4.2500  supply_chain=0.0000  cu_tech_lead=0.0000  au_priority=0.0000  serial_horizon=4.0000  maritime_asymmetry=0.6944  colonial_extraction=1.9400  nuclear_convergence=10.0000  df_timing=0.0000  sov_ordering=0.0009  sov_recovery=0.0000  pop_ratio=2.0000  pop_inequality=0.0163  epi_correlation=0.0000
+  seed=256: total=17.5959  lattice_density=0.0000  reach_spread=0.5218  lattice_latitude=0.3406  reach_latitude=0.0000  lattice_shelf=0.0900  civ_gap=0.9972  peak_asymmetry=0.0000  edge_topology=0.0280  climate_crop=0.2667  yield_asymmetry=0.0000  industrial_convergence=0.0000  nav_weapons_coupling=0.0000  security_dilemma=0.0000  nuclear_emergence=0.0000  pu_dependency=6.0000  pu_convergence=4.5000  supply_chain=0.0000  cu_tech_lead=0.0022  au_priority=0.0000  serial_horizon=1.0000  maritime_asymmetry=0.2500  colonial_extraction=1.5750  nuclear_convergence=0.0000  df_timing=0.0000  sov_ordering=0.0020  sov_recovery=0.0000  pop_ratio=2.0000  pop_inequality=0.0224  epi_correlation=0.0000
 
 Convergence (best-so-far):
-  trial   1: best_so_far=32.1504
-  trial   5: best_so_far=24.9257
-  trial  10: best_so_far=24.9257
-  trial  20: best_so_far=24.9257
-  trial  30: best_so_far=24.9057
-  trial  50: best_so_far=24.8924
-  trial  75: best_so_far=24.8924
-  trial 100: best_so_far=24.8825
-  trial 150: best_so_far=24.8822
-  trial 200: best_so_far=24.8822
+  trial   1: best_so_far=36.6027
+  trial   5: best_so_far=28.4221
+  trial  10: best_so_far=27.3285
+  trial  20: best_so_far=25.4154
+  trial  50: best_so_far=23.1310
+  trial 100: best_so_far=22.5332
+  trial 500: best_so_far=22.1828
+  trial 1000: best_so_far=21.8364
+  trial 2500: best_so_far=21.7299
+  trial 5000: best_so_far=21.6935
+  trial 10000: best_so_far=21.6756
 
 Best parameter values (vs defaults):
-  antiquity_base_growth                best=  0.006248  default=  0.002000  delta=+0.004248 (+47% of range) <<<
-  antiquity_lattice_pop_mult           best=  1.960616  default=  2.500000  delta=-0.539384 (-22% of range) <<<
-  serial_shock_base_min                best=  0.176581  default=  0.200000  delta=-0.023419 (-9% of range)
-  serial_shock_base_range              best=  0.306499  default=  0.250000  delta=+0.056499 (+19% of range)
-  serial_trade_rate                    best=  0.000966  default=  0.000400  delta=+0.000566 (+63% of range) <<<
-  reach_serial_base_mult               best=  2.294548  default=  1.300000  delta=+0.994548 (+59% of range) <<<
-  reach_serial_log_coeff               best=  0.121475  default=  0.300000  delta=-0.178525 (-36% of range) <<<
-  lattice_serial_base_mult             best=  1.581665  default=  1.900000  delta=-0.318335 (-14% of range)
-  lattice_serial_log_coeff             best=  0.156573  default=  0.120000  delta=+0.036573 (+14% of range)
-  extraction_base                      best=  0.126997  default=  0.150000  delta=-0.023003 (-8% of range)
-  extraction_per_year                  best=  0.000025  default=  0.000100  delta=-0.000075 (-25% of range) <<<
-  garrison_absorb_base                 best=  0.232817  default=  0.150000  delta=+0.082817 (+28% of range) <<<
-  reach_colony_surplus                 best=  0.065000  default=  0.120000  delta=-0.055000 (-27% of range) <<<
-  lattice_garrison_bonus               best=  0.240972  default=  0.150000  delta=+0.090972 (+36% of range) <<<
-  lattice_trib_bonus                   best=  0.067715  default=  0.080000  delta=-0.012285 (-7% of range)
-  reach_ind_tech_mult                  best=  0.207988  default=  0.120000  delta=+0.087988 (+42% of range) <<<
-  reach_ind_pot_mult                   best=  0.081898  default=  0.140000  delta=-0.058102 (-22% of range) <<<
-  reach_ind_log_coeff                  best=  0.071492  default=  0.140000  delta=-0.068508 (-27% of range) <<<
-  reach_ind_tech_growth                best=  1.394849  default=  0.900000  delta=+0.494849 (+35% of range) <<<
-  lattice_ind_tech_mult                best=  0.041995  default=  0.060000  delta=-0.018005 (-14% of range)
-  lattice_ind_pot_mult                 best=  0.385063  default=  0.220000  delta=+0.165063 (+55% of range) <<<
-  lattice_ind_log_coeff                best=  0.176419  default=  0.100000  delta=+0.076419 (+45% of range) <<<
-  lattice_ind_tech_growth              best=  0.523846  default=  0.600000  delta=-0.076154 (-7% of range)
-  tech_floor_reach_ind                 best=  6.924300  default=  7.000000  delta=-0.075700 (-8% of range)
-  tech_floor_lattice_ind               best=  6.525130  default=  6.500000  delta=+0.025130 (+3% of range)
-  reach_nuclear_pop_mult               best=  1.544799  default=  1.400000  delta=+0.144799 (+16% of range)
-  lattice_nuclear_pop_mult             best=  1.407028  default=  1.350000  delta=+0.057028 (+6% of range)
-  nuclear_access_colony                best=  0.516187  default=  0.700000  delta=-0.183813 (-37% of range) <<<
-  nuclear_access_garrison              best=  0.396321  default=  0.500000  delta=-0.103679 (-21% of range) <<<
-  nuclear_access_independent           best=  0.475243  default=  0.300000  delta=+0.175243 (+44% of range) <<<
-
-STRUCTURAL DIAGNOSIS
-------------------------------------------------------------
-Seeds 17, 97, 137, 256: geo=10.0 (capped), poleco=15.0 (capped).
-Only seed=42 produces uncapped losses.
-Root cause: generate_test_world() synthetic worlds have contact
-  fractions and era distributions outside the lore target window
-  regardless of history-engine parameters. geo/poleco losses are
-  determined by world topology (plateau graph), not sim params.
-Implication: these params are optimised primarily against seed=42.
-  To optimise robustly, use Godot-exported worlds (run_headless.gd)
-  where the full gyre/substrate model produces valid starting state.
-  See README.md 'Third path: offline JSON worlds + thin_sim.py'.
+  antiquity_base_growth                best=  0.005806  default=  0.002000  delta=+0.003806 (+42% of range) <<<
+  antiquity_lattice_pop_mult           best=  1.189958  default=  2.500000  delta=-1.310042 (-44% of range) <<<
+  serial_shock_base_min                best=  0.250543  default=  0.200000  delta=+0.050543 (+20% of range) <<<
+  serial_shock_base_range              best=  0.148199  default=  0.250000  delta=-0.101801 (-34% of range) <<<
+  serial_trade_rate                    best=  0.000826  default=  0.000400  delta=+0.000426 (+47% of range) <<<
+  reach_serial_base_mult               best=  0.982537  default=  1.300000  delta=-0.317463 (-19% of range)
+  reach_serial_log_coeff               best=  0.371392  default=  0.300000  delta=+0.071392 (+14% of range)
+  lattice_serial_base_mult             best=  1.516336  default=  1.900000  delta=-0.383664 (-17% of range)
+  lattice_serial_log_coeff             best=  0.224364  default=  0.120000  delta=+0.104364 (+39% of range) <<<
+  extraction_base                      best=  0.104830  default=  0.150000  delta=-0.045170 (-13% of range)
+  extraction_per_year                  best=  0.000015  default=  0.000100  delta=-0.000086 (-29% of range) <<<
+  garrison_absorb_base                 best=  0.302987  default=  0.150000  delta=+0.152987 (+51% of range) <<<
+  reach_colony_surplus                 best=  0.246569  default=  0.120000  delta=+0.126569 (+42% of range) <<<
+  lattice_garrison_bonus               best=  0.295539  default=  0.150000  delta=+0.145539 (+58% of range) <<<
+  lattice_trib_bonus                   best=  0.184089  default=  0.080000  delta=+0.104089 (+58% of range) <<<
+  reach_ind_tech_mult                  best=  0.125366  default=  0.120000  delta=+0.005366 (+3% of range)
+  reach_ind_pot_mult                   best=  0.189792  default=  0.140000  delta=+0.049792 (+19% of range)
+  reach_ind_log_coeff                  best=  0.146308  default=  0.140000  delta=+0.006308 (+2% of range)
+  reach_ind_tech_growth                best=  0.858608  default=  0.900000  delta=-0.041392 (-3% of range)
+  lattice_ind_tech_mult                best=  0.126160  default=  0.060000  delta=+0.066160 (+51% of range) <<<
+  lattice_ind_pot_mult                 best=  0.239963  default=  0.220000  delta=+0.019963 (+7% of range)
+  lattice_ind_log_coeff                best=  0.167096  default=  0.100000  delta=+0.067096 (+39% of range) <<<
+  lattice_ind_tech_growth              best=  1.109720  default=  0.600000  delta=+0.509720 (+46% of range) <<<
+  tech_floor_reach_ind                 best=  7.479570  default=  7.000000  delta=+0.479570 (+48% of range) <<<
+  tech_floor_lattice_ind               best=  7.462101  default=  6.500000  delta=+0.962101 (+64% of range) <<<
+  reach_nuclear_pop_mult               best=  1.891566  default=  1.400000  delta=+0.491566 (+55% of range) <<<
+  lattice_nuclear_pop_mult             best=  1.404671  default=  1.350000  delta=+0.054671 (+6% of range)
+  nuclear_access_colony                best=  0.592279  default=  0.700000  delta=-0.107721 (-22% of range) <<<
+  nuclear_access_garrison              best=  0.731279  default=  0.500000  delta=+0.231279 (+46% of range) <<<
+  nuclear_access_independent           best=  0.342052  default=  0.300000  delta=+0.042052 (+11% of range)
+  cu_serial_year_bonus                 best=160.549130  default=150.000000  delta=+10.549130 (+3% of range)
+  au_contact_year_bonus                best=1883.291358  default= 80.000000  delta=+1803.291358 (+90% of range) <<<
+  pu_nuclear_tech_fraction             best=  0.194521  default=  0.600000  delta=-0.405479 (-45% of range) <<<
 
 GDScript constants (changed params, |Δ| > 5% of range):
-  var antiquity_base_growth := 0.006248
-  var antiquity_lattice_pop_mult := 1.960616
-  var serial_shock_base_min := 0.176581
-  var serial_shock_base_range := 0.306499
-  var serial_trade_rate := 0.000966
-  var reach_serial_base_mult := 2.294548
-  var reach_serial_log_coeff := 0.121475
-  var lattice_serial_base_mult := 1.581665
-  var lattice_serial_log_coeff := 0.156573
-  var extraction_base := 0.126997
-  var extraction_per_year := 0.000025
-  var garrison_absorb_base := 0.232817
-  var reach_colony_surplus := 0.065000
-  var lattice_garrison_bonus := 0.240972
-  var lattice_trib_bonus := 0.067715
-  var reach_ind_tech_mult := 0.207988
-  var reach_ind_pot_mult := 0.081898
-  var reach_ind_log_coeff := 0.071492
-  var reach_ind_tech_growth := 1.394849
-  var lattice_ind_tech_mult := 0.041995
-  var lattice_ind_pot_mult := 0.385063
-  var lattice_ind_log_coeff := 0.176419
-  var lattice_ind_tech_growth := 0.523846
-  var tech_floor_reach_ind := 6.924300
-  var reach_nuclear_pop_mult := 1.544799
-  var lattice_nuclear_pop_mult := 1.407028
-  var nuclear_access_colony := 0.516187
-  var nuclear_access_garrison := 0.396321
-  var nuclear_access_independent := 0.475243
+  var antiquity_base_growth := 0.005806
+  var antiquity_lattice_pop_mult := 1.189958
+  var serial_shock_base_min := 0.250543
+  var serial_shock_base_range := 0.148199
+  var serial_trade_rate := 0.000826
+  var reach_serial_base_mult := 0.982537
+  var reach_serial_log_coeff := 0.371392
+  var lattice_serial_base_mult := 1.516336
+  var lattice_serial_log_coeff := 0.224364
+  var extraction_base := 0.104830
+  var extraction_per_year := 0.000015
+  var garrison_absorb_base := 0.302987
+  var reach_colony_surplus := 0.246569
+  var lattice_garrison_bonus := 0.295539
+  var lattice_trib_bonus := 0.184089
+  var reach_ind_pot_mult := 0.189792
+  var lattice_ind_tech_mult := 0.126160
+  var lattice_ind_pot_mult := 0.239963
+  var lattice_ind_log_coeff := 0.167096
+  var lattice_ind_tech_growth := 1.109720
+  var tech_floor_reach_ind := 7.479570
+  var tech_floor_lattice_ind := 7.462101
+  var reach_nuclear_pop_mult := 1.891566
+  var lattice_nuclear_pop_mult := 1.404671
+  var nuclear_access_colony := 0.592279
+  var nuclear_access_garrison := 0.731279
+  var nuclear_access_independent := 0.342052
+  var au_contact_year_bonus := 1883.291358
+  var pu_nuclear_tech_fraction := 0.194521

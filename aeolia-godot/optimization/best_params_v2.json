@@ -1,0 +1,23 @@
+{
+  "civic_expansion_share": 0.3091123,
+  "civic_tech_share": 0.28808624,
+  "civic_consolidation_share": 0.4,
+  "subject_expansion_share": 0.30162363,
+  "subject_tech_share": 0.11703067,
+  "subject_consolidation_share": 0.5813457,
+  "parochial_expansion_share": 0.31680192,
+  "parochial_tech_share": 0.1722474,
+  "A0_civic": 1.03830766,
+  "A0_subject": 0.61610557,
+  "A0_parochial": 0.57901691,
+  "cu_unlock_tech": 3.42030927,
+  "au_contact_bonus": 1544.88991739,
+  "naphtha_richness": 0.95803402,
+  "naphtha_depletion": 0.03019192,
+  "energy_to_tfp": 1.93541771,
+  "pu_dependent_factor": 0.82375013,
+  "resource_targeting_weight": 3.85813567,
+  "epi_base_severity": 0.16764881,
+  "sov_extraction_decay": 0.06535587,
+  "df_detection_range": 0.44010393
+}

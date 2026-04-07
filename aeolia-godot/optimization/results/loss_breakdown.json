@@ -1,291 +1,1934 @@
 {
-  "17": {
-    "total": 25.576283,
+  "216089": {
+    "total": 24.969636,
     "components": {
-      "geo": 10.0,
-      "ag": 0.504613,
-      "tech": 0.0,
-      "poleco": 15.0,
-      "epi": 0.001092,
-      "pop": 0.070579
+      "lattice_density": 0.0,
+      "reach_spread": 0.0,
+      "lattice_latitude": 0.0,
+      "reach_latitude": 1.194922,
+      "lattice_shelf": 0.0,
+      "civ_gap": 0.0,
+      "peak_asymmetry": 0.0,
+      "edge_topology": 0.028026,
+      "climate_crop": 0.698668,
+      "yield_asymmetry": 0.0,
+      "industrial_convergence": 0.0,
+      "nav_weapons_coupling": 0.0,
+      "security_dilemma": 0.0,
+      "nuclear_emergence": 0.0,
+      "pu_dependency": 0.0,
+      "pu_convergence": 4.25,
+      "supply_chain": 0.0,
+      "cu_tech_lead": 0.605,
+      "au_priority": 0.0,
+      "serial_horizon": 4.0,
+      "maritime_asymmetry": 0.25,
+      "colonial_extraction": 1.94,
+      "nuclear_convergence": 10.0,
+      "df_timing": 0.0,
+      "sov_ordering": 0.001419,
+      "sov_recovery": 0.0,
+      "pop_ratio": 2.0,
+      "pop_inequality": 0.0016,
+      "epi_correlation": 0.0
     },
     "details": {
-      "geo": {
-        "contact_frac": 0.142857,
-        "n_indep": 0,
-        "reach_frac": 0.833333,
-        "l_contact": 36.862245,
-        "l_indep": 9.0,
-        "l_balance": 0.080278
+      "lattice_density": {
+        "mean_dist_rad": 1.018896,
+        "n_lattice": 12
       },
-      "ag": {
-        "reach_crop": "nori",
-        "lattice_crop": "paddi",
-        "yield_ratio": 1.351047,
-        "n_distinct_crops": 6,
-        "paddi_frac": 0.047619,
-        "emmer_frac": 0.0
+      "reach_spread": {
+        "mean_dist_rad": 0.900518,
+        "n_reach": 8
       },
-      "tech": {
+      "lattice_latitude": {
+        "centroid_abs_lat": 25.953333
+      },
+      "reach_latitude": {
+        "centroid_abs_lat": 24.06875
+      },
+      "lattice_shelf": {
+        "frac_qualifying": 0.5,
+        "qualifying": 6,
+        "n_lattice": 12
+      },
+      "civ_gap": {
+        "min_cross_dist_rad": 0.671331
+      },
+      "peak_asymmetry": {
+        "lattice_mean_peaks": 0.0,
+        "reach_mean_peaks": 0.0
+      },
+      "edge_topology": {
+        "lattice_mean_dist": 1.018896,
+        "reach_mean_dist": 0.900518
+      },
+      "climate_crop": {
+        "incoherent_frac": 0.52381,
+        "incoherent": 22,
+        "n_non_foraging": 42
+      },
+      "yield_asymmetry": {
+        "hydraulic_mean_yield": 2.414903,
+        "dryland_mean_yield": 2.339949,
+        "ratio": 1.032032
+      },
+      "industrial_convergence": {
+        "r_tech_ind": 7.47957,
+        "l_tech_ind": 7.462101,
+        "gap_at_ind": 0.017469,
+        "either_crosses_7": true
+      },
+      "nav_weapons_coupling": {
+        "dtech_reach": 3.97957,
+        "n_serial_reach": 2,
+        "coupling": 1.331056
+      },
+      "security_dilemma": {
+        "note": "DF broke before tech 7 \u2014 correct",
+        "df_year": -153,
+        "t_tech7": -760.377446
+      },
+      "nuclear_emergence": {
+        "note": "not evaluated"
+      },
+      "pu_dependency": {
+        "reach_pu": true,
+        "lattice_pu": false,
+        "asymmetric": true,
+        "reach_nuc_tech": 7.47957,
+        "lattice_nuc_tech": 7.462101
+      },
+      "pu_convergence": {
         "reach_tech": 10.0,
-        "lattice_tech": 9.5,
-        "tech_gap": 0.5,
-        "indep_techs": []
+        "lattice_tech": 7.5,
+        "reach_pu": true,
+        "lattice_pu": false,
+        "gap_penalty": 1.0
       },
-      "poleco": {
-        "df_year": -1400,
-        "era_fracs": {
-          "sail": 0.047619047619047616,
-          "colonial": 0.047619047619047616,
-          "industrial": 0.0,
-          "nuclear": 0.0,
-          "uncontacted": 0.8571428571428571
+      "supply_chain": {
+        "reach_robust": true,
+        "lattice_robust": true
+      },
+      "cu_tech_lead": {
+        "cu_serial_mean_tech": 1.7,
+        "non_cu_serial_mean_tech": 1.95,
+        "delta": -0.25,
+        "n_cu": 1,
+        "n_non_cu": 2
+      },
+      "au_priority": {
+        "au_mean_year": -3675.0,
+        "non_au_mean_year": -698.4375,
+        "delta_years": 2976.5625,
+        "n_au": 2,
+        "n_non_au": 16
+      },
+      "serial_horizon": {
+        "max_serial_hops": 1,
+        "n_serial": 3
+      },
+      "maritime_asymmetry": {
+        "reach_contacts": 6,
+        "reach_colonies": 6,
+        "ratio": 1.0
+      },
+      "colonial_extraction": {
+        "mean_col_sov_pre_nuclear": 0.260355,
+        "loss_a": 0.0,
+        "reach_pop_growth_ratio": 0.0,
+        "loss_b": 2.88,
+        "colonial_epi_spearman": null,
+        "n_colonial_epi": 4,
+        "loss_c": 1.0
+      },
+      "nuclear_convergence": {
+        "gap_colonial": 0.1,
+        "gap_nuclear": 2.5
+      },
+      "df_timing": {
+        "df_year": -153
+      },
+      "sov_ordering": {
+        "sov_by_status": {
+          "colony": 0.538,
+          "garrison": 0.5,
+          "contacted": 0.9,
+          "core": 1.0
         },
-        "l_df": 144.0,
-        "l_era": 0.571372,
-        "l_sov": 1.375084,
-        "l_trade": 0.049031
+        "n_ordered_groups": 4
       },
-      "epi": {
-        "mortality_cv": 0.266957
+      "sov_recovery": {
+        "nuclear_colony_sov": 0.537672,
+        "colonial_colony_sov": 0.260355
       },
-      "pop": {
-        "lattice_reach_ratio": 0.682195,
-        "pop_gini": 0.794062,
-        "mean_colony_sov": 0.551701,
-        "lattice_vs_median": 94.142857
+      "pop_ratio": {
+        "lattice_pop": 0,
+        "reach_pop": 0,
+        "ratio": 0.0
+      },
+      "pop_inequality": {
+        "gini": 0.221713,
+        "n_archs": 6
+      },
+      "epi_correlation": {
+        "spearman_rho": 0.790569,
+        "n_events": 7
+      }
+    }
+  },
+  "51": {
+    "total": 21.114549,
+    "components": {
+      "lattice_density": 0.096399,
+      "reach_spread": 0.0029,
+      "lattice_latitude": 0.012333,
+      "reach_latitude": 2.15167,
+      "lattice_shelf": 0.0,
+      "civ_gap": 0.0,
+      "peak_asymmetry": 0.0,
+      "edge_topology": 0.464967,
+      "climate_crop": 0.168056,
+      "yield_asymmetry": 0.0,
+      "industrial_convergence": 0.0,
+      "nav_weapons_coupling": 0.0,
+      "security_dilemma": 0.0,
+      "nuclear_emergence": 0.0,
+      "pu_dependency": 0.0,
+      "pu_convergence": 2.75,
+      "supply_chain": 0.0,
+      "cu_tech_lead": 0.045,
+      "au_priority": 0.0,
+      "serial_horizon": 4.0,
+      "maritime_asymmetry": 0.25,
+      "colonial_extraction": 1.94,
+      "nuclear_convergence": 7.22,
+      "df_timing": 0.0,
+      "sov_ordering": 0.00214,
+      "sov_recovery": 0.0,
+      "pop_ratio": 2.0,
+      "pop_inequality": 0.011084,
+      "epi_correlation": 0.0
+    },
+    "details": {
+      "lattice_density": {
+        "mean_dist_rad": 1.255241,
+        "n_lattice": 18
+      },
+      "reach_spread": {
+        "mean_dist_rad": 0.773075,
+        "n_reach": 7
+      },
+      "lattice_latitude": {
+        "centroid_abs_lat": 29.110556
+      },
+      "reach_latitude": {
+        "centroid_abs_lat": 20.331429
+      },
+      "lattice_shelf": {
+        "frac_qualifying": 0.666667,
+        "qualifying": 12,
+        "n_lattice": 18
+      },
+      "civ_gap": {
+        "min_cross_dist_rad": 0.889585
+      },
+      "peak_asymmetry": {
+        "lattice_mean_peaks": 0.0,
+        "reach_mean_peaks": 0.0
+      },
+      "edge_topology": {
+        "lattice_mean_dist": 1.255241,
+        "reach_mean_dist": 0.773075
+      },
+      "climate_crop": {
+        "incoherent_frac": 0.333333,
+        "incoherent": 14,
+        "n_non_foraging": 42
+      },
+      "yield_asymmetry": {
+        "hydraulic_mean_yield": 3.45261,
+        "dryland_mean_yield": 2.619218,
+        "ratio": 1.318183
+      },
+      "industrial_convergence": {
+        "r_tech_ind": 7.47957,
+        "l_tech_ind": 7.462101,
+        "gap_at_ind": 0.017469,
+        "either_crosses_7": true
+      },
+      "nav_weapons_coupling": {
+        "dtech_reach": 3.97957,
+        "n_serial_reach": 2,
+        "coupling": 1.331056
+      },
+      "security_dilemma": {
+        "note": "DF broke before tech 7 \u2014 correct",
+        "df_year": -94,
+        "t_tech7": -760.377446
+      },
+      "nuclear_emergence": {
+        "note": "not evaluated"
+      },
+      "pu_dependency": {
+        "reach_pu": false,
+        "lattice_pu": true,
+        "asymmetric": true,
+        "reach_nuc_tech": 7.47957,
+        "lattice_nuc_tech": 7.462101
+      },
+      "pu_convergence": {
+        "reach_tech": 7.5,
+        "lattice_tech": 9.5,
+        "reach_pu": false,
+        "lattice_pu": true,
+        "gap_penalty": 0.25
+      },
+      "supply_chain": {
+        "reach_robust": true,
+        "lattice_robust": true
+      },
+      "cu_tech_lead": {
+        "cu_serial_mean_tech": 3.1,
+        "non_cu_serial_mean_tech": 2.95,
+        "delta": 0.15,
+        "n_cu": 1,
+        "n_non_cu": 2
+      },
+      "au_priority": {
+        "au_mean_year": -3675.0,
+        "non_au_mean_year": -552.52381,
+        "delta_years": 3122.47619,
+        "n_au": 2,
+        "n_non_au": 21
+      },
+      "serial_horizon": {
+        "max_serial_hops": 1,
+        "n_serial": 3
+      },
+      "maritime_asymmetry": {
+        "reach_contacts": 6,
+        "reach_colonies": 6,
+        "ratio": 1.0
+      },
+      "colonial_extraction": {
+        "mean_col_sov_pre_nuclear": 0.270724,
+        "loss_a": 0.0,
+        "reach_pop_growth_ratio": 0.0,
+        "loss_b": 2.88,
+        "colonial_epi_spearman": null,
+        "n_colonial_epi": 4,
+        "loss_c": 1.0
+      },
+      "nuclear_convergence": {
+        "gap_colonial": 0.1,
+        "gap_nuclear": 2.0
+      },
+      "df_timing": {
+        "df_year": -94
+      },
+      "sov_ordering": {
+        "sov_by_status": {
+          "colony": 0.538,
+          "garrison": 0.5,
+          "core": 1.0
+        },
+        "n_ordered_groups": 3
+      },
+      "sov_recovery": {
+        "nuclear_colony_sov": 0.537774,
+        "colonial_colony_sov": 0.270724
+      },
+      "pop_ratio": {
+        "lattice_pop": 0,
+        "reach_pop": 0,
+        "ratio": 0.0
+      },
+      "pop_inequality": {
+        "gini": 0.175556,
+        "n_archs": 6
+      },
+      "epi_correlation": {
+        "spearman_rho": 0.801784,
+        "n_events": 7
+      }
+    }
+  },
+  "73": {
+    "total": 16.576742,
+    "components": {
+      "lattice_density": 0.105819,
+      "reach_spread": 0.0,
+      "lattice_latitude": 0.000193,
+      "reach_latitude": 0.695765,
+      "lattice_shelf": 0.0,
+      "civ_gap": 0.0,
+      "peak_asymmetry": 0.0,
+      "edge_topology": 0.339039,
+      "climate_crop": 0.266695,
+      "yield_asymmetry": 0.0,
+      "industrial_convergence": 0.0,
+      "nav_weapons_coupling": 0.0,
+      "security_dilemma": 0.0,
+      "nuclear_emergence": 0.0,
+      "pu_dependency": 0.0,
+      "pu_convergence": 2.75,
+      "supply_chain": 0.0,
+      "cu_tech_lead": 0.0,
+      "au_priority": 0.0,
+      "serial_horizon": 1.0,
+      "maritime_asymmetry": 0.25,
+      "colonial_extraction": 1.94,
+      "nuclear_convergence": 7.22,
+      "df_timing": 0.0,
+      "sov_ordering": 0.001419,
+      "sov_recovery": 0.0,
+      "pop_ratio": 2.0,
+      "pop_inequality": 0.007812,
+      "epi_correlation": 0.0
+    },
+    "details": {
+      "lattice_density": {
+        "mean_dist_rad": 1.26265,
+        "n_lattice": 20
+      },
+      "reach_spread": {
+        "mean_dist_rad": 0.850922,
+        "n_reach": 8
+      },
+      "lattice_latitude": {
+        "centroid_abs_lat": 28.139
+      },
+      "reach_latitude": {
+        "centroid_abs_lat": 26.65875
+      },
+      "lattice_shelf": {
+        "frac_qualifying": 0.6,
+        "qualifying": 12,
+        "n_lattice": 20
+      },
+      "civ_gap": {
+        "min_cross_dist_rad": 0.765931
+      },
+      "peak_asymmetry": {
+        "lattice_mean_peaks": 0.0,
+        "reach_mean_peaks": 0.0
+      },
+      "edge_topology": {
+        "lattice_mean_dist": 1.26265,
+        "reach_mean_dist": 0.850922
+      },
+      "climate_crop": {
+        "incoherent_frac": 0.380952,
+        "incoherent": 16,
+        "n_non_foraging": 42
+      },
+      "yield_asymmetry": {
+        "hydraulic_mean_yield": 2.308747,
+        "dryland_mean_yield": 1.797394,
+        "ratio": 1.284497
+      },
+      "industrial_convergence": {
+        "r_tech_ind": 7.47957,
+        "l_tech_ind": 7.462101,
+        "gap_at_ind": 0.017469,
+        "either_crosses_7": true
+      },
+      "nav_weapons_coupling": {
+        "dtech_reach": 3.97957,
+        "n_serial_reach": 2,
+        "coupling": 1.331056
+      },
+      "security_dilemma": {
+        "note": "DF broke before tech 7 \u2014 correct",
+        "df_year": -59,
+        "t_tech7": -760.377446
+      },
+      "nuclear_emergence": {
+        "note": "not evaluated"
+      },
+      "pu_dependency": {
+        "reach_pu": false,
+        "lattice_pu": true,
+        "asymmetric": true,
+        "reach_nuc_tech": 7.47957,
+        "lattice_nuc_tech": 7.462101
+      },
+      "pu_convergence": {
+        "reach_tech": 7.5,
+        "lattice_tech": 9.5,
+        "reach_pu": false,
+        "lattice_pu": true,
+        "gap_penalty": 0.25
+      },
+      "supply_chain": {
+        "reach_robust": true,
+        "lattice_robust": true
+      },
+      "cu_tech_lead": {
+        "cu_serial_mean_tech": 2.5,
+        "non_cu_serial_mean_tech": 2.12,
+        "delta": 0.38,
+        "n_cu": 1,
+        "n_non_cu": 5
+      },
+      "au_priority": {
+        "au_mean_year": -2684.4,
+        "non_au_mean_year": -542.47619,
+        "delta_years": 2141.92381,
+        "n_au": 5,
+        "n_non_au": 21
+      },
+      "serial_horizon": {
+        "max_serial_hops": 2,
+        "n_serial": 6
+      },
+      "maritime_asymmetry": {
+        "reach_contacts": 6,
+        "reach_colonies": 6,
+        "ratio": 1.0
+      },
+      "colonial_extraction": {
+        "mean_col_sov_pre_nuclear": 0.27304,
+        "loss_a": 0.0,
+        "reach_pop_growth_ratio": 0.0,
+        "loss_b": 2.88,
+        "colonial_epi_spearman": null,
+        "n_colonial_epi": 4,
+        "loss_c": 1.0
+      },
+      "nuclear_convergence": {
+        "gap_colonial": 0.1,
+        "gap_nuclear": 2.0
+      },
+      "df_timing": {
+        "df_year": -59
+      },
+      "sov_ordering": {
+        "sov_by_status": {
+          "colony": 0.538,
+          "garrison": 0.5,
+          "contacted": 0.9,
+          "core": 1.0
+        },
+        "n_ordered_groups": 4
+      },
+      "sov_recovery": {
+        "nuclear_colony_sov": 0.537666,
+        "colonial_colony_sov": 0.27304
+      },
+      "pop_ratio": {
+        "lattice_pop": 0,
+        "reach_pop": 0,
+        "ratio": 0.0
+      },
+      "pop_inequality": {
+        "gini": 0.1875,
+        "n_archs": 6
+      },
+      "epi_correlation": {
+        "spearman_rho": 0.509395,
+        "n_events": 10
+      }
+    }
+  },
+  "74": {
+    "total": 19.425404,
+    "components": {
+      "lattice_density": 0.0,
+      "reach_spread": 0.009671,
+      "lattice_latitude": 0.010314,
+      "reach_latitude": 1.458574,
+      "lattice_shelf": 0.0,
+      "civ_gap": 0.0,
+      "peak_asymmetry": 0.0,
+      "edge_topology": 0.188166,
+      "climate_crop": 0.127239,
+      "yield_asymmetry": 0.0,
+      "industrial_convergence": 0.0,
+      "nav_weapons_coupling": 0.0,
+      "security_dilemma": 0.0,
+      "nuclear_emergence": 0.0,
+      "pu_dependency": 6.0,
+      "pu_convergence": 4.5,
+      "supply_chain": 0.0,
+      "cu_tech_lead": 0.568889,
+      "au_priority": 0.0,
+      "serial_horizon": 1.0,
+      "maritime_asymmetry": 0.25,
+      "colonial_extraction": 1.94,
+      "nuclear_convergence": 0.0,
+      "df_timing": 1.36125,
+      "sov_ordering": 0.002042,
+      "sov_recovery": 0.0,
+      "pop_ratio": 2.0,
+      "pop_inequality": 0.00926,
+      "epi_correlation": 0.0
+    },
+    "details": {
+      "lattice_density": {
+        "mean_dist_rad": 1.057559,
+        "n_lattice": 9
+      },
+      "reach_spread": {
+        "mean_dist_rad": 0.750829,
+        "n_reach": 7
+      },
+      "lattice_latitude": {
+        "centroid_abs_lat": 29.015556
+      },
+      "reach_latitude": {
+        "centroid_abs_lat": 22.922857
+      },
+      "lattice_shelf": {
+        "frac_qualifying": 0.555556,
+        "qualifying": 5,
+        "n_lattice": 9
+      },
+      "civ_gap": {
+        "min_cross_dist_rad": 0.830989
+      },
+      "peak_asymmetry": {
+        "lattice_mean_peaks": 0.0,
+        "reach_mean_peaks": 0.0
+      },
+      "edge_topology": {
+        "lattice_mean_dist": 1.057559,
+        "reach_mean_dist": 0.750829
+      },
+      "climate_crop": {
+        "incoherent_frac": 0.309524,
+        "incoherent": 13,
+        "n_non_foraging": 42
+      },
+      "yield_asymmetry": {
+        "hydraulic_mean_yield": 2.547913,
+        "dryland_mean_yield": 2.260492,
+        "ratio": 1.127149
+      },
+      "industrial_convergence": {
+        "r_tech_ind": 7.47957,
+        "l_tech_ind": 7.462101,
+        "gap_at_ind": 0.017469,
+        "either_crosses_7": true
+      },
+      "nav_weapons_coupling": {
+        "dtech_reach": 3.97957,
+        "n_serial_reach": 2,
+        "coupling": 1.331056
+      },
+      "security_dilemma": {
+        "note": "DF broke before tech 7 \u2014 correct",
+        "df_year": -233,
+        "t_tech7": -760.377446
+      },
+      "nuclear_emergence": {
+        "note": "not evaluated"
+      },
+      "pu_dependency": {
+        "reach_pu": false,
+        "lattice_pu": false,
+        "asymmetric": false,
+        "reach_nuc_tech": 7.47957,
+        "lattice_nuc_tech": 7.462101
+      },
+      "pu_convergence": {
+        "reach_tech": 7.5,
+        "lattice_tech": 7.5,
+        "reach_pu": false,
+        "lattice_pu": false,
+        "gap_penalty": 0.0
+      },
+      "supply_chain": {
+        "reach_robust": true,
+        "lattice_robust": true
+      },
+      "cu_tech_lead": {
+        "cu_serial_mean_tech": 2.3,
+        "non_cu_serial_mean_tech": 2.533333,
+        "delta": -0.233333,
+        "n_cu": 1,
+        "n_non_cu": 3
+      },
+      "au_priority": {
+        "au_mean_year": -2133.0,
+        "non_au_mean_year": -1191.666667,
+        "delta_years": 941.333333,
+        "n_au": 2,
+        "n_non_au": 12
+      },
+      "serial_horizon": {
+        "max_serial_hops": 2,
+        "n_serial": 4
+      },
+      "maritime_asymmetry": {
+        "reach_contacts": 6,
+        "reach_colonies": 6,
+        "ratio": 1.0
+      },
+      "colonial_extraction": {
+        "mean_col_sov_pre_nuclear": 0.251529,
+        "loss_a": 0.0,
+        "reach_pop_growth_ratio": 0.0,
+        "loss_b": 2.88,
+        "colonial_epi_spearman": null,
+        "n_colonial_epi": 4,
+        "loss_c": 1.0
+      },
+      "nuclear_convergence": {
+        "gap_colonial": 0.1,
+        "gap_nuclear": 0.0
+      },
+      "df_timing": {
+        "df_year": -233
+      },
+      "sov_ordering": {
+        "sov_by_status": {
+          "colony": 0.537,
+          "garrison": 0.5,
+          "core": 1.0
+        },
+        "n_ordered_groups": 3
+      },
+      "sov_recovery": {
+        "nuclear_colony_sov": 0.5369,
+        "colonial_colony_sov": 0.251529
+      },
+      "pop_ratio": {
+        "lattice_pop": 0,
+        "reach_pop": 0,
+        "ratio": 0.0
+      },
+      "pop_inequality": {
+        "gini": 0.181957,
+        "n_archs": 6
+      },
+      "epi_correlation": {
+        "spearman_rho": 0.845154,
+        "n_events": 8
+      }
+    }
+  },
+  "11": {
+    "total": 26.025366,
+    "components": {
+      "lattice_density": 0.006395,
+      "reach_spread": 0.0,
+      "lattice_latitude": 0.0,
+      "reach_latitude": 2.069282,
+      "lattice_shelf": 0.669421,
+      "civ_gap": 0.0,
+      "peak_asymmetry": 0.0,
+      "edge_topology": 0.188519,
+      "climate_crop": 0.324518,
+      "yield_asymmetry": 0.027651,
+      "industrial_convergence": 0.0,
+      "nav_weapons_coupling": 0.0,
+      "security_dilemma": 0.0,
+      "nuclear_emergence": 0.0,
+      "pu_dependency": 0.0,
+      "pu_convergence": 4.25,
+      "supply_chain": 0.0,
+      "cu_tech_lead": 0.125,
+      "au_priority": 0.0,
+      "serial_horizon": 4.0,
+      "maritime_asymmetry": 0.413265,
+      "colonial_extraction": 1.94,
+      "nuclear_convergence": 10.0,
+      "df_timing": 0.0,
+      "sov_ordering": 0.001515,
+      "sov_recovery": 0.0,
+      "pop_ratio": 2.0,
+      "pop_inequality": 0.0098,
+      "epi_correlation": 0.0
+    },
+    "details": {
+      "lattice_density": {
+        "mean_dist_rad": 1.139983,
+        "n_lattice": 11
+      },
+      "reach_spread": {
+        "mean_dist_rad": 0.832966,
+        "n_reach": 8
+      },
+      "lattice_latitude": {
+        "centroid_abs_lat": 25.69
+      },
+      "reach_latitude": {
+        "centroid_abs_lat": 20.615
+      },
+      "lattice_shelf": {
+        "frac_qualifying": 0.090909,
+        "qualifying": 1,
+        "n_lattice": 11
+      },
+      "civ_gap": {
+        "min_cross_dist_rad": 0.894176
+      },
+      "peak_asymmetry": {
+        "lattice_mean_peaks": 0.0,
+        "reach_mean_peaks": 0.0
+      },
+      "edge_topology": {
+        "lattice_mean_dist": 1.139983,
+        "reach_mean_dist": 0.832966
+      },
+      "climate_crop": {
+        "incoherent_frac": 0.404762,
+        "incoherent": 17,
+        "n_non_foraging": 42
+      },
+      "yield_asymmetry": {
+        "hydraulic_mean_yield": 2.049554,
+        "dryland_mean_yield": 2.322655,
+        "ratio": 0.882419
+      },
+      "industrial_convergence": {
+        "r_tech_ind": 7.47957,
+        "l_tech_ind": 7.462101,
+        "gap_at_ind": 0.017469,
+        "either_crosses_7": true
+      },
+      "nav_weapons_coupling": {
+        "dtech_reach": 3.97957,
+        "n_serial_reach": 2,
+        "coupling": 1.331056
+      },
+      "security_dilemma": {
+        "note": "DF broke before tech 7 \u2014 correct",
+        "df_year": -165,
+        "t_tech7": -760.377446
+      },
+      "nuclear_emergence": {
+        "note": "not evaluated"
+      },
+      "pu_dependency": {
+        "reach_pu": true,
+        "lattice_pu": false,
+        "asymmetric": true,
+        "reach_nuc_tech": 7.47957,
+        "lattice_nuc_tech": 7.462101
+      },
+      "pu_convergence": {
+        "reach_tech": 10.0,
+        "lattice_tech": 7.5,
+        "reach_pu": true,
+        "lattice_pu": false,
+        "gap_penalty": 1.0
+      },
+      "supply_chain": {
+        "reach_robust": true,
+        "lattice_robust": true
+      },
+      "cu_tech_lead": {
+        "cu_serial_mean_tech": 1.85,
+        "non_cu_serial_mean_tech": 1.8,
+        "delta": 0.05,
+        "n_cu": 2,
+        "n_non_cu": 1
+      },
+      "au_priority": {
+        "au_mean_year": -2316.0,
+        "non_au_mean_year": -941.0,
+        "delta_years": 1375.0,
+        "n_au": 1,
+        "n_non_au": 16
+      },
+      "serial_horizon": {
+        "max_serial_hops": 1,
+        "n_serial": 3
+      },
+      "maritime_asymmetry": {
+        "reach_contacts": 6,
+        "reach_colonies": 7,
+        "ratio": 0.857143
+      },
+      "colonial_extraction": {
+        "mean_col_sov_pre_nuclear": 0.251321,
+        "loss_a": 0.0,
+        "reach_pop_growth_ratio": 0.0,
+        "loss_b": 2.88,
+        "colonial_epi_spearman": null,
+        "n_colonial_epi": 4,
+        "loss_c": 1.0
+      },
+      "nuclear_convergence": {
+        "gap_colonial": 0.1,
+        "gap_nuclear": 2.5
+      },
+      "df_timing": {
+        "df_year": -165
+      },
+      "sov_ordering": {
+        "sov_by_status": {
+          "colony": 0.532,
+          "garrison": 0.5,
+          "core": 1.0
+        },
+        "n_ordered_groups": 3
+      },
+      "sov_recovery": {
+        "nuclear_colony_sov": 0.531779,
+        "colonial_colony_sov": 0.251321
+      },
+      "pop_ratio": {
+        "lattice_pop": 0,
+        "reach_pop": 0,
+        "ratio": 0.0
+      },
+      "pop_inequality": {
+        "gini": 0.18,
+        "n_archs": 6
+      },
+      "epi_correlation": {
+        "spearman_rho": 0.612372,
+        "n_events": 7
+      }
+    }
+  },
+  "66": {
+    "total": 16.392016,
+    "components": {
+      "lattice_density": 0.029863,
+      "reach_spread": 0.0,
+      "lattice_latitude": 0.0,
+      "reach_latitude": 0.993123,
+      "lattice_shelf": 0.0,
+      "civ_gap": 0.0,
+      "peak_asymmetry": 0.0,
+      "edge_topology": 0.145349,
+      "climate_crop": 0.324518,
+      "yield_asymmetry": 0.044108,
+      "industrial_convergence": 0.0,
+      "nav_weapons_coupling": 0.0,
+      "security_dilemma": 0.0,
+      "nuclear_emergence": 0.0,
+      "pu_dependency": 0.0,
+      "pu_convergence": 2.75,
+      "supply_chain": 0.0,
+      "cu_tech_lead": 0.0,
+      "au_priority": 0.0,
+      "serial_horizon": 1.0,
+      "maritime_asymmetry": 0.390625,
+      "colonial_extraction": 1.44,
+      "nuclear_convergence": 7.22,
+      "df_timing": 0.0,
+      "sov_ordering": 0.001627,
+      "sov_recovery": 0.0,
+      "pop_ratio": 2.0,
+      "pop_inequality": 0.052802,
+      "epi_correlation": 0.0
+    },
+    "details": {
+      "lattice_density": {
+        "mean_dist_rad": 1.186405,
+        "n_lattice": 16
+      },
+      "reach_spread": {
+        "mean_dist_rad": 0.916822,
+        "n_reach": 9
+      },
+      "lattice_latitude": {
+        "centroid_abs_lat": 27.644375
+      },
+      "reach_latitude": {
+        "centroid_abs_lat": 25.034444
+      },
+      "lattice_shelf": {
+        "frac_qualifying": 0.625,
+        "qualifying": 10,
+        "n_lattice": 16
+      },
+      "civ_gap": {
+        "min_cross_dist_rad": 0.710925
+      },
+      "peak_asymmetry": {
+        "lattice_mean_peaks": 0.0,
+        "reach_mean_peaks": 0.0
+      },
+      "edge_topology": {
+        "lattice_mean_dist": 1.186405,
+        "reach_mean_dist": 0.916822
+      },
+      "climate_crop": {
+        "incoherent_frac": 0.404762,
+        "incoherent": 17,
+        "n_non_foraging": 42
+      },
+      "yield_asymmetry": {
+        "hydraulic_mean_yield": 2.727708,
+        "dryland_mean_yield": 3.20344,
+        "ratio": 0.851494
+      },
+      "industrial_convergence": {
+        "r_tech_ind": 7.47957,
+        "l_tech_ind": 7.462101,
+        "gap_at_ind": 0.017469,
+        "either_crosses_7": true
+      },
+      "nav_weapons_coupling": {
+        "dtech_reach": 3.97957,
+        "n_serial_reach": 2,
+        "coupling": 1.331056
+      },
+      "security_dilemma": {
+        "note": "DF broke before tech 7 \u2014 correct",
+        "df_year": -94,
+        "t_tech7": -760.377446
+      },
+      "nuclear_emergence": {
+        "note": "not evaluated"
+      },
+      "pu_dependency": {
+        "reach_pu": false,
+        "lattice_pu": true,
+        "asymmetric": true,
+        "reach_nuc_tech": 7.47957,
+        "lattice_nuc_tech": 7.462101
+      },
+      "pu_convergence": {
+        "reach_tech": 7.5,
+        "lattice_tech": 9.5,
+        "reach_pu": false,
+        "lattice_pu": true,
+        "gap_penalty": 0.25
+      },
+      "supply_chain": {
+        "reach_robust": true,
+        "lattice_robust": true
+      },
+      "cu_tech_lead": {
+        "note": "insufficient data for Cu tech lead"
+      },
+      "au_priority": {
+        "au_mean_year": -3042.333333,
+        "non_au_mean_year": -585.45,
+        "delta_years": 2456.883333,
+        "n_au": 3,
+        "n_non_au": 20
+      },
+      "serial_horizon": {
+        "max_serial_hops": 2,
+        "n_serial": 3
+      },
+      "maritime_asymmetry": {
+        "reach_contacts": 7,
+        "reach_colonies": 8,
+        "ratio": 0.875
+      },
+      "colonial_extraction": {
+        "mean_col_sov_pre_nuclear": 0.259282,
+        "loss_a": 0.0,
+        "reach_pop_growth_ratio": 0.0,
+        "loss_b": 2.88,
+        "colonial_epi_spearman": 0.707107,
+        "n_colonial_epi": 5,
+        "loss_c": 0.0
+      },
+      "nuclear_convergence": {
+        "gap_colonial": 0.1,
+        "gap_nuclear": 2.0
+      },
+      "df_timing": {
+        "df_year": -94
+      },
+      "sov_ordering": {
+        "sov_by_status": {
+          "colony": 0.533,
+          "garrison": 0.5,
+          "core": 1.0
+        },
+        "n_ordered_groups": 3
+      },
+      "sov_recovery": {
+        "nuclear_colony_sov": 0.532935,
+        "colonial_colony_sov": 0.259282
+      },
+      "pop_ratio": {
+        "lattice_pop": 0,
+        "reach_pop": 0,
+        "ratio": 0.0
+      },
+      "pop_inequality": {
+        "gini": 0.087516,
+        "n_archs": 7
+      },
+      "epi_correlation": {
+        "spearman_rho": 0.845154,
+        "n_events": 8
+      }
+    }
+  },
+  "17": {
+    "total": 18.111803,
+    "components": {
+      "lattice_density": 0.0,
+      "reach_spread": 0.11166,
+      "lattice_latitude": 0.495872,
+      "reach_latitude": 0.0,
+      "lattice_shelf": 0.0,
+      "civ_gap": 0.946966,
+      "peak_asymmetry": 0.0,
+      "edge_topology": 0.00573,
+      "climate_crop": 0.214541,
+      "yield_asymmetry": 0.000601,
+      "industrial_convergence": 0.0,
+      "nav_weapons_coupling": 0.0,
+      "security_dilemma": 0.0,
+      "nuclear_emergence": 0.0,
+      "pu_dependency": 6.0,
+      "pu_convergence": 4.5,
+      "supply_chain": 0.0,
+      "cu_tech_lead": 0.002222,
+      "au_priority": 0.0,
+      "serial_horizon": 1.0,
+      "maritime_asymmetry": 0.373457,
+      "colonial_extraction": 1.44,
+      "nuclear_convergence": 0.0,
+      "df_timing": 0.98,
+      "sov_ordering": 0.00161,
+      "sov_recovery": 0.0,
+      "pop_ratio": 2.0,
+      "pop_inequality": 0.039144,
+      "epi_correlation": 0.0
+    },
+    "details": {
+      "lattice_density": {
+        "mean_dist_rad": 0.686448,
+        "n_lattice": 22
+      },
+      "reach_spread": {
+        "mean_dist_rad": 0.632922,
+        "n_reach": 10
+      },
+      "lattice_latitude": {
+        "centroid_abs_lat": 35.041818
+      },
+      "reach_latitude": {
+        "centroid_abs_lat": 35.705
+      },
+      "lattice_shelf": {
+        "frac_qualifying": 0.590909,
+        "qualifying": 13,
+        "n_lattice": 22
+      },
+      "civ_gap": {
+        "min_cross_dist_rad": 0.013439
+      },
+      "peak_asymmetry": {
+        "lattice_mean_peaks": 0.0,
+        "reach_mean_peaks": 0.0
+      },
+      "edge_topology": {
+        "lattice_mean_dist": 0.686448,
+        "reach_mean_dist": 0.632922
+      },
+      "climate_crop": {
+        "incoherent_frac": 0.357143,
+        "incoherent": 15,
+        "n_non_foraging": 42
+      },
+      "yield_asymmetry": {
+        "hydraulic_mean_yield": 2.194198,
+        "dryland_mean_yield": 2.232892,
+        "ratio": 0.982671
+      },
+      "industrial_convergence": {
+        "r_tech_ind": 7.47957,
+        "l_tech_ind": 7.462101,
+        "gap_at_ind": 0.017469,
+        "either_crosses_7": true
+      },
+      "nav_weapons_coupling": {
+        "dtech_reach": 3.97957,
+        "n_serial_reach": 2,
+        "coupling": 1.331056
+      },
+      "security_dilemma": {
+        "note": "DF broke before tech 7 \u2014 correct",
+        "df_year": -12,
+        "t_tech7": -760.377446
+      },
+      "nuclear_emergence": {
+        "note": "not evaluated"
+      },
+      "pu_dependency": {
+        "reach_pu": false,
+        "lattice_pu": false,
+        "asymmetric": false,
+        "reach_nuc_tech": 7.47957,
+        "lattice_nuc_tech": 7.462101
+      },
+      "pu_convergence": {
+        "reach_tech": 7.5,
+        "lattice_tech": 7.5,
+        "reach_pu": false,
+        "lattice_pu": false,
+        "gap_penalty": 0.0
+      },
+      "supply_chain": {
+        "reach_robust": true,
+        "lattice_robust": true
+      },
+      "cu_tech_lead": {
+        "cu_serial_mean_tech": 2.0,
+        "non_cu_serial_mean_tech": 1.733333,
+        "delta": 0.266667,
+        "n_cu": 2,
+        "n_non_cu": 3
+      },
+      "au_priority": {
+        "au_mean_year": -2047.4,
+        "non_au_mean_year": -629.52,
+        "delta_years": 1417.88,
+        "n_au": 5,
+        "n_non_au": 25
+      },
+      "serial_horizon": {
+        "max_serial_hops": 2,
+        "n_serial": 5
+      },
+      "maritime_asymmetry": {
+        "reach_contacts": 8,
+        "reach_colonies": 9,
+        "ratio": 0.888889
+      },
+      "colonial_extraction": {
+        "mean_col_sov_pre_nuclear": 0.26483,
+        "loss_a": 0.0,
+        "reach_pop_growth_ratio": 0.0,
+        "loss_b": 2.88,
+        "colonial_epi_spearman": 0.654654,
+        "n_colonial_epi": 6,
+        "loss_c": 0.0
+      },
+      "nuclear_convergence": {
+        "gap_colonial": 0.1,
+        "gap_nuclear": 0.0
+      },
+      "df_timing": {
+        "df_year": -12
+      },
+      "sov_ordering": {
+        "sov_by_status": {
+          "colony": 0.533,
+          "garrison": 0.5,
+          "core": 1.0
+        },
+        "n_ordered_groups": 3
+      },
+      "sov_recovery": {
+        "nuclear_colony_sov": 0.532766,
+        "colonial_colony_sov": 0.26483
+      },
+      "pop_ratio": {
+        "lattice_pop": 0,
+        "reach_pop": 0,
+        "ratio": 0.0
+      },
+      "pop_inequality": {
+        "gini": 0.110099,
+        "n_archs": 8
+      },
+      "epi_correlation": {
+        "spearman_rho": 0.83666,
+        "n_events": 11
       }
     }
   },
   "42": {
-    "total": 12.700925,
+    "total": 19.628305,
     "components": {
-      "geo": 9.451707,
-      "ag": 0.490348,
-      "tech": 0.0,
-      "poleco": 2.696528,
-      "epi": 0.012554,
-      "pop": 0.049788
+      "lattice_density": 0.0,
+      "reach_spread": 0.265948,
+      "lattice_latitude": 0.03893,
+      "reach_latitude": 1.952008,
+      "lattice_shelf": 0.147929,
+      "civ_gap": 0.989555,
+      "peak_asymmetry": 0.0,
+      "edge_topology": 0.057994,
+      "climate_crop": 0.457171,
+      "yield_asymmetry": 0.000121,
+      "industrial_convergence": 0.0,
+      "nav_weapons_coupling": 0.0,
+      "security_dilemma": 0.0,
+      "nuclear_emergence": 0.0,
+      "pu_dependency": 6.0,
+      "pu_convergence": 4.5,
+      "supply_chain": 0.0,
+      "cu_tech_lead": 0.0,
+      "au_priority": 0.0,
+      "serial_horizon": 1.0,
+      "maritime_asymmetry": 0.25,
+      "colonial_extraction": 1.94,
+      "nuclear_convergence": 0.0,
+      "df_timing": 0.0,
+      "sov_ordering": 0.002044,
+      "sov_recovery": 0.0,
+      "pop_ratio": 2.0,
+      "pop_inequality": 0.026604,
+      "epi_correlation": 0.0
     },
     "details": {
-      "geo": {
-        "contact_frac": 0.261905,
-        "n_indep": 0,
-        "reach_frac": 0.727273,
-        "l_contact": 23.823696,
-        "l_indep": 9.0,
-        "l_balance": 0.031426
+      "lattice_density": {
+        "mean_dist_rad": 0.712434,
+        "n_lattice": 13
       },
-      "ag": {
-        "reach_crop": "nori",
-        "lattice_crop": "paddi",
-        "yield_ratio": 1.378607,
-        "n_distinct_crops": 6,
-        "paddi_frac": 0.02381,
-        "emmer_frac": 0.0
+      "reach_spread": {
+        "mean_dist_rad": 0.542149,
+        "n_reach": 7
       },
-      "tech": {
-        "reach_tech": 10.0,
-        "lattice_tech": 9.5,
-        "tech_gap": 0.5,
-        "indep_techs": []
+      "lattice_latitude": {
+        "centroid_abs_lat": 29.973077
       },
-      "poleco": {
-        "df_year": -400,
-        "era_fracs": {
-          "sail": 0.047619047619047616,
-          "colonial": 0.09523809523809523,
-          "industrial": 0.07142857142857142,
-          "nuclear": 0.0,
-          "uncontacted": 0.7380952380952381
+      "reach_latitude": {
+        "centroid_abs_lat": 21.028571
+      },
+      "lattice_shelf": {
+        "frac_qualifying": 0.307692,
+        "qualifying": 4,
+        "n_lattice": 13
+      },
+      "civ_gap": {
+        "min_cross_dist_rad": 0.002618
+      },
+      "peak_asymmetry": {
+        "lattice_mean_peaks": 0.0,
+        "reach_mean_peaks": 0.0
+      },
+      "edge_topology": {
+        "lattice_mean_dist": 0.712434,
+        "reach_mean_dist": 0.542149
+      },
+      "climate_crop": {
+        "incoherent_frac": 0.452381,
+        "incoherent": 19,
+        "n_non_foraging": 42
+      },
+      "yield_asymmetry": {
+        "hydraulic_mean_yield": 2.493067,
+        "dryland_mean_yield": 2.51261,
+        "ratio": 0.992222
+      },
+      "industrial_convergence": {
+        "r_tech_ind": 7.47957,
+        "l_tech_ind": 7.462101,
+        "gap_at_ind": 0.017469,
+        "either_crosses_7": true
+      },
+      "nav_weapons_coupling": {
+        "dtech_reach": 3.97957,
+        "n_serial_reach": 2,
+        "coupling": 1.331056
+      },
+      "security_dilemma": {
+        "note": "DF broke before tech 7 \u2014 correct",
+        "df_year": -153,
+        "t_tech7": -760.377446
+      },
+      "nuclear_emergence": {
+        "note": "not evaluated"
+      },
+      "pu_dependency": {
+        "reach_pu": false,
+        "lattice_pu": false,
+        "asymmetric": false,
+        "reach_nuc_tech": 7.47957,
+        "lattice_nuc_tech": 7.462101
+      },
+      "pu_convergence": {
+        "reach_tech": 7.5,
+        "lattice_tech": 7.5,
+        "reach_pu": false,
+        "lattice_pu": false,
+        "gap_penalty": 0.0
+      },
+      "supply_chain": {
+        "reach_robust": true,
+        "lattice_robust": true
+      },
+      "cu_tech_lead": {
+        "note": "insufficient data for Cu tech lead"
+      },
+      "au_priority": {
+        "au_mean_year": -2210.5,
+        "non_au_mean_year": -926.6875,
+        "delta_years": 1283.8125,
+        "n_au": 2,
+        "n_non_au": 16
+      },
+      "serial_horizon": {
+        "max_serial_hops": 2,
+        "n_serial": 4
+      },
+      "maritime_asymmetry": {
+        "reach_contacts": 6,
+        "reach_colonies": 6,
+        "ratio": 1.0
+      },
+      "colonial_extraction": {
+        "mean_col_sov_pre_nuclear": 0.262304,
+        "loss_a": 0.0,
+        "reach_pop_growth_ratio": 0.0,
+        "loss_b": 2.88,
+        "colonial_epi_spearman": null,
+        "n_colonial_epi": 4,
+        "loss_c": 1.0
+      },
+      "nuclear_convergence": {
+        "gap_colonial": 0.1,
+        "gap_nuclear": 0.0
+      },
+      "df_timing": {
+        "df_year": -153
+      },
+      "sov_ordering": {
+        "sov_by_status": {
+          "colony": 0.537,
+          "garrison": 0.5,
+          "core": 1.0
         },
-        "l_df": 4.0,
-        "l_era": 0.414796,
-        "l_sov": 1.078626,
-        "l_trade": 0.038135
+        "n_ordered_groups": 3
       },
-      "epi": {
-        "mortality_cv": 0.187956
+      "sov_recovery": {
+        "nuclear_colony_sov": 0.536912,
+        "colonial_colony_sov": 0.262304
       },
-      "pop": {
-        "lattice_reach_ratio": 0.761232,
-        "pop_gini": 0.757628,
-        "mean_colony_sov": 0.5407,
-        "lattice_vs_median": 31.210526
+      "pop_ratio": {
+        "lattice_pop": 0,
+        "reach_pop": 0,
+        "ratio": 0.0
+      },
+      "pop_inequality": {
+        "gini": 0.134667,
+        "n_archs": 6
+      },
+      "epi_correlation": {
+        "spearman_rho": 0.57735,
+        "n_events": 8
       }
     }
   },
   "97": {
-    "total": 25.854253,
+    "total": 19.077591,
     "components": {
-      "geo": 10.0,
-      "ag": 0.847102,
-      "tech": 0.0,
-      "poleco": 15.0,
-      "epi": 0.002057,
-      "pop": 0.005094
+      "lattice_density": 0.0,
+      "reach_spread": 0.310906,
+      "lattice_latitude": 0.0,
+      "reach_latitude": 1.463409,
+      "lattice_shelf": 0.0,
+      "civ_gap": 0.988861,
+      "peak_asymmetry": 0.0,
+      "edge_topology": 0.012258,
+      "climate_crop": 0.532001,
+      "yield_asymmetry": 0.003299,
+      "industrial_convergence": 0.0,
+      "nav_weapons_coupling": 0.0,
+      "security_dilemma": 0.0,
+      "nuclear_emergence": 0.0,
+      "pu_dependency": 6.0,
+      "pu_convergence": 4.5,
+      "supply_chain": 0.0,
+      "cu_tech_lead": 0.0,
+      "au_priority": 0.0,
+      "serial_horizon": 1.0,
+      "maritime_asymmetry": 0.25,
+      "colonial_extraction": 1.94,
+      "nuclear_convergence": 0.0,
+      "df_timing": 0.0,
+      "sov_ordering": 0.002031,
+      "sov_recovery": 0.0,
+      "pop_ratio": 2.0,
+      "pop_inequality": 0.074827,
+      "epi_correlation": 0.0
     },
     "details": {
-      "geo": {
-        "contact_frac": 0.142857,
-        "n_indep": 0,
-        "reach_frac": 0.833333,
-        "l_contact": 36.862245,
-        "l_indep": 9.0,
-        "l_balance": 0.080278
+      "lattice_density": {
+        "mean_dist_rad": 0.599494,
+        "n_lattice": 14
       },
-      "ag": {
-        "reach_crop": "nori",
-        "lattice_crop": "paddi",
-        "yield_ratio": 0.998409,
-        "n_distinct_crops": 6,
-        "paddi_frac": 0.047619,
-        "emmer_frac": 0.0
+      "reach_spread": {
+        "mean_dist_rad": 0.521205,
+        "n_reach": 7
       },
-      "tech": {
-        "reach_tech": 10.0,
-        "lattice_tech": 9.5,
-        "tech_gap": 0.5,
-        "indep_techs": []
+      "lattice_latitude": {
+        "centroid_abs_lat": 23.635
       },
-      "poleco": {
-        "df_year": -1400,
-        "era_fracs": {
-          "sail": 0.047619047619047616,
-          "colonial": 0.047619047619047616,
-          "industrial": 0.0,
-          "nuclear": 0.0,
-          "uncontacted": 0.8571428571428571
+      "reach_latitude": {
+        "centroid_abs_lat": 22.902857
+      },
+      "lattice_shelf": {
+        "frac_qualifying": 0.5,
+        "qualifying": 7,
+        "n_lattice": 14
+      },
+      "civ_gap": {
+        "min_cross_dist_rad": 0.002793
+      },
+      "peak_asymmetry": {
+        "lattice_mean_peaks": 0.0,
+        "reach_mean_peaks": 0.0
+      },
+      "edge_topology": {
+        "lattice_mean_dist": 0.599494,
+        "reach_mean_dist": 0.521205
+      },
+      "climate_crop": {
+        "incoherent_frac": 0.47619,
+        "incoherent": 20,
+        "n_non_foraging": 42
+      },
+      "yield_asymmetry": {
+        "hydraulic_mean_yield": 2.270066,
+        "dryland_mean_yield": 2.366166,
+        "ratio": 0.959386
+      },
+      "industrial_convergence": {
+        "r_tech_ind": 7.47957,
+        "l_tech_ind": 7.462101,
+        "gap_at_ind": 0.017469,
+        "either_crosses_7": true
+      },
+      "nav_weapons_coupling": {
+        "dtech_reach": 3.97957,
+        "n_serial_reach": 2,
+        "coupling": 1.331056
+      },
+      "security_dilemma": {
+        "note": "DF broke before tech 7 \u2014 correct",
+        "df_year": -141,
+        "t_tech7": -760.377446
+      },
+      "nuclear_emergence": {
+        "note": "not evaluated"
+      },
+      "pu_dependency": {
+        "reach_pu": false,
+        "lattice_pu": false,
+        "asymmetric": false,
+        "reach_nuc_tech": 7.47957,
+        "lattice_nuc_tech": 7.462101
+      },
+      "pu_convergence": {
+        "reach_tech": 7.5,
+        "lattice_tech": 7.5,
+        "reach_pu": false,
+        "lattice_pu": false,
+        "gap_penalty": 0.0
+      },
+      "supply_chain": {
+        "reach_robust": true,
+        "lattice_robust": true
+      },
+      "cu_tech_lead": {
+        "note": "insufficient data for Cu tech lead"
+      },
+      "au_priority": {
+        "au_mean_year": -2150.0,
+        "non_au_mean_year": -853.111111,
+        "delta_years": 1296.888889,
+        "n_au": 1,
+        "n_non_au": 18
+      },
+      "serial_horizon": {
+        "max_serial_hops": 2,
+        "n_serial": 3
+      },
+      "maritime_asymmetry": {
+        "reach_contacts": 6,
+        "reach_colonies": 6,
+        "ratio": 1.0
+      },
+      "colonial_extraction": {
+        "mean_col_sov_pre_nuclear": 0.26425,
+        "loss_a": 0.0,
+        "reach_pop_growth_ratio": 0.0,
+        "loss_b": 2.88,
+        "colonial_epi_spearman": null,
+        "n_colonial_epi": 4,
+        "loss_c": 1.0
+      },
+      "nuclear_convergence": {
+        "gap_colonial": 0.1,
+        "gap_nuclear": 0.0
+      },
+      "df_timing": {
+        "df_year": -141
+      },
+      "sov_ordering": {
+        "sov_by_status": {
+          "colony": 0.537,
+          "garrison": 0.5,
+          "core": 1.0
         },
-        "l_df": 144.0,
-        "l_era": 0.571372,
-        "l_sov": 1.369943,
-        "l_trade": 0.049031
+        "n_ordered_groups": 3
       },
-      "epi": {
-        "mortality_cv": 0.254643
+      "sov_recovery": {
+        "nuclear_colony_sov": 0.536792,
+        "colonial_colony_sov": 0.26425
       },
-      "pop": {
-        "lattice_reach_ratio": 2.154639,
-        "pop_gini": 0.823152,
-        "mean_colony_sov": 0.551038,
-        "lattice_vs_median": 121.916667
+      "pop_ratio": {
+        "lattice_pop": 0,
+        "reach_pop": 0,
+        "ratio": 0.0
+      },
+      "pop_inequality": {
+        "gini": 0.056575,
+        "n_archs": 6
+      },
+      "epi_correlation": {
+        "spearman_rho": 0.866025,
+        "n_events": 7
       }
     }
   },
   "137": {
-    "total": 26.331866,
+    "total": 27.385962,
     "components": {
-      "geo": 10.0,
-      "ag": 1.327921,
-      "tech": 0.0,
-      "poleco": 15.0,
-      "epi": 0.0,
-      "pop": 0.003945
+      "lattice_density": 0.0,
+      "reach_spread": 0.763221,
+      "lattice_latitude": 2.826722,
+      "reach_latitude": 0.0,
+      "lattice_shelf": 0.081633,
+      "civ_gap": 0.567852,
+      "peak_asymmetry": 0.0,
+      "edge_topology": 0.030299,
+      "climate_crop": 0.214541,
+      "yield_asymmetry": 0.0,
+      "industrial_convergence": 0.0,
+      "nav_weapons_coupling": 0.0,
+      "security_dilemma": 0.0,
+      "nuclear_emergence": 0.0,
+      "pu_dependency": 0.0,
+      "pu_convergence": 4.25,
+      "supply_chain": 0.0,
+      "cu_tech_lead": 0.0,
+      "au_priority": 0.0,
+      "serial_horizon": 4.0,
+      "maritime_asymmetry": 0.694444,
+      "colonial_extraction": 1.94,
+      "nuclear_convergence": 10.0,
+      "df_timing": 0.0,
+      "sov_ordering": 0.00095,
+      "sov_recovery": 0.0,
+      "pop_ratio": 2.0,
+      "pop_inequality": 0.0163,
+      "epi_correlation": 0.0
     },
     "details": {
-      "geo": {
-        "contact_frac": 0.047619,
-        "n_indep": 0,
-        "reach_frac": 0.5,
-        "l_contact": 49.3339,
-        "l_indep": 9.0,
-        "l_balance": 0.0
+      "lattice_density": {
+        "mean_dist_rad": 0.486272,
+        "n_lattice": 14
       },
-      "ag": {
-        "reach_crop": "papa",
-        "lattice_crop": "paddi",
-        "yield_ratio": 0.757538,
-        "n_distinct_crops": 6,
-        "paddi_frac": 0.02381,
-        "emmer_frac": 0.0
+      "reach_spread": {
+        "mean_dist_rad": 0.363188,
+        "n_reach": 10
       },
-      "tech": {
+      "lattice_latitude": {
+        "centroid_abs_lat": 44.812857
+      },
+      "reach_latitude": {
+        "centroid_abs_lat": 49.565
+      },
+      "lattice_shelf": {
+        "frac_qualifying": 0.357143,
+        "qualifying": 5,
+        "n_lattice": 14
+      },
+      "civ_gap": {
+        "min_cross_dist_rad": 0.12322
+      },
+      "peak_asymmetry": {
+        "lattice_mean_peaks": 0.0,
+        "reach_mean_peaks": 0.0
+      },
+      "edge_topology": {
+        "lattice_mean_dist": 0.486272,
+        "reach_mean_dist": 0.363188
+      },
+      "climate_crop": {
+        "incoherent_frac": 0.357143,
+        "incoherent": 15,
+        "n_non_foraging": 42
+      },
+      "yield_asymmetry": {
+        "hydraulic_mean_yield": 2.904831,
+        "dryland_mean_yield": 2.401307,
+        "ratio": 1.209687
+      },
+      "industrial_convergence": {
+        "r_tech_ind": 7.47957,
+        "l_tech_ind": 7.462101,
+        "gap_at_ind": 0.017469,
+        "either_crosses_7": true
+      },
+      "nav_weapons_coupling": {
+        "dtech_reach": 3.97957,
+        "n_serial_reach": 2,
+        "coupling": 1.331056
+      },
+      "security_dilemma": {
+        "note": "DF broke before tech 7 \u2014 correct",
+        "df_year": -106,
+        "t_tech7": -760.377446
+      },
+      "nuclear_emergence": {
+        "note": "not evaluated"
+      },
+      "pu_dependency": {
+        "reach_pu": true,
+        "lattice_pu": false,
+        "asymmetric": true,
+        "reach_nuc_tech": 7.47957,
+        "lattice_nuc_tech": 7.462101
+      },
+      "pu_convergence": {
         "reach_tech": 10.0,
-        "lattice_tech": 9.5,
-        "tech_gap": 0.5,
-        "indep_techs": []
+        "lattice_tech": 7.5,
+        "reach_pu": true,
+        "lattice_pu": false,
+        "gap_penalty": 1.0
       },
-      "poleco": {
-        "df_year": -5000,
-        "era_fracs": {
-          "sail": 0.0,
-          "colonial": 0.0,
-          "industrial": 0.0,
-          "nuclear": 0.0,
-          "uncontacted": 0.9523809523809523
+      "supply_chain": {
+        "reach_robust": true,
+        "lattice_robust": true
+      },
+      "cu_tech_lead": {
+        "note": "insufficient data for Cu tech lead"
+      },
+      "au_priority": {
+        "au_mean_year": -3625.0,
+        "non_au_mean_year": -580.45,
+        "delta_years": 3044.55,
+        "n_au": 2,
+        "n_non_au": 20
+      },
+      "serial_horizon": {
+        "max_serial_hops": 1,
+        "n_serial": 3
+      },
+      "maritime_asymmetry": {
+        "reach_contacts": 6,
+        "reach_colonies": 9,
+        "ratio": 0.666667
+      },
+      "colonial_extraction": {
+        "mean_col_sov_pre_nuclear": 0.248933,
+        "loss_a": 0.0,
+        "reach_pop_growth_ratio": 0.0,
+        "loss_b": 2.88,
+        "colonial_epi_spearman": null,
+        "n_colonial_epi": 4,
+        "loss_c": 1.0
+      },
+      "nuclear_convergence": {
+        "gap_colonial": 0.1,
+        "gap_nuclear": 2.5
+      },
+      "df_timing": {
+        "df_year": -106
+      },
+      "sov_ordering": {
+        "sov_by_status": {
+          "colony": 0.525,
+          "garrison": 0.5,
+          "core": 1.0
         },
-        "l_df": 2304.0,
-        "l_era": 0.705839,
-        "l_sov": 0.0,
-        "l_trade": 0.0
+        "n_ordered_groups": 3
       },
-      "epi": {
-        "note": "no epi_log and insufficient state data; epi component skipped"
+      "sov_recovery": {
+        "nuclear_colony_sov": 0.525168,
+        "colonial_colony_sov": 0.248933
       },
-      "pop": {
-        "lattice_reach_ratio": 1.985989,
-        "pop_gini": 0.825616,
-        "mean_colony_sov": null,
-        "lattice_vs_median": 141.75
+      "pop_ratio": {
+        "lattice_pop": 0,
+        "reach_pop": 0,
+        "ratio": 0.0
+      },
+      "pop_inequality": {
+        "gini": 0.159722,
+        "n_archs": 6
+      },
+      "epi_correlation": {
+        "spearman_rho": 0.866025,
+        "n_events": 7
       }
     }
   },
   "256": {
-    "total": 25.995922,
+    "total": 17.595907,
     "components": {
-      "geo": 10.0,
-      "ag": 0.992751,
-      "tech": 0.0,
-      "poleco": 15.0,
-      "epi": 0.0,
-      "pop": 0.003171
+      "lattice_density": 0.0,
+      "reach_spread": 0.52177,
+      "lattice_latitude": 0.340647,
+      "reach_latitude": 0.0,
+      "lattice_shelf": 0.09,
+      "civ_gap": 0.997209,
+      "peak_asymmetry": 0.0,
+      "edge_topology": 0.027952,
+      "climate_crop": 0.266695,
+      "yield_asymmetry": 0.0,
+      "industrial_convergence": 0.0,
+      "nav_weapons_coupling": 0.0,
+      "security_dilemma": 0.0,
+      "nuclear_emergence": 0.0,
+      "pu_dependency": 6.0,
+      "pu_convergence": 4.5,
+      "supply_chain": 0.0,
+      "cu_tech_lead": 0.002222,
+      "au_priority": 0.0,
+      "serial_horizon": 1.0,
+      "maritime_asymmetry": 0.25,
+      "colonial_extraction": 1.575,
+      "nuclear_convergence": 0.0,
+      "df_timing": 0.0,
+      "sov_ordering": 0.002042,
+      "sov_recovery": 0.0,
+      "pop_ratio": 2.0,
+      "pop_inequality": 0.022369,
+      "epi_correlation": 0.0
     },
     "details": {
-      "geo": {
-        "contact_frac": 0.047619,
-        "n_indep": 0,
-        "reach_frac": 0.5,
-        "l_contact": 49.3339,
-        "l_indep": 9.0,
-        "l_balance": 0.0
+      "lattice_density": {
+        "mean_dist_rad": 0.557053,
+        "n_lattice": 20
       },
-      "ag": {
-        "reach_crop": "nori",
-        "lattice_crop": "paddi",
-        "yield_ratio": 0.907824,
-        "n_distinct_crops": 6,
-        "paddi_frac": 0.071429,
-        "emmer_frac": 0.0
+      "reach_spread": {
+        "mean_dist_rad": 0.438832,
+        "n_reach": 8
       },
-      "tech": {
-        "reach_tech": 10.0,
-        "lattice_tech": 9.5,
-        "tech_gap": 0.5,
-        "indep_techs": []
+      "lattice_latitude": {
+        "centroid_abs_lat": 33.8365
       },
-      "poleco": {
-        "df_year": -5000,
-        "era_fracs": {
-          "sail": 0.0,
-          "colonial": 0.0,
-          "industrial": 0.0,
-          "nuclear": 0.0,
-          "uncontacted": 0.9523809523809523
+      "reach_latitude": {
+        "centroid_abs_lat": 40.85625
+      },
+      "lattice_shelf": {
+        "frac_qualifying": 0.35,
+        "qualifying": 7,
+        "n_lattice": 20
+      },
+      "civ_gap": {
+        "min_cross_dist_rad": 0.000698
+      },
+      "peak_asymmetry": {
+        "lattice_mean_peaks": 0.0,
+        "reach_mean_peaks": 0.0
+      },
+      "edge_topology": {
+        "lattice_mean_dist": 0.557053,
+        "reach_mean_dist": 0.438832
+      },
+      "climate_crop": {
+        "incoherent_frac": 0.380952,
+        "incoherent": 16,
+        "n_non_foraging": 42
+      },
+      "yield_asymmetry": {
+        "hydraulic_mean_yield": 2.333669,
+        "dryland_mean_yield": 2.131834,
+        "ratio": 1.094677
+      },
+      "industrial_convergence": {
+        "r_tech_ind": 7.47957,
+        "l_tech_ind": 7.462101,
+        "gap_at_ind": 0.017469,
+        "either_crosses_7": true
+      },
+      "nav_weapons_coupling": {
+        "dtech_reach": 3.97957,
+        "n_serial_reach": 2,
+        "coupling": 1.331056
+      },
+      "security_dilemma": {
+        "note": "DF broke before tech 7 \u2014 correct",
+        "df_year": -59,
+        "t_tech7": -760.377446
+      },
+      "nuclear_emergence": {
+        "note": "not evaluated"
+      },
+      "pu_dependency": {
+        "reach_pu": false,
+        "lattice_pu": false,
+        "asymmetric": false,
+        "reach_nuc_tech": 7.47957,
+        "lattice_nuc_tech": 7.462101
+      },
+      "pu_convergence": {
+        "reach_tech": 7.5,
+        "lattice_tech": 7.5,
+        "reach_pu": false,
+        "lattice_pu": false,
+        "gap_penalty": 0.0
+      },
+      "supply_chain": {
+        "reach_robust": true,
+        "lattice_robust": true
+      },
+      "cu_tech_lead": {
+        "cu_serial_mean_tech": 1.8,
+        "non_cu_serial_mean_tech": 1.533333,
+        "delta": 0.266667,
+        "n_cu": 1,
+        "n_non_cu": 3
+      },
+      "au_priority": {
+        "au_mean_year": -2069.333333,
+        "non_au_mean_year": -690.565217,
+        "delta_years": 1378.768116,
+        "n_au": 3,
+        "n_non_au": 23
+      },
+      "serial_horizon": {
+        "max_serial_hops": 2,
+        "n_serial": 4
+      },
+      "maritime_asymmetry": {
+        "reach_contacts": 7,
+        "reach_colonies": 7,
+        "ratio": 1.0
+      },
+      "colonial_extraction": {
+        "mean_col_sov_pre_nuclear": 0.26955,
+        "loss_a": 0.0,
+        "reach_pop_growth_ratio": 0.0,
+        "loss_b": 2.88,
+        "colonial_epi_spearman": 0.0,
+        "n_colonial_epi": 5,
+        "loss_c": 0.27
+      },
+      "nuclear_convergence": {
+        "gap_colonial": 0.1,
+        "gap_nuclear": 0.0
+      },
+      "df_timing": {
+        "df_year": -59
+      },
+      "sov_ordering": {
+        "sov_by_status": {
+          "colony": 0.537,
+          "garrison": 0.5,
+          "core": 1.0
         },
-        "l_df": 2304.0,
-        "l_era": 0.705839,
-        "l_sov": 0.0,
-        "l_trade": 0.0
+        "n_ordered_groups": 3
       },
-      "epi": {
-        "note": "no epi_log and insufficient state data; epi component skipped"
+      "sov_recovery": {
+        "nuclear_colony_sov": 0.536901,
+        "colonial_colony_sov": 0.26955
       },
-      "pop": {
-        "lattice_reach_ratio": 2.225243,
-        "pop_gini": 0.809757,
-        "mean_colony_sov": null,
-        "lattice_vs_median": 114.6
+      "pop_ratio": {
+        "lattice_pop": 0,
+        "reach_pop": 0,
+        "ratio": 0.0
+      },
+      "pop_inequality": {
+        "gini": 0.144244,
+        "n_archs": 7
+      },
+      "epi_correlation": {
+        "spearman_rho": 0.547723,
+        "n_events": 9
       }
     }
   }
