@@ -64,18 +64,21 @@ class Mulberry32:
 
 @dataclass
 class SimParams:
-    # Political Culture (11)
-    civic_expansion_share:      float = 0.40
-    civic_tech_share:           float = 0.40
-    civic_consolidation_share:  float = 0.20
-    subject_expansion_share:    float = 0.20
-    subject_tech_share:         float = 0.30
-    subject_consolidation_share:float = 0.50
-    parochial_expansion_share:  float = 0.25
-    parochial_tech_share:       float = 0.25
-    A0_civic:                   float = 1.2
-    A0_subject:                 float = 0.8
-    A0_parochial:               float = 0.5
+    # Continuous Culture Space (10) — replaces 11 categorical params
+    # Allocation shares are affine functions of culture-space position (§10).
+    # Calibrated so seed positions reproduce old categorical behavior:
+    #   sago/taro  (ind≈0.4, out≈0.45)  → exp≈0.25, tech≈0.24, A0≈0.80  (old Parochial)
+    #   emmer/nori (ind≈0.70, out≈0.75) → exp≈0.38, tech≈0.37, A0≈1.16  (old Civic)
+    base_expansion:             float = 0.05   # minimum expansion share (at collective+inward)
+    outward_expansion_coeff:    float = 0.35   # outward adds to expansion
+    individual_expansion_coeff: float = 0.10   # individual adds to expansion
+    base_tech:                  float = 0.05   # minimum tech share
+    outward_tech_coeff:         float = 0.42   # outward adds to tech share
+    base_A0:                    float = 0.30   # minimum TFP coefficient
+    individual_A0_coeff:        float = 0.80   # individual amplifies A0
+    outward_A0_coeff:           float = 0.40   # outward amplifies A0
+    culture_drift_rate:         float = 0.010  # position drift per tick (~0.005–0.02)
+    culture_noise_scale:        float = 0.15   # noise on initial culture position
 
     # Material Conditions (7)
     cu_unlock_tech:             float = 3.0
@@ -86,26 +89,37 @@ class SimParams:
     pu_dependent_factor:        float = 0.65
     resource_targeting_weight:  float = 2.0
 
+    # Trade model (§12/§13)
+    luxury_markup_rate:         float = 0.40   # per-hop markup for luxury goods (stimulants, fibers, prestige)
+    bulk_markup_rate:           float = 0.10   # per-hop markup for bulk goods (food, raw materials)
+
     # Contact Dynamics (3)
     epi_base_severity:          float = 0.30
     sov_extraction_decay:       float = 0.04
     df_detection_range:         float = 0.6
 
+    # Malthusian clamp (Q5 resolution) — applied to energy surplus for tech < 4
+    carry_cap_scale:            float = 1.0    # carrying_capacity = crop_y × n_archipelagos × scale
+
+    # Desperation / Tech Decay (3) — §11
+    maintenance_rate:           float = 0.01   # energy cost per tech² per tick
+    decay_rate:                 float = 0.10   # tech loss per unit maintenance shortfall
+    desperation_weight:         float = 0.50   # how strongly resource_pressure overrides culture
+
 
 DEFAULT_PARAMS = SimParams()
 
 PARAM_BOUNDS: list = [
-    ("civic_expansion_share",       0.2,  0.6),
-    ("civic_tech_share",            0.2,  0.6),
-    ("civic_consolidation_share",   0.1,  0.4),
-    ("subject_expansion_share",     0.1,  0.4),
-    ("subject_tech_share",          0.1,  0.5),
-    ("subject_consolidation_share", 0.3,  0.7),
-    ("parochial_expansion_share",   0.1,  0.4),
-    ("parochial_tech_share",        0.1,  0.4),
-    ("A0_civic",                    0.8,  1.5),
-    ("A0_subject",                  0.5,  1.2),
-    ("A0_parochial",                0.3,  0.9),
+    ("base_expansion",              0.00, 0.20),
+    ("outward_expansion_coeff",     0.10, 0.60),
+    ("individual_expansion_coeff",  0.00, 0.25),
+    ("base_tech",                   0.00, 0.15),
+    ("outward_tech_coeff",          0.20, 0.70),
+    ("base_A0",                     0.10, 0.60),
+    ("individual_A0_coeff",         0.40, 1.50),
+    ("outward_A0_coeff",            0.10, 0.80),
+    ("culture_drift_rate",          0.003, 0.030),
+    ("culture_noise_scale",         0.05, 0.35),
     ("cu_unlock_tech",              2.0,  4.0),
     ("au_contact_bonus",          100.0, 2000.0),
     ("naphtha_richness",            0.5,  5.0),
@@ -116,6 +130,11 @@ PARAM_BOUNDS: list = [
     ("epi_base_severity",           0.15, 0.50),
     ("sov_extraction_decay",        0.01, 0.10),
     ("df_detection_range",          0.3,  1.0),
+    ("luxury_markup_rate",          0.25, 0.55),
+    ("bulk_markup_rate",            0.05, 0.20),
+    ("maintenance_rate",            0.005, 0.05),
+    ("decay_rate",                  0.05, 0.30),
+    ("desperation_weight",          0.2,  1.0),
 ]
 
 
@@ -150,22 +169,30 @@ _ISLAND_MAX_HEIGHT = 3000.0
 # maritime trade orientation" with Beta(1.5,1) optimistic priors.
 # ---------------------------------------------------------------------------
 
-_CROP_TO_CULTURE = {
-    "emmer":    "civic",
-    "nori":     "civic",       # Parochial-Civic hybrid → civic allocation
-    "paddi":    "subject",
-    "taro":     "parochial",
-    "sago":     "parochial",
-    "papa":     "parochial",
-    "foraging": "parochial",
+# Crop → culture-space seed: (coll_ind, inw_out) in range -1 to +1
+# coll_ind: -1 = Collective, +1 = Individual (§10 Axis 1)
+# inw_out:  -1 = Inward,     +1 = Outward    (§10 Axis 2)
+# Calibrated so the old categorical regions emerge naturally:
+#   Civic   ≈ coll_ind >  0.3 & inw_out >  0.3
+#   Subject ≈ coll_ind < -0.3 & inw_out <  0.0
+#   Parochial ≈ centre
+_CROP_CULTURE_SEED: dict = {
+    "emmer":    ( 0.45,  0.55),   # Individual+Outward → Civic analog
+    "nori":     ( 0.35,  0.65),   # Individual+Outward, maritime emphasis
+    "paddi":    (-0.55, -0.20),   # Collective, slight inward (irrigated-rice bureaucracy)
+    "taro":     (-0.10,  0.05),   # Slight collective, near centre
+    "sago":     (-0.20, -0.10),   # Slight collective+inward
+    "papa":     ( 0.15,  0.15),   # Near centre, slight individual
+    "foraging": ( 0.00,  0.00),   # True centre
 }
 
-# Thompson Sampling Beta priors by culture (plan §5.7)
-_TS_PRIORS = {
-    "civic":     (2.0, 1.0),   # optimistic explorers
-    "subject":   (1.0, 2.0),   # skeptical consolidators
-    "parochial": (1.0, 1.0),   # uniform, no strong prior
-}
+
+def _culture_label_from_pos(pos) -> str:
+    """Derive backward-compat culture label from continuous position."""
+    ci, io = pos
+    if ci > 0.3 and io > 0.3:   return "civic"
+    if ci < -0.3 and io < 0.0:  return "subject"
+    return "parochial"
 
 _TROPICAL  = frozenset(["paddi", "taro", "sago"])
 _TEMPERATE = frozenset(["emmer", "papa"])
@@ -276,6 +303,21 @@ def _compute_substrate(archs, plateau_edges, seed, naphtha_richness=2.0):
         upwelling += edge_count[i] * 0.08
         fisheries = min(1.0, upwelling * 0.5 + effective_rainfall * 0.0001 + edge_count[i] * 0.05)
 
+        # Coast factor: ocean access for fisheries (coastline/area proxy)
+        coast_factor_val = min(1.0, edge_count[i] * 0.18 + min(1.0, upwelling) * 0.25)
+
+        # Fish base caloric yield by latitude: cold→sthaq/bakala, warm→tunnu/sardai
+        if abs_lat > 38:
+            fish_base_val = 2.0 + upwelling          # cold: sthaq + bakala (highest productivity)
+        elif abs_lat > 22:
+            fish_base_val = 1.6 + upwelling * 0.8    # temperate: mixed
+        elif abs_lat > 10:
+            fish_base_val = 1.2 + upwelling * 0.6    # subtropical: tunnu
+        else:
+            fish_base_val = 1.0 + upwelling * 0.4    # equatorial: sardai
+        # fish_y = coast_factor * fish_base  (per §12 spec)
+        fish_y_val = coast_factor_val * fish_base_val
+
         if   mean_temp > 24 and effective_rainfall > 2000: climate_zone = "tropical_wet"
         elif mean_temp > 24 and effective_rainfall < 1000: climate_zone = "tropical_dry"
         elif mean_temp > 10 and effective_rainfall > 1200: climate_zone = "temperate_wet"
@@ -344,7 +386,28 @@ def _compute_substrate(archs, plateau_edges, seed, naphtha_richness=2.0):
         # C (naphtha) — deterministic from geology (plan §2.2)
         minerals["C"] = shelf_r * tidal_range * naphtha_richness if shelf_r >= 0.04 else 0.0
 
-        culture = _CROP_TO_CULTURE.get(primary_crop, "parochial")
+        # Continuous culture-space initial position (§10)
+        # Axis 0: coll_ind  -1=Collective, +1=Individual
+        # Axis 1: inw_out   -1=Inward,     +1=Outward
+        ci_seed, io_seed = _CROP_CULTURE_SEED.get(primary_crop, (0.0, 0.0))
+
+        # Geography modulates crop's institutional pressure (§10 Initial Position)
+        # Larger island → more Collective (coordination pressure at scale)
+        ci_geo = -size * 0.25
+        # Rugged terrain → more Individual (Scott's Zomia effect)
+        ci_geo += avg_h * 0.20
+        # More neighbors → more Outward; isolated → more Inward
+        io_geo = min(1.0, nearby / 5.0) * 0.25
+        # Larger coastline ratio (shelf_r proxy) → more Outward
+        io_geo += min(1.0, shelf_r / 0.12) * 0.15
+        # Isolation penalty
+        io_geo -= (1.0 - min(1.0, nearby / 3.0)) * 0.15
+        # Higher surplus potential → more Outward
+        io_geo += primary_yield * 0.08
+
+        ci_init = _clamp(ci_seed + ci_geo + (rng.next_float() - 0.5) * 0.30, -1.0, 1.0)
+        io_init = _clamp(io_seed + io_geo + (rng.next_float() - 0.5) * 0.30, -1.0, 1.0)
+        culture_pos = [ci_init, io_init]
 
         substrates.append({
             "climate": {
@@ -355,6 +418,7 @@ def _compute_substrate(archs, plateau_edges, seed, naphtha_richness=2.0):
                 "tidal_range": tidal_range, "ocean_warmth": ocean_warmth,
                 "gyre_position": gyre_pos, "upwelling": upwelling,
                 "fisheries_richness": fisheries, "climate_zone": climate_zone,
+                "coast_factor": coast_factor_val, "fish_y": fish_y_val, "avg_h": avg_h,
             },
             "crops": {
                 "primary_crop": primary_crop, "secondary_crop": secondary_crop,
@@ -362,7 +426,8 @@ def _compute_substrate(archs, plateau_edges, seed, naphtha_richness=2.0):
             },
             "trade_goods": {"total_trade_value": total_trade_value},
             "minerals": minerals,
-            "culture": culture,
+            "culture_pos": culture_pos,
+            "culture": _culture_label_from_pos(culture_pos),
         })
     return substrates
 
@@ -398,7 +463,8 @@ def load_world(path: str) -> dict:
                 },
                 "trade_goods": {"total_trade_value": s.get("total_trade_value", 0.0)},
                 "minerals": minerals,
-                "culture": _CROP_TO_CULTURE.get(crop, "parochial"),
+                "culture_pos": list(_CROP_CULTURE_SEED.get(crop, (0.0, 0.0))),
+                "culture": _culture_label_from_pos(_CROP_CULTURE_SEED.get(crop, (0.0, 0.0))),
             })
         data["substrate"] = nested
     return data
@@ -474,22 +540,53 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
     N             = len(archs)
     seed          = seed or world.get("seed", 42)
 
-    # Substrate (recompute if needed, adding C and culture)
+    # Substrate (recompute if needed, adding C and culture_pos)
     substrate = world.get("substrate")
-    if not substrate or "culture" not in substrate[0]:
+    if not substrate or "culture_pos" not in substrate[0]:
         substrate = _compute_substrate(archs, plateau_edges, seed, p.naphtha_richness)
-    # Ensure C and culture fields
+    # Ensure C and culture_pos fields
     for i in range(N):
         mins = substrate[i]["minerals"]
         if "C" not in mins:
             sr = archs[i].get("shelf_r", 0.06)
             td = substrate[i]["climate"].get("tidal_range", 2.0)
             mins["C"] = sr * td * p.naphtha_richness if sr >= 0.04 else 0.0
-        # Always recompute culture from crop (don't trust pre-computed values)
-        substrate[i]["culture"] = _CROP_TO_CULTURE.get(
-            substrate[i]["crops"].get("primary_crop", "foraging"), "parochial")
+        if "culture_pos" not in substrate[i]:
+            crop = substrate[i]["crops"].get("primary_crop", "foraging")
+            substrate[i]["culture_pos"] = list(_CROP_CULTURE_SEED.get(crop, (0.0, 0.0)))
+        # Refresh backward-compat label from position
+        substrate[i]["culture"] = _culture_label_from_pos(substrate[i]["culture_pos"])
+
+    # Fish and land fields fallback (for pre-computed substrates without these fields)
+    for i in range(N):
+        clim_i = substrate[i]["climate"]
+        if "coast_factor" not in clim_i:
+            abs_lat_i = clim_i.get("abs_latitude", 30.0)
+            upwell_i  = clim_i.get("upwelling", 0.1)
+            ec_i = sum(1 for e in plateau_edges if int(e[0]) == i or int(e[1]) == i)
+            cf_i = min(1.0, ec_i * 0.18 + min(1.0, upwell_i) * 0.25)
+            if abs_lat_i > 38:   fb_i = 2.0 + upwell_i
+            elif abs_lat_i > 22: fb_i = 1.6 + upwell_i * 0.8
+            elif abs_lat_i > 10: fb_i = 1.2 + upwell_i * 0.6
+            else:                fb_i = 1.0 + upwell_i * 0.4
+            clim_i["coast_factor"] = cf_i
+            clim_i["fish_y"] = cf_i * fb_i
+        if "avg_h" not in clim_i:
+            peaks_i = archs[i].get("peaks", [])
+            clim_i["avg_h"] = (sum(pk["h"] for pk in peaks_i) / (len(peaks_i) * _ISLAND_MAX_HEIGHT)
+                               if peaks_i else archs[i].get("avg_h", 0.2))
 
     rng = Mulberry32((seed if seed != 0 else 42) * 31 + 1066)
+
+    # ── Continuous culture-space positions (§10) ─────────────────────────────
+    # cpos[i] = [coll_ind, inw_out]  range -1..+1 each
+    # Initialised from substrate seed + sim-RNG noise; drifts for polity cores.
+    cpos = []
+    for i in range(N):
+        base = substrate[i].get("culture_pos", [0.0, 0.0])
+        ci = _clamp(float(base[0]) + (rng.next_float() - 0.5) * 2.0 * p.culture_noise_scale, -1.0, 1.0)
+        io = _clamp(float(base[1]) + (rng.next_float() - 0.5) * 2.0 * p.culture_noise_scale, -1.0, 1.0)
+        cpos.append([ci, io])
 
     # Adjacency
     adj = [[] for _ in range(N)]
@@ -533,25 +630,38 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
         sz = archs[i].get("shelf_r", 0.06) / 0.12
         carry_cap[i] = y * pk * sz * 50.0 + 5.0  # base carrying capacity
 
-    # Helper: culture and allocation for a polity core
-    def _culture(i):
-        return substrate[i]["culture"]
+    # ── Continuous culture helpers (§10) ─────────────────────────────────────
 
-    def _shares(culture):
-        if culture == "civic":
-            s = [p.civic_expansion_share, p.civic_tech_share, p.civic_consolidation_share]
-        elif culture == "subject":
-            s = [p.subject_expansion_share, p.subject_tech_share, p.subject_consolidation_share]
-        else:
-            paroch_con = _clamp(1.0 - p.parochial_expansion_share - p.parochial_tech_share, 0.05, 1.0)
-            s = [p.parochial_expansion_share, p.parochial_tech_share, paroch_con]
-        t = sum(s)
-        return tuple(x / t for x in s) if t > 0 else (0.33, 0.34, 0.33)
+    def _culture_label(core: int) -> str:
+        """Backward-compat label derived from polity's current position."""
+        return _culture_label_from_pos(cpos[core])
 
-    def _A0(culture):
-        if culture == "civic":     return p.A0_civic
-        if culture == "subject":   return p.A0_subject
-        return p.A0_parochial
+    def _shares_from_pos(pos) -> tuple:
+        """Allocation shares as affine functions of culture-space position."""
+        ci, io = pos
+        individual = (ci + 1.0) * 0.5   # 0=Collective, 1=Individual
+        outward    = (io + 1.0) * 0.5   # 0=Inward,     1=Outward
+        exp_s = p.base_expansion + p.outward_expansion_coeff * outward + p.individual_expansion_coeff * individual
+        tec_s = p.base_tech + p.outward_tech_coeff * outward
+        con_s = max(0.05, 1.0 - exp_s - tec_s)
+        t = exp_s + tec_s + con_s
+        return (exp_s / t, tec_s / t, con_s / t)
+
+    def _A0_from_pos(pos) -> float:
+        """TFP coefficient as affine function of culture-space position."""
+        ci, io = pos
+        individual = (ci + 1.0) * 0.5
+        outward    = (io + 1.0) * 0.5
+        return p.base_A0 + p.individual_A0_coeff * individual + p.outward_A0_coeff * outward
+
+    def _ts_priors_from_pos(pos) -> tuple:
+        """Thompson Sampling Beta priors from continuous position (§10)."""
+        ci, io = pos
+        outward    = (io + 1.0) * 0.5
+        collective = (1.0 - ci) * 0.5   # 1=Collective, 0=Individual
+        ts_a = 1.0 + outward
+        ts_b = 1.0 + (1.0 - outward) * collective
+        return (ts_a, ts_b)
 
     # Helper: polity aggregation
     def _controlled(core):
@@ -574,6 +684,8 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
     pu_scramble_onset  = None
     tech_snapshots     = {}
     pop_snapshots      = {}
+    tech_decay_log     = []     # §11: records of tech decay events
+    desperation_log    = []     # §11: records of desperation-mode activations
 
     # ── TICK LOOP ─────────────────────────────────────────────────────────
     for tick in range(N_TICKS):
@@ -586,12 +698,82 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
         core_pop     = {c: _polity_pop(c) for c in cores}
         core_c       = {c: _polity_c(c) for c in cores}
         core_n_ctrl  = {c: sum(1 for j in range(N) if controller[j] == c) for c in cores}
+        # Aggregate food yield across all controlled arches (for §11 deficit detection)
+        core_food    = {c: sum(substrate[j]["crops"]["primary_yield"]
+                               for j in range(N) if controller[j] == c) for c in cores}
 
         # ──────────────────────────────────────────────────────────────
-        # STAGE 1: Resource accounting (Layer 1)
+        # TRADE PRE-PASS: Net trade energy per polity (§12)
+        # Gravity model: volume ∝ complementarity × sqrt(mass_A×mass_B) / dist²
+        # Layers gated by tech: Subsistence(0+), Relay(2+), Administered(5+)
         # ──────────────────────────────────────────────────────────────
-        energy_ratio  = {}  # per core
-        energy_surplus = {}
+        cores_set  = set(cores)
+        trade_net  = {c: 0.0 for c in cores}
+
+        for _tc in cores:
+            tc_tech = tech[_tc]
+            for _other in contact_set[_tc]:
+                if _other not in cores_set or _other <= _tc:
+                    continue
+                tc_other_tech = tech[_other]
+                eff_tech = min(tc_tech, tc_other_tech)
+
+                dist_rad = _gc_dist_arch(archs[_tc], archs[_other])
+                if dist_rad < 1e-6:
+                    continue
+
+                # Commodity complementarity: different goods → more to trade
+                crop_a = substrate[_tc]["crops"]["primary_crop"]
+                crop_b = substrate[_other]["crops"]["primary_crop"]
+                comp = 0.5 if crop_a == crop_b else 1.0
+
+                lat_a = substrate[_tc]["climate"]["abs_latitude"]
+                lat_b = substrate[_other]["climate"]["abs_latitude"]
+                if abs(lat_a - lat_b) > 15.0:
+                    comp += 0.3   # cold+warm water: fish variety trade
+
+                for _res in ("Au", "Cu"):
+                    if bool(substrate[_tc]["minerals"].get(_res)) != bool(substrate[_other]["minerals"].get(_res)):
+                        comp += 0.15
+                comp = min(comp, 2.0)
+
+                # Tech-gated layer: markup and effective range
+                if eff_tech < 2.0:
+                    # Subsistence: direct neighbors only, low markup
+                    if dist_rad > 0.55:
+                        continue
+                    eff_markup = p.bulk_markup_rate
+                    layer_mult = 0.25
+                elif eff_tech < 5.0:
+                    # Relay: luxury+bulk mix, hop-limited
+                    hops = max(1, int(dist_rad / 0.35) + 1)
+                    if hops > 4:
+                        continue
+                    eff_markup = min(0.85, (p.luxury_markup_rate * 0.6 + p.bulk_markup_rate * 0.4) * hops)
+                    layer_mult = 0.65
+                else:
+                    # Administered: direct routes, bulk markup
+                    eff_markup = p.bulk_markup_rate
+                    layer_mult = 1.0
+
+                # Gravity model: mass = sqrt(pop) × primary_yield
+                mass_a = math.sqrt(max(1.0, core_pop[_tc]))    * substrate[_tc]["crops"]["primary_yield"]
+                mass_b = math.sqrt(max(1.0, core_pop[_other])) * substrate[_other]["crops"]["primary_yield"]
+                volume     = layer_mult * comp * math.sqrt(mass_a * mass_b) / (dist_rad ** 2)
+                net_benefit = volume * (1.0 - eff_markup) * 0.003   # scale: ~0.1 per pair at relay
+
+                trade_net[_tc]    += net_benefit
+                trade_net[_other] += net_benefit
+
+        # ──────────────────────────────────────────────────────────────
+        # STAGE 1: Resource accounting (Layer 1) — layered energy balance
+        # ──────────────────────────────────────────────────────────────
+        energy_ratio      = {}  # per core
+        energy_surplus    = {}
+        resource_pressure = {}  # §11: 0=comfortable, →1=near-collapse
+        food_deficit_flag = {}  # §11: food layer in shortfall
+        ind_deficit_flag  = {}  # §11: industrial layer in shortfall
+        nuc_deficit_flag  = {}  # §11: nuclear layer in shortfall
 
         for core in cores:
             tp = max(1.0, core_pop[core])
@@ -603,14 +785,56 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
                 e_supply = core_c[core] * 0.2
                 ratio = _clamp(e_supply / max(0.001, e_demand), 0.3, 1.5)
                 surplus = max(0.0, e_supply - e_demand) * 0.2 + tp * 0.01
+                ind_def = e_supply < e_demand
             else:
-                # Pre-industrial: crop yield drives surplus
-                y = substrate[core]["crops"]["primary_yield"]
-                ratio = _clamp(0.6 + y * 0.2, 0.3, 1.5)
-                surplus = y * tp * 0.01
+                # Pre-industrial: caloric budget = crop + fish + trade (§12)
+                crop_y   = substrate[core]["crops"]["primary_yield"]
+                clim_c   = substrate[core]["climate"]
+                avg_h_c  = clim_c.get("avg_h", archs[core].get("avg_h", 0.2))
+                land_factor = max(0.3, 1.0 - avg_h_c * 0.35)
+
+                # Fish: aggregate over polity, average per arch
+                # total_cal = crop_y × land_factor + fish_y × coast_factor  (per spec)
+                fish_pol = sum(
+                    substrate[j]["climate"].get("fish_y", 0.0) *
+                    substrate[j]["climate"].get("coast_factor", 0.0)
+                    for j in range(N) if controller[j] == core
+                )
+                fish_avg = fish_pol / max(1, core_n_ctrl[core])
+
+                total_cal = crop_y * land_factor + fish_avg
+
+                # Trade: energy = total_cal + trade_imports − trade_exports → net_trade
+                net_trade = trade_net.get(core, 0.0)
+
+                ratio   = _clamp(0.6 + total_cal * 0.2, 0.3, 1.5)
+                surplus = total_cal * tp * 0.01 + net_trade
+                ind_def = False
+
+                # Malthusian carrying-capacity clamp (Q5 resolution):
+                # for tech < 4, surplus shrinks as population approaches
+                # carrying capacity — produces Malthusian trap without
+                # touching the production function or accel_rate table.
+                if ct < 4.0:
+                    n_ctrl = max(1, core_n_ctrl[core])
+                    carrying_capacity = crop_y * n_ctrl * p.carry_cap_scale
+                    surplus *= min(1.0, carrying_capacity / max(tp, 1.0))
 
             energy_ratio[core]   = ratio
             energy_surplus[core] = surplus
+
+            # — §11 Desperation: maintenance cost and resource pressure —
+            # Maintenance is quadratic: high-tech civs need more energy to stay there
+            maintenance = ct * ct * p.maintenance_rate
+            rp = max(0.0, (maintenance - surplus) / maintenance) if maintenance > 0 else 0.0
+            resource_pressure[core] = rp
+
+            # Deficit flags for targeting hierarchy (food > industrial > nuclear)
+            # Food: average food yield per controlled arch vs. per-arch subsistence
+            avg_food_yield = core_food[core] / max(1, core_n_ctrl[core])
+            food_deficit_flag[core] = avg_food_yield < 1.0          # below subsistence threshold
+            ind_deficit_flag[core]  = ind_def
+            nuc_deficit_flag[core]  = ct >= 9.0 and not _has_pu(core)
 
         # ──────────────────────────────────────────────────────────────
         # STAGE 2: Political allocation (Layer 2)
@@ -622,8 +846,7 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
         max_surplus = max(energy_surplus.values()) if energy_surplus else 1.0
 
         for core in cores:
-            culture = _culture(core)
-            exp_s, tec_s, con_s = _shares(culture)
+            exp_s, tec_s, con_s = _shares_from_pos(cpos[core])
 
             # IR posture
             own_cap = _categorize_cap(energy_surplus[core], max_surplus)
@@ -642,10 +865,97 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
             t = exp_s + tec_s + con_s
             exp_s /= t; tec_s /= t; con_s /= t
 
-            budget = energy_surplus[core] + core_pop[core] * 0.002
+            # — §11 Desperation override: resource_pressure blends culture out —
+            rp = resource_pressure.get(core, 0.0)
+            if rp > 0.0:
+                # Determine desperation allocation target from deficit hierarchy
+                if food_deficit_flag.get(core, False):
+                    # Food-first: maximum expansion toward fertile land
+                    d_exp, d_tec, d_con = 0.65, 0.20, 0.15
+                elif ind_deficit_flag.get(core, False):
+                    # Industrial: strong expansion toward naphtha
+                    d_exp, d_tec, d_con = 0.55, 0.28, 0.17
+                elif nuc_deficit_flag.get(core, False):
+                    # Nuclear: expansion toward pyra
+                    d_exp, d_tec, d_con = 0.58, 0.25, 0.17
+                else:
+                    # Generic maintenance stress: moderately expansionist
+                    d_exp, d_tec, d_con = 0.45, 0.30, 0.25
+
+                w = _clamp(rp * p.desperation_weight, 0.0, 1.0)
+                exp_s = (1.0 - w) * exp_s + w * d_exp
+                tec_s = (1.0 - w) * tec_s + w * d_tec
+                con_s = (1.0 - w) * con_s + w * d_con
+
+                # Desperation mode (rp > 0.3): military spike, burn reserves
+                if rp > 0.3:
+                    exp_s = min(0.85, exp_s * 1.35)
+                    t = exp_s + tec_s + con_s
+                    exp_s /= t; tec_s /= t; con_s /= t
+                    desperation_log.append({
+                        "core": core, "tick": tick, "year": year,
+                        "resource_pressure": rp,
+                        "food_deficit": food_deficit_flag.get(core, False),
+                        "ind_deficit":  ind_deficit_flag.get(core, False),
+                        "nuc_deficit":  nuc_deficit_flag.get(core, False),
+                    })
+
+                # Final renorm after desperation adjustment
+                t = exp_s + tec_s + con_s
+                exp_s /= t; tec_s /= t; con_s /= t
+
+            # Desperate polities mobilise beyond normal surplus (burn reserves)
+            budget_mult = 1.0 + _clamp(rp - 0.3, 0.0, 0.7) * 0.8 if rp > 0.3 else 1.0
+            budget = (energy_surplus[core] + core_pop[core] * 0.002) * budget_mult
             exp_budget[core]    = budget * exp_s
             tech_bgt[core]      = budget * tec_s
             consol_budget[core] = budget * con_s
+
+        # ──────────────────────────────────────────────────────────────
+        # STAGE 2b: Culture-space drift (§10 energy-budget closed loop)
+        # Each polity core's position drifts ~0.01–0.02 per tick
+        # ──────────────────────────────────────────────────────────────
+        for core in cores:
+            ci, io = cpos[core]
+            exp_s, tec_s, con_s = _shares_from_pos(cpos[core])
+            er = energy_ratio[core]
+
+            # Prosperity erodes coordination pressure → Individual
+            surplus_ratio = _clamp(er / 1.5, 0.0, 1.0)
+            ci += surplus_ratio * (1.0 - con_s) * p.culture_drift_rate
+
+            # Crisis demands coordination → Collective
+            threat_level = _clamp(1.0 - er, 0.0, 1.0)
+            ci -= threat_level * p.culture_drift_rate
+
+            # Tech research × trade integration → Outward
+            trade_int = min(1.0, len(contact_set[core]) / max(1.0, N * 0.3))
+            io += tec_s * trade_int * p.culture_drift_rate
+
+            # Resource stress → Inward (defensive retrenchment)
+            io -= _clamp(1.0 - er, 0.0, 1.0) * p.culture_drift_rate * 0.5
+
+            # Fisheries culture-drift vectors (FISHERIES_REFERENCE.md)
+            fish_r = substrate[core]["climate"].get("fisheries_richness", 0.0)
+            if fish_r > 0.05:
+                mt  = substrate[core]["climate"].get("mean_temp", 18.0)
+                up  = substrate[core]["climate"].get("upwelling", 0.0)
+                fdr = p.culture_drift_rate * fish_r * 0.3  # scale by local richness
+                # Cold water → sthaq (Collective push) + bakala (Individual+Inward)
+                if mt < 14.0:
+                    ci -= fdr * 0.6   # sthaq: communal seasonal harvest
+                    io -= fdr * 0.2   # bakala: merchant-oligarch inward accumulation
+                # High upwelling → saak oil (Outward push regardless of axis 0)
+                if up > 0.3:
+                    io += fdr * 0.8
+                # Warm water → tunnu (Individual+Outward)
+                if mt > 20.0:
+                    ci += fdr * 0.4
+                    io += fdr * 0.4
+                # Universal coastal: kauri slight Collective push
+                ci -= fdr * 0.1
+
+            cpos[core] = [_clamp(ci, -1.0, 1.0), _clamp(io, -1.0, 1.0)]
 
         # ──────────────────────────────────────────────────────────────
         # STAGE 3: Rumor propagation (plan §5.4)
@@ -708,8 +1018,7 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
         # Tech accelerates with: more contacts, energy surplus, existing tech level
         # ──────────────────────────────────────────────────────────────
         for core in cores:
-            culture   = _culture(core)
-            a0        = _A0(culture)
+            a0        = _A0_from_pos(cpos[core])
             nc        = len(contact_set[core])
             tp        = max(1.0, core_pop[core])
             er        = energy_ratio[core]
@@ -727,7 +1036,7 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
             eff_nc       = min(nc, int(tech[core] * 2) + 1)
             contact_mult = 1.0 + _log2(eff_nc + 1) * 0.3
             energy_mult  = er * p.energy_to_tfp
-            share_mult   = _shares(culture)[1] / 0.3
+            share_mult   = _shares_from_pos(cpos[core])[1] / 0.3
 
             # Floor: everyone progresses slowly (neolithic → bronze → iron)
             crop_exp     = crop_y ** 0.3
@@ -754,6 +1063,26 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
             if t > 9.0:
                 delta *= _clamp((11.0 - t) / 2.0, 0.0, 1.0)
             tech[core] += delta
+
+            # — §11 Tech decay: maintenance shortfall slides tech downward —
+            # maintenance = tech² × maintenance_rate (quadratic: high-tech is fragile)
+            # if energy_surplus < maintenance → tech erodes
+            maintenance_cost = tech[core] * tech[core] * p.maintenance_rate
+            avail_e = energy_surplus[core]
+            if avail_e < maintenance_cost:
+                shortfall = maintenance_cost - avail_e
+                decay_amt = shortfall * p.decay_rate
+                old_t = tech[core]
+                tech[core] = max(0.1, tech[core] - decay_amt)
+                if decay_amt > 0.005:  # log non-trivial decay events
+                    tech_decay_log.append({
+                        "core": core, "tick": tick, "year": year,
+                        "tech_before": round(old_t, 3),
+                        "tech_after":  round(tech[core], 3),
+                        "decay":       round(decay_amt, 4),
+                        "shortfall":   round(shortfall, 4),
+                        "resource_pressure": round(resource_pressure.get(core, 0.0), 3),
+                    })
 
             # Knowledge accumulation
             knowledge[core] += delta * a0 * 0.5
@@ -799,8 +1128,7 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
             if budget < 0.1: continue
             if tech[core] < 2.0: continue  # need bronze-age institutions to project power
 
-            culture = _culture(core)
-            ts_a, ts_b = _TS_PRIORS.get(culture, (1.0, 1.0))
+            ts_a, ts_b = _ts_priors_from_pos(cpos[core])
 
             # Build frontier
             ctrl_set = set(_controlled(core))
@@ -829,7 +1157,28 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
                     if pu_scramble_onset is None:
                         pu_scramble_onset = tick
 
-                score = ts_score + p.resource_targeting_weight * rv - dist * 1.5
+                # — §11 Desperation targeting: deficit drives resource-specific expansion —
+                desp_bonus = 0.0
+                rp = resource_pressure.get(core, 0.0)
+                if rp > 0.0:
+                    t_mins    = substrate[target]["minerals"]
+                    t_crops   = substrate[target]["crops"]
+                    t_climate = substrate[target]["climate"]
+                    # Food deficit → fertile islands and fish-rich archipelagos
+                    if food_deficit_flag.get(core, False):
+                        desp_bonus += rp * (t_crops.get("primary_yield", 0.0) * 1.5
+                                            + t_climate.get("fisheries_richness", 0.0) * 2.5)
+                    # Industrial deficit → naphtha-bearing islands
+                    if ind_deficit_flag.get(core, False):
+                        desp_bonus += rp * t_mins.get("C", 0.0) * 4.0
+                    # Nuclear deficit → pyra islands
+                    if nuc_deficit_flag.get(core, False) and t_mins.get("Pu"):
+                        desp_bonus += rp * 6.0
+                    # Desperation mode distance penalty softens: desperate polities reach farther
+                    if rp > 0.3:
+                        dist *= _clamp(1.0 - (rp - 0.3) * 0.5, 0.5, 1.0)
+
+                score = ts_score + p.resource_targeting_weight * rv + desp_bonus - dist * 1.5
                 candidates.append((score, target, dist))
 
             candidates.sort(key=lambda x: -x[0])
@@ -881,6 +1230,11 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
                 for c in contact_set[target]:
                     if c != core:
                         contact_set[core].add(c)
+
+                # Blend absorbed polity's culture position into core (5% pull)
+                t_ci, t_io = cpos[target]
+                cpos[core][0] = _clamp(cpos[core][0] * 0.95 + t_ci * 0.05, -1.0, 1.0)
+                cpos[core][1] = _clamp(cpos[core][1] * 0.95 + t_io * 0.05, -1.0, 1.0)
 
                 expansion_log.append({
                     "core": core, "target": target, "tick": tick, "year": year,
@@ -949,7 +1303,7 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
     # Hegemons: >9% total pop
     hegemons = sorted([c for c, pp in polity_pops.items() if pp > total_world_pop * 0.09],
                       key=lambda c: -polity_pops[c])
-    hegemon_cultures = {c: _culture(c) for c in hegemons}
+    hegemon_cultures = {c: _culture_label(c) for c in hegemons}
 
     uncontacted = sum(1 for i in range(N) if controller[i] == i and i not in hegemons
                       and absorbed_tick[i] is None)
@@ -965,18 +1319,18 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
     for i in range(N):
         core = controller[i]
         if core == i and i in hegemons:
-            faction = _culture(i)
+            faction = _culture_label(i)
             status  = "core"
         elif core in hegemons:
-            faction = _culture(core)
+            faction = _culture_label(core)
             if sovereignty[i] < 0.3:   status = "colony"
-            elif sovereignty[i] < 0.6: status = "garrison" if _culture(core) == "subject" else "client"
+            elif sovereignty[i] < 0.6: status = "garrison" if _culture_label(core) == "subject" else "client"
             else:                      status = "contacted"
         elif controller[i] == i:
             faction = "independent"
             status  = "uncontacted" if absorbed_tick[i] is None else "independent"
         else:
-            faction = _culture(core)
+            faction = _culture_label(core)
             status  = "tributary"
 
         era = None
@@ -998,7 +1352,8 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
             "tradeIntegration": min(1.0, len(contact_set[i]) / max(1.0, N * 0.3)),
             "eraOfContact":     era,
             "hopCount":         0,
-            "culture":          _culture(controller[i]),
+            "culture":          _culture_label(controller[i]),
+            "culture_pos":      list(cpos[controller[i]]),
             "fleet_scale":      fleet_scale[i],
             "c_remaining":      c_remaining[i],
             "controller":       controller[i],
@@ -1007,9 +1362,9 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
     # Backward-compat faction labels: map civic→reach, subject→lattice
     reach_arch = lattice_arch = None
     for h in hegemons:
-        if _culture(h) == "civic" and reach_arch is None:
+        if _culture_label(h) == "civic" and reach_arch is None:
             reach_arch = h
-        elif _culture(h) == "subject" and lattice_arch is None:
+        elif _culture_label(h) == "subject" and lattice_arch is None:
             lattice_arch = h
     if reach_arch is None and hegemons:
         reach_arch = hegemons[0]
@@ -1036,7 +1391,8 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
         polity_members[core] = members
         polities.append({
             "core":         core,
-            "culture_type": _culture(core),
+            "culture_type": _culture_label(core),
+            "culture_pos":  list(cpos[core]),
             "total_pop":    polity_pops[core],
             "has_pu":       _has_pu(core),
             "tech":         tech[core],
@@ -1078,6 +1434,7 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
         # v2 diagnostics
         "hegemons":             hegemons,
         "hegemon_cultures":     hegemon_cultures,
+        "hegemon_culture_pos":  {c: list(cpos[c]) for c in hegemons},
         "c_depletion_frac":     c_depletion_frac,
         "total_c_initial":      total_c_init,
         "total_c_remaining":    total_c_rem,
@@ -1087,6 +1444,11 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
         "fleet_scales":         {c: fleet_scale[c] for c in hegemons},
         "polity_pops":          polity_pops,
         "n_polities":           len(final_cores),
+        # §11 desperation / tech decay diagnostics
+        "tech_decay_log":       tech_decay_log,
+        "desperation_log":      desperation_log,
+        "n_tech_decay_events":  len(tech_decay_log),
+        "n_desperation_events": len(desperation_log),
     }
 
 
@@ -1114,10 +1476,12 @@ def verify_seed(seed=216089, world_path=None, params=None, verbose=True):
         lines = [f"=== Seed {seed} verification ==="]
         lines.append(f"Hegemons ({len(result['hegemons'])}): {result['hegemons']}")
         for h in result["hegemons"]:
-            c = result["hegemon_cultures"][h]
-            s = result["states"][h]
-            lines.append(f"  arch {h}: culture={c}, tech={s['tech']:.1f}, "
-                         f"pop={s['population']}, fleet={result['fleet_scales'].get(h, 0):.2f}, "
+            c   = result["hegemon_cultures"][h]
+            pos = result["hegemon_culture_pos"].get(h, [0.0, 0.0])
+            s   = result["states"][h]
+            lines.append(f"  arch {h}: culture={c} pos=({pos[0]:+.2f},{pos[1]:+.2f}), "
+                         f"tech={s['tech']:.1f}, pop={s['population']}, "
+                         f"fleet={result['fleet_scales'].get(h, 0):.2f}, "
                          f"crop={substrate_crop(result['substrate'], h)}")
         lines.append(f"C depletion: {result['c_depletion_frac']*100:.1f}%")
         lines.append(f"Uncontacted: {result['uncontacted_count']}")
