@@ -1,7 +1,7 @@
 """
 Optuna-based Aeolia history engine v2 optimizer.
 
-21-parameter energy-coupled search using TPE sampler.
+25-parameter continuous culture-space search using TPE sampler.
 Seeds: 216089 (primary) + top candidates from worlds/ directory.
 10,000 trials with variance weighting across seeds.
 
@@ -53,16 +53,8 @@ FAIL_PENALTY     = 2.0
 
 # Seeds from the geo-filter pass + stability anchors.
 # 216089 is mandatory; others are top candidates from worlds/ directory.
-# Primary geo-filter winners + anchors (all must have candidate files with cx/cy/cz)
 GEO_SEEDS  = [216089, 51, 73, 74, 11, 66]
-ANCHOR_SEEDS = [17, 42, 97]  # also available as candidate files
-
-# Culture share groups — optimizer samples 2 freely, third = 1 - a - b
-_SHARE_GROUPS = [
-    ("civic_expansion_share", "civic_tech_share", "civic_consolidation_share"),
-    ("subject_expansion_share", "subject_tech_share", "subject_consolidation_share"),
-    ("parochial_expansion_share", "parochial_tech_share", None),  # parochial_consolidation derived
-]
+ANCHOR_SEEDS = [17, 42, 97]
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -76,37 +68,8 @@ def _std(xs):
     m = _mean(xs)
     return math.sqrt(_mean([(x - m)**2 for x in xs]))
 
-
-def _bounds_for(name: str):
-    """Look up bounds from PARAM_BOUNDS."""
-    for n, lo, hi in PARAM_BOUNDS:
-        if n == name:
-            return lo, hi
-    raise KeyError(f"Unknown param: {name}")
-
-
-def _suggest_shares(trial: optuna.Trial, prefix: str):
-    """Suggest two shares freely, derive third = 1 - a - b clamped to [0.05, 1.0].
-    Returns (expansion, tech, consolidation)."""
-    exp_name = f"{prefix}_expansion_share"
-    tech_name = f"{prefix}_tech_share"
-    cons_name = f"{prefix}_consolidation_share"
-
-    lo_e, hi_e = _bounds_for(exp_name)
-    lo_t, hi_t = _bounds_for(tech_name)
-
-    exp_val = trial.suggest_float(exp_name, lo_e, hi_e)
-    tech_val = trial.suggest_float(tech_name, lo_t, hi_t)
-    cons_val = max(0.05, min(1.0, 1.0 - exp_val - tech_val))
-
-    # Clamp consolidation to its bounds if it has explicit bounds
-    try:
-        lo_c, hi_c = _bounds_for(cons_name)
-        cons_val = max(lo_c, min(hi_c, cons_val))
-    except KeyError:
-        pass  # parochial has no explicit consolidation bounds
-
-    return exp_val, tech_val, cons_val
+# Lookup table for bounds
+_BOUNDS = {name: (lo, hi) for name, lo, hi in PARAM_BOUNDS}
 
 
 # ---------------------------------------------------------------------------
@@ -144,55 +107,12 @@ def make_objective(worlds: dict, all_trials: list, best_holder: list):
     """Create an Optuna objective closure."""
 
     def objective(trial: optuna.Trial) -> float:
-        # --- Suggest 21 parameters ---
-        # Culture shares: sample 2 freely, derive third
-        civic_e, civic_t, civic_c = _suggest_shares(trial, "civic")
-        subject_e, subject_t, subject_c = _suggest_shares(trial, "subject")
-        parochial_e, parochial_t, parochial_c = _suggest_shares(trial, "parochial")
+        # Suggest all 25 parameters directly from PARAM_BOUNDS
+        suggested = {}
+        for name, lo, hi in PARAM_BOUNDS:
+            suggested[name] = trial.suggest_float(name, lo, hi)
 
-        # Knowledge compounding
-        A0_civic     = trial.suggest_float("A0_civic",     *_bounds_for("A0_civic"))
-        A0_subject   = trial.suggest_float("A0_subject",   *_bounds_for("A0_subject"))
-        A0_parochial = trial.suggest_float("A0_parochial", *_bounds_for("A0_parochial"))
-
-        # Material conditions
-        cu_unlock_tech           = trial.suggest_float("cu_unlock_tech",           *_bounds_for("cu_unlock_tech"))
-        au_contact_bonus         = trial.suggest_float("au_contact_bonus",         *_bounds_for("au_contact_bonus"))
-        naphtha_richness         = trial.suggest_float("naphtha_richness",         *_bounds_for("naphtha_richness"))
-        naphtha_depletion        = trial.suggest_float("naphtha_depletion",        *_bounds_for("naphtha_depletion"))
-        energy_to_tfp            = trial.suggest_float("energy_to_tfp",            *_bounds_for("energy_to_tfp"))
-        pu_dependent_factor      = trial.suggest_float("pu_dependent_factor",      *_bounds_for("pu_dependent_factor"))
-        resource_targeting_weight = trial.suggest_float("resource_targeting_weight", *_bounds_for("resource_targeting_weight"))
-
-        # Contact dynamics
-        epi_base_severity    = trial.suggest_float("epi_base_severity",    *_bounds_for("epi_base_severity"))
-        sov_extraction_decay = trial.suggest_float("sov_extraction_decay", *_bounds_for("sov_extraction_decay"))
-        df_detection_range   = trial.suggest_float("df_detection_range",   *_bounds_for("df_detection_range"))
-
-        # Build SimParams
-        params = SimParams(
-            civic_expansion_share=civic_e,
-            civic_tech_share=civic_t,
-            civic_consolidation_share=civic_c,
-            subject_expansion_share=subject_e,
-            subject_tech_share=subject_t,
-            subject_consolidation_share=subject_c,
-            parochial_expansion_share=parochial_e,
-            parochial_tech_share=parochial_t,
-            A0_civic=A0_civic,
-            A0_subject=A0_subject,
-            A0_parochial=A0_parochial,
-            cu_unlock_tech=cu_unlock_tech,
-            au_contact_bonus=au_contact_bonus,
-            naphtha_richness=naphtha_richness,
-            naphtha_depletion=naphtha_depletion,
-            energy_to_tfp=energy_to_tfp,
-            pu_dependent_factor=pu_dependent_factor,
-            resource_targeting_weight=resource_targeting_weight,
-            epi_base_severity=epi_base_severity,
-            sov_extraction_decay=sov_extraction_decay,
-            df_detection_range=df_detection_range,
-        )
+        params = SimParams(**suggested)
 
         t_trial = time.monotonic()
         ev = evaluate_params(params, worlds)
@@ -286,7 +206,7 @@ def run():
     print("Aeolia History Engine v2 Optimizer (Optuna TPE)")
     print(f"  Trials       : {n_trials}" + (" [TEST MODE]" if args.test else ""))
     print(f"  Seeds        : {seeds}")
-    print(f"  Params       : {len(PARAM_BOUNDS)} (21 v2 parameters)")
+    print(f"  Params       : {len(PARAM_BOUNDS)} (v2 continuous culture-space)")
     print(f"  Variance λ   : {VARIANCE_WEIGHT}")
     print(f"  Results dir  : {RESULTS_DIR}")
     print()
@@ -337,44 +257,7 @@ def run():
     # Reconstruct best params from study
     best_trial = study.best_trial
     bp = best_trial.params
-
-    # Derive consolidation shares (not directly in Optuna params)
-    civic_c = max(0.05, min(1.0, 1.0 - bp["civic_expansion_share"] - bp["civic_tech_share"]))
-    subject_c = max(0.05, min(1.0, 1.0 - bp["subject_expansion_share"] - bp["subject_tech_share"]))
-    parochial_c = max(0.05, min(1.0, 1.0 - bp["parochial_expansion_share"] - bp["parochial_tech_share"]))
-
-    # Clamp consolidation to its bounds
-    for name, val_ref in [("civic_consolidation_share", civic_c),
-                          ("subject_consolidation_share", subject_c)]:
-        lo, hi = _bounds_for(name)
-        if name == "civic_consolidation_share":
-            civic_c = max(lo, min(hi, val_ref))
-        else:
-            subject_c = max(lo, min(hi, val_ref))
-
-    best_params = SimParams(
-        civic_expansion_share=bp["civic_expansion_share"],
-        civic_tech_share=bp["civic_tech_share"],
-        civic_consolidation_share=civic_c,
-        subject_expansion_share=bp["subject_expansion_share"],
-        subject_tech_share=bp["subject_tech_share"],
-        subject_consolidation_share=subject_c,
-        parochial_expansion_share=bp["parochial_expansion_share"],
-        parochial_tech_share=bp["parochial_tech_share"],
-        A0_civic=bp["A0_civic"],
-        A0_subject=bp["A0_subject"],
-        A0_parochial=bp["A0_parochial"],
-        cu_unlock_tech=bp["cu_unlock_tech"],
-        au_contact_bonus=bp["au_contact_bonus"],
-        naphtha_richness=bp["naphtha_richness"],
-        naphtha_depletion=bp["naphtha_depletion"],
-        energy_to_tfp=bp["energy_to_tfp"],
-        pu_dependent_factor=bp["pu_dependent_factor"],
-        resource_targeting_weight=bp["resource_targeting_weight"],
-        epi_base_severity=bp["epi_base_severity"],
-        sov_extraction_decay=bp["sov_extraction_decay"],
-        df_detection_range=bp["df_detection_range"],
-    )
+    best_params = SimParams(**bp)
 
     best_eval = evaluate_params(best_params, worlds)
 
@@ -462,7 +345,7 @@ def run():
         f"Backend        : Optuna TPE (multivariate, n_startup={min(20, max(5, n_trials // 10))})",
         f"Trials         : {n_trials}",
         f"Seeds          : {seeds}",
-        f"Parameters     : {len(PARAM_BOUNDS)} (21 v2 energy-coupled)",
+        f"Parameters     : {len(PARAM_BOUNDS)} (v2 continuous culture-space)",
         f"Variance λ     : {VARIANCE_WEIGHT}",
         f"Total time     : {total_elapsed:.1f}s  ({total_elapsed/max(n_trials,1):.1f}s/trial)",
         "",
