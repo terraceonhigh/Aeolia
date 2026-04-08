@@ -97,6 +97,7 @@ class SimParams:
     epi_base_severity:          float = 0.30
     sov_extraction_decay:       float = 0.04
     df_detection_range:         float = 0.6
+    df_min_territory_frac:      float = 0.08   # both polities must control >= this fraction of world for DF
 
     # Malthusian clamp (Q5 resolution) — applied to energy surplus for tech < 4
     carry_cap_scale:            float = 1.0    # carrying_capacity = crop_y × n_archipelagos × scale
@@ -130,6 +131,7 @@ PARAM_BOUNDS: list = [
     ("epi_base_severity",           0.15, 0.50),
     ("sov_extraction_decay",        0.01, 0.10),
     ("df_detection_range",          0.3,  1.0),
+    ("df_min_territory_frac",       0.03, 0.20),
     ("luxury_markup_rate",          0.25, 0.55),
     ("bulk_markup_rate",            0.05, 0.20),
     ("maintenance_rate",            0.005, 0.05),
@@ -1000,7 +1002,13 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
                 for other in cores:
                     if other == core or tech[other] < 8.0: continue
                     aw = awareness.get((core, other), 0.0)
-                    # DF triggers when two nuclear-capable polities detect each other
+                    # DF triggers when two nuclear-capable polities detect each other.
+                    # Territory gate: both polities must control a significant fraction
+                    # of the world — only major powers develop intercontinental
+                    # surveillance / early-warning networks.
+                    min_archs = max(1, int(p.df_min_territory_frac * N))
+                    if core_n_ctrl[core] < min_archs or core_n_ctrl[other] < min_archs:
+                        continue
                     dist = _gc_dist_arch(archs[core], archs[other])
                     if dist <= p.df_detection_range * 1.5 and aw > 0.2:
                         df_year = year
