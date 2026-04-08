@@ -1,7 +1,19 @@
 {
+  "name": "aeolia",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
   "dependencies": {
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "three": "^0.183.2"
+  },
+  "devDependencies": {
+    "vite": "^6.3.0",
+    "@vitejs/plugin-react": "^4.4.0"
   }
 }

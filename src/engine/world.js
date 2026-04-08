@@ -9,6 +9,7 @@ import { ARCH_COUNT, ISLAND_MAX_HEIGHT, MAX_EDGE_ANGLE, MIN_NEIGHBORS } from './
 import { computeSubstrate } from './substrate.js';
 import { assignPolitics } from './history.js';
 import { detectSettlements } from './settlements.js';
+export { computeSubstrate, assignPolitics, detectSettlements };
 
 function latLonToXYZ(lat, lon) {
   const p = (90 - lat) * Math.PI / 180, t = (lon + 180) * Math.PI / 180;

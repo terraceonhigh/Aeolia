@@ -58,7 +58,14 @@ Status as of April 7, 2026. Everything above the line is implemented. Everything
 
 ### Push to GitHub
 - [ ] Push commit 41c518a (Malthusian clamp + trade energy + desperation) to terraceonhigh/Aeolia
+- [ ] Push README.md game-framing edit and expanded CLAUDE.md
 - [ ] Push any subsequent commits from optimizer work
+
+### Channel Housekeeping
+- [ ] Reorganize ~/Labs/.claude-channel/ — character sheets, soul files, and protocol docs are intermingled with message files
+- [ ] Move meta files (PROTOCOL.md, DRAMATIS_PERSONAE.md, *_CHARACTER_SHEET.md, *_SOUL.md) into a subdirectory (e.g., `meta/` or `docs/`)
+- [ ] Keep message files ({timestamp}_{sender}.md) flat in root
+- [ ] Update channel.sh and daemon.sh if paths change
 
 ### Colonial-Era Commodity Name Cleanup
 - [ ] Walk back over-eroded names: yavin→?, sini→cini, nila→keep debating, gamba→gambir, tema→?, losa→louça?, agua→aqua (already done?)
@@ -100,9 +107,14 @@ Status as of April 7, 2026. Everything above the line is implemented. Everything
 - [ ] Dense tables identified as engagement barrier — visual at-a-glance readability is the UX constraint
 - [ ] Sim-to-Godot bridge: pipe sim_proxy_v2 output to the map renderer
 
-### Distribution
-- [ ] macOS binary target (Faculty of Arts ~80-90% Mac)
-- [ ] Homebrew formula or direct binary distribution
+### Distribution (macOS App)
+- [ ] **TERRACE:** Enroll in Apple Developer Program ($99/year) — required for code signing + notarization so Lanthier doesn't hit Gatekeeper wall
+- [ ] Scaffold Aeolia.app from Bacalhau template (Go + Wails v2 shell, .app bundling, Info.plist, icon pipeline, three-platform CI)
+  - Replace `static/` with Aeolia globe/sim frontend
+  - Strip manuscript editor API routes, add sim API if needed
+  - Update `wails.json`, `Info.plist.template`, bundle identifier
+- [ ] Wire real code signing in CI: `codesign -s "Developer ID Application: ..."` with `--timestamp`
+- [ ] Add notarization step: `xcrun notarytool submit` + `xcrun stapler staple`
 - [ ] No App Store needed for academic demo audience
 
 ---

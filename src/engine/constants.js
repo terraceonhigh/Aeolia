@@ -21,7 +21,14 @@ export const RAINFALL_MULTIPLIER = 1.4;     // Aeolia vs Earth at same latitude
 export const ANTIQUITY_START = -20000;
 export const ACTIVE_SIM_START = -5000;
 export const TICK_YEARS = 50;
-export const TOTAL_TICKS = 100;             // -5000 to 0 BP
+export const TOTAL_TICKS = 100;             // -5000 to 0 BP (Dijkstra engine)
+
+// ── Sim Engine (v2 — emergent tick-based) ──
+export const SIM_ISLAND_MAX_HEIGHT = 3000;  // sim uses 3000, renderer uses 3200
+export const SIM_START_YEAR = -20000;
+export const SIM_END_YEAR = 0;
+export const SIM_TICK_YEARS = 50;
+export const SIM_N_TICKS = 400;             // -20000 to 0 BP
 
 // ── Hegemon Parameters ──
 export const REACH_START = -5500;           // aggressive explorer
