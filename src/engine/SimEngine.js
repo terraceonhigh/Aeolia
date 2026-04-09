@@ -719,6 +719,16 @@ export class SimEngine {
         if (playerDecision.culturePolicyIO) io += _clamp(playerDecision.culturePolicyIO, -1, 1) * nudgeCap;
       }
 
+      // Piety → culture: high piety pulls toward Collective (−CI) and mildly Inward (−IO)
+      // Models: religious revival reinforces communal structures and inward traditionalism.
+      // Q8 implementation: closes the piety↔CI/IO feedback loop.
+      const cPiety = this.piety[core];
+      if (cPiety > 0.5) {
+        const pietyPull = (cPiety - 0.5) * p.culture_drift_rate * 0.4;
+        ci -= pietyPull;           // toward collective
+        io -= pietyPull * 0.5;    // mildly toward inward
+      }
+
       this.cpos[core] = [_clamp(ci, -1, 1), _clamp(io, -1, 1)];
     }
 

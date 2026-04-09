@@ -85,7 +85,7 @@ class SimParams:
     au_contact_bonus:           float = 500.0
     naphtha_richness:           float = 2.0
     naphtha_depletion:          float = 0.008
-    energy_to_tfp:              float = 1.0
+    energy_to_tfp:              float = 0.51  # calibrated: gives DF at ~-200 on primary seed
     pu_dependent_factor:        float = 0.65
     resource_targeting_weight:  float = 2.0
 
@@ -957,6 +957,15 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
                 # Universal coastal: kauri slight Collective push
                 ci -= fdr * 0.1
 
+            # Piety → culture: high piety pulls toward Collective (−CI) and mildly Inward (−IO)
+            # Models: religious revival reinforces communal structures and inward traditionalism.
+            # Closes the piety↔CI/IO feedback loop (Q8 implementation).
+            c_piety = piety[core]
+            if c_piety > 0.5:
+                piety_pull = (c_piety - 0.5) * p.culture_drift_rate * 0.4
+                ci -= piety_pull        # toward collective
+                io -= piety_pull * 0.5  # mildly toward inward
+
             cpos[core] = [_clamp(ci, -1.0, 1.0), _clamp(io, -1.0, 1.0)]
 
         # ──────────────────────────────────────────────────────────────
@@ -991,6 +1000,16 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
                     if dist <= signal_r:
                         awareness[(other, core)] = min(1.0, awareness.get((other, core), 0.0) + 0.15)
                         awareness[(core, other)] = min(1.0, awareness.get((core, other), 0.0) + 0.10)
+            # Nuclear peer detection: once both polities are nuclear-capable,
+            # awareness accumulates globally regardless of distance.
+            # Represents weapons-test seismology, satellite surveillance, signals intel.
+            # Rate: 0.04/tick → threshold 0.30 fires after ~7–8 ticks (350–400 years).
+            if tech[core] >= 9.0:
+                for other in cores:
+                    if other == core: continue
+                    if tech[other] >= 9.0:
+                        awareness[(other, core)] = min(1.0, awareness.get((other, core), 0.0) + 0.04)
+                        awareness[(core, other)] = min(1.0, awareness.get((core, other), 0.0) + 0.04)
 
         # ──────────────────────────────────────────────────────────────
         # STAGE 4: Bayesian belief update (plan §5.5)
@@ -1009,14 +1028,25 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
                     min_archs = max(1, int(p.df_min_territory_frac * N))
                     if core_n_ctrl[core] < min_archs or core_n_ctrl[other] < min_archs:
                         continue
-                    dist = _gc_dist_arch(archs[core], archs[other])
-                    if dist <= p.df_detection_range * 1.5 and aw > 0.2:
-                        df_year = year
-                        df_arch = core
-                        df_detector = other
-                        awareness[(core, other)] = 1.0
-                        awareness[(other, core)] = 1.0
-                        break
+                    # Nuclear peer pair (both ≥9.0): no distance gate — global awareness.
+                    # Pre-nuclear rival (8.0–9.0): proximity gate still applies.
+                    if tech[other] >= 9.0:
+                        if aw > 0.30:
+                            df_year = year
+                            df_arch = core
+                            df_detector = other
+                            awareness[(core, other)] = 1.0
+                            awareness[(other, core)] = 1.0
+                            break
+                    else:
+                        dist = _gc_dist_arch(archs[core], archs[other])
+                        if dist <= p.df_detection_range * 1.5 and aw > 0.2:
+                            df_year = year
+                            df_arch = core
+                            df_detector = other
+                            awareness[(core, other)] = 1.0
+                            awareness[(other, core)] = 1.0
+                            break
                 if df_year is not None:
                     break
 
@@ -1071,6 +1101,12 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
             if t > 9.0:
                 delta *= _clamp((11.0 - t) / 2.0, 0.0, 1.0)
             tech[core] += delta
+
+            # Post-DF arms race: all nuclear polities (tech > 8.5) get extra tech investment
+            # Models deterrence infrastructure, delivery systems, second-strike capability
+            if df_year is not None and tech[core] > 8.5:
+                arms_bonus = min(0.05, delta * 0.4)
+                tech[core] += arms_bonus
 
             # — §11 Tech decay: maintenance shortfall slides tech downward —
             # maintenance = tech² × maintenance_rate (quadratic: high-tech is fragile)
@@ -1186,7 +1222,14 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
                     if rp > 0.3:
                         dist *= _clamp(1.0 - (rp - 0.3) * 0.5, 0.5, 1.0)
 
-                score = ts_score + p.resource_targeting_weight * rv + desp_bonus - dist * 1.5
+                # Post-DF deterrence: nuclear peers strongly avoid each other's territory
+                deterrence_penalty = 0.0
+                if df_year is not None:
+                    target_ctrl = controller[target]
+                    if tech[core] >= 9.0 and tech[target_ctrl] >= 9.0 and core != target_ctrl:
+                        deterrence_penalty = 12.0  # hegemons frozen against each other
+
+                score = ts_score + p.resource_targeting_weight * rv + desp_bonus - dist * 1.5 - deterrence_penalty
                 candidates.append((score, target, dist))
 
             candidates.sort(key=lambda x: -x[0])
