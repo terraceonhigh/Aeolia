@@ -231,9 +231,9 @@ export const TECH_MILESTONE_NARRATIVES = {
     body: `Deep-keeled hulls and celestial navigation have made the shelf edges crossable. Your navigators can now reach archipelagos beyond the visible horizon. The navigator's guild has filed a formal claim on the commission for any successful gap crossing — their leverage is absolute, because no one else knows how to do it. Every expedition that returns answers one question and asks three more.`,
   },
   5: {
-    title: 'Administered Trade Network',
+    title: 'Guild Charter Era',
     color: '#9a8a5a',
-    body: `Relay trade has matured into an administered network with formal agreements, guild structures, and commodity standards. Your harbors receive dried bakala, saak oil, and marich from partners who have never met your people directly — three and four hops away, the goods arrive on schedule. The qahwa houses in your trading districts are where foreign merchants negotiate. They are also where dissent accumulates.`,
+    body: `The relay has matured into something different: formal guild charters, standardized commodity grades, letters of credit valid across multiple archipelagos. Your harbors receive dried bakala, saak oil, and marich from partners who have never met your people directly — three and four hops away, the goods arrive on schedule. The qahwa houses in your trading districts are where foreign merchants negotiate. They are also where dissent accumulates.`,
   },
   7: {
     title: 'Naphtha Refinement',

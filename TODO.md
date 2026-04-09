@@ -40,47 +40,48 @@ Status as of April 9, 2026. Everything above the line is implemented. Everything
 
 ### Strategy Game (web app, 2026-04-09)
 - [x] narrativeText.js: deterministic prose library grounded in series bible (no RNG, hash-based selection)
-- [x] cardGenerator.js: 15 situation card types, each actionable
+- [x] cardGenerator.js: 16 situation card types, each actionable
 - [x] EventPopup.jsx rewrite: rich narrative prose for all event types
 - [x] Dispatches feed with source-tagged intelligence (ADMIRALTY / MERCHANT GUILD / INTERNAL AFFAIRS / etc.)
 - [x] Disease mechanics: malaria belts, urban disease sink, epidemic waves (Stage 5b)
-- [x] 4 new situation cards: Piracy Warning, Tech Decay Alert, Navigator Guild Dispute, Malaria Medical Breakthrough
-- [x] Tech decay dispatches in INTERNAL AFFAIRS feed
-- [x] Observatory mode: 10,000-year history viewer with tech/pop charts, event timeline, scrubber, polity standings
+- [x] Environmental shocks: crop failure, fishery depletion
+- [x] Religion/piety: centripetal force mechanic, TurnDashboard piety display
+- [x] 5 new situation cards: Piracy Warning, Tech Decay Alert, Navigator Guild Dispute, Malaria Breakthrough, Religious Revival
+- [x] Tech decay + crop failure + piety dispatches in INTERNAL AFFAIRS feed
+- [x] Observatory mode: 10,000-year history viewer with tech/pop/piety charts, event timeline, scrubber, polity standings, world map
+- [x] Post-DF deterrence freeze + arms race (minimal Q7 implementation)
+- [x] All OPEN_QUESTIONS.md issues resolved (Q1-Q7)
 
 ### Infrastructure
 
 - [x] GitHub repo: terraceonhigh/Aeolia (public, README, topics)
-- [x] Inter-agent channel: ~/Labs/.claude-channel/ with PROTOCOL.md, channel.sh, daemon.sh, ctl.sh
-- [x] Scheduled poller: channel-poll (every 5 min, reads CLI replies)
 - [x] Hackintosh "Aomori" live at 192.168.1.94 (Sonoma, i5-8250U, 8GB)
+- [x] Inter-agent channel deprecated (2026-04-09) — removed from all docs
 
 ---
 
 ## Pending: Immediate
 
-### Optimizer Retuning (CRITICAL)
-- [ ] DF does not fire on seed 216089 with current mechanics — culture space refactoring shifted RNG sequence, old parameter vector is stale
-- [ ] Set up optimizer environment on Aomori (clone repo, install Python + numpy)
-- [ ] Kick off 10K+ parameter sweep with new 26-param SimParams space
-- [ ] Find parameter vectors that produce DF with continuous culture space + all new mechanics
-- [ ] Validate across 5+ seeds
+### Optimizer Retuning (in progress)
+- [x] DF now fires correctly (fixed 2026-04-09): nuclear peer awareness accumulates globally (distance-independent) once both polities tech ≥ 9; `energy_to_tfp=0.51` calibrated so DF fires at year ~-200 on seed 216089 with 2 hegemons
+- [ ] Run full 10K-trial optuna optimization (run_optimization.py) to further refine 26-param space
+- [ ] Validate DF timing across full geo+anchor seed suite (seeds 216089, 51, 73, 74, 11, 66, 17, 42, 97)
 
 ### Push to GitHub
-- [ ] Push commit 41c518a (Malthusian clamp + trade energy + desperation) to terraceonhigh/Aeolia
-- [ ] Push README.md game-framing edit and expanded CLAUDE.md
-- [ ] Push any subsequent commits from optimizer work
+- [x] Merge all 2026-04-09 session commits into master (done; 7 commits from claude/trusting-tu worktree)
+- [ ] Push master to origin — blocked by HTTPS auth on Aomori (no stored keychain credentials, no SSH key, gh CLI not installed)
+- [ ] **TERRACE:** run `git push origin master` from MacBook Neo where credentials are cached, or set up SSH key on Aomori
 
-### Channel Housekeeping
-- [ ] Reorganize ~/Labs/.claude-channel/ — character sheets, soul files, and protocol docs are intermingled with message files
-- [ ] Move meta files (PROTOCOL.md, DRAMATIS_PERSONAE.md, *_CHARACTER_SHEET.md, *_SOUL.md) into a subdirectory (e.g., `meta/` or `docs/`)
-- [ ] Keep message files ({timestamp}_{sender}.md) flat in root
-- [ ] Update channel.sh and daemon.sh if paths change
+### Inter-Agent Channel
+- [x] Channel deprecated per user instruction (2026-04-09) — removed from CLAUDE.md
 
 ### Colonial-Era Commodity Name Cleanup
-- [ ] Walk back over-eroded names: yavin→?, sini→cini, nila→keep debating, gamba→gambir, tema→?, losa→louça?, agua→aqua (already done?)
-- [ ] Add kina (quinine analog, from Quechua kina-kina) to non-staple crops reference
-- [ ] Resolve Fisher-Price problem for trade-layer names that lost too much consonant weight
+- [x] Add kina (quinine analog, from Quechua kina-kina) to non-staple crops reference — done 2026-04-09; links to malaria mechanic
+- [x] Document protein sources (kerbau/kri/moa) in reference — were in sim but not in worldbuilding docs
+- [x] Add V1 commodity map table to reference for clarity
+- [ ] Walk back over-eroded names: yavin→?, sini→cini, nila→nili (done), gamba→gambir, tema→?, losa→louça?
+  - Note: these names don't appear in current codebase — may be from pre-V2 sim. Revisit when narrative text expands.
+- [x] Resolve Fisher-Price problem for trade-layer names: tech 5 milestone renamed "Guild Charter Era" in narrativeText.js; internal sim labels (subsistence/relay/administered) are analytical taxonomy, not UI-visible; "relay" is already in-universe vocabulary
 
 ---
 
@@ -92,16 +93,20 @@ Status as of April 9, 2026. Everything above the line is implemented. Everything
 - [x] Urban disease sink: density-dependent mortality above 70% capacity, urban_disease_rate=0.08 param
 - [x] Disease interaction with desperation mechanic — already handled by existing desperation cascade
 
-### Environmental Shocks
-- [ ] Crop failure: random per-archipelago yield penalties, RNG-seeded, pairs with existing world generation
-- [ ] Fishery stock-and-flow: depletable fish stocks, over-exploitation → collapse → social destabilization
-- [ ] Fishery depletion interaction with desperation mechanic (caloric shortfall → resource pressure → allocation override)
+### Environmental Shocks ✅ (implemented 2026-04-09 in SimEngine.js)
+- [x] Crop failure: random per-arch yield penalties, cropFailureModifier[], recovers +0.25/tick, tech-gated probability
+- [x] Fishery stock-and-flow: fisheryStock[], natural recovery (0.08/tick), over-exploitation depletion at density>50%
+- [x] Fishery depletion interaction with desperation mechanic — caloric shortfall feeds existing resource pressure cascade
+- [x] INTERNAL AFFAIRS dispatch for crop failures; Fishery Collapse situation card (Card 11b)
 
-### Religion / Culture as Political Variable
-- [ ] Religion as centripetal force: imperial unification (Abbasid model, Manifest Destiny)
-- [ ] Religion as centrifugal force: schism, fragmentation (Reformation model)
-- [ ] Implementation options: third axis in culture space, modifier on existing two axes, or discrete variable
-- [ ] Interaction with absorption blending (conquered populations resist or adopt)
+### Religion / Culture as Political Variable ✅ (implemented 2026-04-09 in SimEngine.js)
+- [x] piety[core] scalar (0-1): crisis→up, prosperity→down, tech>7→secular, contact diversity→secular
+- [x] Centripetal force: high piety boosts expansion scoring (missionary drive) + accelerates sovereignty extraction (absorption)
+- [x] Piety blending on conquest: conqueror inherits 8% of absorbed polity's piety (cultural contamination)
+- [x] Religious Revival situation card (Card 16): fires at piety≥0.65, collective vs. individual narrative variants
+- [x] INTERNAL AFFAIRS piety dispatch at high/elevated levels (every 6 ticks)
+- [ ] Centrifugal force: schism, fragmentation (Reformation model) — deferred to next round
+- [ ] Interaction with existing culture space axes — currently piety is independent of CI/IO
 
 ---
 
