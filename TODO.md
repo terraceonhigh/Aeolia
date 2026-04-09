@@ -52,7 +52,7 @@ Status as of April 9, 2026. Everything above the line is implemented. Everything
 
 ### Strategy Game (web app, 2026-04-09)
 - [x] narrativeText.js: deterministic prose library grounded in series bible (no RNG, hash-based selection)
-- [x] cardGenerator.js: 16 situation card types, each actionable
+- [x] cardGenerator.js: 17 situation card types, each actionable
 - [x] EventPopup.jsx rewrite: rich narrative prose for all event types
 - [x] Dispatches feed with source-tagged intelligence (ADMIRALTY / MERCHANT GUILD / INTERNAL AFFAIRS / etc.)
 - [x] Disease mechanics: malaria belts, urban disease sink, epidemic waves (Stage 5b)
@@ -117,6 +117,7 @@ Status as of April 9, 2026. Everything above the line is implemented. Everything
 - [x] Centripetal force: high piety boosts expansion scoring (missionary drive) + accelerates sovereignty extraction (absorption)
 - [x] Piety blending on conquest: conqueror inherits 8% of absorbed polity's piety (cultural contamination)
 - [x] Religious Revival situation card (Card 16): fires at piety≥0.65, collective vs. individual narrative variants
+- [x] Rogue Aircraft situation card (Card 17): nuclear-era piracy equivalent (tech≥9, series bible 08_MARITIME_TRADITIONS); fires periodically when contacts>3
 - [x] INTERNAL AFFAIRS piety dispatch at high/elevated levels (every 6 ticks)
 - [ ] Centrifugal force: schism, fragmentation (Reformation model) — deferred to next round
 - [x] Interaction with culture space axes: high piety (>0.5) pulls CI toward Collective and IO mildly Inward (drift rate × 0.4, capped); closes piety↔culture feedback loop in both JS and Python
