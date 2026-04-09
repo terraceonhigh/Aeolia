@@ -500,6 +500,7 @@ function gameReducer(state, action) {
           text: getDispatchEntry('naphtha_scramble', {}, action.names, tick),
           color: '#7a8a2a',
         });
+        if (!popup) popup = { type: 'naphtha_scramble', data: {} };
       }
 
       // ── Pyra revaluation ────────────────────────────────────
@@ -510,6 +511,7 @@ function gameReducer(state, action) {
           text: getDispatchEntry('pyra_revaluation', {}, action.names, tick),
           color: '#8a2020',
         });
+        if (!popup) popup = { type: 'pyra_scramble', data: {} };
       }
 
       // ── Epidemic waves ──────────────────────────────────────
