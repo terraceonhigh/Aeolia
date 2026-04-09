@@ -99,8 +99,9 @@ const S = {
 };
 
 // ── SVG Line Chart ────────────────────────────────────────
+// years: optional array of year values for each data point (for proper era bands)
 
-function LineChart({ series, width, height, yMax, yLabel, selectedIdx, onHover }) {
+function LineChart({ series, width, height, yMax, yLabel, selectedIdx, years }) {
   if (!series || series.length === 0) return null;
   const PAD = { top: 8, right: 12, bottom: 24, left: 36 };
   const W = width - PAD.left - PAD.right;
@@ -110,6 +111,17 @@ function LineChart({ series, width, height, yMax, yLabel, selectedIdx, onHover }
 
   const xScale = (i) => PAD.left + (i / (nPoints - 1)) * W;
   const yScale = (v) => PAD.top + H - (v / yMax) * H;
+
+  // Year-to-x mapping: if years array provided, use it; otherwise uniform
+  const yearToX = years && years.length === nPoints
+    ? (year) => {
+        const minY = years[0], maxY = years[nPoints - 1];
+        return PAD.left + ((year - minY) / (maxY - minY)) * W;
+      }
+    : (year) => {
+        const minY = -20000, maxY = 0;
+        return PAD.left + Math.max(0, Math.min(W, (year - minY) / (maxY - minY) * W));
+      };
 
   // Tick marks
   const yTicks = [0, yMax * 0.25, yMax * 0.5, yMax * 0.75, yMax];
@@ -123,18 +135,16 @@ function LineChart({ series, width, height, yMax, yLabel, selectedIdx, onHover }
           stroke="#2a1f14" strokeWidth={0.5}
         />
       ))}
-      {/* Era bands */}
+      {/* Era bands: use proper year-to-x mapping */}
       {ERAS.map((era, i) => {
-        // Map year to index approximation
-        const totalYears = 20000;
-        const x1 = PAD.left + Math.max(0, (-era.yearStart - 20000) / totalYears * -W + W * (20000 + era.yearStart) / totalYears);
-        const x2 = PAD.left + Math.max(0, (20000 + era.yearEnd) / totalYears * W);
-        if (x2 <= PAD.left) return null;
+        const x1 = yearToX(era.yearStart);
+        const x2 = yearToX(era.yearEnd);
+        const bx = Math.max(PAD.left, x1);
+        const bw = Math.min(PAD.left + W, x2) - bx;
+        if (bw <= 0) return null;
         return (
-          <rect key={i}
-            x={Math.max(PAD.left, x1)} y={PAD.top}
-            width={Math.min(W, x2) - Math.max(PAD.left, x1)} height={H}
-            fill={era.color} opacity={0.4}
+          <rect key={i} x={bx} y={PAD.top} width={bw} height={H}
+            fill={era.color} opacity={0.5}
           />
         );
       })}
@@ -168,11 +178,11 @@ function LineChart({ series, width, height, yMax, yLabel, selectedIdx, onHover }
           stroke="#c8a878" strokeWidth={1} strokeDasharray="3,2" opacity={0.7}
         />
       )}
-      {/* X-axis: era labels */}
+      {/* X-axis: era labels at midpoint of each band */}
       {ERAS.map((era, i) => {
-        const totalYears = 20000;
         const midYear = (era.yearStart + era.yearEnd) / 2;
-        const xMid = PAD.left + (20000 + midYear) / totalYears * W;
+        const xMid = yearToX(midYear);
+        if (xMid < PAD.left || xMid > PAD.left + W) return null;
         return (
           <text key={i} x={xMid} y={PAD.top + H + 14}
             textAnchor="middle" fill="#4a3a2a" fontSize={6} fontFamily={FONT}>
@@ -398,12 +408,16 @@ export default function Observatory({ seed, onBack }) {
         // Sort all events by year
         events.sort((a, b) => a.year - b.year);
 
+        // Year array for proper x-axis positioning in charts
+        const years = timeline.map(e => e.year);
+
         // Compute max values for chart scaling
         const maxTech = Math.ceil(Math.max(...polityTechSeries.flatMap(s => s.data), 10));
         const maxPop = Math.ceil(Math.max(...worldPopSeries[0].data) * 1.05);
 
         setHistoryData({
           timeline,
+          years,
           polityTechSeries,
           polityPopSeries,
           worldPopSeries,
@@ -466,7 +480,7 @@ export default function Observatory({ seed, onBack }) {
     );
   }
 
-  const { polityTechSeries, polityPopSeries, worldPopSeries, events, maxTech, maxPop } = historyData;
+  const { polityTechSeries, polityPopSeries, worldPopSeries, events, maxTech, maxPop, years } = historyData;
 
   return (
     <div style={S.root}>
@@ -515,6 +529,7 @@ export default function Observatory({ seed, onBack }) {
                       width={w} height={h}
                       yMax={maxTech}
                       yLabel="Tech"
+                      years={years}
                       selectedIdx={selectedIdx}
                     />
                   )}
@@ -548,6 +563,7 @@ export default function Observatory({ seed, onBack }) {
                       series={[...worldPopSeries, ...polityPopSeries]}
                       width={w} height={h}
                       yMax={maxPop}
+                      years={years}
                       yLabel="Pop"
                       selectedIdx={selectedIdx}
                     />

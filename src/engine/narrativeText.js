@@ -367,6 +367,27 @@ export function getDispatchEntry(type, data, names, tick) {
       return `ADMIRALTY INTELLIGENCE — Fission has been demonstrated. Every pyra deposit on Aeolia has changed strategic value overnight. Geological surveys are being reclassified. The scramble has a new object.`;
     }
 
+    case 'tech_decay': {
+      const from = data?.from?.toFixed(1) || '?';
+      const to = data?.to?.toFixed(1) || '?';
+      const deficit = pick([
+        'Energy reserves below maintenance threshold.',
+        'Research institution funding has lapsed.',
+        'Scholar recruitment and retention has collapsed.',
+      ], s);
+      return `INTERNAL AFFAIRS — Technology has declined: ${from} → ${to}. ${deficit}`;
+    }
+
+    case 'piracy_incident': {
+      const route = pick([
+        'the northern relay corridor',
+        'frontier trade lanes',
+        'southern convoy routes',
+        'the island chain connecting your outer holdings',
+      ], s);
+      return `MERCHANT GUILD — Piracy reported on ${route}. Cargo losses above seasonal average. Escort allocation review underway.`;
+    }
+
     default:
       return data?.text || type;
   }
@@ -427,6 +448,59 @@ export function getEpidemicRiskText(sourceName, contactCount, seed) {
     `Merchant vessels arriving from ${sourceName} have reported unusual illness among dock crews. The contact network that enriches you creates vectors the quarantine officers are only now learning to map.`,
     `Three ships from ${sourceName} arrived this season with crews showing fever symptoms. With ${contactCount} active trade contacts, a pathogen that travels the relay network will reach your harbors. When is the question.`,
     `Intelligence from ${sourceName} indicates a disease event of uncertain severity. Your trade routes and their trade routes overlap significantly. Restricting contact reduces the risk — and the revenue.`,
+  ], s);
+}
+
+/**
+ * Returns a piracy warning card body.
+ * contacts: int, tech: float, seed: int
+ */
+export function getPiracyWarningText(contacts, tech, seed) {
+  const s = seed ?? 0;
+  return pick([
+    `Trade convoys on your relay routes are reporting losses to opportunistic seizure. With ${contacts} active contacts, the surface area of your trade network has outpaced your escort capacity. The math of piracy is simple: target value divided by interdiction risk. For some of your outlying routes, that ratio has turned unfavorable.`,
+    `Your merchant fleet is operating across multiple relay hops without consistent escort. ${contacts} active trade relationships create ${contacts} vectors for seizure. The old maritime prize law distinction between privateers and pirates is theoretical — your cargo captains don't have time to read charters.`,
+    `Pirate confederacies operating from unheld islands are targeting your cargo ships between hops. This is not a patrol gap — it is a structural feature of any trade network that expands faster than the naval force protecting it. At tech ${tech.toFixed(1)}, the balance of arms slightly favors the defenders. Slightly.`,
+  ], s);
+}
+
+/**
+ * Returns a tech decay warning card body.
+ * prevTech, currTech: float, seed: int
+ */
+export function getTechDecayText(prevTech, currTech, seed) {
+  const s = seed ?? 0;
+  const loss = (prevTech - currTech).toFixed(1);
+  return pick([
+    `Your technology level has declined from ${prevTech.toFixed(1)} to ${currTech.toFixed(1)}. Energy surplus no longer covers maintenance costs. Research institutions are mothballed when they can't pay their scholars — and those scholars disperse, and do not return.`,
+    `Maintenance costs exceed your available energy surplus. Technology level has slipped ${loss} points. Civilizations that have crossed this threshold describe it as a ratchet: the decline is faster than the recovery, because the institutions that produce knowledge require continuous investment.`,
+    `Your tech advantage has eroded by ${loss} points this cycle. The qahwa houses in your administrative district, where the educated class congregates, are reporting a mood shift. When technical capacity declines, political confidence follows.`,
+  ], s);
+}
+
+/**
+ * Returns a navigator guild tension card body.
+ * tech: float, seed: int
+ */
+export function getNavigatorGuildText(tech, seed) {
+  const s = seed ?? 0;
+  return pick([
+    `The navigator's guild has filed a formal protest against the proliferation of automated position-fixing. Their argument is not sentimental: if a ship's crew cannot navigate by stars when the instrument fails, the ship is an accident waiting for the right conditions. The guild's casualty statistics are correct. The cost of their institutional resistance is also real.`,
+    `The guild of navigators — selected through rigorous examination, carriers of individually calibrated instruments, professional caste going back to the first gap crossings — views the new automated celestial-fix systems as an existential threat to institutional knowledge. Both positions have merit. You are required to have an opinion.`,
+    `A navigator's guild delegation has presented an unusual argument: the new position-fixing technology doesn't merely make navigators redundant, it makes navigators who can no longer navigate by hand without it. The guild wants certification requirements that mandate manual navigation alongside any automated system. Their proposal is technically sound and commercially inconvenient.`,
+  ], s);
+}
+
+/**
+ * Returns a malaria medical breakthrough card body.
+ * tropicalArches: int (number of tropical holdings), seed: int
+ */
+export function getMalariaBreakthroughText(tropicalArches, seed) {
+  const s = seed ?? 0;
+  return pick([
+    `Medical knowledge derived from your research programs has produced the first effective treatment against the endemic fevers of equatorial archipelagos. Your ${tropicalArches} tropical holding${tropicalArches > 1 ? 's' : ''} — previously costly to garrison — now carry a penalty reduced by 70%. The carrying capacity of your equatorial territories has effectively expanded without a single new island.`,
+    `A pharmacological breakthrough: your medical corps has isolated the effective compound in bark preparations that equatorial populations have used for generations. Garrisoning tropical archipelagos was previously a death sentence for temperate-origin troops. It is now merely expensive. Your ${tropicalArches} equatorial holding${tropicalArches > 1 ? 's' : ''} can now be administered rather than merely occupied.`,
+    `Empirical medicine has caught up to traditional knowledge. The plant preparations your equatorial contacts have used for generations — which your physicians dismissed as superstition — have proven pharmacologically sound. Your tropical garrison mortality has dropped substantially. ${tropicalArches} archipelago${tropicalArches > 1 ? 's' : ''} that were administrative liabilities are becoming viable territories.`,
   ], s);
 }
 

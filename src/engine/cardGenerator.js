@@ -14,6 +14,10 @@ import {
   getMineralDetectionText,
   getEpidemicRiskText,
   getCultureDriftText,
+  getPiracyWarningText,
+  getTechDecayText,
+  getNavigatorGuildText,
+  getMalariaBreakthroughText,
 } from './narrativeText.js';
 
 // ── Mineral labels ───────────────────────────────────────────
@@ -70,6 +74,8 @@ export function generateSituationCards(snapshot, playerCore, names, frontier, op
     selectedTargets = new Set(),
     scoutActive    = false,
     prevCultureLabel = null,
+    prevTech       = null,    // for tech decay detection
+    malariaUnlocked = false,  // true once we've shown the breakthrough card
   } = opts || {};
 
   const cards = [];
@@ -397,6 +403,92 @@ export function generateSituationCards(snapshot, playerCore, names, frontier, op
           ],
         });
       }
+    }
+  }
+
+  // ── Card 12: Piracy warning ─────────────────────────────
+  // Fires in mid-game when trade network is large but patrol capability hasn't scaled.
+  if (contactedCores.length > 5 && ps.tech >= 3.0 && ps.tech < 8.0 && cards.length < 3) {
+    const tick = snapshot?.tick || 0;
+    if (tick % 9 === 3) {
+      const seed = hashStr('piracy' + tick + ps.tech);
+      cards.push({
+        id: `piracy_${tick}`,
+        icon: '⚔',
+        title: 'Piracy Warning',
+        body: getPiracyWarningText(contactedCores.length, ps.tech, seed),
+        actions: [
+          { label: 'EXPAND NAVY', action: { type: 'SET_FOCUS', focus: 'expand' } },
+          { label: 'FORTIFY',     action: { type: 'SET_FOCUS', focus: 'fortify' } },
+          { label: 'ACCEPT',      action: null },
+        ],
+      });
+    }
+  }
+
+  // ── Card 13: Tech decay alert ────────────────────────────
+  // Fires when technology has declined this tick.
+  if (prevTech !== null && ps.tech < prevTech - 0.05 && cards.length < 3) {
+    const seed = hashStr('decay' + Math.round(ps.tech * 10));
+    cards.push({
+      id: `tech_decay_${snapshot?.tick || 0}`,
+      icon: '◈',
+      title: 'Technology Decline',
+      body: getTechDecayText(prevTech, ps.tech, seed),
+      actions: [
+        { label: 'INNOVATE',  action: { type: 'SET_FOCUS', focus: 'innovate' } },
+        { label: 'EXPLOIT',   action: { type: 'SET_FOCUS', focus: 'exploit' } },
+        { label: 'ACCEPT',    action: null },
+      ],
+    });
+  }
+
+  // ── Card 14: Navigator guild tension ────────────────────
+  // Fires at tech 7-8 (industrial/modern navigation technology).
+  if (ps.tech >= 7.0 && ps.tech < 8.5 && cards.length < 3) {
+    const tick = snapshot?.tick || 0;
+    if (tick % 13 === 7) {
+      const seed = hashStr('navigator' + tick);
+      cards.push({
+        id: `navigator_guild_${tick}`,
+        icon: '○',
+        title: 'Navigator Guild Dispute',
+        body: getNavigatorGuildText(ps.tech, seed),
+        actions: [
+          { label: 'SUPPORT GUILD',   action: { type: 'SET_CULTURE_POLICY', axis: 'io', value: -0.3 } },
+          { label: 'MANDATE MODERN',  action: { type: 'SET_CULTURE_POLICY', axis: 'io', value: 0.3 } },
+          { label: 'NO OPINION',      action: null },
+        ],
+      });
+    }
+  }
+
+  // ── Card 15: Malaria medical breakthrough ────────────────
+  // Fires once when tech crosses 6.0 and player holds tropical territory.
+  if (!malariaUnlocked && ps.tech >= 6.0 && ps.territory > 1 && cards.length < 3) {
+    const tick = snapshot?.tick || 0;
+    // Count approximate tropical holdings (controller[j] === playerCore and malariaFactor hint:
+    // we use naphtha proxy — tropical crops are paddi/taro/sago)
+    const tropicalCrops = new Set(['paddi', 'taro', 'sago']);
+    const crops = snapshot?.crops || [];
+    let tropicalCount = 0;
+    for (let j = 0; j < (snapshot?.controller || []).length; j++) {
+      if (snapshot.controller[j] === playerCore && tropicalCrops.has(crops[j])) {
+        tropicalCount++;
+      }
+    }
+    if (tropicalCount > 0) {
+      const seed = hashStr('malaria' + tick);
+      cards.push({
+        id: 'malaria_breakthrough',
+        icon: '◉',
+        title: 'Medical Breakthrough',
+        body: getMalariaBreakthroughText(tropicalCount, seed),
+        actions: [
+          { label: 'EXPAND TROPICS', action: { type: 'SET_FOCUS', focus: 'expand' } },
+          { label: 'ACKNOWLEDGE',    action: null },
+        ],
+      });
     }
   }
 

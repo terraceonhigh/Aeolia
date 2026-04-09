@@ -109,6 +109,7 @@ const INITIAL_STATE = {
   scoutActive: false,
   // Per-turn situation cards
   pendingCards: [],
+  malariaUnlocked: false,  // tracks if malaria breakthrough card has been shown
 };
 
 function gameReducer(state, action) {
@@ -431,6 +432,15 @@ function gameReducer(state, action) {
         });
       }
 
+      // ── Tech decay ──────────────────────────────────────────
+      if (playerTech < prevTech - 0.05) {
+        newEvents.push({
+          yearStr: yearStr2,
+          text: getDispatchEntry('tech_decay', { from: prevTech, to: playerTech }, action.names, tick),
+          color: '#a04030',
+        });
+      }
+
       // ── Dark Forest: richer log entry ───────────────────
       if (snapshot.dfYear && !state.snapshot?.dfYear) {
         const contactedCores = snapshot.contactedCores || [];
@@ -485,8 +495,12 @@ function gameReducer(state, action) {
           selectedTargets: nextTargets,
           scoutActive: state.scoutActive,
           prevCultureLabel,
+          prevTech: state.lastTech,
+          malariaUnlocked: state.malariaUnlocked,
         }
       );
+      // Track if malaria breakthrough card was generated (so it only fires once)
+      const newMalariaUnlocked = state.malariaUnlocked || nextCards.some(c => c.id === 'malaria_breakthrough');
 
       return {
         ...state,
@@ -501,6 +515,7 @@ function gameReducer(state, action) {
         lastTech: playerTech,
         contactedSet: newContactedSet,
         pendingCards: nextCards,
+        malariaUnlocked: newMalariaUnlocked,
       };
     }
 
