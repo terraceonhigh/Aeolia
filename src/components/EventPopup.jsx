@@ -77,18 +77,22 @@ function buildEventDef(type, eventData, names, playerCore) {
     case 'first_contact': {
       const d = eventData || {};
       const seed = (d.idx ?? 0) * 31 + (d.name?.charCodeAt(0) ?? 0);
+      const contactTech = d.tech != null ? Number(d.tech) : 0;
+      const secondaryText = contactTech >= 8.5
+        ? `ADMIRALTY ASSESSMENT — This contact has been escalated to strategic-level review. Intelligence, diplomatic, and nuclear-posture assessments are ongoing. Epidemiological monitoring protocols are in effect. All trade discussions are suspended pending strategic review.`
+        : `Your intelligence officers have designated this contact for ongoing assessment. Trade routes, diplomatic posture, and epidemiological monitoring protocols are being established.`;
       return {
         icon: '◉',
         color: '#b8923a',
-        title: 'First Contact',
+        title: contactTech >= 8.5 ? 'Strategic Contact' : 'First Contact',
         subtitle: d.year ? `Year ${d.year}` : undefined,
         body: getFirstContactBody({
           name: d.name || 'an unknown civilization',
           culture: d.culture || 'unknown disposition',
-          tech: d.tech != null ? Number(d.tech).toFixed(1) : '?',
+          tech: contactTech.toFixed(1),
           crop: d.crop,
         }, seed),
-        secondary: `Your intelligence officers have designated this contact for ongoing assessment. Trade routes, diplomatic posture, and epidemiological monitoring protocols are being established.`,
+        secondary: secondaryText,
       };
     }
 
