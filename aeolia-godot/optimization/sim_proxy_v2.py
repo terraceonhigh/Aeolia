@@ -107,6 +107,26 @@ class SimParams:
     decay_rate:                 float = 0.10   # tech loss per unit maintenance shortfall
     desperation_weight:         float = 0.50   # how strongly resource_pressure overrides culture
 
+    # Religion / Piety (Norris-Inglehart + Grzymala-Busse) — Stage 2c/2d
+    piety_drift_rate:           float = 0.008  # base piety change per tick
+    piety_absorption_bonus:     float = 0.35   # centripetal force: high piety boosts sovereignty extraction
+    malaria_cap_penalty:        float = 0.40   # McNeill: carrying-capacity reduction in malaria belt (abs_lat<20)
+
+    # Resource Curse (Sachs-Warner) — Stage 5
+    resource_curse_strength:    float = 0.30   # TFP penalty for naphtha-heavy polities in industrial era
+
+    # Trade Structure (Prebisch-Singer / Greif)
+    prebisch_bulk_discount:     float = 0.75   # calorie exporters' terms of trade relative to luxury/relay nodes
+    greif_relay_bonus:          float = 0.08   # extra per-contact benefit for high-connectivity relay nodes (Maghribi)
+
+    # Resistance Dynamics (Scott's weapons of the weak)
+    grievance_buildup_rate:     float = 0.25   # excess extraction → grievance accumulation rate
+    grievance_resistance_mult:  float = 2.0    # grievance amplifies sovereignty recovery rate
+
+    # Fishery mechanics (calibrated in SimEngine.js; mirrored here for optimizer)
+    fishery_recovery_rate:      float = 0.04
+    fishery_overfish_rate:      float = 0.06
+
 
 DEFAULT_PARAMS = SimParams()
 
@@ -137,6 +157,17 @@ PARAM_BOUNDS: list = [
     ("maintenance_rate",            0.005, 0.05),
     ("decay_rate",                  0.05, 0.30),
     ("desperation_weight",          0.2,  1.0),
+    # Religion / Piety
+    ("piety_drift_rate",            0.003, 0.020),
+    ("piety_absorption_bonus",      0.10,  0.60),
+    ("malaria_cap_penalty",         0.20,  0.70),
+    # Resource curse / trade structure
+    ("resource_curse_strength",     0.10,  0.60),
+    ("prebisch_bulk_discount",      0.50,  0.95),
+    ("greif_relay_bonus",           0.02,  0.20),
+    # Resistance
+    ("grievance_buildup_rate",      0.10,  0.50),
+    ("grievance_resistance_mult",   1.0,   4.0),
 ]
 
 
@@ -611,6 +642,36 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
     absorbed_tick = [None] * N
     first_contact_tick = [None] * N
 
+    # ── Religion / Piety state (Norris-Inglehart + Grzymala-Busse) ──────────
+    # Initialized from climate (tropical warmth → higher initial piety) and
+    # culture-space position (collective orientation → higher initial piety).
+    # Uses a SEPARATE RNG to avoid contaminating the main simulation RNG stream
+    # (which is calibrated against the seed-216089 Dark Forest timing target).
+    piety_rng     = Mulberry32((seed if seed != 0 else 42) * 13 + 2025)
+    piety         = [0.0] * N
+    schism_pressure = [0.0] * N
+    for i in range(N):
+        abs_lat_i = substrate[i]["climate"].get("abs_latitude", 30.0)
+        warm_seed_p = max(0.0, (25.0 - abs_lat_i) / 25.0) * 0.20
+        ci_seed_i = substrate[i].get("culture_pos", [0.0, 0.0])[0]
+        collective_seed = max(0.0, -ci_seed_i) * 0.15
+        piety[i] = _clamp(0.25 + warm_seed_p + collective_seed
+                          + (piety_rng.next_float() - 0.5) * 0.20, 0.05, 0.90)
+    schism_log = []
+
+    # ── Malaria factors (McNeill 1976; Gallup & Sachs 2001) ──────────────────
+    # Carrying-capacity penalty for tropical belts (abs_lat < 20°).
+    # Penalty resolves at tech ≥ 6 (germ-theory medicine / DDT analogue).
+    malaria_factor = [0.0] * N
+    for i in range(N):
+        al = substrate[i]["climate"].get("abs_latitude", 30.0)
+        malaria_factor[i] = max(0.0, (20.0 - al) / 20.0) if al < 20.0 else 0.0
+
+    # ── Grievance / Resistance state (Scott 1985, 1990) ──────────────────────
+    # Per arch: accumulated grievance from colonial extraction above tolerable level.
+    # Grievance amplifies sovereignty recovery (self-limiting empire mechanic).
+    grievance = [0.0] * N
+
     # Initialise
     for i, arch in enumerate(archs):
         pk_count = len(arch.get("peaks", [])) or arch.get("peak_count", 2)
@@ -686,6 +747,7 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
     pu_scramble_onset  = None
     tech_snapshots     = {}
     pop_snapshots      = {}
+    wave_epi_log       = []     # accumulated across all ticks (Stage 5b)
     tech_decay_log     = []     # §11: records of tech decay events
     desperation_log    = []     # §11: records of desperation-mode activations
 
@@ -761,11 +823,25 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
                 # Gravity model: mass = sqrt(pop) × primary_yield
                 mass_a = math.sqrt(max(1.0, core_pop[_tc]))    * substrate[_tc]["crops"]["primary_yield"]
                 mass_b = math.sqrt(max(1.0, core_pop[_other])) * substrate[_other]["crops"]["primary_yield"]
-                volume     = layer_mult * comp * math.sqrt(mass_a * mass_b) / (dist_rad ** 2)
-                net_benefit = volume * (1.0 - eff_markup) * 0.003   # scale: ~0.1 per pair at relay
+                volume = layer_mult * comp * math.sqrt(mass_a * mass_b) / (dist_rad ** 2)
+                base_benefit = volume * (1.0 - eff_markup) * 0.003   # scale: ~0.1 per pair at relay
 
-                trade_net[_tc]    += net_benefit
-                trade_net[_other] += net_benefit
+                # ── Prebisch-Singer (1950): bulk calorie exporters face structurally
+                # declining terms of trade relative to specialty/luxury/relay nodes.
+                # Paddi, taro, sago, papa are bulk staples; emmer and nori produce
+                # storable/specialty goods that command higher per-unit value.
+                _BULK_CROPS = frozenset(["paddi", "taro", "sago", "papa"])
+                ps_a = p.prebisch_bulk_discount if crop_a in _BULK_CROPS else 1.0
+                ps_b = p.prebisch_bulk_discount if crop_b in _BULK_CROPS else 1.0
+
+                # ── Greif (1989): relay intermediaries with many contacts capture
+                # asymmetric price differential (Maghribi trader coalition model).
+                # High-connectivity nodes act as information bottlenecks.
+                relay_bonus_a = min(0.40, len(contact_set[_tc]) * p.greif_relay_bonus)
+                relay_bonus_b = min(0.40, len(contact_set[_other]) * p.greif_relay_bonus)
+
+                trade_net[_tc]    += base_benefit * ps_a * (1.0 + relay_bonus_a)
+                trade_net[_other] += base_benefit * ps_b * (1.0 + relay_bonus_b)
 
         # ──────────────────────────────────────────────────────────────
         # STAGE 1: Resource accounting (Layer 1) — layered energy balance
@@ -960,6 +1036,84 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
             cpos[core] = [_clamp(ci, -1.0, 1.0), _clamp(io, -1.0, 1.0)]
 
         # ──────────────────────────────────────────────────────────────
+        # STAGE 2c: Piety drift (Norris-Inglehart 2004; Weber 1905)
+        # crisis→fervor, prosperity→secular; high tech→secular (existential security)
+        # Collective reinforces piety (Durkheim solidarity mechanism).
+        # ──────────────────────────────────────────────────────────────
+        for core in cores:
+            pi     = piety[core]
+            dRate  = p.piety_drift_rate
+            er     = energy_ratio.get(core, 1.0)
+            ci, _  = cpos[core]
+            # Crisis → piety rises (Norris-Inglehart: existential insecurity → religion)
+            if er < 0.6:
+                pi += dRate * (0.6 - er) * 2.5
+            else:
+                pi -= dRate * min(0.4, er - 0.6) * 0.8
+            # Collective culture reinforces piety; Individual erodes it (Weber)
+            pi -= ci * dRate * 0.6
+            # High tech → secular transition (mediated by prosperity, compressed here)
+            if tech[core] > 7.0:
+                pi -= dRate * (tech[core] - 7.0) * 0.25
+            # Trade diversity → cosmopolitan erosion of piety (contact with Other)
+            contact_div = min(1.0, len(contact_set[core]) / max(1.0, N * 0.25))
+            pi -= dRate * contact_div * 0.3
+            piety[core] = _clamp(pi, 0.05, 0.95)
+            # Piety feeds back into culture: high piety → Collective/Inward pull
+            if piety[core] > 0.5:
+                piety_pull = (piety[core] - 0.5) * dRate * 0.4
+                ci2, io2 = cpos[core]
+                cpos[core] = [_clamp(ci2 - piety_pull, -1.0, 1.0),
+                               _clamp(io2 - piety_pull * 0.5, -1.0, 1.0)]
+
+        # ──────────────────────────────────────────────────────────────
+        # STAGE 2d: Schism pressure (Grzymala-Busse 2023; Reformation model)
+        # High piety + low-sovereignty peripheral holdings + pre-industrial tech
+        # → fragmentation risk. "Tilly Goes to Church" mechanism: religious
+        # intensity produces state formation divergence in weak-sovereignty periphery.
+        # ──────────────────────────────────────────────────────────────
+        for core in cores:
+            pi = piety[core]
+            if pi < 0.60:
+                schism_pressure[core] = max(0.0, schism_pressure[core] - 0.02)
+                continue
+            controlled_arches = [j for j in range(N) if controller[j] == core and j != core]
+            if not controlled_arches:
+                continue
+            low_sov = [j for j in controlled_arches if sovereignty[j] < 0.45]
+            low_sov_frac = len(low_sov) / max(1, len(controlled_arches))
+            # Tech damping: schism dissolves above industrial threshold
+            t_damp = _clamp((7.0 - tech[core]) / 4.0, 0.0, 1.0)
+            dp = (pi - 0.60) * low_sov_frac * 3.0 * t_damp
+            schism_pressure[core] = _clamp(schism_pressure[core] + dp, 0.0, 1.5)
+            # Schism fires at pressure > 1.0: peripheral holdings break away
+            if schism_pressure[core] > 1.0 and low_sov:
+                low_sov_sorted = sorted(low_sov, key=lambda j: sovereignty[j])
+                n_release = max(1, len(low_sov_sorted) // 3)
+                released = 0
+                for j in low_sov_sorted[:n_release]:
+                    # Transfer to nearest independent arch or make ungoverned
+                    nearest_other = None
+                    nearest_dist  = float("inf")
+                    for other in range(N):
+                        if controller[other] == other and other != core:
+                            d = _gc_dist_arch(archs[j], archs[other])
+                            if d < nearest_dist:
+                                nearest_dist = d
+                                nearest_other = other
+                    if nearest_other is not None and nearest_dist < 0.8:
+                        controller[j] = nearest_other
+                        sovereignty[j] = 0.08
+                    else:
+                        controller[j] = j   # ungoverned
+                        sovereignty[j] = 0.04
+                    released += 1
+                schism_pressure[core] = 0.0
+                if released > 0:
+                    schism_log.append({"tick": tick, "year": year,
+                                       "core": core, "count": released})
+
+        # ──────────────────────────────────────────────────────────────
         # STAGE 3: Rumor propagation (plan §5.4)
         # Trade contacts require tech >= 2 (agricultural surplus for trade)
         # Max 1 new contact per polity per tick (takes a generation)
@@ -1053,6 +1207,19 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
             er        = energy_ratio[core]
             crop_y    = substrate[core]["crops"]["primary_yield"]
 
+            # ── Sachs-Warner resource curse (Ross 2012; Vitalis 2018) ────────
+            # Naphtha-rich polities in the industrial era develop extractive
+            # institutions that reduce broad-based innovation (TFP penalty).
+            # Mechanism: high resource rents → elite extraction rather than
+            # investment in human capital or institutional capacity.
+            # Fires when polity holds > ~13% of world C stock, tech 6–9.5.
+            if 6.0 < tech[core] < 9.5:
+                total_c_init_sum = sum(c_initial)
+                polity_c_frac = (sum(c_initial[j] for j in range(N) if controller[j] == core)
+                                 / max(0.001, total_c_init_sum))
+                curse = _clamp(polity_c_frac * 3.0 - 0.4, 0.0, 0.5)
+                a0 *= (1.0 - curse * p.resource_curse_strength)
+
             # Pu dependency at nuclear era
             if tech[core] >= 9.0 and not _has_pu(core):
                 er *= p.pu_dependent_factor
@@ -1130,6 +1297,13 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
                     cap *= (1.0 + er * 0.5)
                 if tech[core] >= 9.0:
                     cap *= 1.5
+                # Malaria carrying-capacity penalty (McNeill 1976; Gallup & Sachs 2001)
+                # Reduces effective cap in tropical belt (abs_lat < 20°).
+                # Resolves at tech ≥ 6 (germ-theory / vector-control analogue).
+                m_sev = malaria_factor[j]
+                if m_sev > 0:
+                    m_penalty = m_sev * p.malaria_cap_penalty * (0.30 if tech[core] >= 6.0 else 1.0)
+                    cap *= max(0.1, 1.0 - m_penalty)
                 growth_rate = 0.03 * er * (1.0 - pop[j] / max(1.0, cap))
                 pop[j] *= (1.0 + _clamp(growth_rate, -0.05, 0.10))
                 pop[j] = max(1.0, pop[j])
@@ -1154,6 +1328,36 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
             if world_max_tech > tech[core] + 1.0:
                 gap = world_max_tech - tech[core]
                 tech[core] += gap * 0.03
+
+        # ──────────────────────────────────────────────────────────────
+        # STAGE 5b: Epidemic waves (McNeill 1976; Schmid et al. 2015)
+        # Periodic disease events propagating through trade contact networks.
+        # Trade hubs as amplifiers (Black Death / Silk Road model): port density
+        # drives origin probability; spread follows contact graph.
+        # Separate from first-contact virgin-soil epidemics (Stage 6).
+        # ──────────────────────────────────────────────────────────────
+        for core in cores:
+            nc = len(contact_set[core])
+            if nc < 2: continue  # isolated polities don't originate waves
+            total_cap = sum(carry_cap[j] for j in range(N) if controller[j] == core)
+            total_pol_pop = sum(pop[j] for j in range(N) if controller[j] == core)
+            density = total_pol_pop / max(1.0, total_cap)
+            # Urban disease sink: Davenport 2020 — cities as net mortality zones
+            urban_factor = max(0.3, density)
+            epi_prob = p.epi_base_severity * 0.015 * (1.0 + nc * 0.2) * urban_factor
+            if rng.next_float() < epi_prob:
+                mortality = 0.04 + rng.next_float() * 0.12  # 4–16% pop loss
+                affected = {core}
+                for other in contact_set[core]:
+                    if other in set(cores) and rng.next_float() < 0.35:
+                        affected.add(other)
+                for c in affected:
+                    for j in range(N):
+                        if controller[j] == c:
+                            pop[j] = max(1.0, pop[j] * (1.0 - mortality))
+                wave_epi_log.append({"tick": tick, "year": year, "source": core,
+                                     "mortality_rate": mortality,
+                                     "affected": list(affected)})
 
         # ──────────────────────────────────────────────────────────────
         # STAGE 6: Thompson Sampling expansion (plan §5.7)
@@ -1215,12 +1419,34 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
 
                 # Post-DF deterrence: nuclear peers strongly avoid each other's territory
                 deterrence_penalty = 0.0
+                proxy_bonus = 0.0
                 if df_year is not None:
                     target_ctrl = controller[target]
                     if tech[core] >= 9.0 and tech[target_ctrl] >= 9.0 and core != target_ctrl:
                         deterrence_penalty = 12.0  # hegemons frozen against each other
+                    elif tech[core] >= 9.0 and tech[target_ctrl] < 9.0:
+                        # ── Stability-instability paradox (Snyder 1965; Waltz 1981) ──
+                        # Nuclear deterrence stabilizes direct inter-hegemon conflict
+                        # but paradoxically ENABLES proxy warfare: hegemons compete
+                        # aggressively in the sub-nuclear periphery.
+                        # Bonus for targeting rival hegemon's client/tributary states.
+                        for other_h in [c for c in cores if c != core and tech[c] >= 9.0]:
+                            if target_ctrl in contact_set[other_h]:
+                                proxy_bonus = 3.0
+                                break
 
-                score = ts_score + p.resource_targeting_weight * rv + desp_bonus - dist * 1.5 - deterrence_penalty
+                # ── Piety missionary bonus (Grzymala-Busse 2023 centripetal force) ──
+                # High-piety polities receive expansion bonus representing missionary
+                # drive, religious legitimation of conquest, and cultural absorption.
+                piety_bonus = 0.0
+                c_piety = piety[core]
+                if c_piety > 0.65:
+                    piety_bonus = (c_piety - 0.65) * 2.0
+                    if tech[core] - tech[controller[target]] > 1.5:
+                        piety_bonus += (c_piety - 0.65) * 1.5
+
+                score = (ts_score + p.resource_targeting_weight * rv + desp_bonus
+                         + piety_bonus + proxy_bonus - dist * 1.5 - deterrence_penalty)
                 candidates.append((score, target, dist))
 
             candidates.sort(key=lambda x: -x[0])
@@ -1246,17 +1472,30 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
                 if pop[target] > core_pop[core] * 0.5 and tech[core] - tech[target] < 2.0:
                     continue  # can't absorb near-peer
 
-                # Epidemiological shock at first contact
+                # ── Epidemiological shock at first contact ─────────────────────
+                # Diamond (1997): severity scaled by crop distance (pathogen divergence
+                # proxy). Crop zones differ in endemic pathogen exposure — tropical/
+                # temperate isolation determines naive-population mortality.
+                # Endemicity transition (McNeill 1976): prior relay-trade contact
+                # provides partial immunological exposure, reducing virgin-soil severity.
                 if first_contact_tick[target] is None:
                     first_contact_tick[target] = tick
                     cc = substrate[core]["crops"]["primary_crop"]
                     ct = substrate[target]["crops"]["primary_crop"]
                     cdist = _crop_distance(cc, ct)
                     sev = p.epi_base_severity + rng.next_float() * 0.15
-                    mort = sev * cdist
+                    # Endemicity factor: prior contact exposure reduces severity.
+                    # Each tick of relay-trade contact (via contact_set) builds partial
+                    # immunity before formal political absorption.
+                    prior_contact_ticks = sum(
+                        1 for fc in first_contact_tick if fc is not None and fc < tick
+                    )
+                    immunity = _clamp(prior_contact_ticks * 0.02, 0.0, 0.6)
+                    mort = sev * cdist * (1.0 - immunity)
                     pop[target] *= (1.0 - mort)
                     epi_log.append({"arch": target, "contactor": core,
-                                    "mortality_rate": mort, "tick": tick, "year": year})
+                                    "mortality_rate": mort, "tick": tick, "year": year,
+                                    "immunity_factor": immunity})
 
                 # Transfer all archs controlled by target to core
                 for j in range(N):
@@ -1294,7 +1533,29 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
 
             extraction = p.sov_extraction_decay / max(0.1, dist)
             extraction *= _clamp(energy_ratio.get(core, 1.0), 0.0, 1.5)
-            recovery = p.sov_extraction_decay * sovereignty[i] * (pop[i] / max(1.0, pop[core])) * 0.5
+
+            # ── Piety absorption bonus (centripetal force — Grzymala-Busse 2023) ──
+            # High-piety empires integrate conquered populations faster through
+            # religious legitimation, missionary administration, and cultural absorption.
+            core_piety = piety[core]
+            if core_piety > 0.5:
+                extraction *= (1.0 + (core_piety - 0.5) * p.piety_absorption_bonus)
+
+            # ── Scott's resistance mechanic (Scott 1985, 1990) ────────────────
+            # "Weapons of the Weak": colonial extraction above tolerable threshold
+            # generates grievance that accelerates sovereignty recovery.
+            # Colonialism is self-limiting: extraction creates the consciousness
+            # that makes resistance possible (mediated through participation axis).
+            tolerable = p.sov_extraction_decay * 0.5
+            excess_extraction = max(0.0, extraction - tolerable)
+            grievance[i] = _clamp(
+                grievance[i] * 0.95 + excess_extraction * p.grievance_buildup_rate,
+                0.0, 1.0
+            )
+            resistance_mult = 1.0 + grievance[i] * p.grievance_resistance_mult
+
+            recovery = (p.sov_extraction_decay * sovereignty[i]
+                        * (pop[i] / max(1.0, pop[core])) * 0.5 * resistance_mult)
 
             sovereignty[i] += (recovery - extraction) * 0.1
             sovereignty[i] = _clamp(sovereignty[i], 0.05, 0.95)
@@ -1491,6 +1752,16 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
         "desperation_log":      desperation_log,
         "n_tech_decay_events":  len(tech_decay_log),
         "n_desperation_events": len(desperation_log),
+        # Religion / piety (Norris-Inglehart; Grzymala-Busse)
+        "piety":                list(piety),
+        "schism_log":           schism_log,
+        "n_schisms":            len(schism_log),
+        "schism_pressure":      list(schism_pressure),
+        # Disease (McNeill; Gallup & Sachs)
+        "wave_epi_log":         wave_epi_log,
+        "malaria_factors":      list(malaria_factor),
+        # Trade / resistance diagnostics
+        "grievance":            list(grievance),
     }
 
 

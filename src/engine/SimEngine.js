@@ -53,6 +53,15 @@ export const DEFAULT_PARAMS = {
   // ── Religion / culture as political variable ──────────────
   piety_drift_rate: 0.008,      // base rate of piety change per tick
   piety_absorption_bonus: 0.35, // extra sovereignty extraction from high piety (centripetal force)
+  // ── Academic grounding additions ─────────────────────────
+  // Resource curse (Sachs-Warner / Ross 2012)
+  resource_curse_strength: 0.30,   // TFP penalty for naphtha-heavy polities in industrial era
+  // Prebisch-Singer (1950) + Greif relay asymmetry (1989)
+  prebisch_bulk_discount: 0.75,    // calorie exporters' terms-of-trade discount
+  greif_relay_bonus: 0.08,         // per-contact relay bottleneck capture (Maghribi)
+  // Scott's resistance dynamics (Scott 1985, 1990)
+  grievance_buildup_rate: 0.25,    // excess extraction → grievance accumulation
+  grievance_resistance_mult: 2.0,  // grievance amplifies sovereignty recovery
 };
 
 // ── Crop culture seeds ──────────────────────────────────────
@@ -264,6 +273,9 @@ export class SimEngine {
     }
     // Schism pressure per core — builds under high piety + low sovereignty in periphery
     this.schismPressure = new Float64Array(this.N);
+    // Grievance per arch: accumulated from colonial extraction above tolerable threshold.
+    // Scott's resistance mechanic — self-limiting empire (Scott 1985, 1990).
+    this.grievance = new Float64Array(this.N);
 
     // ── Logs ───────────────────────────────────────────────
     this.epiLog = [];
@@ -550,16 +562,32 @@ export class SimEngine {
         const massA = Math.sqrt(Math.max(1, corePop[tc])) * this.substrate[tc].crops.primary_yield;
         const massB = Math.sqrt(Math.max(1, corePop[other])) * this.substrate[other].crops.primary_yield;
         const volume = layerMult * comp * Math.sqrt(massA * massB) / (distRad ** 2);
-        let netBenefit = volume * (1 - effMarkup) * 0.003;
+        const baseBenefit = volume * (1 - effMarkup) * 0.003;
+
+        // ── Prebisch-Singer (1950): bulk calorie exporters face structurally declining
+        // terms of trade relative to luxury/specialty/relay nodes. Calorie staples
+        // (paddi, taro, sago, papa) command lower per-unit value than emmer/nori
+        // specialty goods (fellwork, byssus, char, qahwa).
+        const BULK_CROPS = new Set(['paddi', 'taro', 'sago', 'papa']);
+        const psA = BULK_CROPS.has(cropA) ? (p.prebisch_bulk_discount ?? 0.75) : 1.0;
+        const psB = BULK_CROPS.has(cropB) ? (p.prebisch_bulk_discount ?? 0.75) : 1.0;
+
+        // ── Greif (1989): high-connectivity relay nodes capture price differential.
+        // Maghribi trader coalition model: information asymmetry at bottleneck nodes.
+        const relayBonusA = Math.min(0.40, this.contactSet[tc].size * (p.greif_relay_bonus ?? 0.08));
+        const relayBonusB = Math.min(0.40, this.contactSet[other].size * (p.greif_relay_bonus ?? 0.08));
+
+        let benefitA = baseBenefit * psA * (1.0 + relayBonusA);
+        let benefitB = baseBenefit * psB * (1.0 + relayBonusB);
 
         // Player partner bonus: +30% trade with partner cores
         if (partnerSet && (tc === this.playerCore || other === this.playerCore)) {
           const otherSide = tc === this.playerCore ? other : tc;
-          if (partnerSet.has(otherSide)) netBenefit *= 1.3;
+          if (partnerSet.has(otherSide)) { benefitA *= 1.3; benefitB *= 1.3; }
         }
 
-        tradeNet[tc] += netBenefit;
-        tradeNet[other] += netBenefit;
+        tradeNet[tc] += benefitA;
+        tradeNet[other] += benefitB;
       }
     }
 
@@ -914,7 +942,23 @@ export class SimEngine {
 
     // ── STAGE 5: Tech growth + decay + population ───────────
     for (const core of cores) {
-      const a0 = this._A0FromPos(this.cpos[core]);
+      let a0 = this._A0FromPos(this.cpos[core]);
+
+      // ── Sachs-Warner resource curse (Ross 2012; Vitalis 2018) ─────────────
+      // Naphtha-rich polities in the industrial era develop extractive
+      // institutions (elite resource rents) that penalize broad-based TFP
+      // growth. Fires when polity holds > ~13% of world initial C stock.
+      if (this.tech[core] > 6.0 && this.tech[core] < 9.5) {
+        const totalCInit = this.cInitial.reduce((s, v) => s + v, 0);
+        let polityC = 0;
+        for (let j = 0; j < N; j++) {
+          if (this.controller[j] === core) polityC += this.cInitial[j];
+        }
+        const polityFrac = polityC / Math.max(0.001, totalCInit);
+        const curse = Math.min(0.5, Math.max(0, polityFrac * 3.0 - 0.4));
+        a0 *= (1.0 - curse * (p.resource_curse_strength ?? 0.30));
+      }
+
       const nc = this.contactSet[core].size;
       const er = this.tech[core] >= 9.0 && !this._hasPu(core)
         ? energyRatio[core] * p.pu_dependent_factor
@@ -1134,14 +1178,27 @@ export class SimEngine {
         // (mutual assured destruction locks in stasis between any two nuclear peers).
         // Uses tech >= 9.0 as the nuclear threshold — same condition as awareness accumulation.
         let deterrencePenalty = 0;
+        let proxyBonus = 0;
         if (this.dfYear !== null) {
           const targetCtrl = this.controller[target];
           if (this.tech[core] >= 9.0 && this.tech[targetCtrl] >= 9.0 && core !== targetCtrl) {
             deterrencePenalty = 12.0;  // very strong penalty — nuclear peers frozen against each other
+          } else if (this.tech[core] >= 9.0 && this.tech[targetCtrl] < 9.0) {
+            // ── Stability-instability paradox (Snyder 1965; Waltz 1981) ─────
+            // Nuclear deterrence freezes direct inter-hegemon war but paradoxically
+            // ENABLES proxy warfare: hegemons compete aggressively for sub-nuclear
+            // periphery. Bonus for targeting territory in the rival hegemon's orbit.
+            for (const otherH of cores) {
+              if (otherH !== core && this.tech[otherH] >= 9.0
+                  && this.contactSet[otherH].has(targetCtrl)) {
+                proxyBonus = 3.0;
+                break;
+              }
+            }
           }
         }
 
-        candidates.push([tsScore + p.resource_targeting_weight * rv + despBonus + diploBonus + pietyBonus - deterrencePenalty - dist * 1.5, target, dist, rv]);
+        candidates.push([tsScore + p.resource_targeting_weight * rv + despBonus + diploBonus + pietyBonus + proxyBonus - deterrencePenalty - dist * 1.5, target, dist, rv]);
       }
       candidates.sort((a, b) => b[0] - a[0]);
 
@@ -1160,16 +1217,24 @@ export class SimEngine {
         if (cost > budget) continue;
         if (this.pop[target] > corePop[core] * 0.5 && this.tech[core] - this.tech[target] < 2.0) continue;
 
-        // Epidemic shock
+        // ── Epidemic shock at first contact ──────────────────────────────
+        // Diamond (1997): severity scaled by crop distance (pathogen divergence proxy).
+        // Endemicity transition (McNeill 1976): prior relay-trade contacts provide
+        // partial immunological exposure, reducing virgin-soil epidemic severity.
+        // "Before the conquest there was contact; before contact, the first wave." — McNeill
         if (this.firstContactTick[target] === null) {
           this.firstContactTick[target] = tick;
           const cc = this.substrate[core].crops.primary_crop;
           const ct = this.substrate[target].crops.primary_crop;
           const cdist = _cropDistance(cc, ct);
           const sev = p.epi_base_severity + this.rng() * 0.15;
-          const mort = sev * cdist;
+          // Count prior first-contact events as proxy for global pathogen exposure pool
+          const priorContacts = this.firstContactTick.filter(t => t !== null && t < tick).length;
+          const immunity = Math.min(0.6, priorContacts * 0.02);
+          const mort = sev * cdist * (1.0 - immunity);
           this.pop[target] *= (1 - mort);
-          this.epiLog.push({ arch: target, contactor: core, mortality_rate: mort, tick, year });
+          this.epiLog.push({ arch: target, contactor: core, mortality_rate: mort,
+                             immunity_factor: immunity, tick, year });
         }
 
         // Transfer
@@ -1208,13 +1273,27 @@ export class SimEngine {
       }
 
       // Piety bonus: high-piety empires integrate conquered populations faster
-      // (religious conversion as centripetal force — Abbasid model)
+      // (religious conversion as centripetal force — Abbasid model; Grzymala-Busse 2023)
       const corePiety = this.piety[core];
       if (corePiety > 0.5) {
         extraction *= (1.0 + (corePiety - 0.5) * p.piety_absorption_bonus);
       }
 
-      const recovery = p.sov_extraction_decay * this.sovereignty[i] * (this.pop[i] / Math.max(1, this.pop[core])) * 0.5;
+      // ── Scott's resistance mechanic (Scott 1985 "Weapons of the Weak"; 1990) ──
+      // Colonial extraction above tolerable threshold generates grievance that
+      // accelerates sovereignty recovery — making extraction self-limiting.
+      // "It is not exploitation per se, but exploitation beyond what is deemed legitimate"
+      // that triggers organized resistance (participation axis drift).
+      const tolerable = p.sov_extraction_decay * 0.5;
+      const excess = Math.max(0, extraction - tolerable);
+      this.grievance[i] = _clamp(
+        this.grievance[i] * 0.95 + excess * (p.grievance_buildup_rate ?? 0.25),
+        0, 1.0
+      );
+      const resistanceMult = 1.0 + this.grievance[i] * (p.grievance_resistance_mult ?? 2.0);
+
+      const recovery = p.sov_extraction_decay * this.sovereignty[i]
+        * (this.pop[i] / Math.max(1, this.pop[core])) * 0.5 * resistanceMult;
       this.sovereignty[i] += (recovery - extraction) * 0.1;
       this.sovereignty[i] = _clamp(this.sovereignty[i], 0.05, 0.95);
       if (this.tech[core] >= 9.0 && year >= -200) this.sovereignty[i] = Math.min(0.80, this.sovereignty[i] + 0.015);
@@ -1322,6 +1401,8 @@ export class SimEngine {
       schismPressure: Array.from(this.schismPressure, v => Math.round(v * 100) / 100),
       // Schism events this tick (for event popups / dispatch)
       schismEvents: this.schismLog.filter(e => e.tick === this.tick - 1),
+      // Grievance per arch (Scott resistance mechanic — for situation cards)
+      grievance: Array.from(this.grievance, v => Math.round(v * 1000) / 1000),
       // Scramble onset ticks (for one-time dispatch events in GameApp)
       scramble_onset_tick: this.scrambleOnset,
       pu_scramble_onset_tick: this.puScrambleOnset,
