@@ -1,85 +1,87 @@
 Aeolia History Engine v2 — Optimization Results
 ============================================================
-Backend        : Optuna TPE (multivariate, n_startup=20)
-Trials         : 10000
+Backend        : Optuna TPE (multivariate, n_startup=5)
+Trials         : 20
 Seeds          : [216089, 51, 73, 74, 11, 66, 17, 42, 97]
-Parameters     : 21 (21 v2 energy-coupled)
+Parameters     : 26 (v2 continuous culture-space)
 Variance λ     : 0.3
-Total time     : 26721.2s  (2.7s/trial)
+Total time     : 400.4s  (20.0s/trial)
 
 Baseline (default params):
-  total=24.8118  mean=22.3682  std=8.1455
-  latitude_separation=0.4512  civ_gap=0.3540  density_asymmetry=0.6682  two_hegemons=3.7333  naphtha_peak=0.2990  energy_transition=1.1495  pu_acquisition=3.5000  nuclear_fleets=2.4061  fleet_asymmetry=0.3125  sovereignty_gradient=0.0000  dark_forest_timing=7.5556  el_dorados=1.9389
+  total=25.9218  mean=23.3023  std=8.7317
+  latitude_separation=2.1840  civ_gap=0.7520  density_asymmetry=0.8663  two_hegemons=3.4222  naphtha_peak=0.0000  energy_transition=0.0000  pu_acquisition=2.3333  nuclear_fleets=2.2222  fleet_asymmetry=0.0000  sovereignty_gradient=0.0000  dark_forest_timing=8.2222  el_dorados=3.3000
 
-Best (trial #8224):
-  total=15.6725  mean=14.5370  std=3.7850
-  latitude_separation=0.1009  civ_gap=0.0395  density_asymmetry=0.3042  two_hegemons=1.3556  naphtha_peak=0.0000  energy_transition=0.0002  pu_acquisition=3.6667  nuclear_fleets=0.3338  fleet_asymmetry=0.0000  sovereignty_gradient=0.0000  dark_forest_timing=7.6806  el_dorados=1.0556
-  Improvement vs baseline: 9.1393
+Best (trial #15):
+  total=18.2448  mean=17.3817  std=2.8769
+  latitude_separation=0.8701  civ_gap=0.0547  density_asymmetry=0.0013  two_hegemons=3.3333  naphtha_peak=0.0000  energy_transition=0.0000  pu_acquisition=3.2500  nuclear_fleets=0.0000  fleet_asymmetry=0.0000  sovereignty_gradient=0.0000  dark_forest_timing=8.8889  el_dorados=0.9833
+  Improvement vs baseline: 7.6770
 
 Per-seed losses (best params):
-  seed=216089: total=13.6855  latitude_separation=0.0248  civ_gap=0.0857  density_asymmetry=0.0000  two_hegemons=2.0000  naphtha_peak=0.0000  energy_transition=0.0000  pu_acquisition=2.2500  nuclear_fleets=0.0000  fleet_asymmetry=0.0000  sovereignty_gradient=0.0000  dark_forest_timing=6.1250  el_dorados=3.2000
-  seed=51: total=17.2172  latitude_separation=0.0630  civ_gap=0.0000  density_asymmetry=0.3042  two_hegemons=4.6000  naphtha_peak=0.0000  energy_transition=0.0000  pu_acquisition=2.2500  nuclear_fleets=0.0000  fleet_asymmetry=0.0000  sovereignty_gradient=0.0000  dark_forest_timing=10.0000  el_dorados=0.0000
-  seed=73: total=5.9496  latitude_separation=0.0648  civ_gap=0.0000  density_asymmetry=0.0349  two_hegemons=0.6000  naphtha_peak=0.0000  energy_transition=0.0000  pu_acquisition=2.2500  nuclear_fleets=0.0000  fleet_asymmetry=0.0000  sovereignty_gradient=0.0000  dark_forest_timing=3.0000  el_dorados=0.0000
-  seed=74: total=12.1617  latitude_separation=0.5833  civ_gap=0.1299  density_asymmetry=0.3985  two_hegemons=0.6000  naphtha_peak=0.0000  energy_transition=0.0000  pu_acquisition=0.0000  nuclear_fleets=0.0000  fleet_asymmetry=0.0000  sovereignty_gradient=0.0000  dark_forest_timing=8.0000  el_dorados=2.4500
-  seed=11: total=12.9159  latitude_separation=0.0000  civ_gap=0.0659  density_asymmetry=2.0000  two_hegemons=0.6000  naphtha_peak=0.0000  energy_transition=0.0000  pu_acquisition=2.2500  nuclear_fleets=0.0000  fleet_asymmetry=0.0000  sovereignty_gradient=0.0000  dark_forest_timing=8.0000  el_dorados=0.0000
-  seed=66: total=17.6457  latitude_separation=0.0000  civ_gap=0.0394  density_asymmetry=0.0000  two_hegemons=0.6000  naphtha_peak=0.0000  energy_transition=0.0022  pu_acquisition=6.0000  nuclear_fleets=3.0040  fleet_asymmetry=0.0000  sovereignty_gradient=0.0000  dark_forest_timing=8.0000  el_dorados=0.0000
-  seed=17: total=14.8026  latitude_separation=0.0026  civ_gap=0.0000  density_asymmetry=0.0000  two_hegemons=0.6000  naphtha_peak=0.0000  energy_transition=0.0000  pu_acquisition=6.0000  nuclear_fleets=0.0000  fleet_asymmetry=0.0000  sovereignty_gradient=0.0000  dark_forest_timing=8.0000  el_dorados=0.2000
-  seed=42: total=19.2380  latitude_separation=0.0143  civ_gap=0.0237  density_asymmetry=0.0000  two_hegemons=2.0000  naphtha_peak=0.0000  energy_transition=0.0000  pu_acquisition=6.0000  nuclear_fleets=0.0000  fleet_asymmetry=0.0000  sovereignty_gradient=0.0000  dark_forest_timing=8.0000  el_dorados=3.2000
-  seed=97: total=17.2170  latitude_separation=0.1559  civ_gap=0.0111  density_asymmetry=0.0000  two_hegemons=0.6000  naphtha_peak=0.0000  energy_transition=0.0000  pu_acquisition=6.0000  nuclear_fleets=0.0000  fleet_asymmetry=0.0000  sovereignty_gradient=0.0000  dark_forest_timing=10.0000  el_dorados=0.4500
+  seed=216089: total=19.2500  latitude_separation=5.0000  civ_gap=0.0000  density_asymmetry=0.0000  two_hegemons=2.0000  naphtha_peak=0.0000  energy_transition=0.0000  pu_acquisition=2.2500  nuclear_fleets=0.0000  fleet_asymmetry=0.0000  sovereignty_gradient=0.0000  dark_forest_timing=10.0000  el_dorados=0.0000
+  seed=51: total=16.3527  latitude_separation=0.0000  civ_gap=0.1527  density_asymmetry=0.0000  two_hegemons=2.0000  naphtha_peak=0.0000  energy_transition=0.0000  pu_acquisition=6.0000  nuclear_fleets=0.0000  fleet_asymmetry=0.0000  sovereignty_gradient=0.0000  dark_forest_timing=8.0000  el_dorados=0.2000
+  seed=73: total=16.3037  latitude_separation=0.0537  civ_gap=0.0000  density_asymmetry=0.0000  two_hegemons=6.0000  naphtha_peak=0.0000  energy_transition=0.0000  pu_acquisition=2.2500  nuclear_fleets=0.0000  fleet_asymmetry=0.0000  sovereignty_gradient=0.0000  dark_forest_timing=8.0000  el_dorados=0.0000
+  seed=74: total=13.3542  latitude_separation=0.0456  civ_gap=0.1085  density_asymmetry=0.0000  two_hegemons=2.0000  naphtha_peak=0.0000  energy_transition=0.0000  pu_acquisition=0.0000  nuclear_fleets=0.0000  fleet_asymmetry=0.0000  sovereignty_gradient=0.0000  dark_forest_timing=8.0000  el_dorados=3.2000
+  seed=11: total=16.4500  latitude_separation=0.0000  civ_gap=0.0000  density_asymmetry=0.0000  two_hegemons=6.0000  naphtha_peak=0.0000  energy_transition=0.0000  pu_acquisition=2.2500  nuclear_fleets=0.0000  fleet_asymmetry=0.0000  sovereignty_gradient=0.0000  dark_forest_timing=8.0000  el_dorados=0.2000
+  seed=66: total=14.6942  latitude_separation=0.0713  civ_gap=0.1729  density_asymmetry=0.0000  two_hegemons=2.0000  naphtha_peak=0.0000  energy_transition=0.0000  pu_acquisition=2.2500  nuclear_fleets=0.0000  fleet_asymmetry=0.0000  sovereignty_gradient=0.0000  dark_forest_timing=10.0000  el_dorados=0.2000
+  seed=17: total=16.0932  latitude_separation=0.0112  civ_gap=0.0320  density_asymmetry=0.0000  two_hegemons=2.0000  naphtha_peak=0.0000  energy_transition=0.0000  pu_acquisition=2.2500  nuclear_fleets=0.0000  fleet_asymmetry=0.0000  sovereignty_gradient=0.0000  dark_forest_timing=10.0000  el_dorados=1.8000
+  seed=42: total=21.3681  latitude_separation=2.5298  civ_gap=0.0265  density_asymmetry=0.0118  two_hegemons=2.0000  naphtha_peak=0.0000  energy_transition=0.0000  pu_acquisition=6.0000  nuclear_fleets=0.0000  fleet_asymmetry=0.0000  sovereignty_gradient=0.0000  dark_forest_timing=10.0000  el_dorados=0.8000
+  seed=97: total=22.5695  latitude_separation=0.1195  civ_gap=0.0000  density_asymmetry=0.0000  two_hegemons=6.0000  naphtha_peak=0.0000  energy_transition=0.0000  pu_acquisition=6.0000  nuclear_fleets=0.0000  fleet_asymmetry=0.0000  sovereignty_gradient=0.0000  dark_forest_timing=8.0000  el_dorados=2.4500
 
 Convergence (best-so-far):
-  trial     1: best_so_far=38.9138
-  trial     5: best_so_far=26.2849
-  trial    10: best_so_far=25.8041
-  trial    20: best_so_far=20.2074
-  trial    50: best_so_far=17.6486
-  trial   100: best_so_far=17.6486
-  trial   500: best_so_far=16.3990
-  trial  1000: best_so_far=16.3990
-  trial  2500: best_so_far=15.8696
-  trial  5000: best_so_far=15.8696
-  trial 10000: best_so_far=15.6725
+  trial     1: best_so_far=44.2132
+  trial     5: best_so_far=25.2953
+  trial    10: best_so_far=18.2996
+  trial    20: best_so_far=18.2448
 
 Best parameter values (vs defaults):
-  civic_expansion_share                best=  0.359329  default=  0.400000  delta=-0.040671 (-10% of range)
-  civic_tech_share                     best=  0.485572  default=  0.400000  delta=+0.085572 (+21% of range) <<<
-  civic_consolidation_share            best=  0.155099  default=  0.200000  delta=-0.044901 (-15% of range)
-  subject_expansion_share              best=  0.251550  default=  0.200000  delta=+0.051550 (+17% of range)
-  subject_tech_share                   best=  0.493784  default=  0.300000  delta=+0.193784 (+48% of range) <<<
-  subject_consolidation_share          best=  0.300000  default=  0.500000  delta=-0.200000 (-50% of range) <<<
-  parochial_expansion_share            best=  0.218413  default=  0.250000  delta=-0.031587 (-11% of range)
-  parochial_tech_share                 best=  0.338762  default=  0.250000  delta=+0.088762 (+30% of range) <<<
-  A0_civic                             best=  0.987013  default=  1.200000  delta=-0.212987 (-30% of range) <<<
-  A0_subject                           best=  1.140503  default=  0.800000  delta=+0.340503 (+49% of range) <<<
-  A0_parochial                         best=  0.622180  default=  0.500000  delta=+0.122180 (+20% of range) <<<
-  cu_unlock_tech                       best=  3.101972  default=  3.000000  delta=+0.101972 (+5% of range)
-  au_contact_bonus                     best=316.044805  default=500.000000  delta=-183.955195 (-10% of range)
-  naphtha_richness                     best=  2.985078  default=  2.000000  delta=+0.985078 (+22% of range) <<<
-  naphtha_depletion                    best=  0.043531  default=  0.008000  delta=+0.035531 (+73% of range) <<<
-  energy_to_tfp                        best=  1.053152  default=  1.000000  delta=+0.053152 (+4% of range)
-  pu_dependent_factor                  best=  0.450298  default=  0.650000  delta=-0.199702 (-40% of range) <<<
-  resource_targeting_weight            best=  2.141436  default=  2.000000  delta=+0.141436 (+3% of range)
-  epi_base_severity                    best=  0.419073  default=  0.300000  delta=+0.119073 (+34% of range) <<<
-  sov_extraction_decay                 best=  0.079552  default=  0.040000  delta=+0.039552 (+44% of range) <<<
-  df_detection_range                   best=  0.379225  default=  0.600000  delta=-0.220775 (-32% of range) <<<
+  base_expansion                       best=  0.015191  default=  0.050000  delta=-0.034809 (-17% of range)
+  outward_expansion_coeff              best=  0.219750  default=  0.350000  delta=-0.130250 (-26% of range) <<<
+  individual_expansion_coeff           best=  0.177583  default=  0.100000  delta=+0.077583 (+31% of range) <<<
+  base_tech                            best=  0.143886  default=  0.050000  delta=+0.093886 (+63% of range) <<<
+  outward_tech_coeff                   best=  0.591537  default=  0.420000  delta=+0.171537 (+34% of range) <<<
+  base_A0                              best=  0.435540  default=  0.300000  delta=+0.135540 (+27% of range) <<<
+  individual_A0_coeff                  best=  1.295707  default=  0.800000  delta=+0.495707 (+45% of range) <<<
+  outward_A0_coeff                     best=  0.319346  default=  0.400000  delta=-0.080654 (-12% of range)
+  culture_drift_rate                   best=  0.028599  default=  0.010000  delta=+0.018599 (+69% of range) <<<
+  culture_noise_scale                  best=  0.160324  default=  0.150000  delta=+0.010324 (+3% of range)
+  cu_unlock_tech                       best=  2.013427  default=  3.000000  delta=-0.986573 (-49% of range) <<<
+  au_contact_bonus                     best=1393.769989  default=500.000000  delta=+893.769989 (+47% of range) <<<
+  naphtha_richness                     best=  1.624293  default=  2.000000  delta=-0.375707 (-8% of range)
+  naphtha_depletion                    best=  0.016423  default=  0.008000  delta=+0.008423 (+17% of range)
+  energy_to_tfp                        best=  1.970700  default=  1.000000  delta=+0.970700 (+65% of range) <<<
+  pu_dependent_factor                  best=  0.692812  default=  0.650000  delta=+0.042812 (+9% of range)
+  resource_targeting_weight            best=  0.324196  default=  2.000000  delta=-1.675804 (-34% of range) <<<
+  epi_base_severity                    best=  0.307673  default=  0.300000  delta=+0.007673 (+2% of range)
+  sov_extraction_decay                 best=  0.086522  default=  0.040000  delta=+0.046522 (+52% of range) <<<
+  df_detection_range                   best=  0.717583  default=  0.600000  delta=+0.117583 (+17% of range)
+  df_min_territory_frac                best=  0.164260  default=  0.080000  delta=+0.084260 (+50% of range) <<<
+  luxury_markup_rate                   best=  0.494046  default=  0.400000  delta=+0.094046 (+31% of range) <<<
+  bulk_markup_rate                     best=  0.087281  default=  0.100000  delta=-0.012719 (-8% of range)
+  maintenance_rate                     best=  0.039599  default=  0.010000  delta=+0.029599 (+66% of range) <<<
+  decay_rate                           best=  0.094966  default=  0.100000  delta=-0.005034 (-2% of range)
+  desperation_weight                   best=  0.779333  default=  0.500000  delta=+0.279333 (+35% of range) <<<
 
 GDScript constants (changed params, |Δ| > 5% of range):
-  var civic_expansion_share := 0.359329
-  var civic_tech_share := 0.485572
-  var civic_consolidation_share := 0.155099
-  var subject_expansion_share := 0.251550
-  var subject_tech_share := 0.493784
-  var subject_consolidation_share := 0.300000
-  var parochial_expansion_share := 0.218413
-  var parochial_tech_share := 0.338762
-  var A0_civic := 0.987013
-  var A0_subject := 1.140503
-  var A0_parochial := 0.622180
-  var cu_unlock_tech := 3.101972
-  var au_contact_bonus := 316.044805
-  var naphtha_richness := 2.985078
-  var naphtha_depletion := 0.043531
-  var pu_dependent_factor := 0.450298
-  var epi_base_severity := 0.419073
-  var sov_extraction_decay := 0.079552
-  var df_detection_range := 0.379225
+  var base_expansion := 0.015191
+  var outward_expansion_coeff := 0.219750
+  var individual_expansion_coeff := 0.177583
+  var base_tech := 0.143886
+  var outward_tech_coeff := 0.591537
+  var base_A0 := 0.435540
+  var individual_A0_coeff := 1.295707
+  var outward_A0_coeff := 0.319346
+  var culture_drift_rate := 0.028599
+  var cu_unlock_tech := 2.013427
+  var au_contact_bonus := 1393.769989
+  var naphtha_richness := 1.624293
+  var naphtha_depletion := 0.016423
+  var energy_to_tfp := 1.970700
+  var pu_dependent_factor := 0.692812
+  var resource_targeting_weight := 0.324196
+  var sov_extraction_decay := 0.086522
+  var df_detection_range := 0.717583
+  var df_min_territory_frac := 0.164260
+  var luxury_markup_rate := 0.494046
+  var bulk_markup_rate := 0.087281
+  var maintenance_rate := 0.039599
+  var desperation_weight := 0.779333

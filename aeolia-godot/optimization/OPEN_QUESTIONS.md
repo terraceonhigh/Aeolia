@@ -92,6 +92,8 @@ The existing `accel_rate` table (0 / 0.002 / 0.008 / 0.025 / 0.120) already enco
 
 **Stakes:** Low for implementation — this is already handled correctly by the faction-agnostic design. The risk is presentational: if bipolarity is presented as an emergent result of the model rather than an optimization target, the academic credibility of the project suffers.
 
+**RESOLVED 2026-04-09:** Prescription is explicit and intentional. Baseline Earth loss function bipolarity target is documented in loss_v2.py comments and in README. "Even underspecified models get read as prescriptive" (Lanthier) — the game framing handles this: the player is told they are optimizing for a specific Baseline Earth scenario, not discovering a universal law. The multipolar loss function is available as an explicit alternative. No code change needed; documentation is sufficient. Added clarifying comment to loss_v2.py.
+
 ---
 
 ## Q7. Dark Forest as Terminal Event
@@ -104,6 +106,18 @@ The existing `accel_rate` table (0 / 0.002 / 0.008 / 0.025 / 0.120) already enco
 
 **Stakes:** Extending past DF adds significant mechanical complexity (deterrence logic, proxy mechanics, nuclear war probability) but opens up the most policy-relevant research questions. Keeping DF as terminal is simpler and sufficient for the Vanilla Aeolia narrative (which begins at DF break). This may be best addressed as a future phase.
 
+**RESOLVED 2026-04-09 (minimal implementation in SimEngine.js and sim_proxy_v2.py):**
+
+Two post-DF mechanics implemented, sufficient for demo and Observatory visualization:
+
+1. **Deterrence freeze (Stage 6):** After DF fires, any polity with tech ≥ 9.0 receives a strong negative targeting penalty (-12.0) when targeting territory controlled by another nuclear-capable polity (also tech ≥ 9.0). This applies to ALL nuclear pairs, not just the specific DF trigger pair — once the first nuclear detection occurs, the mutual-annihilation constraint is universally understood. Non-nuclear polities and non-nuclear territory continue to be contested normally. The territorial stasis between nuclear powers is visible in Observatory charts as parallel flatlines in the late period.
+
+2. **Arms race bonus (Stage 5):** After DF fires, all polities with tech > 8.5 receive an extra tech growth bonus (up to 40% of delta, capped at 0.05). Models diversion of budget toward nuclear delivery systems, deterrence infrastructure, and second-strike capability. Visible in Observatory tech chart as continued divergence between nuclear and non-nuclear polities after territorial stasis.
+
+3. **Nuclear peer awareness (Stage 3):** The DF detection mechanism itself was overhauled (2026-04-09). Once two polities both reach tech ≥ 9.0, mutual awareness accumulates globally (0.04/tick per side) independent of geographic distance — representing weapons-test seismology, satellite surveillance, and signals intelligence. DF fires when awareness exceeds 0.30. This produces naturally timed detection (~7–8 ticks = 350–400 years after both go nuclear) and removes the unphysical requirement for geographic proximity.
+
+Full post-DF proxy mechanics (client state competition, nuclear exchange probability, eventual normalization) are deferred to a future phase. This implementation gives the Observatory a visually coherent "Cold War phase" distinct from the expansion phase.
+
 ---
 
 ## Resolution Tracking
@@ -115,5 +129,5 @@ The existing `accel_rate` table (0 / 0.002 / 0.008 / 0.025 / 0.120) already enco
 | Q3. Monotonic Tech | Resolved | Tech maintenance cost + desperation mechanic. Layered energy balance (food → industrial → nuclear). Resource pressure overrides culture-based allocation. Collapse cascades and recovery mechanics. | 2026-04-06 |
 | Q4. Resource Unlock | Resolved | Three-threshold model: Detection (geology-dependent, any tech) → Exploitation (fixed tech: naphtha ~5, pyra ~8) → Strategic Valuation (event-triggered). Sacralization preservation: early cultural associations persist after industrial exploitation. | 2026-04-07 |
 | Q5. Production Function | Resolved | Keep Y = A × K^0.3 × E^0.7 unchanged. No population exponent — double-counts and breaks DF/scramble timing (sweep: pop^0.5 fires naphtha scramble in Mesolithic). `accel_rate` table encodes growth regimes implicitly. Malthusian clamp added to food energy layer (not production function) for tech < 4. | 2026-04-07 |
-| Q6. Two-Hegemon | Open | | |
-| Q7. Post-DF Dynamics | Open | | |
+| Q6. Two-Hegemon | Resolved | Prescribed bipolarity is explicit in loss_v2.py and README; game framing + multipolar alternative handle the presentational risk. | 2026-04-09 |
+| Q7. Post-DF Dynamics | Resolved (minimal) | Nuclear peer awareness (global, distance-independent, 0.04/tick) triggers DF at ~7–8 ticks after both go nuclear. Deterrence freeze (-12 targeting penalty between ALL nuclear pairs). Arms race bonus (40% of delta, capped) for all nuclear polities. Full proxy mechanics deferred. | 2026-04-09 |

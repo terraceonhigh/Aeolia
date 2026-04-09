@@ -16,7 +16,7 @@ Aeolia/
 │   ├── engine/
 │   │   ├── SimEngine.js         # JS port of sim_proxy_v2.py with player interaction hooks
 │   │   ├── narrativeText.js     # Deterministic prose library (no RNG; hash-based selection)
-│   │   ├── cardGenerator.js     # Situation card generator (11 card types, actionable responses)
+│   │   ├── cardGenerator.js     # Situation card generator (16 card types, actionable responses)
 │   │   ├── world.js             # World generation (archipelagos, edges, substrate)
 │   │   ├── constants.js         # Polity names, parameters
 │   │   └── rng.js               # Mulberry32 PRNG
@@ -28,16 +28,16 @@ Aeolia/
 ├── aeolia-godot/
 │   └── optimization/
 │       ├── sim_proxy_v2.py      # The simulation engine (Python reference)
-│       ├── loss_v2.py           # Baseline Earth loss function (12 terms)
-│       ├── optimizer_v2.py      # CMA-ES parameter optimizer
+│       ├── loss.py              # Baseline Earth loss function (12 terms)
+│       ├── run_optimization.py  # Optuna-based parameter optimizer
 │       ├── worlds/              # RNG-seeded world JSON files (candidate_*.json)
-│       ├── OPEN_QUESTIONS.md    # Design decisions — Q1-Q5 resolved, Q6-Q7 open
+│       ├── OPEN_QUESTIONS.md    # Design decisions — Q1-Q7 all resolved (2026-04-09)
 │       ├── SCRAMBLE_AND_DF_PROPOSAL.md  # 15-section design document
 │       ├── FISHERIES_REFERENCE.md       # Six named marine species
 │       ├── NON_STAPLE_CROPS_REFERENCE.md # Trade commodities with etymologies
 │       ├── exponent_sweep.py            # Production function sweep experiment
 │       ├── exponent_sweep_results.md    # Sweep analysis
-│       └── worldbuilding/               # In-universe textbook chapters
+│       └── worldbuilding/               # In-universe textbook chapters (Ch. 5, 7, 8)
 ├── TODO.md                      # Full project status and task queue
 ├── README.md                    # Project overview (game framing)
 └── CLAUDE.md                    # You are here
@@ -48,17 +48,25 @@ Aeolia/
 **SimParams:** 26 tunable parameters in a dataclass. All optimizer work targets this space.
 
 **Tick pipeline (50-year resolution):**
-1. **Stage 1 — Energy budget:** Crop yield × land + fish yield × coast = total calories. Malthusian clamp for tech < 4. Trade energy from three layers (Subsistence/Relay/Administered).
-2. **Stage 2 — Culture & allocation:** 2D continuous culture space (Collective↔Individual × Inward↔Outward). Drift based on prosperity, crisis, trade exposure, resource stress, fishery type. Allocation shares (expansion/tech/consolidation) derived from position.
-3. **Stage 3 — Expansion:** Controller map, conquest, absorption blending (0.95 core + 0.05 target).
-4. **Stage 4 — Detection & awareness:** Dark Forest detection between nuclear-capable polities.
-5. **Stage 5 — Tech growth & decay:** accel_rate table (5 regimes). Maintenance cost = tech² × rate. Tech decays when surplus < maintenance.
-6. **Stage 6 — Desperation:** Resource pressure overrides allocation. Food/industrial/nuclear deficit hierarchy. Targeting bonus for resource-rich islands.
+0. **Environmental pre-pass:** Crop failure rolling and recovery; fishery stock update.
+1. **Stage 1 — Energy budget:** Crop yield (×failure modifier) × land + fish yield (×fishery stock) × coast. Malthusian clamp for tech < 4. Trade energy from three layers (Subsistence/Relay/Administered).
+2. **Stage 2 — Culture & allocation:** 2D continuous culture space (Collective↔Individual × Inward↔Outward). Drift from prosperity, crisis, trade exposure, resource stress, fishery type. Piety drift (Stage 2c): crisis→up, prosperity→down, tech>7→secular.
+3. **Stage 3 — Expansion + Detection:** Rumor propagation, controller map, conquest, culture/piety absorption blending. Industrial signals build awareness (proximity-gated). Nuclear peer awareness builds globally (distance-independent, 0.04/tick per side) once both polities have tech ≥ 9.
+4. **Stage 4 — Dark Forest detection:** Fires when nuclear peer awareness > 0.30 (no distance gate) or when pre-nuclear rival detects within proximity range.
+5. **Stage 5 — Tech growth & decay:** accel_rate table (5 regimes). Post-DF arms race bonus for hegemons at tech > 8.5. Malaria cap penalty in population growth.
+6. **Stage 5b — Epidemic waves:** Periodic disease events propagating through contact networks.
+7. **Stage 6 — Expansion (targeting):** Thompson-sampling with piety bonus (missionary drive) and deterrence penalty (post-DF hegemon freeze, -12.0).
+8. **Stage 7 — Sovereignty:** Extraction with piety absorption bonus (centripetal force mechanic).
+9. **Stage 8 — Naphtha depletion.**
 
 **Key mechanics:**
 - Three-threshold resources: Detection (geology) → Exploitation (tech-gated) → Strategic Valuation (event-triggered)
 - Naphtha scramble (tech ~5), pyra scramble (tech ~8), Dark Forest (two nuclear hegemons detect each other)
+- Post-DF deterrence: hegemons frozen against each other (-12.0 targeting penalty); arms race continues (≤40% delta, capped 0.05/tick)
 - Desperation cascade: surplus shortfall → tech decay → allocation override → aggressive expansion
+- Disease: malaria belts (abs_lat < 20°), urban disease sink (density > 70%), epidemic waves (Stage 5b)
+- Environmental shocks: crop failure (RNG per tick, tech-gated recovery), fishery depletion (stock-and-flow)
+- Religion/piety: centripetal force — crisis drives fervor, fervor drives absorption + expansion
 
 ## Web App (Strategy Game Mode)
 
@@ -95,16 +103,27 @@ Aeolia/
 - TOTP-style turn timer with speed controls (pause/1x/5x/10x)
 - National Focus cards (Expand/Innovate/Fortify/Balanced/Exploit)
 - Fog of war with 5 visibility levels (owned/frontier/contacted/rumor/unknown)
-- Event popups (first contact, absorption, territory lost, era transition, tech milestones, dark forest, defeat)
+- Event popups: first contact, absorption, territory lost, era transition, tech milestones, dark forest (deterrence + arms race text), naphtha/pyra scramble, epidemic wave, fishery collapse, defeat
+- 16 situation cards (cardGenerator.js): tech assessment, resource detection, expansion opportunity, culture drift, epidemic risk, naphtha/pyra, era transition, administered trade, fishery collapse, piracy warning, tech decay, navigator guild dispute, malaria breakthrough, religious revival
+- Dispatches panel: ADMIRALTY / MERCHANT GUILD / INTERNAL AFFAIRS source-tagged intelligence feed
+- Player stats panel: piety reading (fervent/devout/moderate/secular) with color coding
 - Defeat condition on 0 territory
+- Observatory mode: 3-chart panel (tech/pop/piety) + equirectangular world map + event timeline + scrubber
 
 ## Current State
 
-**Working:** Sim runs, produces hegemons, all new mechanics (culture space, Malthusian clamp, trade energy, desperation) are implemented and validated on seed 216089. Narrative engine (`src/engine/narrativeText.js`) provides deterministic prose for all event types grounded in the series bible. Situation cards system (`src/engine/cardGenerator.js`) generates 11 card types with player-actionable responses. Event popups draw from `narrativeText.js` for varied, flavored text. Dispatches panel shows source-tagged intelligence feed (ADMIRALTY / MERCHANT GUILD / INTERNAL AFFAIRS / etc.).
+**Working:** Full simulation pipeline with all Lanthier consultation targets implemented (2026-04-09):
+- Disease mechanics: malaria belts, epidemic waves, urban disease sink
+- Environmental shocks: crop failure, fishery depletion
+- Religion/piety: centripetal force, missionary expansion, absorption bonus
+- Post-DF deterrence: hegemons frozen against each other; arms race continues
+- Observatory mode: 3-chart panel (tech/pop/piety) + world map + event timeline + scrubber
+- 16 situation cards, 10+ popup types, source-tagged dispatches feed
+- **Dark Forest now fires correctly** (fixed 2026-04-09): Added distance-independent nuclear peer awareness accumulation (0.04/tick per side once both polities tech ≥ 9). Calibrated `energy_to_tfp=0.51` so tech 9 is reached around year -400 and DF fires at year -200 on primary seed (216089).
 
-**Broken:** Dark Forest doesn't fire. The culture space refactoring shifted the RNG sequence — the old optimized parameter vector no longer produces DF. This is a calibration problem, not a bug. The optimizer needs retuning with the new 26-parameter space.
-
-**Next implementation round (from Lanthier consultation):** Disease mechanics, environmental shocks (crop failure, fishery depletion), religion/culture as political variable. See TODO.md. Also: Observatory/history viewer mode for the Lanthier presentation (timeline scrubber, tech curves, event markers).
+**Next steps:**
+- Run optimizer (run_optimization.py, 10K trials) to further refine all 26 parameters
+- GitHub push (requires MacBook Neo — Aomori lacks stored credentials)
 
 ## Running the Sim
 
@@ -114,7 +133,7 @@ import json
 
 world = json.load(open('worlds/candidate_0216089.json'))
 result = simulate(world, SimParams())
-print(result.keys())  # states, polities, hegemon_tech, df_year, etc.
+print(result.keys())  # states, polities, df_year, hegemons, etc.
 ```
 
 World files are `candidate_NNNNNN.json`, not `world_NNNNNN.json`.
@@ -122,10 +141,23 @@ World files are `candidate_NNNNNN.json`, not `world_NNNNNN.json`.
 ## Running the Optimizer
 
 ```python
-python3 optimizer_v2.py  # CMA-ES, runs indefinitely, Ctrl-C to stop
+# From aeolia-godot/optimization/
+python3 run_optimization.py              # full 10K run
+python3 run_optimization.py --test 100   # quick 100-trial test
 ```
 
-Results are printed to stdout. Best parameters are logged. For long runs, use tmux/nohup.
+Results saved to `results/`. For long runs, use tmux/nohup.
+
+Quick seed scan:
+```python
+from sim_proxy_v2 import SimParams, simulate
+import json
+from pathlib import Path
+for wf in sorted(Path('worlds').glob('candidate_*.json')):
+    r = simulate(json.loads(wf.read_text()), SimParams())
+    if r['df_year']:
+        print(f"DF seed {int(wf.stem.split('_')[1])}: year {r['df_year']}, {len(r['hegemons'])} hegemons")
+```
 
 ## Conventions
 

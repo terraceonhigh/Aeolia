@@ -1,88 +1,11 @@
 {
   "216089": {
-    "total": 13.685482,
+    "total": 19.25,
     "components": {
-      "latitude_separation": 0.024758,
-      "civ_gap": 0.085724,
+      "latitude_separation": 5.0,
+      "civ_gap": 0.0,
       "density_asymmetry": 0.0,
       "two_hegemons": 2.0,
-      "naphtha_peak": 0.0,
-      "energy_transition": 0.0,
-      "pu_acquisition": 2.25,
-      "nuclear_fleets": 0.0,
-      "fleet_asymmetry": 0.0,
-      "sovereignty_gradient": 0.0,
-      "dark_forest_timing": 6.125,
-      "el_dorados": 3.2
-    },
-    "details": {
-      "latitude_separation": {
-        "reach_centroid_lat": 33.4,
-        "lattice_centroid_lat": 19.4
-      },
-      "civ_gap": {
-        "min_cross_dist_rad": 0.354
-      },
-      "density_asymmetry": {
-        "reach_spread_rad": 1.545,
-        "lattice_spread_rad": 0.701
-      },
-      "two_hegemons": {
-        "n_big_polities": 2,
-        "reach_culture": "parochial",
-        "lattice_culture": "parochial"
-      },
-      "naphtha_peak": {
-        "reach_c_depletion": 0.915,
-        "lattice_c_depletion": 0.961,
-        "max_depletion": 0.961
-      },
-      "energy_transition": {
-        "c_initial": 43.32,
-        "c_final": 2.86,
-        "depletion_frac": 0.934
-      },
-      "pu_acquisition": {
-        "reach_has_pu": true,
-        "lattice_has_pu": false
-      },
-      "nuclear_fleets": {
-        "reach_tech": 9.93,
-        "lattice_tech": 9.39,
-        "reach_fleet": 1.0,
-        "lattice_fleet": 0.45
-      },
-      "fleet_asymmetry": {
-        "reach_pu": true,
-        "reach_fleet": 1.0,
-        "lattice_pu": false,
-        "lattice_fleet": 0.45,
-        "note": "Reach has Pu"
-      },
-      "sovereignty_gradient": {
-        "reach_core_sov": 1.0,
-        "reach_periphery_mean_sov": 0.131,
-        "lattice_core_sov": 0.95,
-        "lattice_periphery_mean_sov": 0.092
-      },
-      "dark_forest_timing": {
-        "df_year": -250,
-        "between_hegemons": false,
-        "df_polity_a": 15,
-        "df_polity_b": 15
-      },
-      "el_dorados": {
-        "uncontacted": 2
-      }
-    }
-  },
-  "51": {
-    "total": 17.217196,
-    "components": {
-      "latitude_separation": 0.062995,
-      "civ_gap": 0.0,
-      "density_asymmetry": 0.304201,
-      "two_hegemons": 4.6,
       "naphtha_peak": 0.0,
       "energy_transition": 0.0,
       "pu_acquisition": 2.25,
@@ -94,369 +17,72 @@
     },
     "details": {
       "latitude_separation": {
-        "reach_centroid_lat": 44.5,
-        "lattice_centroid_lat": 30.5
+        "reach_centroid_lat": 10.2,
+        "lattice_centroid_lat": 34.6
       },
       "civ_gap": {
-        "min_cross_dist_rad": 0.501
+        "min_cross_dist_rad": 0.578
       },
       "density_asymmetry": {
-        "reach_spread_rad": 0.668,
-        "lattice_spread_rad": 1.058
+        "reach_spread_rad": 0.833,
+        "lattice_spread_rad": 0.529
       },
       "two_hegemons": {
-        "n_big_polities": 1,
-        "reach_culture": "civic",
+        "n_big_polities": 2,
+        "reach_culture": "parochial",
         "lattice_culture": "parochial"
       },
       "naphtha_peak": {
         "reach_c_depletion": 1.0,
-        "lattice_c_depletion": 0.898,
-        "max_depletion": 1.0
-      },
-      "energy_transition": {
-        "c_initial": 66.6,
-        "c_final": 3.12,
-        "depletion_frac": 0.953
-      },
-      "pu_acquisition": {
-        "reach_has_pu": false,
-        "lattice_has_pu": true
-      },
-      "nuclear_fleets": {
-        "reach_tech": 10.11,
-        "lattice_tech": 9.98,
-        "reach_fleet": 0.45,
-        "lattice_fleet": 1.0
-      },
-      "fleet_asymmetry": {
-        "reach_pu": false,
-        "reach_fleet": 0.45,
-        "lattice_pu": true,
-        "lattice_fleet": 1.0,
-        "note": "Lattice has Pu"
-      },
-      "sovereignty_gradient": {
-        "reach_core_sov": 0.95,
-        "reach_periphery_mean_sov": 0.095,
-        "lattice_core_sov": 1.0,
-        "lattice_periphery_mean_sov": 0.152
-      },
-      "dark_forest_timing": {
-        "df_year": -400,
-        "between_hegemons": false,
-        "df_polity_a": 18,
-        "df_polity_b": 18
-      },
-      "el_dorados": {
-        "uncontacted": 14
-      }
-    }
-  },
-  "73": {
-    "total": 5.949642,
-    "components": {
-      "latitude_separation": 0.064756,
-      "civ_gap": 0.0,
-      "density_asymmetry": 0.034886,
-      "two_hegemons": 0.6,
-      "naphtha_peak": 0.0,
-      "energy_transition": 0.0,
-      "pu_acquisition": 2.25,
-      "nuclear_fleets": 0.0,
-      "fleet_asymmetry": 0.0,
-      "sovereignty_gradient": 0.0,
-      "dark_forest_timing": 3.0,
-      "el_dorados": 0.0
-    },
-    "details": {
-      "latitude_separation": {
-        "reach_centroid_lat": 33.6,
-        "lattice_centroid_lat": 30.1
-      },
-      "civ_gap": {
-        "min_cross_dist_rad": 0.535
-      },
-      "density_asymmetry": {
-        "reach_spread_rad": 0.732,
-        "lattice_spread_rad": 0.864
-      },
-      "two_hegemons": {
-        "n_big_polities": 2,
-        "reach_culture": "civic",
-        "lattice_culture": "parochial"
-      },
-      "naphtha_peak": {
-        "reach_c_depletion": 0.66,
-        "lattice_c_depletion": 0.708,
-        "max_depletion": 0.708
-      },
-      "energy_transition": {
-        "c_initial": 59.84,
-        "c_final": 11.28,
-        "depletion_frac": 0.811
-      },
-      "pu_acquisition": {
-        "reach_has_pu": false,
-        "lattice_has_pu": true
-      },
-      "nuclear_fleets": {
-        "reach_tech": 9.95,
-        "lattice_tech": 9.65,
-        "reach_fleet": 0.45,
-        "lattice_fleet": 1.0
-      },
-      "fleet_asymmetry": {
-        "reach_pu": false,
-        "reach_fleet": 0.45,
-        "lattice_pu": true,
-        "lattice_fleet": 1.0,
-        "note": "Lattice has Pu"
-      },
-      "sovereignty_gradient": {
-        "reach_core_sov": 0.95,
-        "reach_periphery_mean_sov": 0.165,
-        "lattice_core_sov": 1.0,
-        "lattice_periphery_mean_sov": 0.202
-      },
-      "dark_forest_timing": {
-        "df_year": -50,
-        "between_hegemons": false,
-        "df_polity_a": 30,
-        "df_polity_b": 30
-      },
-      "el_dorados": {
-        "uncontacted": 20
-      }
-    }
-  },
-  "74": {
-    "total": 12.161695,
-    "components": {
-      "latitude_separation": 0.583298,
-      "civ_gap": 0.129931,
-      "density_asymmetry": 0.398467,
-      "two_hegemons": 0.6,
-      "naphtha_peak": 0.0,
-      "energy_transition": 0.0,
-      "pu_acquisition": 0.0,
-      "nuclear_fleets": 0.0,
-      "fleet_asymmetry": 0.0,
-      "sovereignty_gradient": 0.0,
-      "dark_forest_timing": 8.0,
-      "el_dorados": 2.45
-    },
-    "details": {
-      "latitude_separation": {
-        "reach_centroid_lat": 35.1,
-        "lattice_centroid_lat": 35.6
-      },
-      "civ_gap": {
-        "min_cross_dist_rad": 0.32
-      },
-      "density_asymmetry": {
-        "reach_spread_rad": 1.088,
-        "lattice_spread_rad": 1.41
-      },
-      "two_hegemons": {
-        "n_big_polities": 2,
-        "reach_culture": "civic",
-        "lattice_culture": "parochial"
-      },
-      "naphtha_peak": {
-        "reach_c_depletion": 0.991,
-        "lattice_c_depletion": 0.945,
-        "max_depletion": 0.991
-      },
-      "energy_transition": {
-        "c_initial": 49.64,
-        "c_final": 1.64,
-        "depletion_frac": 0.967
-      },
-      "pu_acquisition": {
-        "reach_has_pu": true,
-        "lattice_has_pu": true
-      },
-      "nuclear_fleets": {
-        "reach_tech": 10.91,
-        "lattice_tech": 10.37,
-        "reach_fleet": 1.0,
-        "lattice_fleet": 1.0
-      },
-      "fleet_asymmetry": {
-        "reach_pu": true,
-        "reach_fleet": 1.0,
-        "lattice_pu": true,
-        "lattice_fleet": 1.0,
-        "note": "same Pu status"
-      },
-      "sovereignty_gradient": {
-        "reach_core_sov": 1.0,
-        "reach_periphery_mean_sov": 0.102,
-        "lattice_core_sov": 1.0,
-        "lattice_periphery_mean_sov": 0.102
-      },
-      "dark_forest_timing": {
-        "note": "no Dark Forest break"
-      },
-      "el_dorados": {
-        "uncontacted": 3
-      }
-    }
-  },
-  "11": {
-    "total": 12.915903,
-    "components": {
-      "latitude_separation": 0.0,
-      "civ_gap": 0.065903,
-      "density_asymmetry": 2.0,
-      "two_hegemons": 0.6,
-      "naphtha_peak": 0.0,
-      "energy_transition": 0.0,
-      "pu_acquisition": 2.25,
-      "nuclear_fleets": 0.0,
-      "fleet_asymmetry": 0.0,
-      "sovereignty_gradient": 0.0,
-      "dark_forest_timing": 8.0,
-      "el_dorados": 0.0
-    },
-    "details": {
-      "latitude_separation": {
-        "reach_centroid_lat": 35.2,
-        "lattice_centroid_lat": 9.9
-      },
-      "civ_gap": {
-        "min_cross_dist_rad": 0.372
-      },
-      "density_asymmetry": {
-        "note": "need >=2 members per hegemon for pairwise"
-      },
-      "two_hegemons": {
-        "n_big_polities": 2,
-        "reach_culture": "civic",
-        "lattice_culture": "parochial"
-      },
-      "naphtha_peak": {
-        "reach_c_depletion": 0.965,
         "lattice_c_depletion": 1.0,
         "max_depletion": 1.0
       },
       "energy_transition": {
-        "c_initial": 39.7,
-        "c_final": 1.67,
-        "depletion_frac": 0.958
+        "c_initial": 43.32,
+        "c_final": 0.52,
+        "depletion_frac": 0.988
       },
       "pu_acquisition": {
-        "reach_has_pu": false,
-        "lattice_has_pu": true
-      },
-      "nuclear_fleets": {
-        "reach_tech": 10.55,
-        "lattice_tech": 10.12,
-        "reach_fleet": 0.45,
-        "lattice_fleet": 1.0
-      },
-      "fleet_asymmetry": {
-        "reach_pu": false,
-        "reach_fleet": 0.45,
-        "lattice_pu": true,
-        "lattice_fleet": 1.0,
-        "note": "Lattice has Pu"
-      },
-      "sovereignty_gradient": {
-        "reach_core_sov": 0.95,
-        "reach_periphery_mean_sov": 0.186,
-        "lattice_note": "single-arch polity"
-      },
-      "dark_forest_timing": {
-        "note": "no Dark Forest break"
-      },
-      "el_dorados": {
-        "uncontacted": 12
-      }
-    }
-  },
-  "66": {
-    "total": 17.645651,
-    "components": {
-      "latitude_separation": 0.0,
-      "civ_gap": 0.03944,
-      "density_asymmetry": 0.0,
-      "two_hegemons": 0.6,
-      "naphtha_peak": 0.0,
-      "energy_transition": 0.002166,
-      "pu_acquisition": 6.0,
-      "nuclear_fleets": 3.004045,
-      "fleet_asymmetry": 0.0,
-      "sovereignty_gradient": 0.0,
-      "dark_forest_timing": 8.0,
-      "el_dorados": 0.0
-    },
-    "details": {
-      "latitude_separation": {
-        "reach_centroid_lat": 36.0,
-        "lattice_centroid_lat": 16.1
-      },
-      "civ_gap": {
-        "min_cross_dist_rad": 0.401
-      },
-      "density_asymmetry": {
-        "reach_spread_rad": 0.941,
-        "lattice_spread_rad": 0.741
-      },
-      "two_hegemons": {
-        "n_big_polities": 2,
-        "reach_culture": "civic",
-        "lattice_culture": "civic"
-      },
-      "naphtha_peak": {
-        "reach_c_depletion": 0.723,
-        "lattice_c_depletion": 0.915,
-        "max_depletion": 0.915
-      },
-      "energy_transition": {
-        "c_initial": 49.37,
-        "c_final": 15.47,
-        "depletion_frac": 0.687
-      },
-      "pu_acquisition": {
-        "reach_has_pu": false,
+        "reach_has_pu": true,
         "lattice_has_pu": false
       },
       "nuclear_fleets": {
-        "reach_tech": 9.05,
-        "lattice_tech": 8.94,
-        "reach_fleet": 0.45,
-        "lattice_fleet": 0.0
+        "reach_tech": 11.0,
+        "lattice_tech": 11.0,
+        "reach_fleet": 1.0,
+        "lattice_fleet": 0.69
       },
       "fleet_asymmetry": {
-        "reach_pu": false,
-        "reach_fleet": 0.45,
+        "reach_pu": true,
+        "reach_fleet": 1.0,
         "lattice_pu": false,
-        "lattice_fleet": 0.0,
-        "note": "same Pu status"
+        "lattice_fleet": 0.69,
+        "note": "Reach has Pu"
       },
       "sovereignty_gradient": {
-        "reach_core_sov": 0.95,
-        "reach_periphery_mean_sov": 0.168,
-        "lattice_core_sov": 1.0,
-        "lattice_periphery_mean_sov": 0.05
+        "reach_core_sov": 1.0,
+        "reach_periphery_mean_sov": 0.097,
+        "lattice_core_sov": 0.95,
+        "lattice_periphery_mean_sov": 0.093
       },
       "dark_forest_timing": {
-        "note": "no Dark Forest break"
+        "df_year": -8100,
+        "between_hegemons": false,
+        "df_polity_a": 11,
+        "df_polity_b": 16
       },
       "el_dorados": {
-        "uncontacted": 15
+        "uncontacted": 10
       }
     }
   },
-  "17": {
-    "total": 14.802585,
+  "51": {
+    "total": 16.352719,
     "components": {
-      "latitude_separation": 0.002575,
-      "civ_gap": 1e-05,
+      "latitude_separation": 0.0,
+      "civ_gap": 0.152719,
       "density_asymmetry": 0.0,
-      "two_hegemons": 0.6,
+      "two_hegemons": 2.0,
       "naphtha_peak": 0.0,
       "energy_transition": 0.0,
       "pu_acquisition": 6.0,
@@ -468,53 +94,53 @@
     },
     "details": {
       "latitude_separation": {
-        "reach_centroid_lat": 51.5,
-        "lattice_centroid_lat": 28.5
+        "reach_centroid_lat": 36.3,
+        "lattice_centroid_lat": 22.0
       },
       "civ_gap": {
-        "min_cross_dist_rad": 0.498
+        "min_cross_dist_rad": 0.305
       },
       "density_asymmetry": {
-        "reach_spread_rad": 0.914,
-        "lattice_spread_rad": 0.755
+        "reach_spread_rad": 0.991,
+        "lattice_spread_rad": 0.851
       },
       "two_hegemons": {
         "n_big_polities": 2,
-        "reach_culture": "civic",
-        "lattice_culture": "civic"
+        "reach_culture": "parochial",
+        "lattice_culture": "parochial"
       },
       "naphtha_peak": {
-        "reach_c_depletion": 0.767,
+        "reach_c_depletion": 0.971,
         "lattice_c_depletion": 1.0,
         "max_depletion": 1.0
       },
       "energy_transition": {
-        "c_initial": 60.6,
-        "c_final": 4.73,
-        "depletion_frac": 0.922
+        "c_initial": 66.6,
+        "c_final": 0.5,
+        "depletion_frac": 0.993
       },
       "pu_acquisition": {
         "reach_has_pu": false,
         "lattice_has_pu": false
       },
       "nuclear_fleets": {
-        "reach_tech": 10.13,
-        "lattice_tech": 10.01,
-        "reach_fleet": 0.45,
-        "lattice_fleet": 0.45
+        "reach_tech": 11.0,
+        "lattice_tech": 11.0,
+        "reach_fleet": 0.69,
+        "lattice_fleet": 0.69
       },
       "fleet_asymmetry": {
         "reach_pu": false,
-        "reach_fleet": 0.45,
+        "reach_fleet": 0.69,
         "lattice_pu": false,
-        "lattice_fleet": 0.45,
+        "lattice_fleet": 0.69,
         "note": "same Pu status"
       },
       "sovereignty_gradient": {
         "reach_core_sov": 0.95,
-        "reach_periphery_mean_sov": 0.139,
+        "reach_periphery_mean_sov": 0.13,
         "lattice_core_sov": 0.95,
-        "lattice_periphery_mean_sov": 0.098
+        "lattice_periphery_mean_sov": 0.121
       },
       "dark_forest_timing": {
         "note": "no Dark Forest break"
@@ -524,16 +150,90 @@
       }
     }
   },
-  "42": {
-    "total": 19.238028,
+  "73": {
+    "total": 16.303673,
     "components": {
-      "latitude_separation": 0.014302,
-      "civ_gap": 0.023726,
+      "latitude_separation": 0.053673,
+      "civ_gap": 0.0,
+      "density_asymmetry": 0.0,
+      "two_hegemons": 6.0,
+      "naphtha_peak": 0.0,
+      "energy_transition": 0.0,
+      "pu_acquisition": 2.25,
+      "nuclear_fleets": 0.0,
+      "fleet_asymmetry": 0.0,
+      "sovereignty_gradient": 0.0,
+      "dark_forest_timing": 8.0,
+      "el_dorados": 0.0
+    },
+    "details": {
+      "latitude_separation": {
+        "reach_centroid_lat": 32.7,
+        "lattice_centroid_lat": 15.5
+      },
+      "civ_gap": {
+        "min_cross_dist_rad": 0.543
+      },
+      "density_asymmetry": {
+        "reach_spread_rad": 0.97,
+        "lattice_spread_rad": 0.491
+      },
+      "two_hegemons": {
+        "n_big_polities": 1,
+        "reach_culture": "parochial",
+        "lattice_culture": "parochial"
+      },
+      "naphtha_peak": {
+        "reach_c_depletion": 1.0,
+        "lattice_c_depletion": 1.0,
+        "max_depletion": 1.0
+      },
+      "energy_transition": {
+        "c_initial": 59.84,
+        "c_final": 0.0,
+        "depletion_frac": 1.0
+      },
+      "pu_acquisition": {
+        "reach_has_pu": true,
+        "lattice_has_pu": false
+      },
+      "nuclear_fleets": {
+        "reach_tech": 11.0,
+        "lattice_tech": 11.0,
+        "reach_fleet": 1.0,
+        "lattice_fleet": 0.69
+      },
+      "fleet_asymmetry": {
+        "reach_pu": true,
+        "reach_fleet": 1.0,
+        "lattice_pu": false,
+        "lattice_fleet": 0.69,
+        "note": "Reach has Pu"
+      },
+      "sovereignty_gradient": {
+        "reach_core_sov": 1.0,
+        "reach_periphery_mean_sov": 0.097,
+        "lattice_core_sov": 0.95,
+        "lattice_periphery_mean_sov": 0.091
+      },
+      "dark_forest_timing": {
+        "note": "no Dark Forest break"
+      },
+      "el_dorados": {
+        "uncontacted": 11
+      }
+    }
+  },
+  "74": {
+    "total": 13.354159,
+    "components": {
+      "latitude_separation": 0.045637,
+      "civ_gap": 0.108522,
       "density_asymmetry": 0.0,
       "two_hegemons": 2.0,
       "naphtha_peak": 0.0,
       "energy_transition": 0.0,
-      "pu_acquisition": 6.0,
+      "pu_acquisition": 0.0,
       "nuclear_fleets": 0.0,
       "fleet_asymmetry": 0.0,
       "sovereignty_gradient": 0.0,
@@ -542,15 +242,15 @@
     },
     "details": {
       "latitude_separation": {
-        "reach_centroid_lat": 33.8,
-        "lattice_centroid_lat": 17.6
+        "reach_centroid_lat": 32.9,
+        "lattice_centroid_lat": 27.1
       },
       "civ_gap": {
-        "min_cross_dist_rad": 0.423
+        "min_cross_dist_rad": 0.335
       },
       "density_asymmetry": {
-        "reach_spread_rad": 1.551,
-        "lattice_spread_rad": 0.752
+        "reach_spread_rad": 1.08,
+        "lattice_spread_rad": 1.021
       },
       "two_hegemons": {
         "n_big_polities": 2,
@@ -558,37 +258,37 @@
         "lattice_culture": "parochial"
       },
       "naphtha_peak": {
-        "reach_c_depletion": 0.963,
+        "reach_c_depletion": 1.0,
         "lattice_c_depletion": 1.0,
         "max_depletion": 1.0
       },
       "energy_transition": {
-        "c_initial": 39.58,
-        "c_final": 1.44,
-        "depletion_frac": 0.964
+        "c_initial": 49.64,
+        "c_final": 0.04,
+        "depletion_frac": 0.999
       },
       "pu_acquisition": {
-        "reach_has_pu": false,
-        "lattice_has_pu": false
+        "reach_has_pu": true,
+        "lattice_has_pu": true
       },
       "nuclear_fleets": {
-        "reach_tech": 9.79,
-        "lattice_tech": 9.79,
-        "reach_fleet": 0.45,
-        "lattice_fleet": 0.45
+        "reach_tech": 11.0,
+        "lattice_tech": 11.0,
+        "reach_fleet": 1.0,
+        "lattice_fleet": 1.0
       },
       "fleet_asymmetry": {
-        "reach_pu": false,
-        "reach_fleet": 0.45,
-        "lattice_pu": false,
-        "lattice_fleet": 0.45,
+        "reach_pu": true,
+        "reach_fleet": 1.0,
+        "lattice_pu": true,
+        "lattice_fleet": 1.0,
         "note": "same Pu status"
       },
       "sovereignty_gradient": {
-        "reach_core_sov": 0.95,
-        "reach_periphery_mean_sov": 0.104,
-        "lattice_core_sov": 0.95,
-        "lattice_periphery_mean_sov": 0.098
+        "reach_core_sov": 1.0,
+        "reach_periphery_mean_sov": 0.124,
+        "lattice_core_sov": 1.0,
+        "lattice_periphery_mean_sov": 0.114
       },
       "dark_forest_timing": {
         "note": "no Dark Forest break"
@@ -598,13 +298,241 @@
       }
     }
   },
-  "97": {
-    "total": 17.217009,
+  "11": {
+    "total": 16.45,
     "components": {
-      "latitude_separation": 0.155878,
-      "civ_gap": 0.011131,
+      "latitude_separation": 0.0,
+      "civ_gap": 0.0,
       "density_asymmetry": 0.0,
-      "two_hegemons": 0.6,
+      "two_hegemons": 6.0,
+      "naphtha_peak": 0.0,
+      "energy_transition": 0.0,
+      "pu_acquisition": 2.25,
+      "nuclear_fleets": 0.0,
+      "fleet_asymmetry": 0.0,
+      "sovereignty_gradient": 0.0,
+      "dark_forest_timing": 8.0,
+      "el_dorados": 0.2
+    },
+    "details": {
+      "latitude_separation": {
+        "reach_centroid_lat": 42.4,
+        "lattice_centroid_lat": 14.6
+      },
+      "civ_gap": {
+        "min_cross_dist_rad": 0.713
+      },
+      "density_asymmetry": {
+        "reach_spread_rad": 0.805,
+        "lattice_spread_rad": 0.782
+      },
+      "two_hegemons": {
+        "n_big_polities": 3,
+        "reach_culture": "parochial",
+        "lattice_culture": "parochial"
+      },
+      "naphtha_peak": {
+        "reach_c_depletion": 1.0,
+        "lattice_c_depletion": 1.0,
+        "max_depletion": 1.0
+      },
+      "energy_transition": {
+        "c_initial": 39.7,
+        "c_final": 0.27,
+        "depletion_frac": 0.993
+      },
+      "pu_acquisition": {
+        "reach_has_pu": false,
+        "lattice_has_pu": true
+      },
+      "nuclear_fleets": {
+        "reach_tech": 11.0,
+        "lattice_tech": 11.0,
+        "reach_fleet": 0.69,
+        "lattice_fleet": 1.0
+      },
+      "fleet_asymmetry": {
+        "reach_pu": false,
+        "reach_fleet": 0.69,
+        "lattice_pu": true,
+        "lattice_fleet": 1.0,
+        "note": "Lattice has Pu"
+      },
+      "sovereignty_gradient": {
+        "reach_core_sov": 0.95,
+        "reach_periphery_mean_sov": 0.112,
+        "lattice_core_sov": 1.0,
+        "lattice_periphery_mean_sov": 0.096
+      },
+      "dark_forest_timing": {
+        "note": "no Dark Forest break"
+      },
+      "el_dorados": {
+        "uncontacted": 8
+      }
+    }
+  },
+  "66": {
+    "total": 14.694234,
+    "components": {
+      "latitude_separation": 0.071347,
+      "civ_gap": 0.172887,
+      "density_asymmetry": 0.0,
+      "two_hegemons": 2.0,
+      "naphtha_peak": 0.0,
+      "energy_transition": 0.0,
+      "pu_acquisition": 2.25,
+      "nuclear_fleets": 0.0,
+      "fleet_asymmetry": 0.0,
+      "sovereignty_gradient": 0.0,
+      "dark_forest_timing": 10.0,
+      "el_dorados": 0.2
+    },
+    "details": {
+      "latitude_separation": {
+        "reach_centroid_lat": 32.3,
+        "lattice_centroid_lat": 25.3
+      },
+      "civ_gap": {
+        "min_cross_dist_rad": 0.292
+      },
+      "density_asymmetry": {
+        "reach_spread_rad": 1.198,
+        "lattice_spread_rad": 0.811
+      },
+      "two_hegemons": {
+        "n_big_polities": 2,
+        "reach_culture": "parochial",
+        "lattice_culture": "parochial"
+      },
+      "naphtha_peak": {
+        "reach_c_depletion": 1.0,
+        "lattice_c_depletion": 1.0,
+        "max_depletion": 1.0
+      },
+      "energy_transition": {
+        "c_initial": 49.37,
+        "c_final": 0.32,
+        "depletion_frac": 0.993
+      },
+      "pu_acquisition": {
+        "reach_has_pu": false,
+        "lattice_has_pu": true
+      },
+      "nuclear_fleets": {
+        "reach_tech": 11.0,
+        "lattice_tech": 11.0,
+        "reach_fleet": 0.69,
+        "lattice_fleet": 1.0
+      },
+      "fleet_asymmetry": {
+        "reach_pu": false,
+        "reach_fleet": 0.69,
+        "lattice_pu": true,
+        "lattice_fleet": 1.0,
+        "note": "Lattice has Pu"
+      },
+      "sovereignty_gradient": {
+        "reach_core_sov": 0.95,
+        "reach_periphery_mean_sov": 0.154,
+        "lattice_core_sov": 1.0,
+        "lattice_periphery_mean_sov": 0.153
+      },
+      "dark_forest_timing": {
+        "df_year": -7950,
+        "between_hegemons": true,
+        "df_polity_a": 10,
+        "df_polity_b": 18
+      },
+      "el_dorados": {
+        "uncontacted": 8
+      }
+    }
+  },
+  "17": {
+    "total": 16.093179,
+    "components": {
+      "latitude_separation": 0.011161,
+      "civ_gap": 0.032017,
+      "density_asymmetry": 0.0,
+      "two_hegemons": 2.0,
+      "naphtha_peak": 0.0,
+      "energy_transition": 0.0,
+      "pu_acquisition": 2.25,
+      "nuclear_fleets": 0.0,
+      "fleet_asymmetry": 0.0,
+      "sovereignty_gradient": 0.0,
+      "dark_forest_timing": 10.0,
+      "el_dorados": 1.8
+    },
+    "details": {
+      "latitude_separation": {
+        "reach_centroid_lat": 34.0,
+        "lattice_centroid_lat": 28.3
+      },
+      "civ_gap": {
+        "min_cross_dist_rad": 0.411
+      },
+      "density_asymmetry": {
+        "reach_spread_rad": 1.069,
+        "lattice_spread_rad": 0.769
+      },
+      "two_hegemons": {
+        "n_big_polities": 2,
+        "reach_culture": "parochial",
+        "lattice_culture": "parochial"
+      },
+      "naphtha_peak": {
+        "reach_c_depletion": 1.0,
+        "lattice_c_depletion": 1.0,
+        "max_depletion": 1.0
+      },
+      "energy_transition": {
+        "c_initial": 60.6,
+        "c_final": 0.03,
+        "depletion_frac": 1.0
+      },
+      "pu_acquisition": {
+        "reach_has_pu": false,
+        "lattice_has_pu": true
+      },
+      "nuclear_fleets": {
+        "reach_tech": 11.0,
+        "lattice_tech": 11.0,
+        "reach_fleet": 0.69,
+        "lattice_fleet": 1.0
+      },
+      "fleet_asymmetry": {
+        "reach_pu": false,
+        "reach_fleet": 0.69,
+        "lattice_pu": true,
+        "lattice_fleet": 1.0,
+        "note": "Lattice has Pu"
+      },
+      "sovereignty_gradient": {
+        "reach_core_sov": 0.95,
+        "reach_periphery_mean_sov": 0.149,
+        "lattice_core_sov": 1.0,
+        "lattice_periphery_mean_sov": 0.178
+      },
+      "dark_forest_timing": {
+        "df_year": -7600,
+        "between_hegemons": false,
+        "df_polity_a": 19,
+        "df_polity_b": 6
+      },
+      "el_dorados": {
+        "uncontacted": 4
+      }
+    }
+  },
+  "42": {
+    "total": 21.368119,
+    "components": {
+      "latitude_separation": 2.529849,
+      "civ_gap": 0.026488,
+      "density_asymmetry": 0.011781,
+      "two_hegemons": 2.0,
       "naphtha_peak": 0.0,
       "energy_transition": 0.0,
       "pu_acquisition": 6.0,
@@ -612,66 +540,140 @@
       "fleet_asymmetry": 0.0,
       "sovereignty_gradient": 0.0,
       "dark_forest_timing": 10.0,
-      "el_dorados": 0.45
+      "el_dorados": 0.8
     },
     "details": {
       "latitude_separation": {
-        "reach_centroid_lat": 31.1,
-        "lattice_centroid_lat": 23.8
+        "reach_centroid_lat": 27.4,
+        "lattice_centroid_lat": 42.0
       },
       "civ_gap": {
-        "min_cross_dist_rad": 0.447
+        "min_cross_dist_rad": 0.419
       },
       "density_asymmetry": {
-        "reach_spread_rad": 1.226,
-        "lattice_spread_rad": 0.922
+        "reach_spread_rad": 1.311,
+        "lattice_spread_rad": 1.177
       },
       "two_hegemons": {
         "n_big_polities": 2,
-        "reach_culture": "civic",
+        "reach_culture": "parochial",
         "lattice_culture": "parochial"
       },
       "naphtha_peak": {
-        "reach_c_depletion": 0.952,
+        "reach_c_depletion": 0.991,
         "lattice_c_depletion": 1.0,
         "max_depletion": 1.0
       },
       "energy_transition": {
-        "c_initial": 53.48,
-        "c_final": 3.29,
-        "depletion_frac": 0.938
+        "c_initial": 39.58,
+        "c_final": 0.21,
+        "depletion_frac": 0.995
       },
       "pu_acquisition": {
         "reach_has_pu": false,
         "lattice_has_pu": false
       },
       "nuclear_fleets": {
-        "reach_tech": 10.48,
-        "lattice_tech": 9.84,
-        "reach_fleet": 0.45,
-        "lattice_fleet": 0.45
+        "reach_tech": 11.0,
+        "lattice_tech": 11.0,
+        "reach_fleet": 0.69,
+        "lattice_fleet": 0.69
       },
       "fleet_asymmetry": {
         "reach_pu": false,
-        "reach_fleet": 0.45,
+        "reach_fleet": 0.69,
         "lattice_pu": false,
-        "lattice_fleet": 0.45,
+        "lattice_fleet": 0.69,
         "note": "same Pu status"
       },
       "sovereignty_gradient": {
         "reach_core_sov": 0.95,
-        "reach_periphery_mean_sov": 0.199,
+        "reach_periphery_mean_sov": 0.152,
         "lattice_core_sov": 0.95,
-        "lattice_periphery_mean_sov": 0.127
+        "lattice_periphery_mean_sov": 0.14
       },
       "dark_forest_timing": {
-        "df_year": -550,
-        "between_hegemons": false,
-        "df_polity_a": 35,
-        "df_polity_b": 35
+        "df_year": -8350,
+        "between_hegemons": true,
+        "df_polity_a": 23,
+        "df_polity_b": 36
       },
       "el_dorados": {
-        "uncontacted": 7
+        "uncontacted": 6
+      }
+    }
+  },
+  "97": {
+    "total": 22.569532,
+    "components": {
+      "latitude_separation": 0.119532,
+      "civ_gap": 0.0,
+      "density_asymmetry": 0.0,
+      "two_hegemons": 6.0,
+      "naphtha_peak": 0.0,
+      "energy_transition": 0.0,
+      "pu_acquisition": 6.0,
+      "nuclear_fleets": 0.0,
+      "fleet_asymmetry": 0.0,
+      "sovereignty_gradient": 0.0,
+      "dark_forest_timing": 8.0,
+      "el_dorados": 2.45
+    },
+    "details": {
+      "latitude_separation": {
+        "reach_centroid_lat": 31.5,
+        "lattice_centroid_lat": 21.3
+      },
+      "civ_gap": {
+        "min_cross_dist_rad": 1.025
+      },
+      "density_asymmetry": {
+        "reach_spread_rad": 0.96,
+        "lattice_spread_rad": 0.778
+      },
+      "two_hegemons": {
+        "n_big_polities": 3,
+        "reach_culture": "parochial",
+        "lattice_culture": "parochial"
+      },
+      "naphtha_peak": {
+        "reach_c_depletion": 1.0,
+        "lattice_c_depletion": 1.0,
+        "max_depletion": 1.0
+      },
+      "energy_transition": {
+        "c_initial": 53.48,
+        "c_final": 1.56,
+        "depletion_frac": 0.971
+      },
+      "pu_acquisition": {
+        "reach_has_pu": false,
+        "lattice_has_pu": false
+      },
+      "nuclear_fleets": {
+        "reach_tech": 11.0,
+        "lattice_tech": 11.0,
+        "reach_fleet": 0.69,
+        "lattice_fleet": 0.69
+      },
+      "fleet_asymmetry": {
+        "reach_pu": false,
+        "reach_fleet": 0.69,
+        "lattice_pu": false,
+        "lattice_fleet": 0.69,
+        "note": "same Pu status"
+      },
+      "sovereignty_gradient": {
+        "reach_core_sov": 0.95,
+        "reach_periphery_mean_sov": 0.119,
+        "lattice_core_sov": 0.95,
+        "lattice_periphery_mean_sov": 0.173
+      },
+      "dark_forest_timing": {
+        "note": "no Dark Forest break"
+      },
+      "el_dorados": {
+        "uncontacted": 3
       }
     }
   }
