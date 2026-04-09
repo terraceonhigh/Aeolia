@@ -1,8 +1,8 @@
 # Aeolia
 
-**A procedural history generator that models the emergence of trade networks, resource scrambles, and nuclear deterrence on a fictional archipelago world.**
+**A procedural history game that generates trade networks, resource scrambles, and nuclear deterrence on fictional archipelago worlds.**
 
-Aeolia generates planets — randomized archipelago geographies with distinct climates, crops, and resource endowments — then simulates 20,000 years of geopolitical history on each one. The simulation produces civilizations that trade, expand, colonize, and eventually discover nuclear fission, at which point the system models a deterrence standoff analogous to the Cold War.
+Aeolia is a thought experiment in game form. It generates planets — randomized archipelago geographies with distinct climates, crops, and resource endowments — then simulates 20,000 years of geopolitical history on each one. Civilizations trade, expand, colonize, and eventually discover nuclear fission, at which point the system models a deterrence standoff. The simulation does not claim to represent what *did* or *should* happen in human history — it explores what *could* happen under simplified assumptions on a world very different from our own.
 
 ## What this project models
 
@@ -45,6 +45,10 @@ The project includes sample in-universe documents written at different registers
   - `worldbuilding/` — in-universe textbook chapters
 - `aeolia-godot/` — Godot 4 GDScript planet renderer (procedural terrain, globe visualization)
 
+## A note on epistemology
+
+Aeolia is a game, not a predictive model. Its simulation mechanics encode deliberate simplifications — deterministic rational actors, Cobb-Douglas production, gravity-model trade — that would be indefensible as claims about real history. The value is in the exploration, not the output: watching how energy constraints, geography, and information asymmetry interact under controlled conditions, then asking whether the patterns remind you of anything. If the simulation told you what *had* to happen, it would be wrong. If it makes you argue about *why* something happened, it's working.
+
 ## Status
 
-Design phase. The simulation engine runs and produces plausible 20,000-year histories on procedurally generated worlds. Parameter optimization against a Baseline Earth loss function is ongoing. The worldbuilding commodity layer is documented but not yet fully integrated into the simulation code.
+Design phase. The simulation engine runs and produces 20,000-year histories on procedurally generated worlds. Parameter optimization against a Baseline Earth loss function is ongoing. The worldbuilding commodity layer is documented and partially integrated into the simulation code. A human-in-the-loop mode (player replaces the deterministic rational actor on one polity) is planned.
