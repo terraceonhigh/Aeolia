@@ -43,6 +43,9 @@ export const DEFAULT_PARAMS = {
   maintenance_rate: 0.01,
   decay_rate: 0.10,
   desperation_weight: 0.50,
+  // ── Disease mechanics (from DISEASE_MECHANIC.md) ─────────
+  malaria_cap_penalty: 0.40,   // carrying capacity reduction at equator, pre-medical
+  urban_disease_rate: 0.08,    // density-dependent mortality above 70% capacity
 };
 
 // ── Crop culture seeds ──────────────────────────────────────
@@ -224,8 +227,19 @@ export class SimEngine {
       this.carryCap[i] = y * pk * sz * 50.0 + 5.0;
     }
 
+    // ── Malaria belts: per-arch severity (0 at 20°+, peaks at equator) ───
+    // Based on abs_latitude in degrees. Threshold: 20° from equator.
+    this.malariaFactor = new Float64Array(this.N);
+    for (let i = 0; i < this.N; i++) {
+      const absLat = substrate[i].climate?.abs_latitude ?? 30;
+      if (absLat < 20) {
+        this.malariaFactor[i] = (20 - absLat) / 20;  // 1.0 at equator, 0 at 20°
+      }
+    }
+
     // ── Logs ───────────────────────────────────────────────
     this.epiLog = [];
+    this.waveEpiLog = [];  // spontaneous epidemic waves (separate from contact epidemics)
     this.expansionLog = [];
     this.dfYear = null;
     this.dfArch = null;
@@ -768,7 +782,19 @@ export class SimEngine {
         let cap = this.carryCap[j];
         if (this.tech[core] >= 7.0 && this.cRemaining[j] > 0) cap *= (1.0 + er * 0.5);
         if (this.tech[core] >= 9.0) cap *= 1.5;
-        const growthRate = 0.03 * er * (1.0 - this.pop[j] / Math.max(1, cap));
+        // Malaria belt: reduce effective carrying capacity in tropical archipelagos
+        // Medical knowledge (tech ≥ 6) cuts the penalty to 30%
+        const mSev = this.malariaFactor[j];
+        if (mSev > 0) {
+          const mPenalty = mSev * p.malaria_cap_penalty * (this.tech[core] >= 6.0 ? 0.30 : 1.0);
+          cap *= (1.0 - mPenalty);
+        }
+        let growthRate = 0.03 * er * (1.0 - this.pop[j] / Math.max(1, cap));
+        // Urban disease sink: density-dependent mortality above 70% capacity
+        const densityRatio = this.pop[j] / Math.max(1, cap);
+        if (densityRatio > 0.7) {
+          growthRate -= (densityRatio - 0.7) * p.urban_disease_rate;
+        }
         this.pop[j] *= (1.0 + _clamp(growthRate, -0.05, 0.10));
         this.pop[j] = Math.max(1.0, this.pop[j]);
       }
@@ -788,6 +814,48 @@ export class SimEngine {
       }
       if (maxContactTech > this.tech[core] + 1.0) this.tech[core] += (maxContactTech - this.tech[core]) * 0.08;
       if (worldMaxTech > this.tech[core] + 1.0) this.tech[core] += (worldMaxTech - this.tech[core]) * 0.03;
+    }
+
+    // ── STAGE 5b: Epidemic waves ────────────────────────────
+    // Periodic disease events propagating through trade contact networks.
+    // Probability per tick scales with contact count × population density.
+    // Separate from contact epidemics (which fire on first-contact absorption).
+    for (const core of cores) {
+      const nc = this.contactSet[core].size;
+      if (nc < 2) continue;  // isolated polities don't originate waves
+      // Compute population density relative to carrying capacity
+      let totalCap = 0, totalPop = 0;
+      for (let j = 0; j < N; j++) {
+        if (this.controller[j] === core) {
+          totalCap += this.carryCap[j];
+          totalPop += this.pop[j];
+        }
+      }
+      const density = totalCap > 0 ? totalPop / totalCap : 0;
+      // Probability: base × contact bonus × density. ~3-8% per tick for trade hubs.
+      const epiProb = p.epi_base_severity * 0.015 * (1.0 + nc * 0.2) * Math.max(0.3, density);
+      if (this.rng() < epiProb) {
+        const mortality = 0.04 + this.rng() * 0.12;  // 4–16% population loss
+        const sourceName = core;
+        // Spread to trade partners with ~35% probability each
+        const affected = new Set([core]);
+        for (const other of this.contactSet[core]) {
+          if (coresSet.has(other) && this.rng() < 0.35) affected.add(other);
+        }
+        for (const c of affected) {
+          for (let j = 0; j < N; j++) {
+            if (this.controller[j] === c) {
+              this.pop[j] *= (1.0 - mortality);
+              this.pop[j] = Math.max(1.0, this.pop[j]);
+            }
+          }
+        }
+        this.waveEpiLog.push({
+          tick, year, source: sourceName,
+          mortality_rate: mortality,
+          affected: [...affected],
+        });
+      }
     }
 
     // ── STAGE 6: Thompson Sampling expansion ────────────────
@@ -1002,6 +1070,8 @@ export class SimEngine {
       contactedCores: this.playerCore !== null ? [...this.contactSet[this.playerCore]] : [],
       // Primary crop per archipelago (for narrative text)
       crops: this.substrate.map(s => s.crops?.primary_crop || 'foraging'),
+      // Epidemic waves that fired this tick (for event popups / dispatch)
+      waveEpis: this.waveEpiLog.filter(e => e.tick === this.tick - 1),
     };
   }
 
@@ -1104,7 +1174,7 @@ export class SimEngine {
       states, log: this.expansionLog,
       df_year: this.dfYear, df_arch: this.dfArch, df_detector: this.dfDetector,
       reach_arch: reachArch ?? 0, lattice_arch: latticeArch ?? 0,
-      epi_log: this.epiLog, substrate: this.substrate,
+      epi_log: this.epiLog, wave_epi_log: this.waveEpiLog, substrate: this.substrate,
       hegemons, hegemon_cultures: hegemonCultures,
       hegemon_culture_pos: Object.fromEntries(hegemons.map(c => [c, [...this.cpos[c]]])),
       tech_snapshots: this.techSnapshots, pop_snapshots: this.popSnapshots,

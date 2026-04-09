@@ -446,6 +446,32 @@ function gameReducer(state, action) {
         }
       }
 
+      // ── Epidemic waves ──────────────────────────────────────
+      // Surface wave epidemics that touch the player or their contacts.
+      if (snapshot.waveEpis && snapshot.waveEpis.length > 0) {
+        for (const wave of snapshot.waveEpis) {
+          const affectsPlayer = wave.affected.includes(playerCore);
+          const affectsContact = wave.affected.some(c => snapshot.contactedCores?.includes(c));
+          if (affectsPlayer || affectsContact) {
+            const sourceName = action.names[wave.source] || `Nation ${wave.source}`;
+            newEvents.push({
+              yearStr: yearStr2,
+              text: `MERCHANT GUILD — Epidemic wave from ${sourceName} trade routes. Mortality ${Math.round(wave.mortality_rate * 100)}%. Trade disruption expected.`,
+              color: '#6a4a2a',
+            });
+            if (!popup && affectsPlayer) {
+              popup = {
+                type: 'epidemic_wave',
+                data: {
+                  source: sourceName,
+                  mortality: wave.mortality_rate,
+                },
+              };
+            }
+          }
+        }
+      }
+
       // ── Generate situation cards for next turn ────────────
       const nextCards = generateSituationCards(
         snapshot,

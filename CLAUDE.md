@@ -15,6 +15,8 @@ Aeolia/
 │   ├── main.jsx                 # Mode selector (Observatory / Strategy)
 │   ├── engine/
 │   │   ├── SimEngine.js         # JS port of sim_proxy_v2.py with player interaction hooks
+│   │   ├── narrativeText.js     # Deterministic prose library (no RNG; hash-based selection)
+│   │   ├── cardGenerator.js     # Situation card generator (11 card types, actionable responses)
 │   │   ├── world.js             # World generation (archipelagos, edges, substrate)
 │   │   ├── constants.js         # Polity names, parameters
 │   │   └── rng.js               # Mulberry32 PRNG
@@ -98,11 +100,11 @@ Aeolia/
 
 ## Current State
 
-**Working:** Sim runs, produces hegemons, all new mechanics (culture space, Malthusian clamp, trade energy, desperation) are implemented and validated on seed 216089.
+**Working:** Sim runs, produces hegemons, all new mechanics (culture space, Malthusian clamp, trade energy, desperation) are implemented and validated on seed 216089. Narrative engine (`src/engine/narrativeText.js`) provides deterministic prose for all event types grounded in the series bible. Situation cards system (`src/engine/cardGenerator.js`) generates 11 card types with player-actionable responses. Event popups draw from `narrativeText.js` for varied, flavored text. Dispatches panel shows source-tagged intelligence feed (ADMIRALTY / MERCHANT GUILD / INTERNAL AFFAIRS / etc.).
 
 **Broken:** Dark Forest doesn't fire. The culture space refactoring shifted the RNG sequence — the old optimized parameter vector no longer produces DF. This is a calibration problem, not a bug. The optimizer needs retuning with the new 26-parameter space.
 
-**Next implementation round (from Lanthier consultation):** Disease mechanics, environmental shocks (crop failure, fishery depletion), religion/culture as political variable. See TODO.md.
+**Next implementation round (from Lanthier consultation):** Disease mechanics, environmental shocks (crop failure, fishery depletion), religion/culture as political variable. See TODO.md. Also: Observatory/history viewer mode for the Lanthier presentation (timeline scrubber, tech curves, event markers).
 
 ## Running the Sim
 
@@ -124,26 +126,6 @@ python3 optimizer_v2.py  # CMA-ES, runs indefinitely, Ctrl-C to stop
 ```
 
 Results are printed to stdout. Best parameters are logged. For long runs, use tmux/nohup.
-
-## Inter-Agent Channel
-
-A file-based message bus at `~/Labs/.claude-channel/` enables async communication between team members. Read PROTOCOL.md and DRAMATIS_PERSONAE.md there.
-
-**Team:**
-- **Guido** (Dispatch/Cowork) — coordinator, channel ID `dispatch`
-- **Clio** (Claude Code CLI, MacBook Neo) — local engineer, channel ID `cli`
-- **Hermes** (Claude Code CLI, Aomori Hackintosh) — compute node, channel ID `hermes`
-
-**At session start:**
-```bash
-# Read your soul file first (if it exists)
-cat ~/Labs/.claude-channel/{YOUR_NAME}_SOUL.md 2>/dev/null
-
-# Then check the channel
-cd ~/Labs/.claude-channel && ./channel.sh unread cli && ./channel.sh read cli
-```
-
-**Character sheets** in the channel directory explain each team member's role, capabilities, and the soul system for session continuity.
 
 ## Conventions
 
