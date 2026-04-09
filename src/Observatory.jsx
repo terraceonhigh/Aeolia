@@ -281,6 +281,91 @@ function StatsPanel({ snapshot, names }) {
   );
 }
 
+// ── World control map ─────────────────────────────────────
+// Projects 3D arch coordinates to equirectangular 2D for control viz.
+
+function WorldMap({ archCoords, snapshot, polityColorMap, names, width, height }) {
+  if (!archCoords || !snapshot) return null;
+  const PAD = 8;
+  const W = width - PAD * 2;
+  const H = height - PAD * 2;
+
+  // Equirectangular: lon → x, lat → y
+  const lonToX = (lon) => PAD + ((lon + Math.PI) / (2 * Math.PI)) * W;
+  const latToY = (lat) => PAD + ((-lat + Math.PI / 2) / Math.PI) * H;
+
+  const controller = snapshot.controller || [];
+  const pop = snapshot.pop || [];
+  const maxPop = Math.max(...pop, 1);
+
+  // Compute polity territories for background fill
+  const polityArches = {};
+  for (let j = 0; j < controller.length; j++) {
+    const c = controller[j];
+    if (!polityArches[c]) polityArches[c] = [];
+    polityArches[c].push(j);
+  }
+
+  // Determine which polities are at the "hegemon" scale
+  const totalPop = pop.reduce((s, v) => s + v, 0);
+  const polityPops = {};
+  for (const c in polityArches) {
+    polityPops[c] = polityArches[c].reduce((s, j) => s + (pop[j] || 0), 0);
+  }
+
+  return (
+    <svg width={width} height={height} style={{ background: '#0a0a12' }}>
+      {/* Ocean background */}
+      <rect x={0} y={0} width={width} height={height} fill="#0e0c18" />
+      {/* Graticule */}
+      {[-60, -30, 0, 30, 60].map(lat => {
+        const y = latToY(lat * Math.PI / 180);
+        return <line key={lat} x1={PAD} y1={y} x2={PAD + W} y2={y} stroke="#1a1820" strokeWidth={0.5} />;
+      })}
+      {[-120, -60, 0, 60, 120].map(lon => {
+        const x = lonToX(lon * Math.PI / 180);
+        return <line key={lon} x1={x} y1={PAD} x2={x} y2={PAD + H} stroke="#1a1820" strokeWidth={0.5} />;
+      })}
+      {/* Archipelago dots */}
+      {archCoords.map((coord, i) => {
+        const x = lonToX(coord.lon);
+        const y = latToY(coord.lat);
+        const ctrl = controller[i];
+        const color = polityColorMap[ctrl] || '#3a3a4a';
+        const p = pop[i] || 0;
+        // Size by population, minimum 3px
+        const r = Math.max(2.5, Math.sqrt(p / maxPop) * 9);
+        const isHegemon = polityPops[ctrl] > totalPop * 0.09;
+        return (
+          <g key={i}>
+            {isHegemon && <circle cx={x} cy={y} r={r + 2} fill={color} opacity={0.15} />}
+            <circle cx={x} cy={y} r={r} fill={color} opacity={0.85} />
+            <circle cx={x} cy={y} r={r} fill="none" stroke={color} strokeWidth={0.5} opacity={0.4} />
+          </g>
+        );
+      })}
+      {/* Polity labels for hegemons */}
+      {Object.entries(polityPops)
+        .filter(([c, pp]) => pp > totalPop * 0.09)
+        .map(([c, pp]) => {
+          const arches = polityArches[c] || [];
+          if (arches.length === 0) return null;
+          // Centroid of controlled arches
+          const cx_sum = arches.reduce((s, j) => s + lonToX(archCoords[j]?.lon || 0), 0) / arches.length;
+          const cy_sum = arches.reduce((s, j) => s + latToY(archCoords[j]?.lat || 0), 0) / arches.length;
+          const color = polityColorMap[c] || '#c8a878';
+          return (
+            <text key={c} x={cx_sum} y={cy_sum - 10}
+              textAnchor="middle" fill={color} fontSize={7} fontFamily={FONT}
+              opacity={0.9} fontWeight={700} letterSpacing="1px">
+              {names[Number(c)] || `N${c}`}
+            </text>
+          );
+        })}
+    </svg>
+  );
+}
+
 // ── Main Observatory component ────────────────────────────
 
 export default function Observatory({ seed, onBack }) {
@@ -306,6 +391,14 @@ export default function Observatory({ seed, onBack }) {
 
         // Collect data we need for charts
         const timeline = engine.timeline;
+
+        // Arch coordinates for world map (project to 2D using equirectangular)
+        const archCoords = world.archs.map(a => {
+          // cx, cy, cz are 3D unit sphere coords; project to lon/lat
+          const lat = Math.asin(Math.max(-1, Math.min(1, a.cy ?? 0)));
+          const lon = Math.atan2(a.cz ?? 0, a.cx ?? 0);
+          return { lat, lon };  // radians
+        });
 
         // Find top polities by final population
         const finalController = [...engine.controller];
@@ -415,9 +508,19 @@ export default function Observatory({ seed, onBack }) {
         const maxTech = Math.ceil(Math.max(...polityTechSeries.flatMap(s => s.data), 10));
         const maxPop = Math.ceil(Math.max(...worldPopSeries[0].data) * 1.05);
 
+        // Polity color map (stable across ticks)
+        const allCores = [...new Set(timeline.flatMap(e => e.controller))];
+        const allCoresSorted = allCores.sort((a, b) => (polityFinalPop[b] || 0) - (polityFinalPop[a] || 0));
+        const polityColorMap = {};
+        allCoresSorted.forEach((c, i) => {
+          polityColorMap[c] = POLITY_COLORS[i % POLITY_COLORS.length];
+        });
+
         setHistoryData({
           timeline,
           years,
+          archCoords,
+          polityColorMap,
           polityTechSeries,
           polityPopSeries,
           worldPopSeries,
@@ -624,8 +727,21 @@ export default function Observatory({ seed, onBack }) {
           </div>
         </div>
 
-        {/* Right: Stats at selected tick */}
+        {/* Right: Control map + stats */}
         <div style={S.right}>
+          <div style={S.sectionLabel}>CONTROL MAP</div>
+          <div style={{ flexShrink: 0, height: 128, borderBottom: '1px solid #1a1410', overflow: 'hidden' }}>
+            {selectedSnapshot && historyData?.archCoords && (
+              <WorldMap
+                archCoords={historyData.archCoords}
+                snapshot={selectedSnapshot}
+                polityColorMap={historyData.polityColorMap}
+                names={names}
+                width={240}
+                height={128}
+              />
+            )}
+          </div>
           <div style={S.sectionLabel}>POLITY STANDINGS</div>
           {selectedSnapshot && (
             <StatsPanel snapshot={selectedSnapshot} names={names} />
