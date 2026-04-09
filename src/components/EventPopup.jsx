@@ -6,12 +6,12 @@
 const STYLES = {
   overlay: {
     position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-    background: 'rgba(3,6,16,0.75)',
+    background: 'rgba(10,8,4,0.80)',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     zIndex: 20,
   },
   card: (accentColor) => ({
-    width: 400, background: '#050a14',
+    width: 400, background: '#0e0a06',
     border: `1px solid ${accentColor}40`,
     borderLeft: `3px solid ${accentColor}`,
     borderRadius: 6, overflow: 'hidden',
@@ -32,7 +32,7 @@ const STYLES = {
   }),
   body: {
     padding: '12px 18px',
-    fontSize: 9, color: '#b0c4d8', lineHeight: 1.7,
+    fontSize: 9, color: '#c8a878', lineHeight: 1.7,
   },
   footer: {
     padding: '10px 18px 14px',
@@ -53,39 +53,45 @@ const STYLES = {
 const EVENT_DEFS = {
   first_contact: {
     icon: '◉',
-    color: '#daa540',
+    color: '#b8923a',
     title: 'First Contact',
     body: (data) => `Your traders have encountered ${data.name} — a ${data.culture} civilization with tech level ${data.tech}. Trade routes may now form between your peoples.`,
   },
   absorption: {
     icon: '⚔',
-    color: '#44cc88',
+    color: '#8a7a3a',
     title: 'Territory Absorbed',
     body: (data) => `${data.name} has been brought under your control. Your domain now spans ${data.territory} archipelagos.`,
   },
   territory_lost: {
     icon: '⚠',
-    color: '#cc4444',
+    color: '#a04030',
     title: 'Territory Lost',
     body: (data) => `${data.aggressor} has seized ${data.name} from your holdings.`,
   },
   era_transition: {
     icon: '◆',
-    color: '#88aadd',
+    color: '#a09060',
     title: (data) => `${data.era} Era`,
     body: (data) => data.description,
   },
   tech_milestone: {
     icon: '◈',
-    color: '#88ccdd',
+    color: '#9a8a5a',
     title: 'Technology Milestone',
     body: (data) => data.description,
   },
   dark_forest: {
     icon: '⚠',
-    color: '#cc2222',
+    color: '#8a2020',
     title: 'Dark Forest Contact',
     body: () => `Two nuclear-capable civilizations have detected each other across the ocean. The age of mutual annihilation begins. The world will never be the same.`,
+  },
+  defeat: {
+    icon: '✦',
+    color: '#6a3020',
+    title: 'Civilization Fallen',
+    body: () => `Your last archipelago has been seized. Your people are scattered, your culture absorbed. The ocean remembers no names.`,
   },
 };
 

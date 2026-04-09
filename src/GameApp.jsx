@@ -33,10 +33,11 @@ function shuffleNames(seed) {
 
 // ── Color helpers ────────────────────────────────────────
 
-const FOG_COLOR = new THREE.Color(0.04, 0.06, 0.10);       // terra incognita — near-invisible
-const RUMOR_COLOR = new THREE.Color(0.08, 0.10, 0.14);     // rumor — faint hint
-const FRONTIER_COLOR = new THREE.Color(0.35, 0.30, 0.20);  // frontier — visible, amber
-const PLAYER_COLOR = new THREE.Color(0.2, 0.8, 0.3);       // player — green
+// ── Antique cartography palette ─────────────────────────
+const FOG_COLOR = new THREE.Color(0.08, 0.06, 0.04);       // terra incognita — dark umber
+const RUMOR_COLOR = new THREE.Color(0.22, 0.18, 0.12);     // rumor — faint sepia hint
+const FRONTIER_COLOR = new THREE.Color(0.45, 0.35, 0.20);  // frontier — aged brown
+const PLAYER_COLOR = new THREE.Color(0.16, 0.12, 0.08);    // player — dark ink
 
 function factionColor(archIdx, controller, playerCore, snapshot, visibility) {
   const vis = visibility?.[archIdx] || 'unknown';
@@ -48,24 +49,24 @@ function factionColor(archIdx, controller, playerCore, snapshot, visibility) {
     // Frontier shows who controls it
     if (controller === archIdx) return FRONTIER_COLOR; // independent
     if (controller === playerCore) return PLAYER_COLOR; // ours somehow
-    // Owned by someone else — muted faction color
+    // Owned by someone else — muted sepia faction color
     const cpos = snapshot?.cpos?.[controller];
     if (cpos) {
       const ci = (cpos[0] + 1) * 0.5;
       const io = (cpos[1] + 1) * 0.5;
-      return new THREE.Color(0.12 + ci * 0.3, 0.12 + io * 0.2, 0.2 + (1 - ci) * 0.25);
+      return new THREE.Color(0.25 + ci * 0.25, 0.18 + io * 0.18, 0.10 + (1 - ci) * 0.12);
     }
     return FRONTIER_COLOR;
   }
-  // 'contacted' — full faction color
+  // 'contacted' — full faction color in sepia tones
   if (controller === playerCore) return PLAYER_COLOR;
   const cpos = snapshot?.cpos?.[controller];
   if (cpos) {
     const ci = (cpos[0] + 1) * 0.5;
     const io = (cpos[1] + 1) * 0.5;
-    return new THREE.Color(0.15 + ci * 0.5, 0.15 + io * 0.3, 0.3 + (1 - ci) * 0.4);
+    return new THREE.Color(0.35 + ci * 0.3, 0.25 + io * 0.2, 0.12 + (1 - ci) * 0.15);
   }
-  return new THREE.Color(0.3, 0.3, 0.35);
+  return new THREE.Color(0.4, 0.32, 0.22);
 }
 
 // ── Camera: compute quaternion to face a point on the sphere ──
@@ -176,10 +177,10 @@ function gameReducer(state, action) {
       let popup = null; // first popup-worthy event wins
 
       for (const ev of snapshot.events) {
-        const yearStr = ev.year < 0 ? `${Math.abs(ev.year)} BP` : `${ev.year} AP`;
+        const yearStr = `Y${(snapshot.tick || 60) - 60}`;
         if (ev.core === playerCore) {
           const targetName = action.names[ev.target];
-          newEvents.push({ yearStr, text: `You absorbed ${targetName}`, color: '#44cc88' });
+          newEvents.push({ yearStr, text: `You absorbed ${targetName}`, color: '#8a7a3a' });
           if (!popup) {
             popup = {
               type: 'absorption',
@@ -191,7 +192,7 @@ function gameReducer(state, action) {
           // We lost territory
           const targetName = action.names[ev.target];
           const aggressorName = action.names[ev.core];
-          newEvents.push({ yearStr, text: `${aggressorName} seized ${targetName} from you!`, color: '#cc4444' });
+          newEvents.push({ yearStr, text: `${aggressorName} seized ${targetName} from you!`, color: '#a04030' });
           if (!popup) {
             popup = {
               type: 'territory_lost',
@@ -203,9 +204,9 @@ function gameReducer(state, action) {
           const coreVis = vis?.[ev.core] || 'unknown';
           if (targetVis === 'unknown' && coreVis === 'unknown') continue;
           if (targetVis === 'rumor' && coreVis === 'rumor') {
-            newEvents.push({ yearStr, text: `Rumors of conflict near ${action.names[ev.target]}`, color: '#3a4a5a' });
+            newEvents.push({ yearStr, text: `Rumors of conflict near ${action.names[ev.target]}`, color: '#3a2a1a' });
           } else {
-            newEvents.push({ yearStr, text: `${action.names[ev.core]} absorbed ${action.names[ev.target]}`, color: '#607888' });
+            newEvents.push({ yearStr, text: `${action.names[ev.core]} absorbed ${action.names[ev.target]}`, color: '#6a5a3a' });
           }
         }
       }
@@ -261,8 +262,8 @@ function gameReducer(state, action) {
         const canSeeDF = snapshot.dfArch === playerCore || snapshot.dfDetector === playerCore
           || contactedCores.includes(snapshot.dfArch) || contactedCores.includes(snapshot.dfDetector);
         if (canSeeDF) {
-          const yearStr = snapshot.dfYear < 0 ? `${Math.abs(snapshot.dfYear)} BP` : `${snapshot.dfYear} AP`;
-          newEvents.push({ yearStr, text: 'DARK FOREST CONTACT DETECTED', color: '#cc4444' });
+          const yearStr = `Y${(snapshot.tick || 60) - 60}`;
+          newEvents.push({ yearStr, text: 'DARK FOREST CONTACT DETECTED', color: '#a04030' });
           popup = { type: 'dark_forest', data: {} };
         }
       }
@@ -271,13 +272,20 @@ function gameReducer(state, action) {
       const frontierSet = new Set(frontier.map(f => f.index));
       const nextTargets = new Set([...selectedTargets].filter(t => frontierSet.has(t)));
 
+      // Check for defeat — lost all territory
+      const playerTerritory = snapshot.playerStats?.territory || 0;
+      const defeated = playerTerritory === 0;
+      if (defeated && !popup) {
+        popup = { type: 'defeat', data: {} };
+      }
+
       return {
         ...state,
         snapshot,
         frontier,
         selectedTargets: nextTargets,
         eventLog: newEvents,
-        phase: snapshot.finished ? 'GAME_OVER' : 'PLAYING',
+        phase: (snapshot.finished || defeated) ? 'GAME_OVER' : 'PLAYING',
         pendingPopup: popup,
         timerKey: state.timerKey + 1,
         lastEra: eraName,
@@ -331,36 +339,36 @@ function GameInner({ seed, onBack }) {
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(w, h);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setClearColor(0x030610);
+    renderer.setClearColor(0x0a0804); // dark umber void
     el.appendChild(renderer.domElement);
 
-    const ambLight = new THREE.AmbientLight(0x445566, 0.6);
+    const ambLight = new THREE.AmbientLight(0x998866, 0.5); // warm sepia ambient
     scene.add(ambLight);
-    const dirLight = new THREE.DirectionalLight(0xffeedd, 0.8);
+    const dirLight = new THREE.DirectionalLight(0xffe8c0, 0.9); // candlelight directional
     dirLight.position.set(0, 2, 10);
     scene.add(dirLight);
 
     const globeGroup = new THREE.Group();
     scene.add(globeGroup);
 
-    // Atmosphere glow
+    // Atmosphere glow — warm parchment halo
     globeGroup.add(new THREE.Mesh(
       new THREE.IcosahedronGeometry(R * 1.02, 3),
-      new THREE.MeshBasicMaterial({ color: 0x3366aa, transparent: true, opacity: 0.03, side: THREE.BackSide })
+      new THREE.MeshBasicMaterial({ color: 0xd4b896, transparent: true, opacity: 0.06, side: THREE.BackSide })
     ));
 
-    // Ocean sphere
+    // Ocean sphere — warm parchment surface
     globeGroup.add(new THREE.Mesh(
       new THREE.IcosahedronGeometry(R * 0.998, 5),
-      new THREE.MeshPhongMaterial({ color: new THREE.Color(0.02, 0.05, 0.12), shininess: 5, specular: new THREE.Color(0x040810) })
+      new THREE.MeshPhongMaterial({ color: new THREE.Color(0.58, 0.48, 0.34), shininess: 3, specular: new THREE.Color(0x1a1408) })
     ));
 
-    // Archipelago markers (sprites)
+    // Archipelago markers
     const markers = [];
     for (let i = 0; i < world.archs.length; i++) {
       const arch = world.archs[i];
       const geo = new THREE.SphereGeometry(0.06 + (arch.shelfR || 0.06) * 0.3, 8, 6);
-      const mat = new THREE.MeshPhongMaterial({ color: 0x556677, emissive: 0x111111, shininess: 3 });
+      const mat = new THREE.MeshPhongMaterial({ color: 0x2a1f14, emissive: 0x0a0804, shininess: 2 }); // dark ink landmasses
       const mesh = new THREE.Mesh(geo, mat);
       mesh.position.set(arch.cx * R * 1.001, arch.cy * R * 1.001, arch.cz * R * 1.001);
       mesh.userData.archIdx = i;
@@ -384,7 +392,7 @@ function GameInner({ seed, onBack }) {
         pts.push(new THREE.Vector3(x * R * 0.999, y * R * 0.999, z * R * 0.999));
       }
       const geo = new THREE.BufferGeometry().setFromPoints(pts);
-      const line = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: 0x1a2a3a, transparent: true, opacity: 0.3 }));
+      const line = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: 0x2a1f14, transparent: true, opacity: 0.4 }));
       edgeGroup.add(line);
     }
     globeGroup.add(edgeGroup);
@@ -398,9 +406,9 @@ function GameInner({ seed, onBack }) {
       const ctx = canvas.getContext('2d');
       ctx.font = "bold 24px 'JetBrains Mono','Fira Code',monospace";
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.strokeStyle = 'rgba(0,0,0,0.8)'; ctx.lineWidth = 3;
+      ctx.strokeStyle = 'rgba(10,8,4,0.8)'; ctx.lineWidth = 3;
       ctx.strokeText(names[i], 128, 32);
-      ctx.fillStyle = '#8aa0b8';
+      ctx.fillStyle = '#c8a878'; // parchment gold text
       ctx.fillText(names[i], 128, 32);
 
       const tex = new THREE.CanvasTexture(canvas);
@@ -469,12 +477,12 @@ function GameInner({ seed, onBack }) {
       const mesh = st.markers[i];
       if (game.phase === 'SELECT_POLITY') {
         if (i === highlightedArch) {
-          mesh.material.color.set(0xddaa44);
-          mesh.material.emissive.set(0x443311);
+          mesh.material.color.set(0xb8923a); // highlighted gold
+          mesh.material.emissive.set(0x3a2a10);
           mesh.scale.setScalar(1.3);
         } else {
-          mesh.material.color.set(0x556677);
-          mesh.material.emissive.set(0x111111);
+          mesh.material.color.set(0x2a1f14); // dark ink
+          mesh.material.emissive.set(0x0a0804);
           mesh.scale.setScalar(1.0);
         }
         mesh.visible = true;
@@ -486,29 +494,32 @@ function GameInner({ seed, onBack }) {
 
         // Visibility-based rendering
         if (v === 'unknown') {
-          mesh.material.emissive.set(0x020304);
-          mesh.visible = false; // completely hidden in terra incognita
+          mesh.material.emissive.set(0x050402);
+          mesh.visible = false;
         } else if (v === 'rumor') {
-          mesh.material.emissive.copy(color).multiplyScalar(0.05);
+          mesh.material.color.set(0x1a1408);
+          mesh.material.emissive.set(0x0a0804);
           mesh.visible = true;
-          mesh.scale.setScalar(0.6);
+          mesh.scale.setScalar(0.7);
         } else if (v === 'frontier') {
-          mesh.material.emissive.copy(color).multiplyScalar(0.15);
+          mesh.material.color.set(0x1a1408); // dark ink
+          mesh.material.emissive.set(0x1a1408);
           mesh.visible = true;
           mesh.scale.setScalar(1.0);
-          // Pulse selected targets
           if (game.selectedTargets.has(i)) {
-            mesh.material.emissive.set(0x336633);
+            mesh.material.emissive.set(0x5a4a2a);
             mesh.scale.setScalar(1.2);
           }
         } else if (v === 'contacted') {
-          mesh.material.emissive.copy(color).multiplyScalar(0.15);
+          mesh.material.color.copy(color);
+          mesh.material.emissive.set(0x14100a);
           mesh.visible = true;
           mesh.scale.setScalar(0.9);
         } else { // owned
-          mesh.material.emissive.copy(color).multiplyScalar(0.3);
+          mesh.material.color.set(0x0e0a06); // darkest ink for owned
+          mesh.material.emissive.set(0x2a1f14);
           mesh.visible = true;
-          mesh.scale.setScalar(1.1);
+          mesh.scale.setScalar(1.15);
         }
       }
     }
@@ -526,8 +537,8 @@ function GameInner({ seed, onBack }) {
         line.visible = anyKnown;
         if (anyKnown) {
           const isPlayerEdge = va === 'owned' || vb === 'owned';
-          line.material.opacity = isPlayerEdge ? 0.5 : 0.2;
-          line.material.color.set(isPlayerEdge ? 0x2a4a3a : 0x1a2a3a);
+          line.material.opacity = isPlayerEdge ? 0.65 : 0.35;
+          line.material.color.set(isPlayerEdge ? 0x4a3a20 : 0x2a1f14);
         }
       }
     }
@@ -543,19 +554,23 @@ function GameInner({ seed, onBack }) {
         } else if (vis) {
           const v = vis[idx];
           if (v === 'owned') {
+            sprite.material.color.set(0xffffff); // full brightness — gold label
             sprite.material.opacity = 0.95;
             sprite.visible = true;
           } else if (v === 'frontier') {
+            sprite.material.color.set(0xc0a070); // warm muted
             sprite.material.opacity = 0.7;
             sprite.visible = true;
           } else if (v === 'contacted') {
+            sprite.material.color.set(0x8a7a5a); // faded sepia
             sprite.material.opacity = 0.5;
             sprite.visible = true;
           } else if (v === 'rumor') {
+            sprite.material.color.set(0x6a5a3a); // very faded
             sprite.material.opacity = 0.2;
             sprite.visible = true;
           } else {
-            sprite.visible = false; // terra incognita
+            sprite.visible = false;
           }
         }
       }
@@ -701,29 +716,29 @@ function GameInner({ seed, onBack }) {
 
   return (
     <div style={{
-      width: '100%', height: '100vh', background: '#030610', color: '#b0c4d8',
+      width: '100%', height: '100vh', background: '#0a0804', color: '#c8a878',
       fontFamily: "'JetBrains Mono','Fira Code',monospace",
       display: 'flex', flexDirection: 'column', overflow: 'hidden',
     }}>
       {/* Header */}
       <div style={{
-        padding: '8px 20px', borderBottom: '1px solid #0f1a28', flexShrink: 0,
+        padding: '8px 20px', borderBottom: '1px solid #2a1f14', flexShrink: 0,
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        background: 'linear-gradient(180deg,#060b14,#030610)',
+        background: 'linear-gradient(180deg,#120e08,#0a0804)',
       }}>
         <div>
-          <div style={{ fontSize: 9, color: '#8aa0b8', letterSpacing: '3px', textTransform: 'uppercase', marginBottom: 1 }}>
+          <div style={{ fontSize: 9, color: '#8a7a5a', letterSpacing: '3px', textTransform: 'uppercase', marginBottom: 1 }}>
             Game Mode
           </div>
-          <div style={{ fontSize: 14, color: '#d4e0ec', fontWeight: 600 }}>
+          <div style={{ fontSize: 14, color: '#d4b896', fontWeight: 600 }}>
             AEOLIA — STRATEGY
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ fontSize: 8, color: '#607888' }}>seed {seed}</div>
+          <div style={{ fontSize: 8, color: '#6a5a3a' }}>seed {seed}</div>
           <button onClick={onBack} style={{
             padding: '4px 12px', fontSize: 8, fontFamily: 'inherit', cursor: 'pointer',
-            background: '#0a1218', border: '1px solid #1a2a3a', color: '#8aa0b8',
+            background: '#14100a', border: '1px solid #2a1f14', color: '#8a7a5a',
             letterSpacing: '1px', borderRadius: 2,
           }}>
             Observatory

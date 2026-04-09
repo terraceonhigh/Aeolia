@@ -9,52 +9,52 @@ import { useState } from 'react';
 const STYLES = {
   overlay: {
     position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-    background: 'rgba(3,6,16,0.85)',
+    background: 'rgba(10,8,4,0.88)',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     zIndex: 10,
   },
   panel: {
-    width: 520, maxHeight: '80vh', background: '#050a14',
-    border: '1px solid #1a2a3a', borderRadius: 6,
+    width: 520, maxHeight: '80vh', background: '#0e0a06',
+    border: '1px solid #2a1f14', borderRadius: 6,
     display: 'flex', flexDirection: 'column', overflow: 'hidden',
     fontFamily: "'JetBrains Mono','Fira Code',monospace",
     boxShadow: '0 8px 48px rgba(0,0,0,0.8)',
   },
   header: {
-    padding: '16px 20px 12px', borderBottom: '1px solid #1a2a3a', flexShrink: 0,
+    padding: '16px 20px 12px', borderBottom: '1px solid #2a1f14', flexShrink: 0,
   },
   title: {
-    fontSize: 14, color: '#d4e0ec', fontWeight: 700, letterSpacing: '2px',
+    fontSize: 14, color: '#d4b896', fontWeight: 700, letterSpacing: '2px',
     textTransform: 'uppercase', marginBottom: 4,
   },
   subtitle: {
-    fontSize: 9, color: '#8aa0b8', lineHeight: 1.5,
+    fontSize: 9, color: '#8a7a5a', lineHeight: 1.5,
   },
   list: {
     flex: 1, overflowY: 'auto', padding: '8px 12px',
   },
   item: (selected, hovered) => ({
     padding: '8px 12px', marginBottom: 4, borderRadius: 4, cursor: 'pointer',
-    border: `1px solid ${selected ? '#4a8a4a' : hovered ? '#2a4a5a' : '#0f1a28'}`,
-    background: selected ? '#0a1a0a' : hovered ? '#0a1420' : '#060b14',
+    border: `1px solid ${selected ? '#6a5430' : hovered ? '#3a2a1a' : '#1a1408'}`,
+    background: selected ? '#1a1408' : hovered ? '#14100a' : '#0e0a06',
     transition: 'all 0.15s',
   }),
   archName: (selected) => ({
-    fontSize: 11, fontWeight: 600, color: selected ? '#88cc88' : '#c8d4e0',
+    fontSize: 11, fontWeight: 600, color: selected ? '#d4b896' : '#c8a878',
     letterSpacing: '1px',
   }),
   archDetail: {
-    fontSize: 8, color: '#8aa0b8', marginTop: 3, lineHeight: 1.6,
+    fontSize: 8, color: '#8a7a5a', marginTop: 3, lineHeight: 1.6,
     display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px 12px',
   },
   footer: {
-    padding: '12px 20px', borderTop: '1px solid #1a2a3a', flexShrink: 0,
+    padding: '12px 20px', borderTop: '1px solid #2a1f14', flexShrink: 0,
     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
   },
   button: (enabled) => ({
     padding: '8px 20px', fontSize: 10, fontFamily: 'inherit', cursor: enabled ? 'pointer' : 'default',
-    background: enabled ? '#1a3a1a' : '#0a1218', border: `1px solid ${enabled ? '#4a8a4a' : '#1a2a3a'}`,
-    color: enabled ? '#88cc88' : '#607888', letterSpacing: '1.5px', fontWeight: 600,
+    background: enabled ? '#1a1408' : '#0a0804', border: `1px solid ${enabled ? '#6a5430' : '#2a1f14'}`,
+    color: enabled ? '#d4b896' : '#6a5a3a', letterSpacing: '1.5px', fontWeight: 600,
     borderRadius: 3, textTransform: 'uppercase',
   }),
 };
@@ -112,7 +112,7 @@ export default function PolitySelect({ archs, substrate, names, onSelect, onHigh
         </div>
 
         <div style={STYLES.footer}>
-          <div style={{ fontSize: 8, color: '#607888' }}>
+          <div style={{ fontSize: 8, color: '#6a5a3a' }}>
             {selected !== null ? `Selected: ${names[selected]}` : 'Click an archipelago to select'}
           </div>
           <button
