@@ -5,6 +5,7 @@
 // ═══════════════════════════════════════════════════════════
 
 import { useState } from 'react';
+import { CROP_LORE } from '../engine/narrativeText.js';
 
 const STYLES = {
   overlay: {
@@ -69,13 +70,19 @@ export default function PolitySelect({ archs, substrate, names, onSelect, onHigh
     const yield_ = sub?.crops?.primary_yield?.toFixed(1) || '?';
     const minerals = sub?.minerals || {};
     const mineralStr = [
-      minerals.Cu && 'Cu', minerals.Au && 'Au',
-      minerals.C > 0 && 'C', minerals.Pu && 'Pu'
-    ].filter(Boolean).join(' ') || 'Fe';
+      minerals.Cu && 'aes', minerals.Au && 'chrysos',
+      minerals.C > 0 && 'naphtha', minerals.Pu && 'pyra'
+    ].filter(Boolean).join(' ') || 'iron only';
     const fishR = (sub?.climate?.fisheries_richness * 100)?.toFixed(0) || '0';
     const peaks = arch.peaks?.length || 0;
+    const cropLore = CROP_LORE[crop];
+    // Fish species by climate zone
+    const zone = sub?.climate?.climate_zone || 'temperate';
+    const fishSpecies = zone === 'cold' ? 'sthaq/bakala' : zone === 'equatorial' ? 'sardai' :
+      zone === 'subtropical' ? 'tunnu/sardai' : 'mixed waters';
+    const stimulant = cropLore?.stimulant || null;
 
-    return { i, crop, yield_, mineralStr, fishR, peaks, name: names[i] };
+    return { i, crop, yield_, mineralStr, fishR, peaks, name: names[i], cropLore, fishSpecies, stimulant };
   });
 
   // Sort by yield descending (good starting positions first)
@@ -87,8 +94,8 @@ export default function PolitySelect({ archs, substrate, names, onSelect, onHigh
         <div style={STYLES.header}>
           <div style={STYLES.title}>Choose Your Archipelago</div>
           <div style={STYLES.subtitle}>
-            Select a starting position. Higher crop yield and more peaks mean a stronger start.
-            Mineral access unlocks at higher tech levels.
+            The ocean is 4.6× Earth's circumference. Your people know the sky above the home shelf.
+            Everything beyond it is dark water. Choose where the history starts.
           </div>
         </div>
 
@@ -102,10 +109,10 @@ export default function PolitySelect({ archs, substrate, names, onSelect, onHigh
             >
               <div style={STYLES.archName(selected === i)}>{name}</div>
               <div style={STYLES.archDetail}>
-                <span>crop: {crop} (yield {yield_})</span>
+                <span>{crop} fields — yield {yield_}{cropLore ? ` · ${cropLore.season}` : ''}</span>
                 <span>minerals: {mineralStr}</span>
-                <span>peaks: {peaks}</span>
-                <span>fisheries: {fishR}%</span>
+                <span>{fishSpecies} — fisheries {fishR}%</span>
+                <span>{stimulant ? `${stimulant} houses · ` : ''}{peaks} island{peaks !== 1 ? 's' : ''}</span>
               </div>
             </div>
           ))}
