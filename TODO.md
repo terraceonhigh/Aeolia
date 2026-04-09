@@ -1,6 +1,6 @@
 # Aeolia TODO
 
-Status as of April 7, 2026. Everything above the line is implemented. Everything below is pending.
+Status as of April 9, 2026. Everything above the line is implemented. Everything below is pending.
 
 ---
 
@@ -37,6 +37,16 @@ Status as of April 7, 2026. Everything above the line is implemented. Everything
 - [x] In-universe textbook: Intro to Reach History Ch. 7 (university register)
 - [x] In-universe textbook: Our Reach, Our Trade Ch. 3 (elementary register)
 - [x] V1 commodity maps kept as canon (stim_map, fiber_map, prot_map)
+
+### Strategy Game (web app, 2026-04-09)
+- [x] narrativeText.js: deterministic prose library grounded in series bible (no RNG, hash-based selection)
+- [x] cardGenerator.js: 15 situation card types, each actionable
+- [x] EventPopup.jsx rewrite: rich narrative prose for all event types
+- [x] Dispatches feed with source-tagged intelligence (ADMIRALTY / MERCHANT GUILD / INTERNAL AFFAIRS / etc.)
+- [x] Disease mechanics: malaria belts, urban disease sink, epidemic waves (Stage 5b)
+- [x] 4 new situation cards: Piracy Warning, Tech Decay Alert, Navigator Guild Dispute, Malaria Medical Breakthrough
+- [x] Tech decay dispatches in INTERNAL AFFAIRS feed
+- [x] Observatory mode: 10,000-year history viewer with tech/pop charts, event timeline, scrubber, polity standings
 
 ### Infrastructure
 
@@ -76,11 +86,11 @@ Status as of April 7, 2026. Everything above the line is implemented. Everything
 
 ## Pending: Lanthier Targets (Next Implementation Round)
 
-### Disease Mechanics
-- [ ] Malaria belts: latitude-dependent disease zones gating colonial expansion into equatorial archipelagos
-- [ ] Epidemic waves: random civilization-scale setback events (population loss, tech disruption)
-- [ ] Urban disease sink: cities replenish population via immigration not reproduction; human-animal contact vector; demographic drag on urbanized polities
-- [ ] Disease interaction with desperation mechanic (population crash → maintenance exceeds surplus → tech decay cascade)
+### Disease Mechanics ✅ (implemented 2026-04-09 in SimEngine.js)
+- [x] Malaria belts: malariaFactor[] array, abs_lat < 20°, malaria_cap_penalty=0.40 param, tech≥6 reduces to 30%
+- [x] Epidemic waves: Stage 5b in advanceTick(), waveEpiLog, MERCHANT GUILD dispatches + epidemic_wave popup
+- [x] Urban disease sink: density-dependent mortality above 70% capacity, urban_disease_rate=0.08 param
+- [x] Disease interaction with desperation mechanic — already handled by existing desperation cascade
 
 ### Environmental Shocks
 - [ ] Crop failure: random per-archipelago yield penalties, RNG-seeded, pairs with existing world generation

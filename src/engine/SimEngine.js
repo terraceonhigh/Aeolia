@@ -43,6 +43,16 @@ export const DEFAULT_PARAMS = {
   maintenance_rate: 0.01,
   decay_rate: 0.10,
   desperation_weight: 0.50,
+  // ── Disease mechanics (from DISEASE_MECHANIC.md) ─────────
+  malaria_cap_penalty: 0.40,   // carrying capacity reduction at equator, pre-medical
+  urban_disease_rate: 0.08,    // density-dependent mortality above 70% capacity
+  // ── Environmental shocks ──────────────────────────────────
+  crop_failure_rate: 0.025,    // probability of crop failure per arch per tick
+  fishery_recovery_rate: 0.08, // natural fishery stock recovery per tick
+  fishery_overfish_rate: 0.06, // stock depletion per unit of excess exploitation
+  // ── Religion / culture as political variable ──────────────
+  piety_drift_rate: 0.008,      // base rate of piety change per tick
+  piety_absorption_bonus: 0.35, // extra sovereignty extraction from high piety (centripetal force)
 };
 
 // ── Crop culture seeds ──────────────────────────────────────
@@ -224,8 +234,40 @@ export class SimEngine {
       this.carryCap[i] = y * pk * sz * 50.0 + 5.0;
     }
 
+    // ── Malaria belts: per-arch severity (0 at 20°+, peaks at equator) ───
+    // Based on abs_latitude in degrees. Threshold: 20° from equator.
+    this.malariaFactor = new Float64Array(this.N);
+    for (let i = 0; i < this.N; i++) {
+      const absLat = substrate[i].climate?.abs_latitude ?? 30;
+      if (absLat < 20) {
+        this.malariaFactor[i] = (20 - absLat) / 20;  // 1.0 at equator, 0 at 20°
+      }
+    }
+
+    // ── Environmental shocks ───────────────────────────────
+    // cropFailureModifier[i]: 1.0 = normal, < 1.0 = active failure (recovers each tick)
+    this.cropFailureModifier = new Float64Array(this.N).fill(1.0);
+    // fisheryStock[i]: 1.0 = fully stocked, depletes with exploitation, recovers naturally
+    this.fisheryStock = new Float64Array(this.N).fill(1.0);
+
+    // ── Religion: piety per core (0 = secular, 1 = theocratic fervor) ─────
+    // Initialized from climate: tropical warm arches seed higher piety;
+    // temperate and cold seed moderate. Collective cultures seed higher.
+    this.piety = new Float64Array(this.N);
+    for (let i = 0; i < this.N; i++) {
+      const absLat = substrate[i].climate?.abs_latitude ?? 30;
+      const crop = substrate[i].crops.primary_crop || 'foraging';
+      const [ci0] = substrate[i].culture_pos || [0, 0];
+      const warmSeed = Math.max(0, (25 - absLat) / 25);   // 1.0 at equator, 0 at 25°+
+      const collectiveSeed = Math.max(0, -ci0 * 0.3);     // collective CI → slightly higher
+      this.piety[i] = _clamp(0.25 + warmSeed * 0.25 + collectiveSeed + (this.rng() - 0.5) * 0.20, 0.05, 0.90);
+    }
+
     // ── Logs ───────────────────────────────────────────────
     this.epiLog = [];
+    this.waveEpiLog = [];  // spontaneous epidemic waves (separate from contact epidemics)
+    this.cropFailureLog = [];
+    this.fisheryLog = [];
     this.expansionLog = [];
     this.dfYear = null;
     this.dfArch = null;
@@ -437,6 +479,24 @@ export class SimEngine {
       coreFood[c] = food;
     }
 
+    // ── ENVIRONMENTAL PRE-PASS: crop failure + fishery ──────
+    // Crop failure: random per-arch yield penalty, more likely at low tech
+    for (let j = 0; j < N; j++) {
+      // Recover from previous failure
+      if (this.cropFailureModifier[j] < 1.0) {
+        this.cropFailureModifier[j] = Math.min(1.0, this.cropFailureModifier[j] + 0.25);
+      }
+      // Roll for new failure (only for inhabited arches with population above threshold)
+      const archCore = this.controller[j];
+      const archTech = this.tech[archCore] || 0;
+      const failureProb = p.crop_failure_rate * Math.max(0.3, 1.0 - archTech / 8.0);
+      if (this.pop[j] > 2 && this.cropFailureModifier[j] >= 1.0 && this.rng() < failureProb) {
+        // 40-75% yield retained during failure
+        this.cropFailureModifier[j] = 0.40 + this.rng() * 0.35;
+        this.cropFailureLog.push({ arch: j, core: archCore, tick, year, modifier: this.cropFailureModifier[j] });
+      }
+    }
+
     // ── TRADE PRE-PASS ──────────────────────────────────────
     const tradeNet = {};
     for (const c of cores) tradeNet[c] = 0;
@@ -520,13 +580,17 @@ export class SimEngine {
         surplus = Math.max(0, eSupply - eDemand) * 0.2 + tp * 0.01;
         indDef = eSupply < eDemand;
       } else {
-        const cropY = this.substrate[core].crops.primary_yield;
+        // Crop yield with failure modifier applied
+        const cropY = this.substrate[core].crops.primary_yield * this.cropFailureModifier[core];
         const avgHC = this.substrate[core].climate.avg_h ?? 0.2;
         const landFactor = Math.max(0.3, 1.0 - avgHC * 0.35);
         let fishPol = 0;
         for (let j = 0; j < N; j++) {
           if (this.controller[j] === core) {
-            fishPol += (this.substrate[j].climate.fish_y ?? 0) * (this.substrate[j].climate.coast_factor ?? 0);
+            // Fish yield modulated by fishery stock level
+            fishPol += (this.substrate[j].climate.fish_y ?? 0)
+              * (this.substrate[j].climate.coast_factor ?? 0)
+              * this.fisheryStock[j];
           }
         }
         const fishAvg = fishPol / Math.max(1, coreNCtrl[core]);
@@ -658,6 +722,33 @@ export class SimEngine {
       this.cpos[core] = [_clamp(ci, -1, 1), _clamp(io, -1, 1)];
     }
 
+    // ── STAGE 2c: Piety drift ───────────────────────────────
+    // Crisis → faith rises. Prosperity → slow secularization.
+    // Collective culture → piety reinforced. Tech > 7 → secularization pressure.
+    for (const core of cores) {
+      let piety = this.piety[core];
+      const er = energyRatio[core];
+      const [ci] = this.cpos[core];
+      const dRate = p.piety_drift_rate;
+
+      // Crisis: low energy ratio → piety rises (crisis → collective solidarity, spiritual appeal)
+      if (er < 0.6) piety += dRate * (0.6 - er) * 2.5;
+      // Prosperity: high surplus → gentle secularization
+      else piety -= dRate * Math.min(0.4, (er - 0.6)) * 0.8;
+
+      // Culture CI: collective reinforces piety, individual erodes it
+      piety -= ci * dRate * 0.6;
+
+      // Secularization at high tech (enlightenment pressure, tech ≥ 7)
+      if (this.tech[core] > 7.0) piety -= dRate * (this.tech[core] - 7.0) * 0.25;
+
+      // Trade contact diversity → mild secularization (exposure to other beliefs)
+      const contactDiv = Math.min(1.0, this.contactSet[core].size / Math.max(1, this.N * 0.25));
+      piety -= dRate * contactDiv * 0.3;
+
+      this.piety[core] = _clamp(piety, 0.05, 0.95);
+    }
+
     // ── STAGE 3: Rumor propagation ──────────────────────────
     for (const core of cores) {
       if (this.tech[core] < 1.5) continue;
@@ -768,7 +859,19 @@ export class SimEngine {
         let cap = this.carryCap[j];
         if (this.tech[core] >= 7.0 && this.cRemaining[j] > 0) cap *= (1.0 + er * 0.5);
         if (this.tech[core] >= 9.0) cap *= 1.5;
-        const growthRate = 0.03 * er * (1.0 - this.pop[j] / Math.max(1, cap));
+        // Malaria belt: reduce effective carrying capacity in tropical archipelagos
+        // Medical knowledge (tech ≥ 6) cuts the penalty to 30%
+        const mSev = this.malariaFactor[j];
+        if (mSev > 0) {
+          const mPenalty = mSev * p.malaria_cap_penalty * (this.tech[core] >= 6.0 ? 0.30 : 1.0);
+          cap *= (1.0 - mPenalty);
+        }
+        let growthRate = 0.03 * er * (1.0 - this.pop[j] / Math.max(1, cap));
+        // Urban disease sink: density-dependent mortality above 70% capacity
+        const densityRatio = this.pop[j] / Math.max(1, cap);
+        if (densityRatio > 0.7) {
+          growthRate -= (densityRatio - 0.7) * p.urban_disease_rate;
+        }
         this.pop[j] *= (1.0 + _clamp(growthRate, -0.05, 0.10));
         this.pop[j] = Math.max(1.0, this.pop[j]);
       }
@@ -788,6 +891,69 @@ export class SimEngine {
       }
       if (maxContactTech > this.tech[core] + 1.0) this.tech[core] += (maxContactTech - this.tech[core]) * 0.08;
       if (worldMaxTech > this.tech[core] + 1.0) this.tech[core] += (worldMaxTech - this.tech[core]) * 0.03;
+    }
+
+    // ── STAGE 5b: Epidemic waves ────────────────────────────
+    // Periodic disease events propagating through trade contact networks.
+    // Probability per tick scales with contact count × population density.
+    // Separate from contact epidemics (which fire on first-contact absorption).
+    for (const core of cores) {
+      const nc = this.contactSet[core].size;
+      if (nc < 2) continue;  // isolated polities don't originate waves
+      // Compute population density relative to carrying capacity
+      let totalCap = 0, totalPop = 0;
+      for (let j = 0; j < N; j++) {
+        if (this.controller[j] === core) {
+          totalCap += this.carryCap[j];
+          totalPop += this.pop[j];
+        }
+      }
+      const density = totalCap > 0 ? totalPop / totalCap : 0;
+      // Probability: base × contact bonus × density. ~3-8% per tick for trade hubs.
+      const epiProb = p.epi_base_severity * 0.015 * (1.0 + nc * 0.2) * Math.max(0.3, density);
+      if (this.rng() < epiProb) {
+        const mortality = 0.04 + this.rng() * 0.12;  // 4–16% population loss
+        const sourceName = core;
+        // Spread to trade partners with ~35% probability each
+        const affected = new Set([core]);
+        for (const other of this.contactSet[core]) {
+          if (coresSet.has(other) && this.rng() < 0.35) affected.add(other);
+        }
+        for (const c of affected) {
+          for (let j = 0; j < N; j++) {
+            if (this.controller[j] === c) {
+              this.pop[j] *= (1.0 - mortality);
+              this.pop[j] = Math.max(1.0, this.pop[j]);
+            }
+          }
+        }
+        this.waveEpiLog.push({
+          tick, year, source: sourceName,
+          mortality_rate: mortality,
+          affected: [...affected],
+        });
+      }
+    }
+
+    // ── Fishery stock update ────────────────────────────────
+    // Natural recovery + depletion from over-exploitation.
+    // Over-exploitation = population density above sustainable threshold.
+    for (let j = 0; j < N; j++) {
+      const core = this.controller[j];
+      const cap = this.carryCap[j];
+      const densityRatio = cap > 0 ? this.pop[j] / cap : 0;
+      // Depletion increases when density is above 50% carrying capacity
+      const overExploit = Math.max(0, densityRatio - 0.5) * p.fishery_overfish_rate;
+      // Natural recovery toward 1.0
+      const recovery = p.fishery_recovery_rate * (1.0 - this.fisheryStock[j]);
+      this.fisheryStock[j] = _clamp(this.fisheryStock[j] + recovery - overExploit, 0.05, 1.0);
+      // Log severe depletion
+      if (this.fisheryStock[j] < 0.3 && (tick % 4 === 0)) {
+        const prev = this.fisheryLog[this.fisheryLog.length - 1];
+        if (!prev || prev.arch !== j || tick - prev.tick > 8) {
+          this.fisheryLog.push({ arch: j, core, tick, year, stock: this.fisheryStock[j] });
+        }
+      }
     }
 
     // ── STAGE 6: Thompson Sampling expansion ────────────────
@@ -844,7 +1010,16 @@ export class SimEngine {
           if (partnerSetD && partnerSetD.has(targetCtrl)) diploBonus -= 3.0; // strongly avoid partner territory
         }
 
-        candidates.push([tsScore + p.resource_targeting_weight * rv + despBonus + diploBonus - dist * 1.5, target, dist, rv]);
+        // Piety bonus: high-piety polities are driven toward missionary expansion
+        // Extra affinity for low-tech targets (conversion dynamic)
+        let pietyBonus = 0;
+        const cPiety = this.piety[core];
+        if (cPiety > 0.65) {
+          pietyBonus = (cPiety - 0.65) * 2.0;
+          if (this.tech[core] - this.tech[target] > 1.5) pietyBonus += (cPiety - 0.65) * 1.5;
+        }
+
+        candidates.push([tsScore + p.resource_targeting_weight * rv + despBonus + diploBonus + pietyBonus - dist * 1.5, target, dist, rv]);
       }
       candidates.sort((a, b) => b[0] - a[0]);
 
@@ -890,6 +1065,8 @@ export class SimEngine {
         }
         this.cpos[core][0] = _clamp(this.cpos[core][0] * 0.95 + this.cpos[target][0] * 0.05, -1, 1);
         this.cpos[core][1] = _clamp(this.cpos[core][1] * 0.95 + this.cpos[target][1] * 0.05, -1, 1);
+        // Piety blending: conqueror absorbs a fraction of the conquered polity's piety
+        this.piety[core] = _clamp(this.piety[core] * 0.92 + this.piety[target] * 0.08, 0.05, 0.95);
 
         this.expansionLog.push({ core, target, tick, year, tech_gap: this.tech[core] - this.tech[target], resource_driven: rv > 0 });
       }
@@ -906,6 +1083,13 @@ export class SimEngine {
       // Player sovereignty focus: reduce extraction on focused islands (faster stabilization)
       if (core === this.playerCore && sovFocusSet && sovFocusSet.has(i)) {
         extraction *= 0.4; // 60% less extraction = faster sovereignty recovery
+      }
+
+      // Piety bonus: high-piety empires integrate conquered populations faster
+      // (religious conversion as centripetal force — Abbasid model)
+      const corePiety = this.piety[core];
+      if (corePiety > 0.5) {
+        extraction *= (1.0 + (corePiety - 0.5) * p.piety_absorption_bonus);
       }
 
       const recovery = p.sov_extraction_decay * this.sovereignty[i] * (this.pop[i] / Math.max(1, this.pop[core])) * 0.5;
@@ -1000,6 +1184,16 @@ export class SimEngine {
       sovereignty: Array.from(this.sovereignty, s => Math.round(s * 1000) / 1000),
       // Contacted polity cores (for intel display)
       contactedCores: this.playerCore !== null ? [...this.contactSet[this.playerCore]] : [],
+      // Primary crop per archipelago (for narrative text)
+      crops: this.substrate.map(s => s.crops?.primary_crop || 'foraging'),
+      // Epidemic waves that fired this tick (for event popups / dispatch)
+      waveEpis: this.waveEpiLog.filter(e => e.tick === this.tick - 1),
+      // Crop failures this tick (for dispatch)
+      cropFailures: this.cropFailureLog.filter(e => e.tick === this.tick - 1),
+      // Current fishery stock per arch (for situation cards + Observatory)
+      fisheryStock: Array.from(this.fisheryStock, s => Math.round(s * 100) / 100),
+      // Piety per core (for situation cards + dispatch)
+      piety: Array.from(this.piety, v => Math.round(v * 100) / 100),
     };
   }
 
@@ -1102,7 +1296,7 @@ export class SimEngine {
       states, log: this.expansionLog,
       df_year: this.dfYear, df_arch: this.dfArch, df_detector: this.dfDetector,
       reach_arch: reachArch ?? 0, lattice_arch: latticeArch ?? 0,
-      epi_log: this.epiLog, substrate: this.substrate,
+      epi_log: this.epiLog, wave_epi_log: this.waveEpiLog, substrate: this.substrate,
       hegemons, hegemon_cultures: hegemonCultures,
       hegemon_culture_pos: Object.fromEntries(hegemons.map(c => [c, [...this.cpos[c]]])),
       tech_snapshots: this.techSnapshots, pop_snapshots: this.popSnapshots,

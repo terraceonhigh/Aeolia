@@ -97,6 +97,64 @@ function NationalFocus({ activeFocus, playerTech, onSetFocus }) {
   );
 }
 
+// ── Situation Report Cards ──────────────────────────────
+
+function SituationCards({ cards, onApplyCard }) {
+  if (!cards || cards.length === 0) return null;
+  return (
+    <div style={{
+      padding: '10px 14px', borderBottom: '1px solid #2a1f14',
+      background: '#0c0906',
+    }}>
+      <div style={{
+        fontSize: 10, color: '#b8923a', letterSpacing: '2px',
+        textTransform: 'uppercase', fontWeight: 600, marginBottom: 8,
+      }}>
+        Situation
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+        {cards.map(card => (
+          <div key={card.id} style={{
+            padding: '8px 10px', borderRadius: 3,
+            background: '#110d07',
+            border: '1px solid #3a2a14',
+          }}>
+            <div style={{
+              fontSize: 9, color: '#d4b896', fontWeight: 700,
+              letterSpacing: '0.5px', marginBottom: 5,
+            }}>
+              {card.icon}  {card.title}
+            </div>
+            <div style={{
+              fontSize: 8, color: '#a8906a', lineHeight: 1.55, marginBottom: 7,
+            }}>
+              {card.body}
+            </div>
+            <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+              {card.actions.map((act, i) => (
+                <button
+                  key={i}
+                  onClick={() => onApplyCard?.(card.id, act.action)}
+                  style={{
+                    padding: '2px 8px', fontSize: 7, fontFamily: 'inherit',
+                    cursor: 'pointer', fontWeight: 600, letterSpacing: '1px',
+                    background: act.action ? '#1a1408' : '#0e0a06',
+                    border: `1px solid ${act.action ? '#4a3a20' : '#2a1f14'}`,
+                    color: act.action ? '#c8a878' : '#6a5a3a',
+                    borderRadius: 2, textTransform: 'uppercase',
+                  }}
+                >
+                  {act.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ── Speed control bar ───────────────────────────────────
 
 const SPEEDS = [
@@ -148,6 +206,8 @@ export default function TurnDashboard({
   culturePolicyCI, culturePolicyIO, onSetCulturePolicy,
   sovFocusTargets, onToggleSovFocus,
   scoutActive, onToggleScout,
+  // Situation cards
+  pendingCards, onApplyCard,
 }) {
   const [showTerritory, setShowTerritory] = useState(false);
   const ps = snapshot?.playerStats;
@@ -229,6 +289,9 @@ export default function TurnDashboard({
           </div>
         )}
       </div>
+
+      {/* Situation Report Cards */}
+      <SituationCards cards={pendingCards} onApplyCard={onApplyCard} />
 
       {/* Timer + Speed */}
       <div style={S.section}>
@@ -470,19 +533,48 @@ export default function TurnDashboard({
         )}
       </div>
 
-      {/* Event log */}
+      {/* Dispatches log */}
       <div style={{ ...S.section, flex: 1, display: 'flex', flexDirection: 'column', minHeight: 100 }}>
-        <div style={S.sectionTitle}>Events</div>
+        <div style={S.sectionTitle}>Dispatches</div>
         <div style={S.eventLog}>
           {eventLog.length === 0 && (
-            <div style={{ color: '#6a5a3a', fontStyle: 'italic' }}>No events yet</div>
+            <div style={{ color: '#6a5a3a', fontStyle: 'italic' }}>No dispatches yet</div>
           )}
-          {eventLog.slice(-30).reverse().map((ev, i) => (
-            <div key={i} style={{ marginBottom: 4, paddingLeft: 6, borderLeft: `2px solid ${ev.color || '#2a1f14'}` }}>
-              <span style={{ color: '#6a5a3a' }}>{ev.yearStr} </span>
-              <span>{ev.text}</span>
-            </div>
-          ))}
+          {eventLog.slice(-40).reverse().map((ev, i) => {
+            // Parse source tag from text (format: "SOURCE — body")
+            const sep = ev.text?.indexOf(' — ');
+            const hasSource = sep > 0 && sep < 32;
+            const source = hasSource ? ev.text.slice(0, sep) : null;
+            const body = hasSource ? ev.text.slice(sep + 3) : ev.text;
+            const sourceColor = {
+              'ADMIRALTY INTELLIGENCE': '#a04030',
+              'MERCHANT GUILD': '#b8923a',
+              'INTERNAL AFFAIRS': '#7a8a5a',
+              'CULTURAL OBSERVER': '#9a6a9a',
+              'CARTOGRAPHIC SURVEY': '#4a8aaa',
+              'GEOLOGICAL SURVEY': '#8a6a4a',
+              'DIPLOMATIC CORPS': '#6a9a7a',
+              'MERCHANT GUILD REPORT': '#b8923a',
+            }[source] || (ev.color || '#2a1f14');
+            return (
+              <div key={i} style={{
+                marginBottom: 6, paddingLeft: 7,
+                borderLeft: `2px solid ${sourceColor}`,
+              }}>
+                <div style={{ display: 'flex', gap: 4, alignItems: 'baseline', flexWrap: 'wrap' }}>
+                  {source && (
+                    <span style={{ color: sourceColor, fontSize: 7, fontWeight: 700, letterSpacing: '0.5px', flexShrink: 0 }}>
+                      {source}
+                    </span>
+                  )}
+                  <span style={{ color: '#6a5a3a', fontSize: 7, flexShrink: 0 }}>{ev.yearStr}</span>
+                </div>
+                <div style={{ color: '#a8906a', fontSize: 8, lineHeight: 1.5, marginTop: 1 }}>
+                  {body}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
