@@ -957,15 +957,6 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
                 # Universal coastal: kauri slight Collective push
                 ci -= fdr * 0.1
 
-            # Piety → culture: high piety pulls toward Collective (−CI) and mildly Inward (−IO)
-            # Models: religious revival reinforces communal structures and inward traditionalism.
-            # Closes the piety↔CI/IO feedback loop (Q8 implementation).
-            c_piety = piety[core]
-            if c_piety > 0.5:
-                piety_pull = (c_piety - 0.5) * p.culture_drift_rate * 0.4
-                ci -= piety_pull        # toward collective
-                io -= piety_pull * 0.5  # mildly toward inward
-
             cpos[core] = [_clamp(ci, -1.0, 1.0), _clamp(io, -1.0, 1.0)]
 
         # ──────────────────────────────────────────────────────────────
