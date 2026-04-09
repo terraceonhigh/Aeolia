@@ -350,7 +350,11 @@ export function getDispatchEntry(type, data, names, tick) {
 
     case 'saak_displacement': {
       const name = data?.name || 'a contact';
-      return `MERCHANT GUILD — Naphtha refineries have undercut saak oil prices across your trade network. ${name}'s fishing economy faces structural disruption. Their saak fleets will either find new markets or contract.`;
+      return pick([
+        `MERCHANT GUILD — Naphtha refineries have undercut saak oil prices on the relay network. ${name}'s rendering economy faces structural disruption. The grease trails that made them wealthy are becoming unprofitable one route at a time.`,
+        `MERCHANT GUILD — Saak oil has lost its margin against naphtha in your common markets. ${name}'s coastal fishing communities are bearing the cost. Their relay relationships will survive only if they find new commodities to carry.`,
+        `MERCHANT GUILD — The price of saak oil has fallen below the rendering cost for the smaller operations in ${name} territory. The fishing villages continue; the commercial network around them is contracting.`,
+      ], s);
     }
 
     case 'epidemic_wave': {
