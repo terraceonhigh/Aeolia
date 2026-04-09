@@ -432,6 +432,21 @@ function gameReducer(state, action) {
         });
       }
 
+      // ── Crop failure ────────────────────────────────────────
+      if (snapshot.cropFailures && snapshot.cropFailures.length > 0) {
+        for (const cf of snapshot.cropFailures) {
+          if (cf.core === playerCore) {
+            const pct = Math.round((1 - cf.modifier) * 100);
+            const archName = action.names[cf.arch] || `Archipelago ${cf.arch}`;
+            newEvents.push({
+              yearStr: yearStr2,
+              text: `INTERNAL AFFAIRS — Crop failure in ${archName}. Yield reduced ${pct}% this season. Food surplus will contract.`,
+              color: '#7a5a2a',
+            });
+          }
+        }
+      }
+
       // ── Tech decay ──────────────────────────────────────────
       if (playerTech < prevTech - 0.05) {
         newEvents.push({

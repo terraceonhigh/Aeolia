@@ -46,6 +46,10 @@ export const DEFAULT_PARAMS = {
   // ── Disease mechanics (from DISEASE_MECHANIC.md) ─────────
   malaria_cap_penalty: 0.40,   // carrying capacity reduction at equator, pre-medical
   urban_disease_rate: 0.08,    // density-dependent mortality above 70% capacity
+  // ── Environmental shocks ──────────────────────────────────
+  crop_failure_rate: 0.025,    // probability of crop failure per arch per tick
+  fishery_recovery_rate: 0.08, // natural fishery stock recovery per tick
+  fishery_overfish_rate: 0.06, // stock depletion per unit of excess exploitation
 };
 
 // ── Crop culture seeds ──────────────────────────────────────
@@ -237,9 +241,17 @@ export class SimEngine {
       }
     }
 
+    // ── Environmental shocks ───────────────────────────────
+    // cropFailureModifier[i]: 1.0 = normal, < 1.0 = active failure (recovers each tick)
+    this.cropFailureModifier = new Float64Array(this.N).fill(1.0);
+    // fisheryStock[i]: 1.0 = fully stocked, depletes with exploitation, recovers naturally
+    this.fisheryStock = new Float64Array(this.N).fill(1.0);
+
     // ── Logs ───────────────────────────────────────────────
     this.epiLog = [];
     this.waveEpiLog = [];  // spontaneous epidemic waves (separate from contact epidemics)
+    this.cropFailureLog = [];
+    this.fisheryLog = [];
     this.expansionLog = [];
     this.dfYear = null;
     this.dfArch = null;
@@ -451,6 +463,24 @@ export class SimEngine {
       coreFood[c] = food;
     }
 
+    // ── ENVIRONMENTAL PRE-PASS: crop failure + fishery ──────
+    // Crop failure: random per-arch yield penalty, more likely at low tech
+    for (let j = 0; j < N; j++) {
+      // Recover from previous failure
+      if (this.cropFailureModifier[j] < 1.0) {
+        this.cropFailureModifier[j] = Math.min(1.0, this.cropFailureModifier[j] + 0.25);
+      }
+      // Roll for new failure (only for inhabited arches with population above threshold)
+      const archCore = this.controller[j];
+      const archTech = this.tech[archCore] || 0;
+      const failureProb = p.crop_failure_rate * Math.max(0.3, 1.0 - archTech / 8.0);
+      if (this.pop[j] > 2 && this.cropFailureModifier[j] >= 1.0 && this.rng() < failureProb) {
+        // 40-75% yield retained during failure
+        this.cropFailureModifier[j] = 0.40 + this.rng() * 0.35;
+        this.cropFailureLog.push({ arch: j, core: archCore, tick, year, modifier: this.cropFailureModifier[j] });
+      }
+    }
+
     // ── TRADE PRE-PASS ──────────────────────────────────────
     const tradeNet = {};
     for (const c of cores) tradeNet[c] = 0;
@@ -534,13 +564,17 @@ export class SimEngine {
         surplus = Math.max(0, eSupply - eDemand) * 0.2 + tp * 0.01;
         indDef = eSupply < eDemand;
       } else {
-        const cropY = this.substrate[core].crops.primary_yield;
+        // Crop yield with failure modifier applied
+        const cropY = this.substrate[core].crops.primary_yield * this.cropFailureModifier[core];
         const avgHC = this.substrate[core].climate.avg_h ?? 0.2;
         const landFactor = Math.max(0.3, 1.0 - avgHC * 0.35);
         let fishPol = 0;
         for (let j = 0; j < N; j++) {
           if (this.controller[j] === core) {
-            fishPol += (this.substrate[j].climate.fish_y ?? 0) * (this.substrate[j].climate.coast_factor ?? 0);
+            // Fish yield modulated by fishery stock level
+            fishPol += (this.substrate[j].climate.fish_y ?? 0)
+              * (this.substrate[j].climate.coast_factor ?? 0)
+              * this.fisheryStock[j];
           }
         }
         const fishAvg = fishPol / Math.max(1, coreNCtrl[core]);
@@ -858,6 +892,27 @@ export class SimEngine {
       }
     }
 
+    // ── Fishery stock update ────────────────────────────────
+    // Natural recovery + depletion from over-exploitation.
+    // Over-exploitation = population density above sustainable threshold.
+    for (let j = 0; j < N; j++) {
+      const core = this.controller[j];
+      const cap = this.carryCap[j];
+      const densityRatio = cap > 0 ? this.pop[j] / cap : 0;
+      // Depletion increases when density is above 50% carrying capacity
+      const overExploit = Math.max(0, densityRatio - 0.5) * p.fishery_overfish_rate;
+      // Natural recovery toward 1.0
+      const recovery = p.fishery_recovery_rate * (1.0 - this.fisheryStock[j]);
+      this.fisheryStock[j] = _clamp(this.fisheryStock[j] + recovery - overExploit, 0.05, 1.0);
+      // Log severe depletion
+      if (this.fisheryStock[j] < 0.3 && (tick % 4 === 0)) {
+        const prev = this.fisheryLog[this.fisheryLog.length - 1];
+        if (!prev || prev.arch !== j || tick - prev.tick > 8) {
+          this.fisheryLog.push({ arch: j, core, tick, year, stock: this.fisheryStock[j] });
+        }
+      }
+    }
+
     // ── STAGE 6: Thompson Sampling expansion ────────────────
     for (const core of cores) {
       let budget = expBudget[core] || 0;
@@ -1072,6 +1127,10 @@ export class SimEngine {
       crops: this.substrate.map(s => s.crops?.primary_crop || 'foraging'),
       // Epidemic waves that fired this tick (for event popups / dispatch)
       waveEpis: this.waveEpiLog.filter(e => e.tick === this.tick - 1),
+      // Crop failures this tick (for dispatch)
+      cropFailures: this.cropFailureLog.filter(e => e.tick === this.tick - 1),
+      // Current fishery stock per arch (for situation cards + Observatory)
+      fisheryStock: Array.from(this.fisheryStock, s => Math.round(s * 100) / 100),
     };
   }
 

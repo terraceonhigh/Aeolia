@@ -406,6 +406,31 @@ export function generateSituationCards(snapshot, playerCore, names, frontier, op
     }
   }
 
+  // ── Card 11b: Fishery depletion ─────────────────────────
+  // Fires when any controlled arch has fishery stock below 0.35.
+  if (cards.length < 3) {
+    const fisheryStock = snapshot?.fisheryStock || [];
+    const depletedArch = (snapshot?.controller || []).reduce((found, ctrl, j) => {
+      if (found !== null) return found;
+      if (ctrl === playerCore && j !== playerCore && (fisheryStock[j] || 1.0) < 0.35) return j;
+      return null;
+    }, null);
+    if (depletedArch !== null) {
+      const stock = Math.round((fisheryStock[depletedArch] || 0) * 100);
+      const depletedName = names[depletedArch] || `Arch ${depletedArch}`;
+      cards.push({
+        id: `fishery_depletion_${depletedArch}`,
+        icon: '◉',
+        title: 'Fishery Collapse',
+        body: `The ${depletedName} fishing grounds are at ${stock}% stock. Your fishing fleets have outpaced recovery rates. The same waters that defined your food security now require rotation and rest. Reducing population pressure is the only sustainable correction — consolidation reduces exploitation.`,
+        actions: [
+          { label: 'FORTIFY',  action: { type: 'SET_FOCUS', focus: 'fortify' } },
+          { label: 'ACCEPT',   action: null },
+        ],
+      });
+    }
+  }
+
   // ── Card 12: Piracy warning ─────────────────────────────
   // Fires in mid-game when trade network is large but patrol capability hasn't scaled.
   if (contactedCores.length > 5 && ps.tech >= 3.0 && ps.tech < 8.0 && cards.length < 3) {
