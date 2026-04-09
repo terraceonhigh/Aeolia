@@ -656,3 +656,32 @@ export function getReligiousRevivalDispatch(polityName, piety, seed) {
     `INTERNAL AFFAIRS — Fervor reading: ${intensity}. ${polityName} faith infrastructure deployment in peripheral territories outpacing administrative settlement. Recommend monitoring conversion rates.`,
   ], s);
 }
+
+// ── Card 19: Colonial resistance (Scott 1985) ─────────────────────────────
+export function getColonialResistanceText(grievanceLevel, archName, seed) {
+  const s = seed ?? 0;
+  const intensity = grievanceLevel > 0.7 ? 'organized' : grievanceLevel > 0.4 ? 'persistent' : 'scattered';
+  const forms = pick([
+    `cargo refusal and coordinated work stoppages`,
+    `non-compliance with extraction quotas and deliberate misreporting to census agents`,
+    `withdrawal from administered markets in favor of subsistence-only production`,
+    `foot-dragging on infrastructure obligations and quiet undermining of extraction logistics`,
+    `appeals through traditional legal channels that exhaust administrative resources`,
+  ], s);
+  return pick([
+    `${archName} is exhibiting ${intensity} resistance: ${forms}. The extraction rate has exceeded what the population regards as legitimate. Reducing the extraction burden would cost less than suppressing what is coming.`,
+    `INTERNAL AFFAIRS reports ${intensity} non-compliance in ${archName}. Local expression: ${forms}. This is not yet rebellion, but it is the precursor to rebellion. The soil is being prepared.`,
+    `Grievance index in ${archName} has reached a level historically preceding formal resistance movements. Current expression: ${forms}. Every extraction event above the tolerable threshold adds to the consciousness that makes organized resistance possible.`,
+    `${intensity.charAt(0).toUpperCase() + intensity.slice(1)} resistance activity in ${archName}: ${forms}. Sovereignty recovery is accelerating despite unchanged extraction. The polity is losing the margin it is extracting.`,
+  ], s);
+}
+
+export function getColonialResistanceDispatch(archName, grievanceLevel, seed) {
+  const s = seed ?? 0;
+  const level = grievanceLevel > 0.7 ? 'HIGH' : grievanceLevel > 0.45 ? 'ELEVATED' : 'MODERATE';
+  return pick([
+    `INTERNAL AFFAIRS — Grievance index ${level} in ${archName}. Extraction above tolerable threshold. Sovereignty recovery rate accelerating. Recommend extraction reduction or administrative investment.`,
+    `INTERNAL AFFAIRS — ${archName} resistance indicators at ${level}. Non-compliance with administered extraction quotas. Historical pattern: this precedes formal sovereignty challenges by 2–4 generations.`,
+    `INTERNAL AFFAIRS — Colonial resistance reading ${level}. ${archName} population demonstrating coordinated withdrawal from administered market participation. Extraction efficiency declining despite unchanged rates.`,
+  ], s);
+}

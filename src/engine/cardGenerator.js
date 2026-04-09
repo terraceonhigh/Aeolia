@@ -21,6 +21,7 @@ import {
   getReligiousRevivalText,
   getRogueAircraftText,
   getSchismBody,
+  getColonialResistanceText,
 } from './narrativeText.js';
 
 // ── Mineral labels ───────────────────────────────────────────
@@ -586,6 +587,39 @@ export function generateSituationCards(snapshot, playerCore, names, frontier, op
           { label: 'INVEST IN GOVERNANCE', action: { type: 'SET_FOCUS', focus: 'fortify' } },
           { label: 'PUSH TECH',            action: { type: 'SET_FOCUS', focus: 'innovate' } },
           { label: 'ACKNOWLEDGE',          action: null },
+        ],
+      });
+    }
+  }
+
+  // ── Card 19: Colonial resistance (Scott 1985) ────────────────────────────
+  // Fires when any of the player's holdings has high grievance — excess
+  // extraction is building resistance that will accelerate sovereignty loss.
+  if (cards.length < 3 && ps.territory > 1) {
+    const grievanceArr = snapshot?.grievance || [];
+    const stateArr = snapshot?.states || [];
+    let maxGrievance = 0;
+    let resistanceArch = null;
+    for (let i = 0; i < grievanceArr.length; i++) {
+      const g = grievanceArr[i];
+      if (g > maxGrievance && stateArr[i] && stateArr[i].faction !== 'independent') {
+        maxGrievance = g;
+        resistanceArch = i;
+      }
+    }
+    if (maxGrievance > 0.35 && resistanceArch !== null) {
+      const archName = stateArr[resistanceArch]?.name ?? `archipelago ${resistanceArch}`;
+      const seed = hashStr('colonial_resistance' + Math.floor((snapshot?.tick || 0) / 4) + resistanceArch);
+      const urgency = maxGrievance > 0.65 ? 'CRITICAL' : 'WARNING';
+      cards.push({
+        id: `colonial_resistance_${Math.floor((snapshot?.tick || 0) / 4)}`,
+        icon: '⚑',
+        title: `Colonial Resistance — ${urgency}`,
+        body: getColonialResistanceText(maxGrievance, archName, seed),
+        actions: [
+          { label: 'REDUCE EXTRACTION', action: { type: 'SET_FOCUS', focus: 'fortify' } },
+          { label: 'INVEST IN SOV FOCUS', action: { type: 'SET_SOV_FOCUS', archIndex: resistanceArch } },
+          { label: 'ACKNOWLEDGE',         action: null },
         ],
       });
     }

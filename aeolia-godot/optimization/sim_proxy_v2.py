@@ -801,6 +801,15 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
                         comp += 0.15
                 comp = min(comp, 2.0)
 
+                # ── Axelrod (1997) cultural polarization: maximally divergent polities
+                # trade less effectively — fewer shared norms, legal frameworks, practices.
+                # Cultural distance above 0.6 in the normalized 2D space reduces trade volume.
+                ci_a, io_a = cpos[_tc]
+                ci_b, io_b = cpos[_other]
+                culture_dist = math.sqrt((ci_a - ci_b)**2 + (io_a - io_b)**2) / 2.828
+                axelrod_friction = 1.0 - max(0.0, (culture_dist - 0.6) * 0.5)
+                comp *= axelrod_friction
+
                 # Tech-gated layer: markup and effective range
                 if eff_tech < 2.0:
                     # Subsistence: direct neighbors only, low markup
