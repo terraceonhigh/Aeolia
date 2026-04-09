@@ -10,6 +10,8 @@ import { buildWorld } from './engine/world.js';
 import { SimEngine, DEFAULT_PARAMS } from './engine/SimEngine.js';
 import { POLITY_NAMES } from './engine/constants.js';
 import { mulberry32 } from './engine/rng.js';
+import { generateSituationCards } from './engine/cardGenerator.js';
+import { getDispatchEntry, getCultureLabel, describeCulture } from './engine/narrativeText.js';
 import PolitySelect from './components/PolitySelect.jsx';
 import TurnDashboard from './components/TurnDashboard.jsx';
 import EventPopup, { ERA_DESCRIPTIONS, TECH_MILESTONES } from './components/EventPopup.jsx';
@@ -105,6 +107,8 @@ const INITIAL_STATE = {
   culturePolicyIO: 0,
   sovFocusTargets: new Set(),
   scoutActive: false,
+  // Per-turn situation cards
+  pendingCards: [],
 };
 
 function gameReducer(state, action) {
@@ -139,6 +143,21 @@ function gameReducer(state, action) {
         lastEra: eraName,
         lastTech: snapshot.tech?.[playerCore] || 0,
         contactedSet: new Set(snapshot.contactedCores || []),
+        pendingCards: [],
+      };
+    }
+
+    case 'APPLY_CARD': {
+      // Remove the card, then optionally execute its sub-action
+      const nextCards = state.pendingCards.filter(c => c.id !== action.cardId);
+      const base = { ...state, pendingCards: nextCards };
+      return action.subAction ? gameReducer(base, action.subAction) : base;
+    }
+
+    case 'DISMISS_CARD': {
+      return {
+        ...state,
+        pendingCards: state.pendingCards.filter(c => c.id !== action.cardId),
       };
     }
 
@@ -242,13 +261,24 @@ function gameReducer(state, action) {
 
       for (const ev of snapshot.events) {
         const yearStr = `Y${(snapshot.tick || 60) - 60}`;
+        const tick = snapshot.tick || 60;
         if (ev.core === playerCore) {
           const targetName = action.names[ev.target];
-          newEvents.push({ yearStr, text: `You absorbed ${targetName}`, color: '#8a7a3a' });
+          const targetCrop = snapshot.crops?.[ev.target];
+          newEvents.push({
+            yearStr,
+            text: `ADMIRALTY INTELLIGENCE — ${targetName} has been absorbed into your domain.`,
+            color: '#8a7a3a',
+          });
           if (!popup) {
             popup = {
               type: 'absorption',
-              data: { name: targetName, territory: snapshot.playerStats?.territory || '?' },
+              data: {
+                name: targetName,
+                territory: snapshot.playerStats?.territory || '?',
+                crop: targetCrop,
+                method: 'naval expedition',
+              },
             };
           }
         } else if (ev.target !== undefined && snapshot.controller?.[ev.target] !== playerCore
@@ -256,7 +286,11 @@ function gameReducer(state, action) {
           // We lost territory
           const targetName = action.names[ev.target];
           const aggressorName = action.names[ev.core];
-          newEvents.push({ yearStr, text: `${aggressorName} seized ${targetName} from you!`, color: '#a04030' });
+          newEvents.push({
+            yearStr,
+            text: `ADMIRALTY INTELLIGENCE — ${aggressorName} has seized ${targetName} from your holdings.`,
+            color: '#a04030',
+          });
           if (!popup) {
             popup = {
               type: 'territory_lost',
@@ -268,9 +302,17 @@ function gameReducer(state, action) {
           const coreVis = vis?.[ev.core] || 'unknown';
           if (targetVis === 'unknown' && coreVis === 'unknown') continue;
           if (targetVis === 'rumor' && coreVis === 'rumor') {
-            newEvents.push({ yearStr, text: `Rumors of conflict near ${action.names[ev.target]}`, color: '#3a2a1a' });
+            newEvents.push({
+              yearStr,
+              text: `CARTOGRAPHIC SURVEY — Distant reports suggest military action near ${action.names[ev.target]}.`,
+              color: '#3a2a1a',
+            });
           } else {
-            newEvents.push({ yearStr, text: `${action.names[ev.core]} absorbed ${action.names[ev.target]}`, color: '#6a5a3a' });
+            newEvents.push({
+              yearStr,
+              text: `ADMIRALTY INTELLIGENCE — ${action.names[ev.core]} has absorbed ${action.names[ev.target]}.`,
+              color: '#6a5a3a',
+            });
           }
         }
       }
@@ -280,19 +322,31 @@ function gameReducer(state, action) {
       const prevContacted = state.contactedSet;
       const newContactedSet = new Set(newContacts);
       for (const cc of newContacts) {
-        if (!prevContacted.has(cc) && !popup) {
-          const cpos = snapshot.cpos?.[cc];
-          const cultureLabel = cpos
-            ? `${cpos[0] > 0 ? 'individualist' : 'collectivist'}-${cpos[1] > 0 ? 'outward' : 'inward'}`
-            : 'unknown';
-          popup = {
-            type: 'first_contact',
-            data: {
-              name: action.names[cc] || `Nation ${cc}`,
-              culture: cultureLabel,
-              tech: snapshot.tech?.[cc] || '?',
-            },
-          };
+        if (!prevContacted.has(cc)) {
+          const cposCC = snapshot.cpos?.[cc];
+          const cultureLabel = describeCulture(cposCC?.[0], cposCC?.[1]);
+          const cropCC = snapshot.crops?.[cc];
+          const techCC = snapshot.tech?.[cc];
+          const contactName = action.names[cc] || `Nation ${cc}`;
+          const yearStr = `Y${(snapshot.tick || 60) - 60}`;
+          newEvents.push({
+            yearStr,
+            text: `DIPLOMATIC CORPS — First contact established with ${contactName} (tech ${techCC?.toFixed(1) || '?'}, ${cultureLabel}).`,
+            color: '#b8923a',
+          });
+          if (!popup) {
+            popup = {
+              type: 'first_contact',
+              data: {
+                idx: cc,
+                name: contactName,
+                culture: cultureLabel,
+                tech: techCC,
+                crop: cropCC,
+                year: (snapshot.tick || 60) - 60,
+              },
+            };
+          }
         }
       }
 
@@ -310,25 +364,13 @@ function gameReducer(state, action) {
       // Check tech milestones
       const playerTech = snapshot.tech?.[playerCore] || 0;
       const prevTech = state.lastTech;
-      for (const [level, info] of Object.entries(TECH_MILESTONES)) {
+      for (const [level] of Object.entries(TECH_MILESTONES)) {
         const tl = Number(level);
         if (playerTech >= tl && prevTech < tl && !popup) {
           popup = {
             type: 'tech_milestone',
-            data: { description: info.desc },
+            data: { tech: tl },
           };
-        }
-      }
-
-      // Dark Forest detection
-      if (snapshot.dfYear && !state.snapshot?.dfYear) {
-        const contactedCores = snapshot.contactedCores || [];
-        const canSeeDF = snapshot.dfArch === playerCore || snapshot.dfDetector === playerCore
-          || contactedCores.includes(snapshot.dfArch) || contactedCores.includes(snapshot.dfDetector);
-        if (canSeeDF) {
-          const yearStr = `Y${(snapshot.tick || 60) - 60}`;
-          newEvents.push({ yearStr, text: 'DARK FOREST CONTACT DETECTED', color: '#a04030' });
-          popup = { type: 'dark_forest', data: {} };
         }
       }
 
@@ -343,6 +385,83 @@ function gameReducer(state, action) {
         popup = { type: 'defeat', data: {} };
       }
 
+      // ── Flavor events (non-blocking dispatch entries) ────
+      const newCultureLabel = snapshot.playerStats?.cultureLabel;
+      const prevCultureLabel = state.snapshot?.playerStats?.cultureLabel;
+      const tick = snapshot.tick || 60;
+      const yearStr2 = `Y${tick - 60}`;
+
+      if (newCultureLabel && prevCultureLabel && newCultureLabel !== prevCultureLabel) {
+        newEvents.push({
+          yearStr: yearStr2,
+          text: getDispatchEntry('culture_shift', { label: newCultureLabel }, action.names, tick),
+          color: '#6a4a8a',
+        });
+      }
+
+      if (snapshot.sovereignty && state.snapshot?.sovereignty) {
+        for (let i = 0; i < snapshot.sovereignty.length; i++) {
+          if (snapshot.controller?.[i] === playerCore && i !== playerCore) {
+            const prev = state.snapshot.sovereignty[i] || 0;
+            const curr = snapshot.sovereignty[i] || 0;
+            if (prev < 0.65 && curr >= 0.65) {
+              newEvents.push({
+                yearStr: yearStr2,
+                text: getDispatchEntry('sovereignty_stabilized', { name: action.names[i], idx: i }, action.names, tick),
+                color: '#4a7a4a',
+              });
+            } else if (prev > 0.25 && curr < 0.25) {
+              newEvents.push({
+                yearStr: yearStr2,
+                text: getDispatchEntry('sovereignty_critical', { name: action.names[i], idx: i }, action.names, tick),
+                color: '#a05030',
+              });
+            }
+          }
+        }
+      }
+
+      const prevContacts = state.snapshot?.playerStats?.contacts || 0;
+      const newContactCount = snapshot.playerStats?.contacts || 0;
+      if (newContactCount > prevContacts && newContactCount > 0 && newContactCount % 4 === 0) {
+        newEvents.push({
+          yearStr: yearStr2,
+          text: getDispatchEntry('trade_growth', { contacts: newContactCount }, action.names, tick),
+          color: '#5a6a4a',
+        });
+      }
+
+      // ── Dark Forest: richer log entry ───────────────────
+      if (snapshot.dfYear && !state.snapshot?.dfYear) {
+        const contactedCores = snapshot.contactedCores || [];
+        const canSeeDF = snapshot.dfArch === playerCore || snapshot.dfDetector === playerCore
+          || contactedCores.includes(snapshot.dfArch) || contactedCores.includes(snapshot.dfDetector);
+        if (canSeeDF) {
+          newEvents.push({
+            yearStr: yearStr2,
+            text: `ADMIRALTY INTELLIGENCE — NUCLEAR PEER DETECTED. Dark Forest protocol initiated.`,
+            color: '#a04030',
+          });
+          popup = { type: 'dark_forest', data: { dfCores: [snapshot.dfArch, snapshot.dfDetector] } };
+        }
+      }
+
+      // ── Generate situation cards for next turn ────────────
+      const nextCards = generateSituationCards(
+        snapshot,
+        playerCore,
+        action.names,
+        frontier,
+        {
+          rivalCores: state.rivalCores,
+          partnerCores: state.partnerCores,
+          activeFocus: state.activeFocus,
+          selectedTargets: nextTargets,
+          scoutActive: state.scoutActive,
+          prevCultureLabel,
+        }
+      );
+
       return {
         ...state,
         snapshot,
@@ -355,6 +474,7 @@ function gameReducer(state, action) {
         lastEra: eraName,
         lastTech: playerTech,
         contactedSet: newContactedSet,
+        pendingCards: nextCards,
       };
     }
 
@@ -800,6 +920,10 @@ function GameInner({ seed, onBack }) {
     dispatch({ type: 'TOGGLE_SCOUT' });
   }, []);
 
+  const handleApplyCard = useCallback((cardId, subAction) => {
+    dispatch({ type: 'APPLY_CARD', cardId, subAction });
+  }, []);
+
   // ── Render ─────────────────────────────────────────────
 
   return (
@@ -887,13 +1011,20 @@ function GameInner({ seed, onBack }) {
             onToggleSovFocus={handleToggleSovFocus}
             scoutActive={game.scoutActive}
             onToggleScout={handleToggleScout}
+            pendingCards={game.pendingCards}
+            onApplyCard={handleApplyCard}
           />
         )}
       </div>
 
       {/* Event popup overlay */}
       {game.pendingPopup && (
-        <EventPopup event={game.pendingPopup} onDismiss={handleDismissPopup} />
+        <EventPopup
+          event={game.pendingPopup}
+          onDismiss={handleDismissPopup}
+          names={names}
+          playerCore={game.playerCore}
+        />
       )}
     </div>
   );

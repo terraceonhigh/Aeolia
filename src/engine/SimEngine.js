@@ -1000,6 +1000,8 @@ export class SimEngine {
       sovereignty: Array.from(this.sovereignty, s => Math.round(s * 1000) / 1000),
       // Contacted polity cores (for intel display)
       contactedCores: this.playerCore !== null ? [...this.contactSet[this.playerCore]] : [],
+      // Primary crop per archipelago (for narrative text)
+      crops: this.substrate.map(s => s.crops?.primary_crop || 'foraging'),
     };
   }
 
