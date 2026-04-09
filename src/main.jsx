@@ -2,13 +2,15 @@ import { useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import AeoliaLOD from './App.jsx';
 import GameApp from './GameApp.jsx';
+import Observatory from './Observatory.jsx';
 
 function ModeSelector() {
-  // null = menu, 'observatory' = LOD renderer, 'game' = 1-player game
+  // null = menu, 'observatory' = history viewer, 'lod' = LOD terrain, 'game' = 1-player game
   const [mode, setMode] = useState(null);
   const [seed, setSeed] = useState(42);
 
-  if (mode === 'observatory') return <AeoliaLOD />;
+  if (mode === 'lod') return <AeoliaLOD />;
+  if (mode === 'observatory') return <Observatory seed={seed} onBack={() => setMode(null)} />;
   if (mode === 'game') return <GameApp seed={seed} onBack={() => setMode(null)} />;
 
   return (
@@ -33,14 +35,15 @@ function ModeSelector() {
 
         <div style={{
           display: 'flex', gap: 16, justifyContent: 'center', marginBottom: 24,
+          flexWrap: 'wrap',
         }}>
           <button onClick={() => setMode('observatory')} style={{
             padding: '14px 28px', fontSize: 11, fontFamily: 'inherit', cursor: 'pointer',
-            background: '#14100a', border: '1px solid #2a1f14', color: '#8a7a5a',
+            background: '#14100a', border: '1px solid #3a2f1e', color: '#b8923a',
             letterSpacing: '2px', borderRadius: 4, minWidth: 180,
           }}>
             <div style={{ fontWeight: 700, marginBottom: 4 }}>OBSERVATORY</div>
-            <div style={{ fontSize: 8, color: '#6a5a3a' }}>0-player simulation viewer</div>
+            <div style={{ fontSize: 8, color: '#6a5a3a' }}>10,000-year history viewer</div>
           </button>
 
           <button onClick={() => setMode('game')} style={{
@@ -50,6 +53,15 @@ function ModeSelector() {
           }}>
             <div style={{ fontWeight: 700, marginBottom: 4 }}>STRATEGY</div>
             <div style={{ fontSize: 8, color: '#8a7a5a' }}>1-player turn-based game</div>
+          </button>
+
+          <button onClick={() => setMode('lod')} style={{
+            padding: '14px 28px', fontSize: 11, fontFamily: 'inherit', cursor: 'pointer',
+            background: '#14100a', border: '1px solid #1a2010', color: '#6a8a6a',
+            letterSpacing: '2px', borderRadius: 4, minWidth: 180,
+          }}>
+            <div style={{ fontWeight: 700, marginBottom: 4 }}>TERRAIN</div>
+            <div style={{ fontSize: 8, color: '#4a5a3a' }}>LOD globe renderer</div>
           </button>
         </div>
 
