@@ -34,8 +34,20 @@ Status as of April 9, 2026. Everything above the line is implemented. Everything
 
 - [x] Fisheries reference: six species with etymology, ecology, trade properties, culture drift vectors
 - [x] Non-staple crops reference: stimulants (qahwa/char/awa/pinang/aqua), fibers (kapas/seric/byssus/fell/tapa/qivu), prestige minerals (chrysos/aes), fruits, oils, dyes, fermentables, East Asian layer, vegetables
-- [x] In-universe textbook: Intro to Reach History Ch. 7 (university register)
-- [x] In-universe textbook: Our Reach, Our Trade Ch. 3 (elementary register)
+- [x] In-universe textbook series: Intro to Reach History, university register
+  - Ch. 7: The Administered Trade Network (relay era, Tahan houses, university register)
+  - Ch. 8: The Architecture of the Administered Trade Network
+  - Ch. 9: The Saak Transition — Energy Economics and the Industrial Scramble
+  - Ch. 10: The Years Before the Equilibrium — From First Detonation to Mutual Deterrence
+  - Ch. 11: Geometry and Geology — The Strange Peace and Its Structure
+  - Ch. 12: What Comes After the Strange Peace?
+- [x] In-universe textbook series: Our Reach, Our Trade, elementary register
+  - Ch. 3: How the Peoples of the Reach Traded With Each Other
+  - Ch. 4: When Everything Sped Up (The Time of Naphtha and Fast Ships)
+  - Ch. 5: The Strange Peace
+  - Ch. 6: The Things We Still Trade (and Why We Still Need Each Other)
+  - Ch. 7: The Children of the Relay (Where Did the Old Trading Peoples Go?)
+  - Ch. 8: What Is a Nation? (And What Was It Before?)
 - [x] V1 commodity maps kept as canon (stim_map, fiber_map, prot_map)
 
 ### Strategy Game (web app, 2026-04-09)

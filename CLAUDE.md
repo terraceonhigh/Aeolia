@@ -37,7 +37,7 @@ Aeolia/
 │       ├── NON_STAPLE_CROPS_REFERENCE.md # Trade commodities with etymologies
 │       ├── exponent_sweep.py            # Production function sweep experiment
 │       ├── exponent_sweep_results.md    # Sweep analysis
-│       └── worldbuilding/               # In-universe textbook chapters (Ch. 5, 7, 8)
+│       └── worldbuilding/               # In-universe textbook chapters (12 chapters, 2 series)
 ├── TODO.md                      # Full project status and task queue
 ├── README.md                    # Project overview (game framing)
 └── CLAUDE.md                    # You are here
