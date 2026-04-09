@@ -10,6 +10,7 @@ import { buildWorld } from './engine/world.js';
 import { SimEngine, DEFAULT_PARAMS } from './engine/SimEngine.js';
 import { POLITY_NAMES } from './engine/constants.js';
 import { mulberry32 } from './engine/rng.js';
+import { ERA_NARRATIVES, TECH_MILESTONE_NARRATIVES } from './engine/narrativeText.js';
 
 // ── Name shuffler (same as GameApp) ──────────────────────
 
@@ -452,17 +453,56 @@ export default function Observatory({ seed, onBack }) {
           data: timeline.map(entry => entry.pop.reduce((s, v) => s + v, 0)),
         }];
 
+        // Piety series for top polities (piety is per-core; direct lookup)
+        const polityPietySeries = topCores.slice(0, 5).map(core => ({
+          core,
+          name: names[core] || `Nation ${core}`,
+          color: POLITY_COLORS[topCores.indexOf(core) % POLITY_COLORS.length],
+          data: timeline.map(entry => entry.piety ? (entry.piety[core] || 0) : 0),
+        }));
+
         // Build major event list for the timeline panel
         const events = [];
 
-        // Era transitions
+        // Era transitions — use ERA_NARRATIVES for consistent short descriptions
         const YEAR_ERA = [
-          { year: -5000, text: 'Serial Contact Era begins', color: '#a09060' },
-          { year: -2000, text: 'Colonial Era begins', color: '#8a7a5a' },
-          { year: -500,  text: 'Industrial Era begins', color: '#7a8a6a' },
-          { year: -200,  text: 'Nuclear Era begins', color: '#8a4040' },
+          { year: -5000, name: 'Serial Contact', color: ERA_NARRATIVES['Serial Contact']?.color || '#a09060' },
+          { year: -2000, name: 'Colonial',       color: ERA_NARRATIVES['Colonial']?.color      || '#8a7a5a' },
+          { year: -500,  name: 'Industrial',     color: ERA_NARRATIVES['Industrial']?.color    || '#7a8a6a' },
+          { year: -200,  name: 'Nuclear',        color: ERA_NARRATIVES['Nuclear']?.color       || '#8a4040' },
         ];
-        for (const ev of YEAR_ERA) events.push(ev);
+        for (const ev of YEAR_ERA) {
+          const nar = ERA_NARRATIVES[ev.name];
+          events.push({
+            year: ev.year,
+            text: nar ? `${ev.name} Era — ${nar.short}` : `${ev.name} Era begins`,
+            color: ev.color,
+          });
+        }
+
+        // Tech milestones: first time any top-3 polity crosses key thresholds
+        const TECH_GATES = [2, 5, 7, 9];
+        const techMilestoneFired = {};
+        for (const gate of TECH_GATES) {
+          for (let ti = 1; ti < timeline.length; ti++) {
+            const key = `${gate}`;
+            if (techMilestoneFired[key]) break;
+            for (const core of topCores.slice(0, 3)) {
+              const prev = timeline[ti - 1]?.tech?.[core] ?? 0;
+              const curr = timeline[ti]?.tech?.[core] ?? 0;
+              if (prev < gate && curr >= gate) {
+                techMilestoneFired[key] = true;
+                const nar = TECH_MILESTONE_NARRATIVES[gate];
+                events.push({
+                  year: timeline[ti].year,
+                  text: nar ? `${nar.title} — first achieved by ${names[core] || `Nation ${core}`}` : `Tech ${gate} reached`,
+                  color: nar?.color || '#8a7a6a',
+                });
+                break;
+              }
+            }
+          }
+        }
 
         // Scrambles
         if (engine.scrambleOnset !== null) {
@@ -476,19 +516,25 @@ export default function Observatory({ seed, onBack }) {
           events.push({ year, text: 'Pyra Scramble begins', color: '#7a1a1a' });
         }
 
-        // Dark Forest
+        // Dark Forest + Deterrence Era
         if (engine.dfYear !== null) {
           events.push({
             year: engine.dfYear,
-            text: `Dark Forest detection (${names[engine.dfArch] || 'unknown'} ↔ ${names[engine.dfDetector] || 'unknown'})`,
-            color: '#a04040',
+            text: `Dark Forest detection — ${names[engine.dfArch] || 'unknown'} ↔ ${names[engine.dfDetector] || 'unknown'}`,
+            color: '#c04040',
+          });
+          // Deterrence era begins the following tick (50 years after detection)
+          events.push({
+            year: engine.dfYear + 50,
+            text: 'Deterrence Era — territorial expansion between hegemons frozen; arms race begins',
+            color: '#8a4040',
           });
         }
 
-        // Major absorptions (top 10 by tick)
+        // Major absorptions (filter: resource-driven or large tech gap, max 15)
         const bigAbsorptions = engine.expansionLog
           .filter(e => e.resource_driven || e.tech_gap > 2)
-          .slice(0, 20);
+          .slice(0, 15);
         for (const e of bigAbsorptions) {
           const year = -20000 + e.tick * 50;
           events.push({
@@ -496,6 +542,63 @@ export default function Observatory({ seed, onBack }) {
             text: `${names[e.core] || `Nation ${e.core}`} absorbed ${names[e.target] || `arch ${e.target}`}`,
             color: '#5a4a2a',
           });
+        }
+
+        // Epidemic waves (max 8 worst waves by mortality rate)
+        if (engine.waveEpiLog && engine.waveEpiLog.length > 0) {
+          const worstWaves = [...engine.waveEpiLog]
+            .sort((a, b) => b.mortality_rate - a.mortality_rate)
+            .slice(0, 8);
+          for (const wave of worstWaves) {
+            const sourceN = names[wave.source] || `Nation ${wave.source}`;
+            events.push({
+              year: wave.year,
+              text: `Epidemic wave from ${sourceN} — ${Math.round(wave.mortality_rate * 100)}% mortality, ${wave.affected.length} polities affected`,
+              color: '#6a3a2a',
+            });
+          }
+        }
+
+        // Crop failures (worst per polity, max 6)
+        if (engine.cropFailureLog && engine.cropFailureLog.length > 0) {
+          const seenCores = new Set();
+          const worstFailures = [...engine.cropFailureLog]
+            .sort((a, b) => a.modifier - b.modifier)  // lowest modifier = worst failure
+            .filter(e => {
+              if (seenCores.has(e.core)) return false;
+              seenCores.add(e.core);
+              return true;
+            })
+            .slice(0, 6);
+          for (const fail of worstFailures) {
+            const pct = Math.round((1 - fail.modifier) * 100);
+            events.push({
+              year: fail.year,
+              text: `Crop failure in ${names[fail.core] || `Nation ${fail.core}`} territory — ${pct}% yield loss`,
+              color: '#5a4a1a',
+            });
+          }
+        }
+
+        // Piety spikes: detect when top polities cross 0.75 (theocratic phase)
+        // Check every 8 timeline entries (~1600 years) to avoid noise
+        const pietyCrossed = new Set();
+        for (let ti = 1; ti < timeline.length; ti += 2) {
+          const entry = timeline[ti];
+          if (!entry.piety) continue;
+          for (const core of topCores.slice(0, 4)) {
+            const prev = timeline[ti - 1]?.piety?.[core] ?? 0;
+            const curr = entry.piety[core] ?? 0;
+            const cKey = `${core}-${Math.floor(ti / 8)}`;
+            if (curr >= 0.75 && prev < 0.75 && !pietyCrossed.has(cKey)) {
+              pietyCrossed.add(cKey);
+              events.push({
+                year: entry.year,
+                text: `${names[core] || `Nation ${core}`} enters theocratic fervor (piety ${(curr * 100).toFixed(0)}%)`,
+                color: '#a09050',
+              });
+            }
+          }
         }
 
         // Sort all events by year
@@ -523,6 +626,7 @@ export default function Observatory({ seed, onBack }) {
           polityColorMap,
           polityTechSeries,
           polityPopSeries,
+          polityPietySeries,
           worldPopSeries,
           events,
           maxTech,
@@ -583,7 +687,7 @@ export default function Observatory({ seed, onBack }) {
     );
   }
 
-  const { polityTechSeries, polityPopSeries, worldPopSeries, events, maxTech, maxPop, years } = historyData;
+  const { polityTechSeries, polityPopSeries, polityPietySeries, worldPopSeries, events, maxTech, maxPop, years } = historyData;
 
   return (
     <div style={S.root}>
@@ -656,7 +760,7 @@ export default function Observatory({ seed, onBack }) {
           </div>
 
           {/* Population chart */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', borderBottom: '1px solid #1a1410' }}>
             <div style={S.sectionLabel}>POPULATION — WORLD + MAJOR POLITIES</div>
             <div style={{ ...S.chartWrap, display: 'flex', alignItems: 'flex-start' }}>
               <div style={{ flex: 1, height: '100%', minHeight: 0 }}>
@@ -689,6 +793,44 @@ export default function Observatory({ seed, onBack }) {
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Piety chart */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <div style={S.sectionLabel}>RELIGIOUS FERVOR (PIETY) — MAJOR POLITIES</div>
+            <div style={{ ...S.chartWrap, display: 'flex', alignItems: 'flex-start' }}>
+              <div style={{ flex: 1, height: '100%', minHeight: 0 }}>
+                <AutoSizeChart>
+                  {(w, h) => (
+                    <LineChart
+                      series={polityPietySeries || []}
+                      width={w} height={h}
+                      yMax={1.0}
+                      years={years}
+                      yLabel="Piety"
+                      selectedIdx={selectedIdx}
+                    />
+                  )}
+                </AutoSizeChart>
+              </div>
+              {/* Legend */}
+              <div style={{ width: 100, paddingLeft: 8, paddingTop: 4, flexShrink: 0 }}>
+                {(polityPietySeries || []).slice(0, 5).map((s, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
+                    <div style={{ width: 12, height: 2, background: s.color, flexShrink: 0 }} />
+                    <div style={{
+                      fontSize: 7, color: '#8a7a5a', overflow: 'hidden',
+                      textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    }}>
+                      {s.name}
+                    </div>
+                  </div>
+                ))}
+                <div style={{ fontSize: 6, color: '#4a3a2a', marginTop: 6, lineHeight: 1.4 }}>
+                  ↑ theocratic<br />↓ secular
+                </div>
               </div>
             </div>
           </div>
