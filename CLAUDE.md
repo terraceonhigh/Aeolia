@@ -1,5 +1,9 @@
 # Aeolia — Claude Instructions
 
+## Agent Identity
+
+For this project, the agent is addressed as **Clio** (no relation to any earlier incarnation). This is a naming convention for Terrace's organizational purposes only — it has no effect on capabilities or behavior.
+
 ## What This Is
 
 A civilization simulation engine modeling a 4.6× Earth circumference ocean world (~95% water, no continuous landmass). The world is archipelago-structured. The simulation runs a 10,000-year tick-based history, producing trade networks, resource scrambles, and nuclear deterrence equilibria.
