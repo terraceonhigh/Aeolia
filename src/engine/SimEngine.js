@@ -30,7 +30,7 @@ export const DEFAULT_PARAMS = {
   au_contact_bonus: 500.0,
   naphtha_richness: 2.0,
   naphtha_depletion: 0.008,
-  energy_to_tfp: 1.0,
+  energy_to_tfp: 0.51,  // calibrated: gives DF at ~year -200 on primary seed (216089)
   pu_dependent_factor: 0.65,
   resource_targeting_weight: 2.0,
   luxury_markup_rate: 0.40,
@@ -783,6 +783,21 @@ export class SimEngine {
           }
         }
       }
+      // Nuclear peer detection: once both are nuclear-capable (tech ≥ 9),
+      // awareness accumulates globally — weapons-test seismology, satellite
+      // surveillance, signals intelligence. No distance gate needed.
+      // Rate 0.04/tick → threshold 0.30 fires after ~7–8 ticks (350–400 years).
+      if (this.tech[core] >= 9.0) {
+        for (const other of cores) {
+          if (other === core) continue;
+          if (this.tech[other] >= 9.0) {
+            const keyOC = `${other},${core}`;
+            const keyCO = `${core},${other}`;
+            this.awareness.set(keyOC, Math.min(1, (this.awareness.get(keyOC) || 0) + 0.04));
+            this.awareness.set(keyCO, Math.min(1, (this.awareness.get(keyCO) || 0) + 0.04));
+          }
+        }
+      }
     }
 
     // ── STAGE 4: Dark Forest detection ──────────────────────
@@ -794,14 +809,27 @@ export class SimEngine {
           const aw = this.awareness.get(`${core},${other}`) || 0;
           const minArchs = Math.max(1, Math.floor(p.df_min_territory_frac * N));
           if (coreNCtrl[core] < minArchs || coreNCtrl[other] < minArchs) continue;
-          const dist = _gcDistArch(this.archs[core], this.archs[other]);
-          if (dist <= p.df_detection_range * 1.5 && aw > 0.2) {
-            this.dfYear = year;
-            this.dfArch = core;
-            this.dfDetector = other;
-            this.awareness.set(`${core},${other}`, 1.0);
-            this.awareness.set(`${other},${core}`, 1.0);
-            break;
+          // Nuclear peer pair (both ≥9): no distance gate, global awareness.
+          // Pre-nuclear rival (8–9): proximity gate still applies.
+          if (this.tech[other] >= 9.0) {
+            if (aw > 0.30) {
+              this.dfYear = year;
+              this.dfArch = core;
+              this.dfDetector = other;
+              this.awareness.set(`${core},${other}`, 1.0);
+              this.awareness.set(`${other},${core}`, 1.0);
+              break;
+            }
+          } else {
+            const dist = _gcDistArch(this.archs[core], this.archs[other]);
+            if (dist <= p.df_detection_range * 1.5 && aw > 0.2) {
+              this.dfYear = year;
+              this.dfArch = core;
+              this.dfDetector = other;
+              this.awareness.set(`${core},${other}`, 1.0);
+              this.awareness.set(`${other},${core}`, 1.0);
+              break;
+            }
           }
         }
         if (this.dfYear !== null) break;
@@ -837,6 +865,13 @@ export class SimEngine {
       let delta = baseFloor + accel;
       if (t > 9.0) delta *= _clamp((11.0 - t) / 2.0, 0, 1);
       this.tech[core] += delta;
+
+      // Post-DF arms race: all nuclear polities (tech > 8.5) get extra tech investment
+      // Models deterrence infrastructure, delivery systems, second-strike capability
+      if (this.dfYear !== null && this.tech[core] > 8.5) {
+        const armsBonus = Math.min(0.05, delta * 0.4);  // up to 40% extra growth, capped at 0.05
+        this.tech[core] += armsBonus;
+      }
 
       // Tech decay
       const maintenanceCost = this.tech[core] * this.tech[core] * p.maintenance_rate;
@@ -1019,7 +1054,18 @@ export class SimEngine {
           if (this.tech[core] - this.tech[target] > 1.5) pietyBonus += (cPiety - 0.65) * 1.5;
         }
 
-        candidates.push([tsScore + p.resource_targeting_weight * rv + despBonus + diploBonus + pietyBonus - dist * 1.5, target, dist, rv]);
+        // Post-DF deterrence: all nuclear-capable polities avoid each other's territory
+        // (mutual assured destruction locks in stasis between any two nuclear peers).
+        // Uses tech >= 9.0 as the nuclear threshold — same condition as awareness accumulation.
+        let deterrencePenalty = 0;
+        if (this.dfYear !== null) {
+          const targetCtrl = this.controller[target];
+          if (this.tech[core] >= 9.0 && this.tech[targetCtrl] >= 9.0 && core !== targetCtrl) {
+            deterrencePenalty = 12.0;  // very strong penalty — nuclear peers frozen against each other
+          }
+        }
+
+        candidates.push([tsScore + p.resource_targeting_weight * rv + despBonus + diploBonus + pietyBonus - deterrencePenalty - dist * 1.5, target, dist, rv]);
       }
       candidates.sort((a, b) => b[0] - a[0]);
 
@@ -1120,6 +1166,7 @@ export class SimEngine {
         controller: [...this.controller],
         tech: Array.from(this.tech, t => Math.round(t * 10) / 10),
         pop: Array.from(this.pop, p => Math.round(p)),
+        piety: Array.from(this.piety, v => Math.round(v * 100) / 100),
       });
     }
 
@@ -1158,6 +1205,7 @@ export class SimEngine {
         cultureLabel: _cultureLabelFromPos(this.cpos[pc]),
         sovereignty: Math.round(this.sovereignty[pc] * 1000) / 1000,
         contacts: this.contactSet[pc].size,
+        piety: Math.round(this.piety[pc] * 100) / 100,
       };
     }
 
@@ -1194,6 +1242,9 @@ export class SimEngine {
       fisheryStock: Array.from(this.fisheryStock, s => Math.round(s * 100) / 100),
       // Piety per core (for situation cards + dispatch)
       piety: Array.from(this.piety, v => Math.round(v * 100) / 100),
+      // Scramble onset ticks (for one-time dispatch events in GameApp)
+      scramble_onset_tick: this.scrambleOnset,
+      pu_scramble_onset_tick: this.puScrambleOnset,
     };
   }
 
