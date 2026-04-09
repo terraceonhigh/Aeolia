@@ -159,6 +159,29 @@ for wf in sorted(Path('worlds').glob('candidate_*.json')):
         print(f"DF seed {int(wf.stem.split('_')[1])}: year {r['df_year']}, {len(r['hegemons'])} hegemons")
 ```
 
+## Session Management for Unattended Runs
+
+During long autonomous or unattended development sessions, Claude must manage the 5-hour usage window to prevent premature termination.
+
+**Periodic usage check cadence:** Every ~20 tool uses (roughly every significant work block), run:
+```bash
+date && bunx ccusage
+```
+
+**Thresholds and actions:**
+
+| Usage level | Action |
+|-------------|--------|
+| < 70% | Continue normally |
+| 70–89% | Note remaining capacity in next commit message or comment; prefer smaller scoped tasks |
+| ≥ 90% | **Stop work immediately.** Commit all staged changes, write a brief status summary of what was done and what's next to TODO.md, then stop. Do not start new work. |
+
+**What `bunx ccusage` reports:** Token usage and elapsed time against the 5-hour rolling window. If the command is unavailable or returns an error, fall back to checking elapsed time via `date` and estimating conservatively (assume heavy usage if uncertain).
+
+**Compaction:** If context is growing large but usage is under 90%, compaction is preferable to stopping. Note in the session that compaction is needed and allow it to proceed.
+
+**Goal:** Uninterrupted programming over days. The priority order is: finish the current unit of work → commit → check usage → decide whether to continue.
+
 ## Conventions
 
 - Commodity names are canon from V1 sim_proxy.py maps (paddi, emmer, taro, sago, papa, nori, qahwa, char, kapas, seric, etc.)
