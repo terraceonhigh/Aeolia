@@ -106,7 +106,7 @@ Status as of April 9, 2026. Everything above the line is implemented. Everything
 - [x] Religious Revival situation card (Card 16): fires at piety≥0.65, collective vs. individual narrative variants
 - [x] INTERNAL AFFAIRS piety dispatch at high/elevated levels (every 6 ticks)
 - [ ] Centrifugal force: schism, fragmentation (Reformation model) — deferred to next round
-- [ ] Interaction with existing culture space axes — currently piety is independent of CI/IO
+- [x] Interaction with culture space axes: high piety (>0.5) pulls CI toward Collective and IO mildly Inward (drift rate × 0.4, capped); closes piety↔culture feedback loop in both JS and Python
 
 ---
 
