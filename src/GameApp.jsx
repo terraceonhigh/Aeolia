@@ -11,7 +11,7 @@ import { SimEngine, DEFAULT_PARAMS } from './engine/SimEngine.js';
 import { POLITY_NAMES } from './engine/constants.js';
 import { mulberry32 } from './engine/rng.js';
 import { generateSituationCards } from './engine/cardGenerator.js';
-import { getDispatchEntry, getCultureLabel, describeCulture } from './engine/narrativeText.js';
+import { getDispatchEntry, getCultureLabel, describeCulture, getReligiousRevivalDispatch } from './engine/narrativeText.js';
 import PolitySelect from './components/PolitySelect.jsx';
 import TurnDashboard from './components/TurnDashboard.jsx';
 import EventPopup, { ERA_DESCRIPTIONS, TECH_MILESTONES } from './components/EventPopup.jsx';
@@ -448,6 +448,28 @@ function gameReducer(state, action) {
         }
       }
 
+      // ── Fishery collapse check ──────────────────────────────
+      // If any player-controlled archipelago drops below critical stock (< 0.15), trigger popup
+      if (snapshot.fisheryStock && !popup) {
+        const playerArchs = [];
+        for (let i = 0; i < (snapshot.controller || []).length; i++) {
+          if (snapshot.controller[i] === playerCore) playerArchs.push(i);
+        }
+        for (const archIdx of playerArchs) {
+          const stock = snapshot.fisheryStock[archIdx] ?? 1;
+          if (stock < 0.15) {
+            const archName = action.names[archIdx] || `Archipelago ${archIdx}`;
+            newEvents.push({
+              yearStr: yearStr2,
+              text: `ADMIRALTY — Fishery collapse in ${archName}. Stock at ${Math.round(stock * 100)}% of sustainable level. Caloric shortfall imminent.`,
+              color: '#3a5a6a',
+            });
+            popup = { type: 'fishery_collapse', data: { archName } };
+            break;
+          }
+        }
+      }
+
       // ── Tech decay ──────────────────────────────────────────
       if (playerTech < prevTech - 0.05) {
         newEvents.push({
@@ -458,18 +480,36 @@ function gameReducer(state, action) {
       }
 
       // ── Dark Forest: richer log entry ───────────────────
+      // DF is a world-altering event — always visible, even if player hasn't
+      // contacted the trigger polities. News of the first nuclear detection
+      // reaches every court in the world within 50 years.
       if (snapshot.dfYear && !state.snapshot?.dfYear) {
-        const contactedCores = snapshot.contactedCores || [];
-        const canSeeDF = snapshot.dfArch === playerCore || snapshot.dfDetector === playerCore
-          || contactedCores.includes(snapshot.dfArch) || contactedCores.includes(snapshot.dfDetector);
-        if (canSeeDF) {
-          newEvents.push({
-            yearStr: yearStr2,
-            text: `ADMIRALTY INTELLIGENCE — NUCLEAR PEER DETECTED. Dark Forest protocol initiated.`,
-            color: '#a04030',
-          });
-          popup = { type: 'dark_forest', data: { dfCores: [snapshot.dfArch, snapshot.dfDetector] } };
-        }
+        newEvents.push({
+          yearStr: yearStr2,
+          text: `ADMIRALTY INTELLIGENCE — NUCLEAR PEER DETECTED. Dark Forest protocol initiated.`,
+          color: '#a04030',
+        });
+        popup = { type: 'dark_forest', data: { dfCores: [snapshot.dfArch, snapshot.dfDetector] } };
+      }
+
+      // ── Naphtha scramble onset ──────────────────────────────
+      // Fires once when the first naphtha contest is detected globally.
+      if (snapshot.scramble_onset_tick && !state.snapshot?.scramble_onset_tick) {
+        newEvents.push({
+          yearStr: yearStr2,
+          text: getDispatchEntry('naphtha_scramble', {}, action.names, tick),
+          color: '#7a8a2a',
+        });
+      }
+
+      // ── Pyra revaluation ────────────────────────────────────
+      // Fires once when the first pyra scramble is detected globally.
+      if (snapshot.pu_scramble_onset_tick && !state.snapshot?.pu_scramble_onset_tick) {
+        newEvents.push({
+          yearStr: yearStr2,
+          text: getDispatchEntry('pyra_revaluation', {}, action.names, tick),
+          color: '#8a2020',
+        });
       }
 
       // ── Epidemic waves ──────────────────────────────────────
@@ -480,9 +520,10 @@ function gameReducer(state, action) {
           const affectsContact = wave.affected.some(c => snapshot.contactedCores?.includes(c));
           if (affectsPlayer || affectsContact) {
             const sourceName = action.names[wave.source] || `Nation ${wave.source}`;
+            const severity = wave.mortality_rate > 0.15 ? 'severe' : 'moderate';
             newEvents.push({
               yearStr: yearStr2,
-              text: `MERCHANT GUILD — Epidemic wave from ${sourceName} trade routes. Mortality ${Math.round(wave.mortality_rate * 100)}%. Trade disruption expected.`,
+              text: getDispatchEntry('epidemic_wave', { name: sourceName, severity }, action.names, tick),
               color: '#6a4a2a',
             });
             if (!popup && affectsPlayer) {
@@ -504,10 +545,10 @@ function gameReducer(state, action) {
         const pp = snapshot.piety[playerCore] ?? 0;
         const tickN = snapshot.tick || 0;
         if (pp >= 0.65 && tickN % 6 === 0) {
-          const intensity = pp >= 0.80 ? 'HIGH' : 'ELEVATED';
+          const polityName = action.names[playerCore] || `Nation ${playerCore}`;
           newEvents.push({
             yearStr: yearStr2,
-            text: `INTERNAL AFFAIRS — Piety index ${intensity}. Absorption rates in peripheral territories above baseline. Missionary networks active.`,
+            text: getReligiousRevivalDispatch(polityName, pp, tickN),
             color: '#7a6a3a',
           });
         }
