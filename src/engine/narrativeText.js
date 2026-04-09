@@ -259,13 +259,22 @@ export function getFirstContactBody(data, seed) {
   const cropFl = CROP_LORE[crop];
   const s = seed ?? hashStr(name);
 
-  const opening = pick([
-    `At dawn, on a submarine plateau your charts did not show, your fishing fleet encountered vessels flying unknown colors.`,
-    `A pilot on deep-survey patrol reported structured radio traffic from a bearing your intelligence had marked as empty ocean.`,
-    `Two boats. Eighty meters of water between them. Both crews staring. Someone on the far vessel raised their hand.`,
-    `Merchant scouts running a speculative relay route found anchored vessels in a harbor that has no name in any chart you hold.`,
-    `A seaplane on extended patrol logged a city visible from altitude — harbor lights, docks, the unmistakable geometry of a working port — on an island marked as uninhabited.`,
-  ], s);
+  const numericTech = parseFloat(tech) || 0;
+
+  const opening = numericTech >= 8.5
+    ? pick([
+        `Atmospheric sampling from a deep-range surveillance seaplane returned reactor-isotope concentrations inconsistent with background — a fission program, operating at scale, somewhere in the next ocean sector. The navigation team took four hours to triangulate. The report sat on your intelligence director's desk for six more hours before anyone said the word aloud.`,
+        `Dense structured radio traffic — encrypted, high-frequency, disciplined — was logged on bearings your charts marked as empty water. Signal-intelligence analysts took three days to confirm it was not atmospheric bounce. It was not. There is a civilization on the other side of the silence, and they are advanced enough to know how to hide in it.`,
+        `A surveillance seaplane on extended deep-ocean patrol reported city lights visible from altitude on an approach bearing: harbor installations, industrial flares, the organized geometry of a functioning port city on an island that does not appear in any cartographic record your government holds. The pilot circled twice, noted two surface radar locks, and turned for home.`,
+        `Your deep-survey network flagged seismic signatures consistent with industrial extraction across three archipelago nodes — too regular, too coordinated to be geological. The signal processing team's conclusion was logged as provisional for two weeks. No one wanted to be the analyst who reported a second civilization without being certain. They are now certain.`,
+      ], s)
+    : pick([
+        `At dawn, on a submarine plateau your charts did not show, your fishing fleet encountered vessels flying unknown colors.`,
+        `A pilot on deep-survey patrol reported structured radio traffic from a bearing your intelligence had marked as empty ocean.`,
+        `Two boats. Eighty meters of water between them. Both crews staring. Someone on the far vessel raised their hand.`,
+        `Merchant scouts running a speculative relay route found anchored vessels in a harbor that has no name in any chart you hold.`,
+        `A seaplane on extended patrol logged a city visible from altitude — harbor lights, docks, the unmistakable geometry of a working port — on an island marked as uninhabited.`,
+      ], s);
 
   const cultureNote = pick([
     `Their institutions read as ${culture}. Contact will require patience.`,
@@ -277,7 +286,11 @@ export function getFirstContactBody(data, seed) {
     ? ` Their harbors cultivate ${cropFl.harvest}. Their ${cropFl.stimulant} houses appear to be where public life happens.`
     : '';
 
-  return `${opening}${cropNote} Technology: ${tech}. ${cultureNote} Trade routes may now form. The contact has also reset the epidemiological clock — both populations carry pathogens the other has never encountered.`;
+  const closing = numericTech >= 8.5
+    ? `${cultureNote} The epidemiological clock has reset — both populations carry pathogens the other has never encountered. Trade is possible. So is everything else.`
+    : `${cultureNote} Trade routes may now form. The contact has also reset the epidemiological clock — both populations carry pathogens the other has never encountered.`;
+
+  return `${opening}${cropNote} Technology: ${tech}. ${closing}`;
 }
 
 // ── Dark Forest narrative ─────────────────────────────────────
