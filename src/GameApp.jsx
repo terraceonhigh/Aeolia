@@ -97,6 +97,14 @@ const INITIAL_STATE = {
   lastEra: null,
   lastTech: 0,
   contactedSet: new Set(),
+  // Interaction mechanics
+  embargoTargets: new Set(),
+  rivalCores: new Set(),
+  partnerCores: new Set(),
+  culturePolicyCI: 0,
+  culturePolicyIO: 0,
+  sovFocusTargets: new Set(),
+  scoutActive: false,
 };
 
 function gameReducer(state, action) {
@@ -157,6 +165,55 @@ function gameReducer(state, action) {
       return { ...state, selectedTargets: next };
     }
 
+    case 'TOGGLE_EMBARGO': {
+      const next = new Set(state.embargoTargets);
+      if (next.has(action.core)) next.delete(action.core);
+      else next.add(action.core);
+      return { ...state, embargoTargets: next };
+    }
+
+    case 'TOGGLE_RIVAL': {
+      const next = new Set(state.rivalCores);
+      if (next.has(action.core)) { next.delete(action.core); }
+      else {
+        next.add(action.core);
+        // Can't be both rival and partner
+        const partners = new Set(state.partnerCores);
+        partners.delete(action.core);
+        return { ...state, rivalCores: next, partnerCores: partners };
+      }
+      return { ...state, rivalCores: next };
+    }
+
+    case 'TOGGLE_PARTNER': {
+      const next = new Set(state.partnerCores);
+      if (next.has(action.core)) { next.delete(action.core); }
+      else {
+        next.add(action.core);
+        // Can't be both rival and partner
+        const rivals = new Set(state.rivalCores);
+        rivals.delete(action.core);
+        return { ...state, partnerCores: next, rivalCores: rivals };
+      }
+      return { ...state, partnerCores: next };
+    }
+
+    case 'SET_CULTURE_POLICY': {
+      if (action.axis === 'ci') return { ...state, culturePolicyCI: action.value };
+      if (action.axis === 'io') return { ...state, culturePolicyIO: action.value };
+      return state;
+    }
+
+    case 'TOGGLE_SOV_FOCUS': {
+      const next = new Set(state.sovFocusTargets);
+      if (next.has(action.target)) next.delete(action.target);
+      else next.add(action.target);
+      return { ...state, sovFocusTargets: next };
+    }
+
+    case 'TOGGLE_SCOUT':
+      return { ...state, scoutActive: !state.scoutActive };
+
     case 'ADVANCE_TURN': {
       const { engine, playerCore, allocation, selectedTargets, eventLog } = state;
       if (!engine || engine.finished || state.pendingPopup) return state;
@@ -166,6 +223,13 @@ function gameReducer(state, action) {
         techShare: allocation.techShare / 100,
         consolidation: allocation.consolidation / 100,
         targets: [...selectedTargets],
+        embargoTargets: [...state.embargoTargets],
+        culturePolicyCI: state.culturePolicyCI,
+        culturePolicyIO: state.culturePolicyIO,
+        sovFocusTargets: [...state.sovFocusTargets],
+        scoutActive: state.scoutActive,
+        rivalCores: [...state.rivalCores],
+        partnerCores: [...state.partnerCores],
       };
 
       const snapshot = engine.advanceTick(decision);
@@ -712,6 +776,30 @@ function GameInner({ seed, onBack }) {
     dispatch({ type: 'TOGGLE_TARGET', target });
   }, []);
 
+  const handleToggleEmbargo = useCallback((core) => {
+    dispatch({ type: 'TOGGLE_EMBARGO', core });
+  }, []);
+
+  const handleToggleRival = useCallback((core) => {
+    dispatch({ type: 'TOGGLE_RIVAL', core });
+  }, []);
+
+  const handleTogglePartner = useCallback((core) => {
+    dispatch({ type: 'TOGGLE_PARTNER', core });
+  }, []);
+
+  const handleSetCulturePolicy = useCallback((axis, value) => {
+    dispatch({ type: 'SET_CULTURE_POLICY', axis, value });
+  }, []);
+
+  const handleToggleSovFocus = useCallback((target) => {
+    dispatch({ type: 'TOGGLE_SOV_FOCUS', target });
+  }, []);
+
+  const handleToggleScout = useCallback(() => {
+    dispatch({ type: 'TOGGLE_SCOUT' });
+  }, []);
+
   // ── Render ─────────────────────────────────────────────
 
   return (
@@ -786,6 +874,19 @@ function GameInner({ seed, onBack }) {
             timerDuration={game.speed > 0 ? 10000 / game.speed : 10000}
             timerPaused={!!game.pendingPopup}
             timerKey={game.timerKey}
+            embargoTargets={game.embargoTargets}
+            onToggleEmbargo={handleToggleEmbargo}
+            rivalCores={game.rivalCores}
+            onToggleRival={handleToggleRival}
+            partnerCores={game.partnerCores}
+            onTogglePartner={handleTogglePartner}
+            culturePolicyCI={game.culturePolicyCI}
+            culturePolicyIO={game.culturePolicyIO}
+            onSetCulturePolicy={handleSetCulturePolicy}
+            sovFocusTargets={game.sovFocusTargets}
+            onToggleSovFocus={handleToggleSovFocus}
+            scoutActive={game.scoutActive}
+            onToggleScout={handleToggleScout}
           />
         )}
       </div>

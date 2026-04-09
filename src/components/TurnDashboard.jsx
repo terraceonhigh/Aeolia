@@ -141,6 +141,13 @@ export default function TurnDashboard({
   onAdvance, eventLog,
   speed, onSetSpeed,
   timerDuration, timerPaused, timerKey,
+  // Interaction mechanics
+  embargoTargets, onToggleEmbargo,
+  rivalCores, onToggleRival,
+  partnerCores, onTogglePartner,
+  culturePolicyCI, culturePolicyIO, onSetCulturePolicy,
+  sovFocusTargets, onToggleSovFocus,
+  scoutActive, onToggleScout,
 }) {
   const [showTerritory, setShowTerritory] = useState(false);
   const ps = snapshot?.playerStats;
@@ -341,6 +348,126 @@ export default function TurnDashboard({
             </div>
           );
         })()}
+      </div>
+
+      {/* Diplomacy — rivals, partners, embargoes */}
+      {(snapshot?.contactedCores?.length > 0) && (
+        <div style={S.section}>
+          <div style={S.sectionTitle}>Diplomacy</div>
+          <div style={{ maxHeight: 140, overflowY: 'auto' }}>
+            {snapshot.contactedCores.map(cc => {
+              const isRival = rivalCores?.has(cc);
+              const isPartner = partnerCores?.has(cc);
+              const isEmbargo = embargoTargets?.has(cc);
+              return (
+                <div key={cc} style={{
+                  padding: '4px 8px', marginBottom: 2, borderRadius: 3,
+                  background: isRival ? '#1a0808' : isPartner ? '#0a1408' : '#0e0a06',
+                  border: `1px solid ${isRival ? '#4a2020' : isPartner ? '#2a4a20' : '#1a1408'}`,
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                }}>
+                  <span style={{ fontSize: 8, color: '#c8a878' }}>{names[cc] || `Nation ${cc}`}</span>
+                  <div style={{ display: 'flex', gap: 2 }}>
+                    <button onClick={() => onToggleRival?.(cc)} title="Rival — prioritize attacking"
+                      style={{
+                        padding: '1px 5px', fontSize: 7, fontFamily: 'inherit', cursor: 'pointer',
+                        background: isRival ? '#3a1010' : '#0a0804', border: `1px solid ${isRival ? '#6a3030' : '#2a1f14'}`,
+                        color: isRival ? '#c06040' : '#6a5a3a', borderRadius: 2,
+                      }}>⚔</button>
+                    <button onClick={() => onTogglePartner?.(cc)} title="Partner — trade bonus, avoid attacking"
+                      style={{
+                        padding: '1px 5px', fontSize: 7, fontFamily: 'inherit', cursor: 'pointer',
+                        background: isPartner ? '#0a1a08' : '#0a0804', border: `1px solid ${isPartner ? '#3a6a30' : '#2a1f14'}`,
+                        color: isPartner ? '#80c060' : '#6a5a3a', borderRadius: 2,
+                      }}>◆</button>
+                    <button onClick={() => onToggleEmbargo?.(cc)} title="Embargo — block trade"
+                      style={{
+                        padding: '1px 5px', fontSize: 7, fontFamily: 'inherit', cursor: 'pointer',
+                        background: isEmbargo ? '#1a1000' : '#0a0804', border: `1px solid ${isEmbargo ? '#6a5020' : '#2a1f14'}`,
+                        color: isEmbargo ? '#c0a040' : '#6a5a3a', borderRadius: 2,
+                      }}>✕</button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div style={{ fontSize: 7, color: '#4a3a2a', marginTop: 4 }}>
+            ⚔ rival · ◆ partner · ✕ embargo
+          </div>
+        </div>
+      )}
+
+      {/* Cultural Policy */}
+      <div style={S.section}>
+        <div style={S.sectionTitle}>
+          Cultural Policy
+          <span style={{ fontSize: 7, color: '#6a5a3a', fontWeight: 400, marginLeft: 8 }}>
+            {ps?.cultureLabel || '—'}
+          </span>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ fontSize: 7, color: '#6a5a3a', width: 50 }}>Collect.</span>
+            <input type="range" min={-100} max={100} value={Math.round((culturePolicyCI || 0) * 100)}
+              onChange={e => onSetCulturePolicy?.('ci', Number(e.target.value) / 100)}
+              style={{ flex: 1, accentColor: '#8a7a5a' }} />
+            <span style={{ fontSize: 7, color: '#6a5a3a', width: 50, textAlign: 'right' }}>Indiv.</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ fontSize: 7, color: '#6a5a3a', width: 50 }}>Inward</span>
+            <input type="range" min={-100} max={100} value={Math.round((culturePolicyIO || 0) * 100)}
+              onChange={e => onSetCulturePolicy?.('io', Number(e.target.value) / 100)}
+              style={{ flex: 1, accentColor: '#8a7a5a' }} />
+            <span style={{ fontSize: 7, color: '#6a5a3a', width: 50, textAlign: 'right' }}>Outward</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Scout & Sovereignty Focus */}
+      <div style={S.section}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+          <div style={S.sectionTitle}>Operations</div>
+          <button onClick={() => onToggleScout?.()}
+            style={{
+              padding: '2px 8px', fontSize: 7, fontFamily: 'inherit', cursor: 'pointer',
+              background: scoutActive ? '#1a1408' : '#0a0804',
+              border: `1px solid ${scoutActive ? '#6a5430' : '#2a1f14'}`,
+              color: scoutActive ? '#d4b896' : '#6a5a3a', borderRadius: 2,
+              fontWeight: scoutActive ? 600 : 400,
+            }}>
+            {scoutActive ? '◉ SCOUTING' : '○ Scout'}
+          </button>
+        </div>
+        {ownedArchs.length > 1 && (
+          <>
+            <div style={{ fontSize: 7, color: '#6a5a3a', marginBottom: 4, letterSpacing: '1px', textTransform: 'uppercase' }}>
+              Sovereignty Focus
+            </div>
+            <div style={{ maxHeight: 100, overflowY: 'auto' }}>
+              {ownedArchs.filter(i => i !== playerCore).map(i => {
+                const focused = sovFocusTargets?.has(i);
+                const sov = snapshot?.sovereignty?.[i];
+                return (
+                  <div key={i} onClick={() => onToggleSovFocus?.(i)} style={{
+                    padding: '3px 6px', marginBottom: 1, cursor: 'pointer', borderRadius: 2,
+                    background: focused ? '#14100a' : '#0e0a06',
+                    border: `1px solid ${focused ? '#4a3a20' : '#1a1408'}`,
+                    display: 'flex', justifyContent: 'space-between', fontSize: 8,
+                  }}>
+                    <span style={{ color: focused ? '#d4b896' : '#8a7a5a' }}>
+                      {focused ? '▣ ' : '□ '}{names[i]}
+                    </span>
+                    {sov !== undefined && (
+                      <span style={{ color: sov > 0.6 ? '#7a8a5a' : sov > 0.3 ? '#8a7a3a' : '#a05030', fontSize: 7 }}>
+                        {Math.round(sov * 100)}%
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
       </div>
 
       {/* Event log */}

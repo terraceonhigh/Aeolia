@@ -127,6 +127,7 @@ export class SimEngine {
     this.N = this.archs.length;
     this.seed = world.seed || 42;
     this.playerCore = playerCore;
+    this._scouting = false; // player scout/explore state
 
     // ── Substrate ──────────────────────────────────────────
     let substrate = world.substrate;
@@ -296,7 +297,7 @@ export class SimEngine {
 
   // ── Visibility: fog of war status for each archipelago ──
 
-  getVisibility(core) {
+  getVisibility(core, scouting = false) {
     // Returns array of visibility levels per archipelago:
     // 'owned'     — player controls this
     // 'frontier'  — adjacent to player territory, can see details
@@ -317,6 +318,22 @@ export class SimEngine {
           vis[nb] = 'frontier';
           frontierSet.add(nb);
         }
+      }
+    }
+
+    // Scout: when active, frontier extends one extra hop (frontier-of-frontier becomes frontier)
+    if (scouting) {
+      const extraFrontier = new Set();
+      for (const j of frontierSet) {
+        for (const nb of this.adj[j]) {
+          if (vis[nb] === 'unknown') {
+            extraFrontier.add(nb);
+          }
+        }
+      }
+      for (const j of extraFrontier) {
+        vis[j] = 'frontier';
+        frontierSet.add(j);
       }
     }
 
@@ -374,13 +391,23 @@ export class SimEngine {
   // ── Core method: advance one tick ──────────────────────
 
   /**
-   * @param {Object|null} playerDecision - { expansion, techShare, consolidation, targets: number[] }
-   *   expansion + techShare + consolidation should sum to ~1.0
-   *   targets: array of arch indices to prioritize for expansion
+   * @param {Object|null} playerDecision - {
+   *   expansion, techShare, consolidation, targets: number[],
+   *   embargoTargets?: number[],       // cores to block trade with
+   *   culturePolicyCI?: number,         // culture nudge: -1 (collectivist) to +1 (individualist)
+   *   culturePolicyIO?: number,         // culture nudge: -1 (inward) to +1 (outward)
+   *   sovFocusTargets?: number[],       // islands to prioritize consolidation on
+   *   scoutActive?: boolean,            // spend allocation to expand fog of war
+   *   rivalCores?: number[],            // cores to target preferentially in expansion
+   *   partnerCores?: number[],          // cores to avoid targeting / trade bonus
+   * }
    * @returns {Object} snapshot of current state
    */
   advanceTick(playerDecision = null) {
     if (this.finished) return this.snapshot();
+
+    // Store scouting state for snapshot visibility
+    this._scouting = !!(playerDecision?.scoutActive);
 
     const tick = this.tick;
     const year = this.year;
@@ -414,10 +441,20 @@ export class SimEngine {
     const tradeNet = {};
     for (const c of cores) tradeNet[c] = 0;
 
+    // Player embargo & partner trade bonus sets
+    const embargoSet = playerDecision?.embargoTargets ? new Set(playerDecision.embargoTargets) : null;
+    const partnerSet = playerDecision?.partnerCores ? new Set(playerDecision.partnerCores) : null;
+
     for (const tc of cores) {
       const tcTech = this.tech[tc];
       for (const other of this.contactSet[tc]) {
         if (!coresSet.has(other) || other <= tc) continue;
+
+        // Player embargo: skip trade with embargoed cores
+        if (embargoSet && (tc === this.playerCore || other === this.playerCore)) {
+          const otherSide = tc === this.playerCore ? other : tc;
+          if (embargoSet.has(otherSide)) continue;
+        }
         const otherTech = this.tech[other];
         const effTech = Math.min(tcTech, otherTech);
         const distRad = _gcDistArch(this.archs[tc], this.archs[other]);
@@ -450,7 +487,14 @@ export class SimEngine {
         const massA = Math.sqrt(Math.max(1, corePop[tc])) * this.substrate[tc].crops.primary_yield;
         const massB = Math.sqrt(Math.max(1, corePop[other])) * this.substrate[other].crops.primary_yield;
         const volume = layerMult * comp * Math.sqrt(massA * massB) / (distRad ** 2);
-        const netBenefit = volume * (1 - effMarkup) * 0.003;
+        let netBenefit = volume * (1 - effMarkup) * 0.003;
+
+        // Player partner bonus: +30% trade with partner cores
+        if (partnerSet && (tc === this.playerCore || other === this.playerCore)) {
+          const otherSide = tc === this.playerCore ? other : tc;
+          if (partnerSet.has(otherSide)) netBenefit *= 1.3;
+        }
+
         tradeNet[tc] += netBenefit;
         tradeNet[other] += netBenefit;
       }
@@ -602,6 +646,13 @@ export class SimEngine {
         if (up > 0.3) io += fdr * 0.8;
         if (mt > 20) { ci += fdr * 0.4; io += fdr * 0.4; }
         ci -= fdr * 0.1;
+      }
+
+      // Player cultural policy: small nudge (capped at ±0.3 of drift rate)
+      if (core === this.playerCore && playerDecision) {
+        const nudgeCap = p.culture_drift_rate * 0.3;
+        if (playerDecision.culturePolicyCI) ci += _clamp(playerDecision.culturePolicyCI, -1, 1) * nudgeCap;
+        if (playerDecision.culturePolicyIO) io += _clamp(playerDecision.culturePolicyIO, -1, 1) * nudgeCap;
       }
 
       this.cpos[core] = [_clamp(ci, -1, 1), _clamp(io, -1, 1)];
@@ -783,7 +834,17 @@ export class SimEngine {
           if (rp > 0.3) dist *= _clamp(1.0 - (rp - 0.3) * 0.5, 0.5, 1.0);
         }
 
-        candidates.push([tsScore + p.resource_targeting_weight * rv + despBonus - dist * 1.5, target, dist, rv]);
+        // Player diplomacy: rival bonus / partner penalty for expansion targeting
+        let diploBonus = 0;
+        if (isPlayer && playerDecision) {
+          const targetCtrl = this.controller[target];
+          const rivalSet = playerDecision.rivalCores ? new Set(playerDecision.rivalCores) : null;
+          const partnerSetD = playerDecision.partnerCores ? new Set(playerDecision.partnerCores) : null;
+          if (rivalSet && rivalSet.has(targetCtrl)) diploBonus += 2.0;
+          if (partnerSetD && partnerSetD.has(targetCtrl)) diploBonus -= 3.0; // strongly avoid partner territory
+        }
+
+        candidates.push([tsScore + p.resource_targeting_weight * rv + despBonus + diploBonus - dist * 1.5, target, dist, rv]);
       }
       candidates.sort((a, b) => b[0] - a[0]);
 
@@ -835,11 +896,18 @@ export class SimEngine {
     }
 
     // ── STAGE 7: Sovereignty drift ──────────────────────────
+    const sovFocusSet = playerDecision?.sovFocusTargets ? new Set(playerDecision.sovFocusTargets) : null;
     for (let i = 0; i < N; i++) {
       if (this.controller[i] === i) continue;
       const core = this.controller[i];
       const dist = _gcDistArch(this.archs[core], this.archs[i]);
-      const extraction = p.sov_extraction_decay / Math.max(0.1, dist) * _clamp(energyRatio[core] ?? 1, 0, 1.5);
+      let extraction = p.sov_extraction_decay / Math.max(0.1, dist) * _clamp(energyRatio[core] ?? 1, 0, 1.5);
+
+      // Player sovereignty focus: reduce extraction on focused islands (faster stabilization)
+      if (core === this.playerCore && sovFocusSet && sovFocusSet.has(i)) {
+        extraction *= 0.4; // 60% less extraction = faster sovereignty recovery
+      }
+
       const recovery = p.sov_extraction_decay * this.sovereignty[i] * (this.pop[i] / Math.max(1, this.pop[core])) * 0.5;
       this.sovereignty[i] += (recovery - extraction) * 0.1;
       this.sovereignty[i] = _clamp(this.sovereignty[i], 0.05, 0.95);
@@ -927,7 +995,9 @@ export class SimEngine {
       // Last tick's events
       events: this.expansionLog.filter(e => e.tick === this.tick - 1),
       // Fog of war
-      visibility: this.playerCore !== null ? this.getVisibility(this.playerCore) : null,
+      visibility: this.playerCore !== null ? this.getVisibility(this.playerCore, this._scouting) : null,
+      // Sovereignty per-island (for sovereignty focus UI)
+      sovereignty: Array.from(this.sovereignty, s => Math.round(s * 1000) / 1000),
       // Contacted polity cores (for intel display)
       contactedCores: this.playerCore !== null ? [...this.contactSet[this.playerCore]] : [],
     };
