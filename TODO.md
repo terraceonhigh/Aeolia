@@ -34,8 +34,14 @@ Status as of April 9, 2026. Everything above the line is implemented. Everything
 
 - [x] Fisheries reference: six species with etymology, ecology, trade properties, culture drift vectors
 - [x] Non-staple crops reference: stimulants (qahwa/char/awa/pinang/aqua), fibers (kapas/seric/byssus/fell/tapa/qivu), prestige minerals (chrysos/aes), fruits, oils, dyes, fermentables, East Asian layer, vegetables
-- [x] In-universe textbook series: Intro to Reach History, university register
-  - Ch. 7: The Administered Trade Network (relay era, Tahan houses, university register)
+- [x] In-universe textbook series: Intro to Reach History, university register (all 12 chapters complete as of 2026-04-09)
+  - Ch. 1: The Ocean World — Geography as History
+  - Ch. 2: The Relay Trading Networks — From Contact to Commerce
+  - Ch. 3: The Colonial Expansion — From Relay to Empire
+  - Ch. 4: The Feitoria System and the Reshaping of Archipelago Production
+  - Ch. 5: Resistance and Accommodation — The Intermediate Belt in the Colonial Period
+  - Ch. 6: The Late Colonial Period — Integration and Dissolution
+  - Ch. 7: The Strait Trade and the Collapse of the Relay Age (relay era, Tahan houses, university register)
   - Ch. 8: The Architecture of the Administered Trade Network
   - Ch. 9: The Saak Transition — Energy Economics and the Industrial Scramble
   - Ch. 10: The Years Before the Equilibrium — From First Detonation to Mutual Deterrence
