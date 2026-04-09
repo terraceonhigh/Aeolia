@@ -441,7 +441,7 @@ function gameReducer(state, action) {
             const archName = action.names[cf.arch] || `Archipelago ${cf.arch}`;
             newEvents.push({
               yearStr: yearStr2,
-              text: `INTERNAL AFFAIRS — Crop failure in ${archName}. Yield reduced ${pct}% this season. Food surplus will contract.`,
+              text: getDispatchEntry('crop_failure', { archName, pct }, action.names, tick + cf.arch),
               color: '#7a5a2a',
             });
           }
@@ -461,7 +461,7 @@ function gameReducer(state, action) {
             const archName = action.names[archIdx] || `Archipelago ${archIdx}`;
             newEvents.push({
               yearStr: yearStr2,
-              text: `ADMIRALTY — Fishery collapse in ${archName}. Stock at ${Math.round(stock * 100)}% of sustainable level. Caloric shortfall imminent.`,
+              text: getDispatchEntry('fishery_collapse', { archName, stock }, action.names, tick + archIdx),
               color: '#3a5a6a',
             });
             popup = { type: 'fishery_collapse', data: { archName } };
@@ -486,7 +486,7 @@ function gameReducer(state, action) {
       if (snapshot.dfYear && !state.snapshot?.dfYear) {
         newEvents.push({
           yearStr: yearStr2,
-          text: `ADMIRALTY INTELLIGENCE — NUCLEAR PEER DETECTED. Dark Forest protocol initiated.`,
+          text: getDispatchEntry('dark_forest_detected', {}, action.names, tick),
           color: '#a04030',
         });
         popup = { type: 'dark_forest', data: { dfCores: [snapshot.dfArch, snapshot.dfDetector] } };

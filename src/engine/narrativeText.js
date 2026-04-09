@@ -392,6 +392,37 @@ export function getDispatchEntry(type, data, names, tick) {
       return `MERCHANT GUILD — Piracy reported on ${route}. Cargo losses above seasonal average. Escort allocation review underway.`;
     }
 
+    case 'crop_failure': {
+      const archName = data?.archName || 'a holding';
+      const pct = data?.pct || '?';
+      const cause = pick([
+        'Unseasonal drought reduced standing water depth across the paddy terraces.',
+        'Late-season storm damage has cut yield estimates substantially.',
+        'Disease pressure in the grain stores detected post-harvest.',
+        'Pest outbreak across the cultivated terraces reported by agricultural surveyors.',
+      ], s);
+      return `INTERNAL AFFAIRS — Crop failure in ${archName}. Yield reduced ${pct}% this season. ${cause} Food surplus will contract.`;
+    }
+
+    case 'fishery_collapse': {
+      const archName = data?.archName || 'a coastal territory';
+      const stock = data?.stock != null ? `${Math.round(data.stock * 100)}%` : 'critically low';
+      const note = pick([
+        'Sustained extraction above regenerative capacity has triggered stock collapse.',
+        'Commercial harvest has outpaced natural recovery for multiple seasons.',
+        'The fishing villages continue operating; the returns are no longer there.',
+      ], s);
+      return `MERCHANT GUILD — Fishery collapse in ${archName}. Stock at ${stock} of sustainable level. ${note} Caloric shortfall imminent.`;
+    }
+
+    case 'dark_forest_detected': {
+      return pick([
+        `ADMIRALTY INTELLIGENCE — NUCLEAR PEER DETECTED. Reactor-isotope signatures from survey aircraft confirm a second pyra-capable civilization. Dark Forest protocol initiated. Every subsequent interaction carries systemic risk.`,
+        `ADMIRALTY INTELLIGENCE — NUCLEAR PEER CONFIRMED. Signals intelligence has resolved a second-strike-capable peer across the dark water. The mutual-annihilation constraint is now operative. Expansion between hegemons is frozen.`,
+        `ADMIRALTY INTELLIGENCE — FISSION PEER DETECTED. We are no longer the only civilization with this capability. They know about us. The Strange Peace has begun — not by agreement, but by the math of mutual destruction.`,
+      ], s);
+    }
+
     default:
       return data?.text || type;
   }
