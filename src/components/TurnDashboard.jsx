@@ -260,6 +260,15 @@ export default function TurnDashboard({
             <span style={S.statValue}>{ps.contacts}</span>
             <span style={S.statLabel}>Culture</span>
             <span style={S.statValue}>{ps.cultureLabel}</span>
+            {ps.piety !== undefined && (() => {
+              const piety = ps.piety;
+              const piLabel = piety >= 0.75 ? 'fervent' : piety >= 0.50 ? 'devout' : piety >= 0.30 ? 'moderate' : 'secular';
+              const piColor = piety >= 0.75 ? '#b8923a' : piety >= 0.50 ? '#9a8a5a' : '#6a5a3a';
+              return (<>
+                <span style={S.statLabel}>Piety</span>
+                <span style={{ ...S.statValue, color: piColor }}>{piLabel} {(piety * 100).toFixed(0)}%</span>
+              </>);
+            })()}
             {ps.hasPu && <>
               <span style={{ ...S.statLabel, color: '#a04030' }}>Plutonium</span>
               <span style={{ ...S.statValue, color: '#a04030' }}>ACTIVE</span>
