@@ -50,6 +50,9 @@ export const DEFAULT_PARAMS = {
   crop_failure_rate: 0.025,    // probability of crop failure per arch per tick
   fishery_recovery_rate: 0.08, // natural fishery stock recovery per tick
   fishery_overfish_rate: 0.06, // stock depletion per unit of excess exploitation
+  // ── Religion / culture as political variable ──────────────
+  piety_drift_rate: 0.008,      // base rate of piety change per tick
+  piety_absorption_bonus: 0.35, // extra sovereignty extraction from high piety (centripetal force)
 };
 
 // ── Crop culture seeds ──────────────────────────────────────
@@ -246,6 +249,19 @@ export class SimEngine {
     this.cropFailureModifier = new Float64Array(this.N).fill(1.0);
     // fisheryStock[i]: 1.0 = fully stocked, depletes with exploitation, recovers naturally
     this.fisheryStock = new Float64Array(this.N).fill(1.0);
+
+    // ── Religion: piety per core (0 = secular, 1 = theocratic fervor) ─────
+    // Initialized from climate: tropical warm arches seed higher piety;
+    // temperate and cold seed moderate. Collective cultures seed higher.
+    this.piety = new Float64Array(this.N);
+    for (let i = 0; i < this.N; i++) {
+      const absLat = substrate[i].climate?.abs_latitude ?? 30;
+      const crop = substrate[i].crops.primary_crop || 'foraging';
+      const [ci0] = substrate[i].culture_pos || [0, 0];
+      const warmSeed = Math.max(0, (25 - absLat) / 25);   // 1.0 at equator, 0 at 25°+
+      const collectiveSeed = Math.max(0, -ci0 * 0.3);     // collective CI → slightly higher
+      this.piety[i] = _clamp(0.25 + warmSeed * 0.25 + collectiveSeed + (this.rng() - 0.5) * 0.20, 0.05, 0.90);
+    }
 
     // ── Logs ───────────────────────────────────────────────
     this.epiLog = [];
@@ -706,6 +722,33 @@ export class SimEngine {
       this.cpos[core] = [_clamp(ci, -1, 1), _clamp(io, -1, 1)];
     }
 
+    // ── STAGE 2c: Piety drift ───────────────────────────────
+    // Crisis → faith rises. Prosperity → slow secularization.
+    // Collective culture → piety reinforced. Tech > 7 → secularization pressure.
+    for (const core of cores) {
+      let piety = this.piety[core];
+      const er = energyRatio[core];
+      const [ci] = this.cpos[core];
+      const dRate = p.piety_drift_rate;
+
+      // Crisis: low energy ratio → piety rises (crisis → collective solidarity, spiritual appeal)
+      if (er < 0.6) piety += dRate * (0.6 - er) * 2.5;
+      // Prosperity: high surplus → gentle secularization
+      else piety -= dRate * Math.min(0.4, (er - 0.6)) * 0.8;
+
+      // Culture CI: collective reinforces piety, individual erodes it
+      piety -= ci * dRate * 0.6;
+
+      // Secularization at high tech (enlightenment pressure, tech ≥ 7)
+      if (this.tech[core] > 7.0) piety -= dRate * (this.tech[core] - 7.0) * 0.25;
+
+      // Trade contact diversity → mild secularization (exposure to other beliefs)
+      const contactDiv = Math.min(1.0, this.contactSet[core].size / Math.max(1, this.N * 0.25));
+      piety -= dRate * contactDiv * 0.3;
+
+      this.piety[core] = _clamp(piety, 0.05, 0.95);
+    }
+
     // ── STAGE 3: Rumor propagation ──────────────────────────
     for (const core of cores) {
       if (this.tech[core] < 1.5) continue;
@@ -967,7 +1010,16 @@ export class SimEngine {
           if (partnerSetD && partnerSetD.has(targetCtrl)) diploBonus -= 3.0; // strongly avoid partner territory
         }
 
-        candidates.push([tsScore + p.resource_targeting_weight * rv + despBonus + diploBonus - dist * 1.5, target, dist, rv]);
+        // Piety bonus: high-piety polities are driven toward missionary expansion
+        // Extra affinity for low-tech targets (conversion dynamic)
+        let pietyBonus = 0;
+        const cPiety = this.piety[core];
+        if (cPiety > 0.65) {
+          pietyBonus = (cPiety - 0.65) * 2.0;
+          if (this.tech[core] - this.tech[target] > 1.5) pietyBonus += (cPiety - 0.65) * 1.5;
+        }
+
+        candidates.push([tsScore + p.resource_targeting_weight * rv + despBonus + diploBonus + pietyBonus - dist * 1.5, target, dist, rv]);
       }
       candidates.sort((a, b) => b[0] - a[0]);
 
@@ -1013,6 +1065,8 @@ export class SimEngine {
         }
         this.cpos[core][0] = _clamp(this.cpos[core][0] * 0.95 + this.cpos[target][0] * 0.05, -1, 1);
         this.cpos[core][1] = _clamp(this.cpos[core][1] * 0.95 + this.cpos[target][1] * 0.05, -1, 1);
+        // Piety blending: conqueror absorbs a fraction of the conquered polity's piety
+        this.piety[core] = _clamp(this.piety[core] * 0.92 + this.piety[target] * 0.08, 0.05, 0.95);
 
         this.expansionLog.push({ core, target, tick, year, tech_gap: this.tech[core] - this.tech[target], resource_driven: rv > 0 });
       }
@@ -1029,6 +1083,13 @@ export class SimEngine {
       // Player sovereignty focus: reduce extraction on focused islands (faster stabilization)
       if (core === this.playerCore && sovFocusSet && sovFocusSet.has(i)) {
         extraction *= 0.4; // 60% less extraction = faster sovereignty recovery
+      }
+
+      // Piety bonus: high-piety empires integrate conquered populations faster
+      // (religious conversion as centripetal force — Abbasid model)
+      const corePiety = this.piety[core];
+      if (corePiety > 0.5) {
+        extraction *= (1.0 + (corePiety - 0.5) * p.piety_absorption_bonus);
       }
 
       const recovery = p.sov_extraction_decay * this.sovereignty[i] * (this.pop[i] / Math.max(1, this.pop[core])) * 0.5;
@@ -1131,6 +1192,8 @@ export class SimEngine {
       cropFailures: this.cropFailureLog.filter(e => e.tick === this.tick - 1),
       // Current fishery stock per arch (for situation cards + Observatory)
       fisheryStock: Array.from(this.fisheryStock, s => Math.round(s * 100) / 100),
+      // Piety per core (for situation cards + dispatch)
+      piety: Array.from(this.piety, v => Math.round(v * 100) / 100),
     };
   }
 

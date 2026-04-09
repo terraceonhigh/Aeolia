@@ -525,3 +525,38 @@ export function getCultureDriftText(oldLabel, newLabel, ci, io, seed) {
   ], s);
   return `Your civilization has shifted from ${oldLabel} to ${newLabel}. ${cause} Your people are now ${direction}.`;
 }
+
+/**
+ * Returns a religious revival situation card body.
+ * piety: float (0-1), tech: float, isCollective: bool, seed: int
+ */
+export function getReligiousRevivalText(piety, tech, isCollective, seed) {
+  const s = seed ?? 0;
+  const fervorLevel = piety > 0.80 ? 'exceptional' : piety > 0.65 ? 'significant' : 'moderate';
+  if (isCollective) {
+    return pick([
+      `Religious fervor at ${fervorLevel} intensity is functioning as a centripetal force in your polity. Disputed territories are being incorporated faster than the administrative model predicted — conversion and cultural assimilation proceeding in parallel with physical occupation. Your political theologians describe this as the canonical model: the faith as empire-builder. The historical precedents are large.`,
+      `Your institutional religion has become an integrative technology. Absorbed populations are converting at rates that exceed your garrison capacity to enforce — which means they are converting voluntarily, under social pressure rather than coercion. This is the efficient mechanism. The absorbed polity's traditional practices are becoming syncretic accretions to your own rather than sites of resistance. The ${fervorLevel} piety reading across your territory represents political cohesion, not just spiritual sentiment.`,
+      `Your religious establishment has outpaced your administrative corps in the newly absorbed territories. Mosques, ritual houses, pilgrimage circuits — the physical infrastructure of faith is being built faster than tax collection infrastructure. The result is a population that identifies as yours before the paperwork confirms it. Piety at ${fervorLevel} levels is currently your cheapest integration technology.`,
+    ], s);
+  } else {
+    return pick([
+      `A ${fervorLevel} religious revival is sweeping your merchant and administrative classes. The timing is notable: revivals in competitive, individualist societies typically follow a resource shock or a military setback — a search for meaning in structural failure. Your analysts are uncertain whether this represents a genuine cultural turn or a fashion. The policy implications differ significantly.`,
+      `Piety at ${fervorLevel} levels is producing a strategic anomaly: your expansion-oriented culture is suddenly acquiring a missionary character. Expeditions that were commercial in mandate are returning with accounts of spiritual purpose. Whether this represents a genuine shift in your civilization's character or a useful post-hoc narrative for conquest is, functionally, the same question.`,
+      `Your religious institutions are experiencing ${fervorLevel} activity in a civilization whose individualism typically resists collective spiritual authority. The pattern suggests a social technology function rather than a purely spiritual one: in the absence of other cohesive institutions, religious community provides the coordination mechanism. This is historically common. It is also, historically, a precursor to significant political change.`,
+    ], s);
+  }
+}
+
+/**
+ * Dispatch text for a religious revival event.
+ */
+export function getReligiousRevivalDispatch(polityName, piety, seed) {
+  const s = seed ?? 0;
+  const intensity = piety > 0.80 ? 'HIGH' : piety > 0.65 ? 'ELEVATED' : 'MODERATE';
+  return pick([
+    `INTERNAL AFFAIRS — Religious activity index at ${intensity} across ${polityName} territory. Integration rates in newly absorbed archipelagos exceeding baseline. Sovereignty acceleration detected.`,
+    `INTERNAL AFFAIRS — Piety index elevated to ${intensity} in ${polityName}. Missionary expansion pressure building. Absorption efficiency in tropical territories above projection.`,
+    `INTERNAL AFFAIRS — Fervor reading: ${intensity}. ${polityName} faith infrastructure deployment in peripheral territories outpacing administrative settlement. Recommend monitoring conversion rates.`,
+  ], s);
+}

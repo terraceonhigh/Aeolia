@@ -18,6 +18,7 @@ import {
   getTechDecayText,
   getNavigatorGuildText,
   getMalariaBreakthroughText,
+  getReligiousRevivalText,
 } from './narrativeText.js';
 
 // ── Mineral labels ───────────────────────────────────────────
@@ -76,6 +77,7 @@ export function generateSituationCards(snapshot, playerCore, names, frontier, op
     prevCultureLabel = null,
     prevTech       = null,    // for tech decay detection
     malariaUnlocked = false,  // true once we've shown the breakthrough card
+    religiousRevivalShown = false, // throttle: show at most once per high-piety phase
   } = opts || {};
 
   const cards = [];
@@ -512,6 +514,29 @@ export function generateSituationCards(snapshot, playerCore, names, frontier, op
         actions: [
           { label: 'EXPAND TROPICS', action: { type: 'SET_FOCUS', focus: 'expand' } },
           { label: 'ACKNOWLEDGE',    action: null },
+        ],
+      });
+    }
+  }
+
+  // ── Card 16: Religious Revival ───────────────────────────
+  // Fires when player piety crosses 0.65, at most once per high-piety phase.
+  // Piety is per-core; snapshot.piety[playerCore] carries the value.
+  if (!religiousRevivalShown && cards.length < 3) {
+    const playerPiety = (snapshot?.piety || [])[playerCore] ?? 0;
+    if (playerPiety >= 0.65) {
+      const tick = snapshot?.tick || 0;
+      const isCollective = (ps.culturePos?.[0] ?? 0) < -0.15;
+      const seed = hashStr('piety' + Math.floor(tick / 8) + playerCore);
+      cards.push({
+        id: 'religious_revival',
+        icon: '✦',
+        title: 'Religious Revival',
+        body: getReligiousRevivalText(playerPiety, ps.tech, isCollective, seed),
+        actions: [
+          { label: 'EMBRACE FAITH',   action: { type: 'CULTURE_POLICY', culturePolicyCI: isCollective ? 0 : -0.5 } },
+          { label: 'CHANNEL OUTWARD', action: { type: 'SET_FOCUS', focus: 'expand' } },
+          { label: 'ACKNOWLEDGE',     action: null },
         ],
       });
     }

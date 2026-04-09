@@ -109,7 +109,8 @@ const INITIAL_STATE = {
   scoutActive: false,
   // Per-turn situation cards
   pendingCards: [],
-  malariaUnlocked: false,  // tracks if malaria breakthrough card has been shown
+  malariaUnlocked: false,       // tracks if malaria breakthrough card has been shown
+  religiousRevivalShown: false, // resets when piety drops below 0.55 (piety cycle tracking)
 };
 
 function gameReducer(state, action) {
@@ -497,6 +498,21 @@ function gameReducer(state, action) {
         }
       }
 
+      // ── Religious piety dispatch ────────────────────────────
+      // Periodic INTERNAL AFFAIRS note when piety is high.
+      if (snapshot.piety) {
+        const pp = snapshot.piety[playerCore] ?? 0;
+        const tickN = snapshot.tick || 0;
+        if (pp >= 0.65 && tickN % 6 === 0) {
+          const intensity = pp >= 0.80 ? 'HIGH' : 'ELEVATED';
+          newEvents.push({
+            yearStr: yearStr2,
+            text: `INTERNAL AFFAIRS — Piety index ${intensity}. Absorption rates in peripheral territories above baseline. Missionary networks active.`,
+            color: '#7a6a3a',
+          });
+        }
+      }
+
       // ── Generate situation cards for next turn ────────────
       const nextCards = generateSituationCards(
         snapshot,
@@ -512,10 +528,16 @@ function gameReducer(state, action) {
           prevCultureLabel,
           prevTech: state.lastTech,
           malariaUnlocked: state.malariaUnlocked,
+          religiousRevivalShown: state.religiousRevivalShown,
         }
       );
       // Track if malaria breakthrough card was generated (so it only fires once)
       const newMalariaUnlocked = state.malariaUnlocked || nextCards.some(c => c.id === 'malaria_breakthrough');
+      // Religious revival: reset shown flag when piety drops below 0.55 (allow re-trigger in new high-piety phase)
+      const playerPiety = (snapshot.piety || [])[playerCore] ?? 0;
+      const newReligiousRevivalShown = playerPiety < 0.55
+        ? false  // piety dropped — allow card to fire again in next revival
+        : state.religiousRevivalShown || nextCards.some(c => c.id === 'religious_revival');
 
       return {
         ...state,
@@ -531,6 +553,7 @@ function gameReducer(state, action) {
         contactedSet: newContactedSet,
         pendingCards: nextCards,
         malariaUnlocked: newMalariaUnlocked,
+        religiousRevivalShown: newReligiousRevivalShown,
       };
     }
 
