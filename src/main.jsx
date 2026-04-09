@@ -7,7 +7,7 @@ import Observatory from './Observatory.jsx';
 function ModeSelector() {
   // null = menu, 'observatory' = history viewer, 'lod' = LOD terrain, 'game' = 1-player game
   const [mode, setMode] = useState(null);
-  const [seed, setSeed] = useState(42);
+  const [seed, setSeed] = useState(216089);  // primary calibrated seed — DF fires at year -200
 
   if (mode === 'lod') return <AeoliaLOD />;
   if (mode === 'observatory') return <Observatory seed={seed} onBack={() => setMode(null)} />;
@@ -77,7 +77,7 @@ function ModeSelector() {
         </div>
 
         <div style={{ fontSize: 7, color: '#4a3a2a', lineHeight: 1.6 }}>
-          Ocean world civilization simulation
+          Archipelago world · 10,000-year simulation · nuclear deterrence equilibrium
         </div>
       </div>
     </div>
