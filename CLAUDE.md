@@ -16,7 +16,7 @@ Aeolia/
 │   ├── engine/
 │   │   ├── SimEngine.js         # JS port of sim_proxy_v2.py with player interaction hooks
 │   │   ├── narrativeText.js     # Deterministic prose library (no RNG; hash-based selection)
-│   │   ├── cardGenerator.js     # Situation card generator (16 card types, actionable responses)
+│   │   ├── cardGenerator.js     # Situation card generator (17 card types, actionable responses)
 │   │   ├── world.js             # World generation (archipelagos, edges, substrate)
 │   │   ├── constants.js         # Polity names, parameters
 │   │   └── rng.js               # Mulberry32 PRNG
@@ -104,7 +104,7 @@ Aeolia/
 - National Focus cards (Expand/Innovate/Fortify/Balanced/Exploit)
 - Fog of war with 5 visibility levels (owned/frontier/contacted/rumor/unknown)
 - Event popups: first contact, absorption, territory lost, era transition, tech milestones, dark forest (deterrence + arms race text), naphtha/pyra scramble, epidemic wave, fishery collapse, defeat
-- 16 situation cards (cardGenerator.js): tech assessment, resource detection, expansion opportunity, culture drift, epidemic risk, naphtha/pyra, era transition, administered trade, fishery collapse, piracy warning, tech decay, navigator guild dispute, malaria breakthrough, religious revival
+- 17 situation cards (cardGenerator.js): tech assessment, resource detection, expansion opportunity, culture drift, epidemic risk, naphtha/pyra, era transition, administered trade, fishery collapse, piracy warning, tech decay, navigator guild dispute, malaria breakthrough, religious revival, rogue aircraft alert
 - Dispatches panel: ADMIRALTY / MERCHANT GUILD / INTERNAL AFFAIRS source-tagged intelligence feed
 - Player stats panel: piety reading (fervent/devout/moderate/secular) with color coding
 - Defeat condition on 0 territory
@@ -118,7 +118,7 @@ Aeolia/
 - Religion/piety: centripetal force, missionary expansion, absorption bonus
 - Post-DF deterrence: hegemons frozen against each other; arms race continues
 - Observatory mode: 3-chart panel (tech/pop/piety) + world map + event timeline + scrubber
-- 16 situation cards, 10+ popup types, source-tagged dispatches feed
+- 17 situation cards, 10+ popup types, source-tagged dispatches feed
 - **Dark Forest now fires correctly** (fixed 2026-04-09): Added distance-independent nuclear peer awareness accumulation (0.04/tick per side once both polities tech ≥ 9). Calibrated `energy_to_tfp=0.51` so tech 9 is reached around year -400 and DF fires at year -200 on primary seed (216089).
 
 **Next steps:**
