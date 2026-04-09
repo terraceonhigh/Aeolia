@@ -86,7 +86,8 @@ export const CROP_LORE = {
 };
 
 // Six canonical fish species
-export const FISH_LORE = {
+// Not yet imported externally — parallel to CROP_LORE for future fish-specific cards
+const FISH_LORE = {
   sthaq: {
     name: 'sthaq',
     type: 'salmon-analog',

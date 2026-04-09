@@ -3,36 +3,36 @@
 // ═══════════════════════════════════════════════════════════
 
 // ── Planet Parameters ──
-export const PLANET_RADIUS = 1.0;           // Normalized unit sphere
+const PLANET_RADIUS = 1.0;                  // Normalized unit sphere (reference only)
 export const OCEAN_DEPTH_BASE = -4500;      // meters (cosmetic, for height function)
 export const ISLAND_MAX_HEIGHT = 3200;      // meters above sea level
 export const PLATEAU_HEIGHT = -120;         // meters (submarine shelf depth)
 export const ARCH_COUNT = 42;               // number of archipelagos
 
-// ── Physical Scale ──
+// ── Physical Scale (reference — not imported by game engine) ──
 // The governing constraint: 185,000 km circumference, 4.6× Earth
-export const CIRCUMFERENCE_KM = 185000;
-export const RADIUS_KM = 29440;
-export const SURFACE_GRAVITY = 9.81;        // 1.0g
-export const ATMOSPHERE_PRESSURE = 1.7;     // atm (1.5–2.0 range)
-export const RAINFALL_MULTIPLIER = 1.4;     // Aeolia vs Earth at same latitude
+const CIRCUMFERENCE_KM = 185000;
+const RADIUS_KM = 29440;
+const SURFACE_GRAVITY = 9.81;               // 1.0g
+const ATMOSPHERE_PRESSURE = 1.7;            // atm (1.5–2.0 range)
+const RAINFALL_MULTIPLIER = 1.4;            // Aeolia vs Earth at same latitude
 
-// ── Simulation Timing ──
-export const ANTIQUITY_START = -20000;
-export const ACTIVE_SIM_START = -5000;
-export const TICK_YEARS = 50;
-export const TOTAL_TICKS = 100;             // -5000 to 0 BP (Dijkstra engine)
+// ── Simulation Timing (reference — declared locally in SimEngine.js / simulate.js) ──
+const ANTIQUITY_START = -20000;
+const ACTIVE_SIM_START = -5000;
+const TICK_YEARS = 50;
+const TOTAL_TICKS = 100;                    // -5000 to 0 BP (Dijkstra engine)
 
-// ── Sim Engine (v2 — emergent tick-based) ──
-export const SIM_ISLAND_MAX_HEIGHT = 3000;  // sim uses 3000, renderer uses 3200
-export const SIM_START_YEAR = -20000;
-export const SIM_END_YEAR = 0;
-export const SIM_TICK_YEARS = 50;
-export const SIM_N_TICKS = 400;             // -20000 to 0 BP
+// ── Sim Engine v2 (reference only) ──
+const SIM_ISLAND_MAX_HEIGHT = 3000;         // sim uses 3000, renderer uses 3200
+const SIM_START_YEAR = -20000;
+const SIM_END_YEAR = 0;
+const SIM_TICK_YEARS = 50;
+const SIM_N_TICKS = 400;                    // -20000 to 0 BP
 
-// ── Hegemon Parameters ──
-export const REACH_START = -5500;           // aggressive explorer
-export const LATTICE_START = -5000;         // older civilization, defensive
+// ── Hegemon Parameters (reference only) ──
+const REACH_START = -5500;                  // aggressive explorer
+const LATTICE_START = -5000;                // older civilization, defensive
 
 // ── Edge Network ──
 export const MAX_EDGE_ANGLE = 0.9;         // radians (~26,000 km max plateau span)
@@ -94,8 +94,8 @@ export const POLITY_NAMES = [
   "The Lagoon",      // Venetian/Pacific — enclosed water, stilts
 ];
 
-// ── Crop Definitions ──
-export const CROPS = {
+// ── Crop Definitions (reference — substrate.js uses its own CANONICAL_CROPS list) ──
+const CROPS = {
   paddi: {
     name: "Paddi", earthAnalogue: "Rice (Oryza sativa)",
     calories: 5, labor: "collective-hydraulic", storage: "good",
@@ -140,8 +140,8 @@ export const CROPS = {
   },
 };
 
-// ── Trade Good Names ──
-export const STIMULANTS = {
+// ── Trade Good Names (reference — not imported; keys are used via CROPS.*.stimulant etc.) ──
+const STIMULANTS = {
   char:   { name: "Char",   origin: "Mandarin chá (tea)", zone: "paddi" },
   qahwa:  { name: "Qahwa",  origin: "Arabic qahwa (coffee)", zone: "emmer" },
   awa:    { name: "Awa",    origin: "Hawaiian ʻawa (kava)", zone: "taro" },
@@ -149,7 +149,7 @@ export const STIMULANTS = {
   aqua:   { name: "Aqua",   origin: "Latin aqua vitae (spirits)", zone: "papa" },
 };
 
-export const FIBERS = {
+const FIBERS = {
   seric:  { name: "Seric",  origin: "Latin sericum (silk)", zone: "paddi" },
   fell:   { name: "Fell",   origin: "Old Norse fell (fleece)", zone: "emmer" },
   tapa:   { name: "Tapa",   origin: "Polynesian tapa (bark cloth)", zone: "taro/sago" },
@@ -157,7 +157,7 @@ export const FIBERS = {
   qivu:   { name: "Qivu",   origin: "Inuktitut qiviut (underwool)", zone: "papa" },
 };
 
-export const PROTEINS = {
+const PROTEINS = {
   kerbau: { name: "Kerbau", origin: "Malay kerbau (water buffalo)", zone: "paddi" },
   kri:    { name: "Kri",    origin: "Old Norse kið (goat)", zone: "emmer" },
   moa:    { name: "Moa",    origin: "Polynesian moa (fowl)", zone: "taro/sago" },
