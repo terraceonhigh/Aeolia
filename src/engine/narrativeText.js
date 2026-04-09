@@ -584,6 +584,20 @@ export function getReligiousRevivalText(piety, tech, isCollective, seed) {
 }
 
 /**
+ * Returns a rogue aircraft situation card body.
+ * Nuclear-era equivalent of piracy — a seaplane that has gone dark.
+ * contacts: int, seed: int
+ */
+export function getRogueAircraftText(contacts, seed) {
+  const s = seed ?? 0;
+  return pick([
+    `A nuclear seaplane assigned to patrol your outer trade lanes has gone dark. Last known position: three days ago, bearing into open ocean. The aircraft carries a crew of thirty and sufficient ordnance to render an archipelago uninhabitable. It has not responded to any signal. It may be mechanical failure. It may not be. Your ${contacts}-contact trade network intersects with every territorial waterway the aircraft can reach from its last known position.`,
+    `An admiralty aircraft failed its scheduled position check-in fourteen hours ago. Your intelligence service is running intercepts on every radio frequency the crew is authorized to use. Nothing. One aircraft on four billion square kilometers of ocean is a problem that cannot be solved by conventional search — only by waiting to see what it does next. If it does nothing, it was a mechanical failure. If it acts, you will know when the target does.`,
+    `Naval intelligence has flagged an aircraft crew as a security concern following a contested shore leave incident at a go-between port. The aircraft has since departed on a scheduled patrol and its IFF transponder has ceased responding. It may be a transponder fault — these happen. Or a crew that has calculated, correctly, that a nuclear seaplane is ungovernable once airborne on a planet with no comprehensive radar coverage. Nuclear piracy is the Dark Forest problem at the tactical level. There is no good response. There is only managing the probability distribution.`,
+  ], s);
+}
+
+/**
  * Dispatch text for a religious revival event.
  */
 export function getReligiousRevivalDispatch(polityName, piety, seed) {

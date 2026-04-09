@@ -19,6 +19,7 @@ import {
   getNavigatorGuildText,
   getMalariaBreakthroughText,
   getReligiousRevivalText,
+  getRogueAircraftText,
 } from './narrativeText.js';
 
 // ── Mineral labels ───────────────────────────────────────────
@@ -514,6 +515,28 @@ export function generateSituationCards(snapshot, playerCore, names, frontier, op
         actions: [
           { label: 'EXPAND TROPICS', action: { type: 'SET_FOCUS', focus: 'expand' } },
           { label: 'ACKNOWLEDGE',    action: null },
+        ],
+      });
+    }
+  }
+
+  // ── Card 17: Rogue Aircraft Alert ───────────────────────
+  // Nuclear-era piracy equivalent. Fires at tech ≥ 9 periodically.
+  // A nuclear seaplane that goes dark: mutiny, defection, or mechanical failure —
+  // somewhere on 4 billion km² of ocean. Impossible to find. Cannot be called back.
+  if (ps.tech >= 9.0 && contactedCores.length > 3 && cards.length < 3) {
+    const tick = snapshot?.tick || 0;
+    if (tick % 11 === 4) {
+      const seed = hashStr('rogue_aircraft' + tick);
+      cards.push({
+        id: `rogue_aircraft_${tick}`,
+        icon: '⚠',
+        title: 'Rogue Aircraft Report',
+        body: getRogueAircraftText(contactedCores.length, seed),
+        actions: [
+          { label: 'EXPAND INTEL', action: { type: 'SET_FOCUS', focus: 'fortify' } },
+          { label: 'EXPAND NAVY',  action: { type: 'SET_FOCUS', focus: 'expand' } },
+          { label: 'ACKNOWLEDGE',  action: null },
         ],
       });
     }
