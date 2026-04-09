@@ -74,10 +74,11 @@ Status as of April 9, 2026. Everything above the line is implemented. Everything
 
 ## Pending: Immediate
 
-### Optimizer Retuning (in progress)
+### Optimizer Retuning (completed 2026-04-09)
 - [x] DF now fires correctly (fixed 2026-04-09): nuclear peer awareness accumulates globally (distance-independent) once both polities tech ≥ 9; `energy_to_tfp=0.51` calibrated so DF fires at year ~-200 on seed 216089 with 2 hegemons
-- [ ] Run full 10K-trial optuna optimization (run_optimization.py) to further refine 26-param space
-- [ ] Validate DF timing across full geo+anchor seed suite (seeds 216089, 51, 73, 74, 11, 66, 17, 42, 97)
+- [x] Run full 10K-trial optuna optimization — converged at trial ~7850/10000, best loss=14.38 (trial 2213). Results in `results/`.
+- [x] Validate DF timing across full geo+anchor seed suite — done; 2/9 seeds fire DF in target window with energy_to_tfp=0.51. Most seeds have only 1 hegemon (structural: DF requires 2 nuclear peers).
+- **DECISION (2026-04-09):** Optimizer found different parameter regime (energy_to_tfp≈1.97) that minimizes cross-seed variance but sacrifices DF timing on demo seed. Hybrid test failed (DF fires at year -1000, 4 hegemons). **SimParams defaults kept as-is** (energy_to_tfp=0.51, hand-tuned for demo). Optimizer output archived in `best_params_v2.json` for reference. Future work: design loss function that rewards DF timing on seed 216089 specifically while not penalizing seeds that structurally can't produce 2 hegemons.
 
 ### Push to GitHub
 - [x] Merge all 2026-04-09 session commits into master (done; 7 commits from claude/trusting-tu worktree)
