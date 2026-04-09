@@ -131,6 +131,12 @@ class SimParams:
     institutional_lock_rate:    float = 0.12   # extraction → extractiveness buildup rate
     extractiveness_tfp_penalty: float = 0.40   # max TFP multiplier penalty at extractiveness=1.0
 
+    # Proxy war casualties (Snyder 1965; Kahn 1965)
+    # Nuclear deterrence stabilises direct hegemon conflict but enables sub-nuclear
+    # competition in the contested periphery.  Each proxy absorption incurs population
+    # losses proportional to target's defensive capacity (tech gap inverse).
+    proxy_war_casualty_rate:    float = 0.10   # base population loss rate per proxy conquest
+
     # Fishery mechanics (calibrated in SimEngine.js; mirrored here for optimizer)
     fishery_recovery_rate:      float = 0.04
     fishery_overfish_rate:      float = 0.06
@@ -179,6 +185,8 @@ PARAM_BOUNDS: list = [
     # Acemoglu-Robinson
     ("institutional_lock_rate",     0.04,  0.30),
     ("extractiveness_tfp_penalty",  0.10,  0.60),
+    # Proxy war
+    ("proxy_war_casualty_rate",     0.02,  0.25),
 ]
 
 
@@ -683,6 +691,7 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
     # Grievance amplifies sovereignty recovery (self-limiting empire mechanic).
     grievance       = [0.0] * N
     extractiveness  = [0.0] * N   # Acemoglu-Robinson: institutional lock-in index (0=inclusive, 1=extractive)
+    proxy_war_log   = []           # Snyder/Kahn: proxy war events in nuclear era
 
     # Initialise
     for i, arch in enumerate(archs):
@@ -1478,12 +1487,12 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
 
                 score = (ts_score + p.resource_targeting_weight * rv + desp_bonus
                          + piety_bonus + proxy_bonus - dist * 1.5 - deterrence_penalty)
-                candidates.append((score, target, dist))
+                candidates.append((score, target, dist, proxy_bonus > 0))
 
             candidates.sort(key=lambda x: -x[0])
 
             absorbed_this_tick = 0
-            for score, target, dist in candidates:
+            for score, target, dist, is_proxy in candidates:
                 if budget < 0.1 or absorbed_this_tick >= 1: break
 
                 # Absorption cost: scales with distance² and target pop
@@ -1537,6 +1546,25 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
                 sovereignty[target] = _clamp(0.15 + dist * 0.3, 0.10, 0.50)
                 budget -= cost
                 absorbed_this_tick += 1
+
+                # ── Proxy war casualties (Snyder 1965; Kahn 1965) ──────────────────
+                # In the nuclear era, DF-era expansion into a rival's periphery
+                # constitutes a proxy conflict. Population losses are proportional to
+                # the target's defensive capacity (lower tech gap = harder resistance)
+                # and the base casualty rate.  Models: Korean/Vietnam/Angola patterns.
+                if is_proxy:
+                    # target_core captured before absorption: original controller
+                    prev_ctrl_tech = tech[target_core] if target_core < N else tech[target]
+                    tech_gap = max(0.1, tech[core] - prev_ctrl_tech)
+                    # Stiffer resistance when tech gap is small (near-peer proxy)
+                    resistance_factor = _clamp(1.0 - (tech_gap - 0.5) * 0.3, 0.3, 1.0)
+                    casualty_rate = p.proxy_war_casualty_rate * resistance_factor
+                    pop_before = pop[target]
+                    pop[target] = max(1.0, pop[target] * (1.0 - casualty_rate))
+                    proxy_war_log.append({
+                        "aggressor": core, "target": target, "tick": tick, "year": year,
+                        "casualty_rate": casualty_rate, "pop_lost": pop_before - pop[target],
+                    })
 
                 # Inherit target's contacts
                 for c in contact_set[target]:
@@ -1811,6 +1839,9 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
         "grievance":            list(grievance),
         # Acemoglu-Robinson institutional diagnostics
         "extractiveness":       list(extractiveness),
+        # Proxy war casualties (Snyder/Kahn; stability-instability paradox)
+        "proxy_war_log":        proxy_war_log,
+        "n_proxy_wars":         len(proxy_war_log),
     }
 
 

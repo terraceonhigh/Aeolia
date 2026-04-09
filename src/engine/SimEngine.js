@@ -1223,12 +1223,12 @@ export class SimEngine {
           }
         }
 
-        candidates.push([tsScore + p.resource_targeting_weight * rv + despBonus + diploBonus + pietyBonus + proxyBonus - deterrencePenalty - dist * 1.5, target, dist, rv]);
+        candidates.push([tsScore + p.resource_targeting_weight * rv + despBonus + diploBonus + pietyBonus + proxyBonus - deterrencePenalty - dist * 1.5, target, dist, rv, proxyBonus > 0]);
       }
       candidates.sort((a, b) => b[0] - a[0]);
 
       let absorbedThisTick = 0;
-      for (const [score, target, dist, rv] of candidates) {
+      for (const [score, target, dist, rv, isProxy] of candidates) {
         if (budget < 0.1 || absorbedThisTick >= 1) break;
 
         const techAdv = Math.max(0.1, this.tech[core] - this.tech[target] + 1.0);
@@ -1271,6 +1271,18 @@ export class SimEngine {
         this.sovereignty[target] = _clamp(0.15 + dist * 0.3, 0.10, 0.50);
         budget -= cost;
         absorbedThisTick++;
+
+        // ── Proxy war casualties (Snyder 1965; Kahn 1965) ──────────────────────
+        // Nuclear-era expansion into a rival's periphery is a proxy conflict.
+        // Population losses scale with target's defensive resistance (inverse tech gap).
+        // Models: Korean War, Vietnam, Angola/Mozambique patterns.
+        if (isProxy) {
+          const prevCtrlTech = targetCore !== target ? this.tech[targetCore] : this.tech[target];
+          const techGap = Math.max(0.1, this.tech[core] - prevCtrlTech);
+          const resistanceFactor = _clamp(1.0 - (techGap - 0.5) * 0.3, 0.3, 1.0);
+          const casualtyRate = (p.proxy_war_casualty_rate ?? 0.10) * resistanceFactor;
+          this.pop[target] = Math.max(1, this.pop[target] * (1 - casualtyRate));
+        }
 
         for (const c of this.contactSet[target]) {
           if (c !== core) this.contactSet[core].add(c);
