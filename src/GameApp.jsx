@@ -11,7 +11,7 @@ import { SimEngine, DEFAULT_PARAMS } from './engine/SimEngine.js';
 import { POLITY_NAMES } from './engine/constants.js';
 import { mulberry32 } from './engine/rng.js';
 import { generateSituationCards } from './engine/cardGenerator.js';
-import { getDispatchEntry, getCultureLabel, describeCulture, getReligiousRevivalDispatch } from './engine/narrativeText.js';
+import { getDispatchEntry, getCultureLabel, describeCulture, getReligiousRevivalDispatch, getColonialResistanceDispatch } from './engine/narrativeText.js';
 import PolitySelect from './components/PolitySelect.jsx';
 import TurnDashboard from './components/TurnDashboard.jsx';
 import EventPopup, { ERA_DESCRIPTIONS, TECH_MILESTONES } from './components/EventPopup.jsx';
@@ -555,6 +555,35 @@ function gameReducer(state, action) {
               popup = { type: 'schism', data: { count: ev.count, core: ev.core, year: ev.year } };
             }
           }
+        }
+      }
+
+      // ── Colonial resistance dispatch ────────────────────────
+      // Scott (1985): grievance-driven resistance generates INTERNAL AFFAIRS intelligence
+      // when the player's held territory shows high extraction grievance.
+      if (snapshot.grievance && snapshot.grievance.length > 0) {
+        const tickN = snapshot.tick || 0;
+        // Find worst grievance among player-controlled islands
+        let maxGrievance = 0;
+        let resistanceArchName = null;
+        if (snapshot.controller) {
+          for (let ai = 0; ai < snapshot.controller.length; ai++) {
+            if (snapshot.controller[ai] === playerCore) {
+              const g = snapshot.grievance[ai] ?? 0;
+              if (g > maxGrievance) {
+                maxGrievance = g;
+                resistanceArchName = action.names[ai] || `Island ${ai}`;
+              }
+            }
+          }
+        }
+        // Fire every 4 ticks when grievance is elevated (0.35+), avoid spamming
+        if (maxGrievance > 0.35 && tickN % 4 === 0) {
+          newEvents.push({
+            yearStr: yearStr2,
+            text: getColonialResistanceDispatch(resistanceArchName, maxGrievance, tickN),
+            color: '#8a4a2a',
+          });
         }
       }
 

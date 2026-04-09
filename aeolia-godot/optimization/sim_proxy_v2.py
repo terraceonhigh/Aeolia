@@ -123,6 +123,14 @@ class SimParams:
     grievance_buildup_rate:     float = 0.25   # excess extraction → grievance accumulation rate
     grievance_resistance_mult:  float = 2.0    # grievance amplifies sovereignty recovery rate
 
+    # Acemoglu-Robinson institutional stagnation (Why Nations Fail, 2012)
+    # Extractive institutions accumulate when a polity is extracting surplus from
+    # foreign-controlled territory with low individualism culture. The index
+    # penalizes TFP independently of the naphtha resource curse — institutional
+    # lock-in blocks creative destruction even when energy is abundant.
+    institutional_lock_rate:    float = 0.12   # extraction → extractiveness buildup rate
+    extractiveness_tfp_penalty: float = 0.40   # max TFP multiplier penalty at extractiveness=1.0
+
     # Fishery mechanics (calibrated in SimEngine.js; mirrored here for optimizer)
     fishery_recovery_rate:      float = 0.04
     fishery_overfish_rate:      float = 0.06
@@ -168,6 +176,9 @@ PARAM_BOUNDS: list = [
     # Resistance
     ("grievance_buildup_rate",      0.10,  0.50),
     ("grievance_resistance_mult",   1.0,   4.0),
+    # Acemoglu-Robinson
+    ("institutional_lock_rate",     0.04,  0.30),
+    ("extractiveness_tfp_penalty",  0.10,  0.60),
 ]
 
 
@@ -670,7 +681,8 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
     # ── Grievance / Resistance state (Scott 1985, 1990) ──────────────────────
     # Per arch: accumulated grievance from colonial extraction above tolerable level.
     # Grievance amplifies sovereignty recovery (self-limiting empire mechanic).
-    grievance = [0.0] * N
+    grievance       = [0.0] * N
+    extractiveness  = [0.0] * N   # Acemoglu-Robinson: institutional lock-in index (0=inclusive, 1=extractive)
 
     # Initialise
     for i, arch in enumerate(archs):
@@ -1229,6 +1241,16 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
                 curse = _clamp(polity_c_frac * 3.0 - 0.4, 0.0, 0.5)
                 a0 *= (1.0 - curse * p.resource_curse_strength)
 
+            # ── Acemoglu-Robinson institutional stagnation ───────────────────
+            # Extractive institutions — formed through concentrated surplus
+            # extraction from periphery under low-individualism culture — block
+            # creative destruction by protecting elite rents against competitive
+            # entry. Effect: TFP penalty proportional to extractiveness index,
+            # independent of naphtha (can form from any extraction surplus).
+            # Source: Acemoglu & Robinson (2012). *Why Nations Fail*. Crown.
+            #         Acemoglu, Johnson & Robinson (2001). AER 91(5).
+            a0 *= (1.0 - extractiveness[core] * p.extractiveness_tfp_penalty)
+
             # Pu dependency at nuclear era
             if tech[core] >= 9.0 and not _has_pu(core):
                 er *= p.pu_dependent_factor
@@ -1569,6 +1591,22 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
             sovereignty[i] += (recovery - extraction) * 0.1
             sovereignty[i] = _clamp(sovereignty[i], 0.05, 0.95)
 
+            # ── Acemoglu-Robinson institutional buildup ────────────────────────
+            # Extractive institutions crystallise from the practice of extraction.
+            # Pressure is proportional to: how much extraction is occurring ×
+            # how collectivist/inward the imperial culture is (low individualism
+            # = no incentive to extend property rights to subjects).
+            # The index decays slowly (sticky institutions), but inclusive
+            # reforms (high individualism × low extraction) drive faster decay.
+            ci_core, io_core = cpos[core]  # individualism [0..1], outwardness [0..1]
+            inclusive_culture = ci_core * 0.7 + io_core * 0.3   # civic/outward → more inclusive
+            extractive_pressure = excess_extraction * (1.0 - inclusive_culture) * p.institutional_lock_rate
+            inclusive_reform    = inclusive_culture * 0.02       # slow institutional liberalisation
+            extractiveness[core] = _clamp(
+                extractiveness[core] * (1.0 - inclusive_reform) + extractive_pressure,
+                0.0, 1.0
+            )
+
             # Post-nuclear decolonisation recovery
             if tech[core] >= 9.0 and year >= -200:
                 sovereignty[i] = min(0.80, sovereignty[i] + 0.015)
@@ -1771,6 +1809,8 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
         "malaria_factors":      list(malaria_factor),
         # Trade / resistance diagnostics
         "grievance":            list(grievance),
+        # Acemoglu-Robinson institutional diagnostics
+        "extractiveness":       list(extractiveness),
     }
 
 
@@ -1781,16 +1821,19 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
 def verify_seed(seed=216089, world_path=None, params=None, verbose=True):
     if params is None:
         params = DEFAULT_PARAMS
+    import os, json as _json
     if world_path:
-        world = load_world(world_path)
+        path = world_path
     else:
-        import os
-        candidate = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                 f"worlds/candidate_{seed:07d}.json")
-        if os.path.exists(candidate):
-            world = load_world(candidate)
-        else:
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                            f"worlds/candidate_{seed:07d}.json")
+        if not os.path.exists(path):
             raise FileNotFoundError(f"No world file for seed {seed}")
+    # Use json.load directly (not load_world) so simulate() recomputes substrate
+    # via _compute_substrate().  load_world produces an older substrate schema
+    # (missing fishery / coast fields) that silently degrades DF timing.
+    with open(path) as _f:
+        world = _json.load(_f)
 
     result = simulate(world, params, seed=seed)
 

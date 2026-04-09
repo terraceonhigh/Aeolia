@@ -169,7 +169,7 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 
 **Implementation:** Fires when polity controls > ~13% of world initial C stock, tech 6–9.5. `curse = clamp(polityFrac × 3.0 − 0.4, 0, 0.5); a0 × = (1 − curse × resource_curse_strength)`.
 
-**Gap:** The Acemoglu-Robinson institutional pathway — where extractive institutions produce stagnation even without a resource abundance trigger — is not yet modeled. Polities can still reach tech collapse through the energy-deficit cascade (Tainter) but not through institutional lock-in alone.
+**Gap:** None. See Mechanic 25 (Acemoglu-Robinson) below.
 
 ---
 
@@ -362,17 +362,38 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 
 ---
 
-## IX. Known Gaps (Priority Order)
+## IX. Institutional Dynamics
+
+### 25. Acemoglu-Robinson institutional lock-in (Why Nations Fail, 2012)
+**Grade: B**  
+**Files:** `src/engine/SimEngine.js` (Stage 5 TFP penalty; Stage 7 buildup), `aeolia-godot/optimization/sim_proxy_v2.py`
+
+**Claim:** Extractive institutions — concentrated surplus extraction from subject populations under low-inclusivity political culture — block creative destruction by protecting elite rents against competitive entry. This produces tech stagnation independent of the naphtha resource curse; inclusive institutions (broad property rights, outward civic culture) allow Schumpeterian destruction and renewed growth.
+
+The Acemoglu-Robinson "reversal of fortune" applies to Aeolia: polities that developed high-extraction colonial relationships early may lock into institutional structures that prevent industrial-era tech acceleration even when energy is abundant.
+
+**Sources:**
+- Acemoglu, D. & Robinson, J. (2012). *Why Nations Fail: The Origins of Power, Prosperity, and Poverty*. Crown.
+- Acemoglu, D., Johnson, S. & Robinson, J. (2001). "The Colonial Origins of Comparative Development." *AER* 91(5).
+- North, D. (1990). *Institutions, Institutional Change and Economic Performance*. Cambridge University Press.
+
+**Implementation:** `extractiveness[core]` builds from `excess_extraction × (1 − inclusive_culture)` where `inclusive_culture = ci × 0.7 + io × 0.3` (civic + outward orientation). Decays slowly via inclusive reform rate. TFP penalty: `a0 × = (1 − extractiveness × extractiveness_tfp_penalty)`. Two new SimParams: `institutional_lock_rate` (default 0.12), `extractiveness_tfp_penalty` (default 0.40).
+
+**Gap:** The reversal-of-fortune path — where *initially high-population* islands become colonial periphery and stagnate — is implicit but not tracked as a specific diagnostic. Full Acemoglu-Johnson-Robinson would require tracking pre-colonial prosperity rank vs. contemporary colonial status.
+
+---
+
+## X. Known Gaps (Priority Order)
 
 | Gap | Grade if unaddressed | Recommended fix |
 |-----|---------------------|-----------------|
 | Axelrod freezing: divergent cultures don't converge | C | Add `frozen_divergence` threshold — cultures too far apart stop trading and polarize |
-| Acemoglu-Robinson institutional pathway | C | Add `extractiveness_index` that builds from concentrated surplus; penalizes tech growth independent of resource curse |
 | Proxy war casualties | C | DF-era conflicts should produce population-level casualties in contested periphery |
 | Doctrinal innovation in schism | C | Schism should sometimes produce breakaway "reformed" culture — doctrinal heterodoxy as trigger |
 | Endemicity at wave-epidemic level | C | Wave epidemic severity should decay with contact age per-pair, not globally |
 | Alliance formation mechanic | B→C | Walt balance-of-threat predicts formal alliances; currently only informal contact bonuses |
 | Resource curse without naphtha | C | Extractive institutions can form around pyra, Au, or monopoly trade routes — not only naphtha |
+| AR reversal-of-fortune diagnostic | C | Track pre-colonial prosperity rank vs. post-colonial status for AJR validation |
 
 ---
 

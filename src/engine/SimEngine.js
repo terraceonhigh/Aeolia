@@ -62,6 +62,9 @@ export const DEFAULT_PARAMS = {
   // Scott's resistance dynamics (Scott 1985, 1990)
   grievance_buildup_rate: 0.25,    // excess extraction → grievance accumulation
   grievance_resistance_mult: 2.0,  // grievance amplifies sovereignty recovery
+  // Acemoglu-Robinson institutional stagnation (Why Nations Fail, 2012)
+  institutional_lock_rate: 0.12,   // extraction → extractiveness buildup rate
+  extractiveness_tfp_penalty: 0.40, // max TFP penalty at extractiveness=1.0
 };
 
 // ── Crop culture seeds ──────────────────────────────────────
@@ -276,6 +279,10 @@ export class SimEngine {
     // Grievance per arch: accumulated from colonial extraction above tolerable threshold.
     // Scott's resistance mechanic — self-limiting empire (Scott 1985, 1990).
     this.grievance = new Float64Array(this.N);
+    // Extractiveness index per core: Acemoglu-Robinson institutional lock-in.
+    // Builds from concentrated extraction under collectivist culture;
+    // penalizes TFP independently of the naphtha resource curse.
+    this.extractiveness = new Float64Array(this.N);
 
     // ── Logs ───────────────────────────────────────────────
     this.epiLog = [];
@@ -970,6 +977,13 @@ export class SimEngine {
         a0 *= (1.0 - curse * (p.resource_curse_strength ?? 0.30));
       }
 
+      // ── Acemoglu-Robinson institutional stagnation ───────────────────────
+      // Extractive institutions — formed through concentrated surplus extraction
+      // under collectivist/inward culture — block creative destruction by
+      // protecting elite rents against competitive entry. Independent of naphtha.
+      // Source: Acemoglu & Robinson (2012). *Why Nations Fail*. Crown.
+      a0 *= (1.0 - this.extractiveness[core] * (p.extractiveness_tfp_penalty ?? 0.40));
+
       const nc = this.contactSet[core].size;
       const er = this.tech[core] >= 9.0 && !this._hasPu(core)
         ? energyRatio[core] * p.pu_dependent_factor
@@ -1308,6 +1322,20 @@ export class SimEngine {
       this.sovereignty[i] += (recovery - extraction) * 0.1;
       this.sovereignty[i] = _clamp(this.sovereignty[i], 0.05, 0.95);
       if (this.tech[core] >= 9.0 && year >= -200) this.sovereignty[i] = Math.min(0.80, this.sovereignty[i] + 0.015);
+
+      // ── Acemoglu-Robinson institutional buildup ─────────────────────────────
+      // Extractive institutions crystallise from the practice of extraction.
+      // Collectivist/inward culture → less incentive to extend property rights
+      // to subjects → higher institutional lock-in. Inclusive cultures decay faster.
+      // Source: Acemoglu & Robinson (2012). *Why Nations Fail*. Crown.
+      const [ciCore, ioCore] = this.cpos[core];
+      const inclusiveCulture = ciCore * 0.7 + ioCore * 0.3;     // civic/outward = more inclusive
+      const extractivePressure = excess * (1.0 - inclusiveCulture) * (p.institutional_lock_rate ?? 0.12);
+      const inclusiveReform = inclusiveCulture * 0.02;           // slow liberalisation
+      this.extractiveness[core] = _clamp(
+        this.extractiveness[core] * (1.0 - inclusiveReform) + extractivePressure,
+        0, 1.0
+      );
     }
 
     // ── STAGE 8: Naphtha depletion ──────────────────────────
@@ -1414,6 +1442,7 @@ export class SimEngine {
       schismEvents: this.schismLog.filter(e => e.tick === this.tick - 1),
       // Grievance per arch (Scott resistance mechanic — for situation cards)
       grievance: Array.from(this.grievance, v => Math.round(v * 1000) / 1000),
+      extractiveness: Array.from(this.extractiveness, v => Math.round(v * 1000) / 1000),
       // Scramble onset ticks (for one-time dispatch events in GameApp)
       scramble_onset_tick: this.scrambleOnset,
       pu_scramble_onset_tick: this.puScrambleOnset,
