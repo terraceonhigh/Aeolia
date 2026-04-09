@@ -293,6 +293,28 @@ export function getFirstContactBody(data, seed) {
   return `${opening}${cropNote} Technology: ${tech}. ${closing}`;
 }
 
+// ── Schism narrative ──────────────────────────────────────────
+
+/**
+ * Generates schism event body text.
+ * data: { count, polityName }
+ * seed: integer for deterministic selection
+ */
+export function getSchismBody(data, seed) {
+  const { count = 1, polityName = 'your realm' } = data;
+  const s = seed ?? 0;
+  const plural = count > 1;
+
+  const opening = pick([
+    `The doctrinal dispute that has simmered in the peripheral territories for generations has finally broken. ${plural ? `${count} island communities have` : 'An island community has'} formally renounced the central religious authority — and with it, the political legitimacy that flowed from it. The governor's representatives were turned away at the harbor. Envoys from neighboring powers are already en route.`,
+    `The heresy your advisors dismissed as a theological curiosity has become a political catastrophe. The peripheral archipelagos — where sovereignty was always more claimed than felt — have found in religious dissent the language for a grievance that was always fundamentally about distance and neglect. ${plural ? `${count} communities have` : 'A community has'} broken from the central order.`,
+    `Schism. The word is being spoken in the councils, and it has no good second meaning. The territories at the empire's margin, where your tax collectors arrive once a decade and your priests not at all, have decided that the central tradition no longer speaks to their condition. ${plural ? `${count} island groups have` : 'One island group has'} aligned with an alternative authority structure.`,
+    `A reformation crisis. The accusation from the periphery — that the center has let devotion calcify into administrative convenience — is not entirely wrong, and your advisors know it. The religious revival in the outer islands has produced political independence as its practical expression. ${plural ? `${count} holdings have` : 'One holding has'} passed out of your direct control.`,
+  ], s);
+
+  return `${opening} Sovereignty in the affected territory has collapsed. Recovery will require administrative investment, military presence, or a doctrinal accommodation the center may not wish to make.`;
+}
+
 // ── Dark Forest narrative ─────────────────────────────────────
 
 export function getDarkForestBody(names, playerCore) {
@@ -434,6 +456,17 @@ export function getDispatchEntry(type, data, names, tick) {
         `ADMIRALTY INTELLIGENCE — NUCLEAR PEER CONFIRMED. Signals intelligence has resolved a second-strike-capable peer across the dark water. The mutual-annihilation constraint is now operative. Expansion between hegemons is frozen.`,
         `ADMIRALTY INTELLIGENCE — FISSION PEER DETECTED. We are no longer the only civilization with this capability. They know about us. The Strange Peace has begun — not by agreement, but by the math of mutual destruction.`,
       ], s);
+    }
+
+    case 'schism': {
+      const count = data?.count || 1;
+      const cause = pick([
+        'Reports of doctrinal dispute in peripheral communities have resolved into territorial fact.',
+        'The religious revival that began as ferment has become fracture.',
+        'Long-standing regional grievance found its expression in doctrinal rather than political language — and has now become both.',
+        'Peripheral communities that lacked the means to resist taxation have found in religious autonomy what they lacked in military strength.',
+      ], s);
+      return `INTERNAL AFFAIRS — Schism event: ${count} peripheral holding${count > 1 ? 's' : ''} lost to religious fragmentation. ${cause} Sovereignty has collapsed in the affected territory. Administrative and religious response required.`;
     }
 
     default:

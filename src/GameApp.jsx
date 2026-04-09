@@ -541,6 +541,23 @@ function gameReducer(state, action) {
         }
       }
 
+      // ── Schism events ───────────────────────────────────────
+      // Religious fragmentation: loss of peripheral low-sovereignty territory.
+      if (snapshot.schismEvents && snapshot.schismEvents.length > 0) {
+        for (const ev of snapshot.schismEvents) {
+          if (ev.core === playerCore) {
+            newEvents.push({
+              yearStr: yearStr2,
+              text: getDispatchEntry('schism', { count: ev.count, core: ev.core }, action.names, tick),
+              color: '#6a3a8a',
+            });
+            if (!popup) {
+              popup = { type: 'schism', data: { count: ev.count, core: ev.core, year: ev.year } };
+            }
+          }
+        }
+      }
+
       // ── Religious piety dispatch ────────────────────────────
       // Periodic INTERNAL AFFAIRS note when piety is high.
       if (snapshot.piety) {

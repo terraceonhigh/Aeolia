@@ -20,6 +20,7 @@ import {
   getMalariaBreakthroughText,
   getReligiousRevivalText,
   getRogueAircraftText,
+  getSchismBody,
 } from './narrativeText.js';
 
 // ── Mineral labels ───────────────────────────────────────────
@@ -560,6 +561,31 @@ export function generateSituationCards(snapshot, playerCore, names, frontier, op
           { label: 'EMBRACE FAITH',   action: { type: 'CULTURE_POLICY', culturePolicyCI: isCollective ? 0 : -0.5 } },
           { label: 'CHANNEL OUTWARD', action: { type: 'SET_FOCUS', focus: 'expand' } },
           { label: 'ACKNOWLEDGE',     action: null },
+        ],
+      });
+    }
+  }
+
+  // ── Card 18: Schism Warning ──────────────────────────────
+  // Fires when schism pressure is elevated (> 0.55) but before schism fires.
+  // Gives player a warning turn to adjust policy (lower piety via tech investment,
+  // or shore up sovereignty in peripheral territories).
+  if (cards.length < 3) {
+    const schismP = (snapshot?.schismPressure || [])[playerCore] ?? 0;
+    const playerPiety = (snapshot?.piety || [])[playerCore] ?? 0;
+    const tick = snapshot?.tick || 0;
+    if (schismP > 0.55 && playerPiety >= 0.65 && ps.tech < 7.0) {
+      const seed = hashStr('schism_warning' + Math.floor(tick / 5) + playerCore);
+      const urgency = schismP > 0.85 ? 'CRITICAL' : 'WARNING';
+      cards.push({
+        id: `schism_warning_${Math.floor(tick / 5)}`,
+        icon: '⊕',
+        title: `Schism Risk — ${urgency}`,
+        body: getSchismBody({ count: 1, polityName: 'your realm' }, seed).split('.')[0] + '. The conditions for religious fragmentation in your peripheral territories are present and worsening.',
+        actions: [
+          { label: 'INVEST IN GOVERNANCE', action: { type: 'SET_FOCUS', focus: 'fortify' } },
+          { label: 'PUSH TECH',            action: { type: 'SET_FOCUS', focus: 'innovate' } },
+          { label: 'ACKNOWLEDGE',          action: null },
         ],
       });
     }

@@ -103,8 +103,8 @@ Aeolia/
 - TOTP-style turn timer with speed controls (pause/1x/5x/10x)
 - National Focus cards (Expand/Innovate/Fortify/Balanced/Exploit)
 - Fog of war with 5 visibility levels (owned/frontier/contacted/rumor/unknown)
-- Event popups: first contact, absorption, territory lost, era transition, tech milestones, dark forest (deterrence + arms race text), naphtha/pyra scramble, epidemic wave, fishery collapse, defeat
-- 17 situation cards (cardGenerator.js): tech assessment, resource detection, expansion opportunity, culture drift, epidemic risk, naphtha/pyra, era transition, administered trade, fishery collapse, piracy warning, tech decay, navigator guild dispute, malaria breakthrough, religious revival, rogue aircraft alert
+- Event popups: first contact (tech-gated: pre-industrial vs. nuclear-era variants), absorption, territory lost, era transition, tech milestones, dark forest (deterrence + arms race text), naphtha/pyra scramble, epidemic wave, fishery collapse, schism, defeat
+- 18 situation cards (cardGenerator.js): tech assessment, resource detection, expansion opportunity, culture drift, epidemic risk, naphtha/pyra, era transition, administered trade, fishery collapse, piracy warning, tech decay, navigator guild dispute, malaria breakthrough, religious revival, rogue aircraft alert, schism warning
 - Dispatches panel: ADMIRALTY / MERCHANT GUILD / INTERNAL AFFAIRS source-tagged intelligence feed
 - Player stats panel: piety reading (fervent/devout/moderate/secular) with color coding
 - Defeat condition on 0 territory

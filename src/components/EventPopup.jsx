@@ -9,6 +9,7 @@ import {
   TECH_MILESTONE_NARRATIVES,
   getFirstContactBody,
   getDarkForestBody,
+  getSchismBody,
 } from '../engine/narrativeText.js';
 
 const STYLES = {
@@ -184,6 +185,21 @@ function buildEventDef(type, eventData, names, playerCore) {
         subtitle: d.archName ? `${d.archName} stock critically depleted` : 'Marine stock depleted',
         body: `Fishery stock in your territory has fallen below viable levels. Sustained over-exploitation — population density exceeding the regenerative capacity of the marine ecosystem — has triggered a collapse. The fish are not gone; they have retreated beyond accessible range, and the remaining population is too sparse to support commercial harvest. Recovery, if it occurs, will take generations. Populations dependent on the fishery face caloric shortfall. Expect food deficit pressure and sovereignty stress in coastal territories.`,
         secondary: `The fishery collapse will cascade into the energy budget as a food deficit. Reducing extraction pressure — restricting population growth in affected archipelagos, or diverting fishing effort to other regions — allows partial stock recovery at a rate of roughly 8% per generation.`,
+      };
+    }
+
+    // ─ Schism ──────────────────────────────────────────────
+    case 'schism': {
+      const d = eventData || {};
+      const count = d.count || 1;
+      const seed = (d.core ?? 0) * 13 + (d.year ?? 0);
+      return {
+        icon: '⊕',
+        color: '#6a3a8a',
+        title: 'Religious Schism',
+        subtitle: count > 1 ? `${count} territories lost to fragmentation` : 'Peripheral territory lost to fragmentation',
+        body: getSchismBody({ count, polityName: 'your realm' }, seed),
+        secondary: `High piety without institutional depth has a historical failure mode: the center's claim to authority rests on religious legitimacy, and when that legitimacy fractures, so does the administrative order. Rebuilding sovereignty in the affected territories requires either military presence or doctrinal accommodation — the latter being the more durable solution and the more politically difficult one.`,
       };
     }
 

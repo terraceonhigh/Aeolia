@@ -262,6 +262,8 @@ export class SimEngine {
       const collectiveSeed = Math.max(0, -ci0 * 0.3);     // collective CI → slightly higher
       this.piety[i] = _clamp(0.25 + warmSeed * 0.25 + collectiveSeed + (this.rng() - 0.5) * 0.20, 0.05, 0.90);
     }
+    // Schism pressure per core — builds under high piety + low sovereignty in periphery
+    this.schismPressure = new Float64Array(this.N);
 
     // ── Logs ───────────────────────────────────────────────
     this.epiLog = [];
@@ -269,6 +271,7 @@ export class SimEngine {
     this.cropFailureLog = [];
     this.fisheryLog = [];
     this.expansionLog = [];
+    this.schismLog = [];       // religious schism / fragmentation events
     this.dfYear = null;
     this.dfArch = null;
     this.dfDetector = null;
@@ -757,6 +760,69 @@ export class SimEngine {
       piety -= dRate * contactDiv * 0.3;
 
       this.piety[core] = _clamp(piety, 0.05, 0.95);
+    }
+
+    // ── STAGE 2d: Schism pressure (centrifugal force) ────────
+    // High piety + overstretched empire (many low-sovereignty holdings) builds schism
+    // pressure. Tech ≥ 7 dissolves the risk (secular state institutions replace
+    // religious authority as the glue of empire). Reformation model.
+    for (const core of cores) {
+      const pi = this.piety[core];
+      const t = this.tech[core];
+
+      // Tech dampener: 1.0 at tech ≤ 3, falling to 0 at tech 7
+      const techDamp = _clamp((7.0 - t) / 4.0, 0, 1);
+
+      // Low-sovereignty peripheral holdings (not the core island itself)
+      const controlled = this._controlled(core);
+      const peripheral = controlled.filter(i => i !== core);
+      const lowSovCount = peripheral.filter(i => this.sovereignty[i] < 0.45).length;
+      const lowSovFrac = peripheral.length > 0 ? lowSovCount / peripheral.length : 0;
+
+      // Pressure builds: high piety AND spread empire AND pre-industrial tech
+      let dp;
+      if (pi > 0.65 && lowSovFrac > 0.40 && techDamp > 0) {
+        dp = (pi - 0.65) * lowSovFrac * 3.0 * techDamp;
+      } else {
+        dp = -0.05; // slow dissipation when conditions not met
+      }
+      this.schismPressure[core] = _clamp(this.schismPressure[core] + dp, 0, 1.5);
+
+      // Schism fires when pressure > 1.0 and there are releasable holdings
+      if (this.schismPressure[core] > 1.0 && lowSovCount > 0) {
+        // Release the lowest-sovereignty third of peripheral holdings
+        const candidates = peripheral
+          .filter(i => this.sovereignty[i] < 0.45)
+          .sort((a, b) => this.sovereignty[a] - this.sovereignty[b]);
+        const nRelease = Math.max(1, Math.floor(candidates.length / 3));
+        let released = 0;
+
+        for (const island of candidates.slice(0, nRelease)) {
+          // Transfer to nearest adjacent rival, or drop to ungoverned
+          let bestRival = null;
+          let bestDist = Infinity;
+          for (const nb of this.adj[island]) {
+            const nbCtrl = this.controller[nb];
+            if (nbCtrl !== core && cores.includes(nbCtrl)) {
+              const d = _gcDistArch(this.archs[island], this.archs[nbCtrl]);
+              if (d < bestDist) { bestDist = d; bestRival = nbCtrl; }
+            }
+          }
+          if (bestRival !== null) {
+            this.controller[island] = bestRival;
+            this.sovereignty[island] = 0.08;
+          } else {
+            // No adjacent rival — sovereignty collapses (ungoverned)
+            this.sovereignty[island] = 0.04;
+          }
+          released++;
+        }
+
+        this.schismPressure[core] = 0;
+        if (released > 0) {
+          this.schismLog.push({ tick, year, core, count: released });
+        }
+      }
     }
 
     // ── STAGE 3: Rumor propagation ──────────────────────────
@@ -1252,6 +1318,10 @@ export class SimEngine {
       fisheryStock: Array.from(this.fisheryStock, s => Math.round(s * 100) / 100),
       // Piety per core (for situation cards + dispatch)
       piety: Array.from(this.piety, v => Math.round(v * 100) / 100),
+      // Schism pressure per core (for situation cards)
+      schismPressure: Array.from(this.schismPressure, v => Math.round(v * 100) / 100),
+      // Schism events this tick (for event popups / dispatch)
+      schismEvents: this.schismLog.filter(e => e.tick === this.tick - 1),
       // Scramble onset ticks (for one-time dispatch events in GameApp)
       scramble_onset_tick: this.scrambleOnset,
       pu_scramble_onset_tick: this.puScrambleOnset,
