@@ -217,7 +217,7 @@ export const ERA_NARRATIVES = {
   Nuclear: {
     icon: '⚠',
     short: 'Fission. Unlimited range. The Dark Forest logic goes planetary.',
-    long: `Two civilizations can now end each other. Neither can afford to strike first; neither can afford not to watch. The surveillance aircraft that pioneered gap-crossing now map the world for threat vectors. Intelligence agencies have replaced admiralties. Pyra deposits are the most valuable geology on Aeolia — more valuable than the islands that contain them, more valuable than the populations who live above them. And somewhere, across 55,000 kilometers of dark water, something is watching back.`,
+    long: `Two civilizations can now end each other. Neither can afford to strike first; neither can afford not to watch. The nuclear seaplane fleet — dispersed across thousands of remote ocean anchorages, impossible to locate and destroy in any single strike — is both the deterrent and the target of every intelligence operation your adversaries run. Intelligence agencies have replaced admiralties. Pyra deposits are the most valuable geology on Aeolia — more valuable than the islands that contain them, more valuable than the populations who live above them. And somewhere, across tens of thousands of kilometers of dark water, something is watching back.`,
     color: '#8a2020',
   },
 };
@@ -243,7 +243,7 @@ export const TECH_MILESTONE_NARRATIVES = {
   9: {
     title: 'Nuclear Capability',
     color: '#8a2020',
-    body: `The chain reaction has been demonstrated. Your civilization commands energy sufficient to render a large island uninhabitable. So does at least one other power. The mutual awareness of this fact changes every calculation — expansion, diplomacy, alliance, even the tenor of ordinary correspondence. This is not a new kind of weapon. It is a new kind of world. The navigator who made the first nuclear gap crossing described the ocean from altitude as "a dark mirror." They were right in more ways than they meant.`,
+    body: `The chain reaction has been demonstrated. Your first nuclear seaplane — reactor-powered, endurance measured in weeks rather than days — has completed its shakedown cruise. The implications are understood immediately: no runway required, no fuel dependency, thousands of potential landing sites across the global ocean. Your fleet is, in principle, undestroyed by any first strike you can imagine. So is your adversary's. The mutual awareness of this fact changes every calculation — expansion, diplomacy, alliance, even the tenor of ordinary correspondence. This is not a new kind of weapon. It is a new kind of world.`,
   },
 };
 
@@ -283,7 +283,7 @@ export function getFirstContactBody(data, seed) {
 // ── Dark Forest narrative ─────────────────────────────────────
 
 export function getDarkForestBody(names, playerCore) {
-  return `Surveillance aircraft operating at the edge of your detection range have returned with reactor-isotope readings that admit only one interpretation: a nuclear-capable peer civilization exists, and they know about you. The chain of suspicion runs to its logical terminus — *if they can strike, and I know they know, and they know I know they know* — faster than any diplomat can interrupt it. Neither side made this situation. Both sides have to live in it. Every subsequent interaction, every trade negotiation, every navigation incident, every radio silence will be interpreted through this fact. Welcome to the dark half of the ocean.`;
+  return `Surveillance seaplanes operating at the edge of your detection range have returned with reactor-isotope readings that admit only one interpretation: a nuclear-capable peer civilization exists, and they know about you. Their fleet is dispersed across thousands of ocean anchorages. Yours is too. Neither side can destroy the other without facing certain destruction in return. The chain of suspicion runs to its logical terminus — *if they can strike, and I know they know, and they know I know they know* — faster than any diplomat can interrupt it. Neither side made this situation. Both sides have to live in it. Every subsequent interaction, every trade negotiation, every navigation incident, every radio silence will be interpreted through this fact. Welcome to the dark half of the ocean.`;
 }
 
 // ── Event log dispatch entries ────────────────────────────────
