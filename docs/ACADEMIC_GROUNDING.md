@@ -475,7 +475,7 @@ The Acemoglu-Robinson "reversal of fortune" applies to Aeolia: polities that dev
 
 ---
 
-## X. Power Transition
+## XI. Power Transition
 
 ### 30. Approach to parity: power transition period (Organski 1958; Gilpin 1981)
 **Grade: B−** (emergent, not explicitly encoded)  
@@ -496,7 +496,33 @@ The Acemoglu-Robinson "reversal of fortune" applies to Aeolia: polities that dev
 
 ---
 
-## XI. Resource Competition and Strategic Scrambles
+## XII. Culture and Economic Behavior
+
+### 32. Culture-to-behavior mapping: civic culture and TFP (Putnam 1993; Inglehart 1997)
+**Grade: B**  
+**Files:** `src/engine/SimEngine.js` (`_sharesFromPos`, `_A0FromPos`), `sim_proxy_v2.py`
+
+**Claim:** Culture position on the CI (Collective↔Individual) and IO (Inward↔Outward) axes determines economic behavior through two functions: allocation shares (how surplus is divided among expansion, tech investment, and consolidation) and baseline TFP (A₀). Outward orientation drives both expansion and tech investment (trade-network learning); Individual orientation drives TFP independently (civic individualism → productive innovation). The highest-performing polities combine both (maritime civic cultures); the lowest combine neither (inward collective / amoral familist).
+
+**Sources:**
+- Putnam, R. (1993). *Making Democracy Work: Civic Traditions in Modern Italy*. Princeton University Press.
+- Inglehart, R. (1997). *Modernization and Postmodernization*. Princeton University Press.
+- Inglehart, R. (2018). *Cultural Evolution*. Cambridge University Press.
+- Banfield, E. (1958). *The Moral Basis of a Backward Society*. Free Press.
+
+**Implementation:**
+- `expS = base_expansion + outward_expansion_coeff × outward + individual_expansion_coeff × individual`
+- `tecS = base_tech + outward_tech_coeff × outward`
+- `A₀ = base_A0 + individual_A0_coeff × individual + outward_A0_coeff × outward`
+- All mappings linear; individual and outward treated as independent additive contributors.
+
+**Gap:** Linear mapping misses threshold effects (amoral familism → civic culture transition non-linear) and interaction effects (individual × outward synergy understated). Consolidation is a residual rather than a modeled preference.
+
+**→ Garden:** `garden/observations/the_culture_allocation_link.md`
+
+---
+
+## XIII. Resource Competition and Strategic Scrambles
 
 ### 31. Three-threshold resource model and strategic scrambles (Le Billon 2012; Kennedy 1987)
 **Grade: B**  
@@ -517,7 +543,7 @@ The Acemoglu-Robinson "reversal of fortune" applies to Aeolia: polities that dev
 
 ---
 
-## XII. Collective Action and Institutional Fragility
+## XIV. Collective Action and Institutional Fragility
 
 ### 28. Desperation expansion as collective action failure (Olson 1965; Tainter 1988)
 **Grade: B**  
@@ -557,7 +583,7 @@ The Acemoglu-Robinson "reversal of fortune" applies to Aeolia: polities that dev
 
 ---
 
-## XIV. Known Gaps (Priority Order)
+## XV. Known Gaps (Priority Order)
 
 | Gap | Status | Notes |
 |-----|--------|-------|

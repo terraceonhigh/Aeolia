@@ -12,6 +12,7 @@
 |------|---------|----------------------|-----------------|
 | `the_crop_culture_seed.md` | Wittfogel hydraulic hypothesis → crop-to-culture seed table; IO dimension (Almond & Verba) | §1 | Wittfogel (1957), Almond & Verba (1963) |
 | `the_culture_engine.md` | 5-factor culture drift; Axelrod freeze at dist ≥ 0.85; three trajectory types | §2 | Axelrod (1997), Boyd & Richerson (1985) |
+| `the_culture_allocation_link.md` | _sharesFromPos / _A0FromPos formulas; Putnam civic culture → TFP; Inglehart modernization; Banfield amoral familism; linear mapping gaps | §32 | Putnam (1993), Inglehart (1997, 2018), Banfield (1958) |
 | `two_bargains.md` | Military vs. legal colonial founding; Reach hierarchy vs. Lattice contract system; extractiveness_index differentiation | §12, §25 | Acemoglu-Robinson (2001) |
 | `the_grievance_accumulation.md` | Scott everyday resistance; self-limiting empire dynamic; geographic grievance distribution | §13 | Scott (1985, 1990) |
 | `the_lock_in_mechanics.md` | AR extractiveness buildup formula; reversal-of-fortune diagnostic; Spearman r on seed 216089 | §25 | Acemoglu-Robinson (2001, 2012), North (1990) |
@@ -71,4 +72,4 @@
 
 ---
 
-*Index last updated: 2026-04-09, Session 6. 25 observations, 11 fragments.*
+*Index last updated: 2026-04-09, Session 6. 26 observations, 11 fragments. ACADEMIC_GROUNDING: 32 sections (§1–§32), all with garden cross-references or worldbuilding coverage.*
