@@ -385,15 +385,15 @@ The Acemoglu-Robinson "reversal of fortune" applies to Aeolia: polities that dev
 
 ## X. Known Gaps (Priority Order)
 
-| Gap | Grade if unaddressed | Recommended fix |
-|-----|---------------------|-----------------|
-| Axelrod freezing: divergent cultures don't converge | C | Add `frozen_divergence` threshold — cultures too far apart stop trading and polarize |
-| Proxy war casualties | C | DF-era conflicts should produce population-level casualties in contested periphery |
-| Doctrinal innovation in schism | C | Schism should sometimes produce breakaway "reformed" culture — doctrinal heterodoxy as trigger |
-| Endemicity at wave-epidemic level | C | Wave epidemic severity should decay with contact age per-pair, not globally |
-| Alliance formation mechanic | B→C | Walt balance-of-threat predicts formal alliances; currently only informal contact bonuses |
-| Resource curse without naphtha | ~~C~~ | Implemented: pyra MIC curse added (tech ≥ 8.5; 60% of naphtha curse strength) |
-| AR reversal-of-fortune diagnostic | C | Track pre-colonial prosperity rank vs. post-colonial status for AJR validation |
+| Gap | Status | Notes |
+|-----|--------|-------|
+| Axelrod freezing: divergent cultures don't converge | Open | Add `frozen_divergence` threshold — cultures too far apart stop trading and polarize |
+| Alliance formation mechanic | Open | Walt balance-of-threat predicts formal alliances; currently only informal contact bonuses |
+| AR reversal-of-fortune diagnostic | Open | Track pre-colonial prosperity rank vs. post-colonial status for AJR validation |
+| Proxy war casualties | ✓ Implemented | Population losses in DF-era expansion into rival's sub-nuclear periphery |
+| Doctrinal innovation in schism | ✓ Implemented | Ungoverned breakaway polities receive Reformed culture shift (+0.30 CI, +0.15 IO); Weber (1904) |
+| Endemicity at wave-epidemic level | ✓ Implemented | Per-pair relay contact age replaces global count; 0.04/tick immunity buildup |
+| Resource curse without naphtha | ✓ Implemented | Pyra MIC curse (tech ≥ 8.5; 60% of naphtha curse strength) |
 
 ---
 
