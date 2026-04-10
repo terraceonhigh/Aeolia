@@ -245,6 +245,17 @@ function StatsPanel({ snapshot, names }) {
 
   const worldPop = snapshot.pop.reduce((s, v) => s + v, 0);
 
+  // AJR reversal-of-fortune score (Acemoglu, Johnson & Robinson 2001)
+  const rofR = snapshot.reversal_of_fortune_r ?? null;
+  // Only show once enough absorptions have accumulated (non-zero)
+  const showRof = rofR !== null && rofR !== 0;
+  const rofColor = rofR < -0.20 ? '#c07050'   // reversal confirmed — warm red
+                 : rofR >  0.20 ? '#6a9a5a'   // persistence — muted green
+                 : '#7a6a5a';                   // ambiguous — grey-brown
+  const rofLabel = rofR < -0.20 ? 'reversal confirmed'
+                 : rofR >  0.20 ? 'persistence'
+                 : 'mixed';
+
   return (
     <div style={{ overflow: 'auto', flex: 1 }}>
       <div style={{ padding: '8px 12px', borderBottom: '1px solid #1a1410' }}>
@@ -258,6 +269,25 @@ function StatsPanel({ snapshot, names }) {
         <div style={{ fontSize: 8, color: '#6a5a3a' }}>
           Polities: {cores.length}
         </div>
+        {showRof && (
+          <div style={{ marginTop: 6, paddingTop: 5, borderTop: '1px solid #1a1410' }}>
+            <div style={{ fontSize: 7, color: '#6a5a3a', marginBottom: 2 }}>
+              REVERSAL-OF-FORTUNE  <span style={{ color: '#3a2f22' }}>AJR 2001</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
+              <span style={{ fontSize: 11, color: rofColor, letterSpacing: '0.5px' }}>
+                r = {rofR.toFixed(3)}
+              </span>
+              <span style={{ fontSize: 7, color: rofColor }}>
+                {rofLabel}
+              </span>
+            </div>
+            <div style={{ fontSize: 6, color: '#4a3a2a', marginTop: 2, lineHeight: 1.4 }}>
+              Spearman rank correlation of pre-colonial tech vs. current tech across absorbed polities.
+              Negative = formerly prosperous territories now lag.
+            </div>
+          </div>
+        )}
       </div>
       {polityData.map((p, i) => (
         <div key={p.c} style={{
