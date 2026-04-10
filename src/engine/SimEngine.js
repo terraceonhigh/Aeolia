@@ -777,7 +777,10 @@ export class SimEngine {
 
       const rp = resourcePressure[core] || 0;
       const budgetMult = rp > 0.3 ? 1.0 + _clamp(rp - 0.3, 0, 0.7) * 0.8 : 1.0;
-      const budget = (energySurplus[core] + corePop[core] * 0.002) * budgetMult;
+      // Use energyRatio (food-security signal, 0.3–1.5) rather than energySurplus, which is
+      // crushed to near-zero by the Malthusian cap at tech < 4.  energyRatio correctly
+      // reflects a polity's capacity for power projection even when absolute surplus is tiny.
+      const budget = (energyRatio[core] + corePop[core] * 0.002) * budgetMult;
       expBudget[core] = budget * expS;
       techBgt[core] = budget * tecS;
       consolBudget[core] = budget * conS;
@@ -1298,10 +1301,15 @@ export class SimEngine {
     // ── STAGE 6: Thompson Sampling expansion ────────────────
     for (const core of cores) {
       let budget = expBudget[core] || 0;
-      if (budget < 0.1 || this.tech[core] < 2.0) continue;
+      // Game-mode gate: 1.0 (not 2.0) — skipToTick(60) leaves most polities at ~0.7–1.5,
+      // well below the Python reference threshold. Bronze-age projection is reachable at tech 1.0.
+      if (budget < 0.1 || this.tech[core] < 1.0) continue;
 
       const isPlayer = core === this.playerCore && playerDecision;
-      const playerTargets = isPlayer && playerDecision.targets ? new Set(playerDecision.targets) : null;
+      // Only build filter set when targets is non-empty. An empty array is truthy, so
+      // `new Set([])` would silently block ALL expansion. null means "use AI scoring".
+      const playerTargets = isPlayer && playerDecision.targets?.length > 0
+        ? new Set(playerDecision.targets) : null;
 
       const [tsA, tsB] = this._tsPriorsFromPos(this.cpos[core]);
       const ctrlSet = new Set(this._controlled(core));
@@ -1405,7 +1413,11 @@ export class SimEngine {
         if (budget < 0.1 || absorbedThisTick >= 1) break;
 
         const techAdv = Math.max(0.1, this.tech[core] - this.tech[target] + 1.0);
-        let cost = (this.pop[target] * 0.05 + dist ** 3 * 40) / (techAdv ** 1.5);
+        // pop coefficient reduced 0.05→0.02: Strategy game starts with far less trade energy
+        // than the Python reference (which has all 30 polities active from tick 0).
+        // Populated islands still cost more but remain reachable without a large tech gap.
+        // dist³ coefficient reduced 40→20 earlier for the same reason.
+        let cost = (this.pop[target] * 0.02 + dist ** 3 * 20) / (techAdv ** 1.5);
 
         const targetCore = this.controller[target];
         if (targetCore !== target) {
