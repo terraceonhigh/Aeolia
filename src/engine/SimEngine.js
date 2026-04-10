@@ -70,6 +70,8 @@ export const DEFAULT_PARAMS = {
   alliance_protection_str: 2.5,    // max targeting penalty for aligned-against hegemon
   // Davis (2001) — extractive administration amplifies crop failure mortality
   davis_amplification: 0.30,       // extractiveness=1.0 worsens failure modifier by 30%
+  // Ostrom (1990) — civic/inclusive institutions produce commons governance reducing depletion
+  ostrom_commons_factor: 0.55,     // max depletion rate reduction from commons governance
 };
 
 // ── Crop culture seeds ──────────────────────────────────────
@@ -1219,8 +1221,16 @@ export class SimEngine {
       const core = this.controller[j];
       const cap = this.carryCap[j];
       const densityRatio = cap > 0 ? this.pop[j] / cap : 0;
+      // Ostrom (1990): civic/inclusive polities develop commons governance — coordinated fishing
+      // rules, territorial use rights, seasonal closures — reducing effective over-exploitation.
+      // governance = f(outward culture IO, inclusive institutions = 1 - extractiveness)
+      const ioPos = this.cpos[core] ? this.cpos[core][1] : 0;  // IO axis ∈ [-1, 1]
+      const inclus = 1.0 - (this.extractiveness[core] ?? 0);    // 0=extractive, 1=inclusive
+      // commonsGov ∈ [0, 0.7]: 0 for inward/extractive, approaches 0.7 for outward/inclusive
+      const commonsGov = _clamp((ioPos * 0.5 + inclus * 0.5 + 0.5) * 0.5, 0, 0.70);
+      const govReduction = commonsGov * (p.ostrom_commons_factor ?? 0.55);
       // Depletion increases when density is above 50% carrying capacity
-      const overExploit = Math.max(0, densityRatio - 0.5) * p.fishery_overfish_rate;
+      const overExploit = Math.max(0, densityRatio - 0.5) * p.fishery_overfish_rate * (1.0 - govReduction);
       // Natural recovery toward 1.0
       const recovery = p.fishery_recovery_rate * (1.0 - this.fisheryStock[j]);
       this.fisheryStock[j] = _clamp(this.fisheryStock[j] + recovery - overExploit, 0.05, 1.0);

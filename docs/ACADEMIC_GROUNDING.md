@@ -467,9 +467,9 @@ The Acemoglu-Robinson "reversal of fortune" applies to Aeolia: polities that dev
 - Hardin, G. (1968). "The Tragedy of the Commons." *Science* 162(3859).
 - Ostrom, E. (1990). *Governing the Commons*. Cambridge University Press.
 
-**Implementation:** `fisheryStock[]` recovers at 8%/tick; depletes proportional to coastal population × fishing_intensity. Collapse below threshold produces yield reduction until stock recovers.
+**Implementation:** `fisheryStock[]` recovers at 8%/tick; depletes proportional to coastal population × fishing_intensity. Collapse below threshold produces yield reduction until stock recovers. Ostrom commons governance (SimEngine.js): `commonsGov = clamp((ioPos × 0.5 + inclus × 0.5 + 0.5) × 0.5, 0, 0.70)` where `ioPos` = IO culture axis, `inclus = 1 − extractiveness`. `overExploit × = (1 − commonsGov × ostrom_commons_factor)`. At max governance (outward, inclusive): depletion reduced by ~38.5%. New param: `ostrom_commons_factor` (default 0.55). Not yet ported to Python reference.
 
-**Gap:** All polities face open-access depletion dynamics. Ostrom-style commons governance (which would produce sustainable-yield harvesting in polities with effective institutions) is not implemented; depletion rate is institution-blind.
+**Gap (partially resolved 2026-04-09):** Institutional differentiation implemented via culture-space + extractiveness proxy. Remaining gap: Ostrom's specific governance conditions (territorial use rights, seasonal closures, graduated sanctions, monitoring) are not individually modeled — governance capacity is a continuous function of culture/extractiveness rather than a discrete institutional choice.
 
 **→ Garden:** `garden/observations/the_environmental_shocks.md`
 

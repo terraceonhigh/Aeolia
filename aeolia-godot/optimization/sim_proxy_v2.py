@@ -150,6 +150,8 @@ class SimParams:
 
     # Davis (2001) — extractive admin amplifies crop failure (SimEngine.js only; not yet in Python sim)
     davis_amplification:        float = 0.30   # extractiveness=1.0 worsens failure modifier by 30%
+    # Ostrom (1990) — civic/inclusive polities develop commons governance (SimEngine.js only)
+    ostrom_commons_factor:      float = 0.55   # max depletion rate reduction from commons governance
 
 
 DEFAULT_PARAMS = SimParams()
