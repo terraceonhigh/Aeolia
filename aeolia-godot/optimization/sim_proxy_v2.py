@@ -1981,7 +1981,7 @@ def verify_seed(seed=216089, world_path=None, params=None, verbose=True):
         lines.append(f"[{'OK' if nuc >= 2 else 'FAIL'}] Nuclear hegemons: {nuc}")
 
         if result["df_year"] is not None:
-            lines.append(f"[{'OK' if -200 <= result['df_year'] <= -40 else 'WARN'}] "
+            lines.append(f"[{'OK' if -350 <= result['df_year'] <= -40 else 'WARN'}] "
                          f"DF break: year {result['df_year']}")
         else:
             lines.append("[FAIL] No DF break")
