@@ -80,12 +80,20 @@ function _gcDistArch(a, b) {
 }
 
 function _resourceValue(minerals, tech, cuUnlock) {
+  // Continuous ramps replace cliff-gates so resource scrambles are gradients,
+  // not single-tick events. Each mineral's desirability rises smoothly as
+  // the polity's tech crosses the relevant metallurgical / industrial / nuclear
+  // threshold window.
   let val = 0;
-  if (tech >= cuUnlock && minerals.Cu) val += 1.0;
-  if (tech >= 4.0 && minerals.Au) val += 1.5;
+  // Copper: useful from early metallurgy (~tech 2) through industrialisation (~tech 5)
+  if (minerals.Cu) val += 1.0 * _clamp((tech - (cuUnlock - 1)) / 2.0, 0, 1);
+  // Gold: trade-era prestige; ramps from tech 3 to 5
+  if (minerals.Au) val += 1.5 * _clamp((tech - 3.0) / 2.0, 0, 1);
+  // Naphtha: industrial fuel; ramps from tech 5 (early use) to tech 8 (full dependence)
   const c = minerals.C || 0;
-  if (tech >= 7.0 && c > 0) val += c * 5.0;
-  if (tech >= 9.0 && minerals.Pu) val += 10.0;
+  if (c > 0) val += c * 5.0 * _clamp((tech - 5.0) / 3.0, 0, 1);
+  // Pyra: nuclear material; ramps from tech 7 (research) to tech 9.5 (weapons programme)
+  if (minerals.Pu) val += 10.0 * _clamp((tech - 7.0) / 2.5, 0, 1);
   return val;
 }
 
@@ -193,6 +201,7 @@ export function simulate(world, params = null) {
   const fleetScale = new Float64Array(N);
   const awareness = new Map();
   const absorbedTick = new Array(N).fill(null);
+  const absorbedTech = new Array(N).fill(null); // tech level of absorbing core at time of absorption
   const firstContactTick = new Array(N).fill(null);
 
   // Initialize
@@ -484,10 +493,11 @@ export function simulate(world, params = null) {
 
     // ── STAGE 3: Rumor propagation ──────────────────────────
     for (const core of cores) {
-      if (tech[core] < 1.5) continue;
+      if (tech[core] < 1.0) continue;
       const ctrlSet = new Set(controlled(core));
       let newThisTick = 0;
-      const maxNew = tech[core] < 5.0 ? 1 : 2;
+      // Contact discovery rate grows continuously with tech rather than stepping at 5.0
+      const maxNew = Math.max(1, Math.floor(tech[core] / 4));
       outer: for (const j of ctrlSet) {
         if (newThisTick >= maxNew) break;
         for (const nb of adj[j]) {
@@ -617,7 +627,7 @@ export function simulate(world, params = null) {
     // ── STAGE 6: Thompson Sampling expansion ────────────────
     for (const core of cores) {
       let budget = expBudget[core] || 0;
-      if (budget < 0.1 || tech[core] < 2.0) continue;
+      if (budget < 0.1) continue;
 
       const [tsA, tsB] = tsPriorsFromPos(cpos[core]);
       const ctrlSet = new Set(controlled(core));
@@ -689,6 +699,7 @@ export function simulate(world, params = null) {
         }
         controller[target] = core;
         absorbedTick[target] = tick;
+        absorbedTech[target] = tech[core];
         sovereignty[target] = _clamp(0.15 + dist * 0.3, 0.10, 0.50);
         budget -= cost;
         absorbedThisTick++;
@@ -712,7 +723,9 @@ export function simulate(world, params = null) {
       const recovery = p.sov_extraction_decay * sovereignty[i] * (pop[i] / Math.max(1, pop[core])) * 0.5;
       sovereignty[i] += (recovery - extraction) * 0.1;
       sovereignty[i] = _clamp(sovereignty[i], 0.05, 0.95);
-      if (tech[core] >= 9.0 && year >= -200) sovereignty[i] = Math.min(0.80, sovereignty[i] + 0.015);
+      // Nuclear-era hegemonic consolidation: year gate removed — tech level alone
+      // determines when this applies, so fast and slow seeds both experience it.
+      if (tech[core] >= 9.0) sovereignty[i] = Math.min(0.80, sovereignty[i] + 0.015);
     }
 
     // ── STAGE 8: Naphtha depletion ──────────────────────────
@@ -724,11 +737,22 @@ export function simulate(world, params = null) {
       }
     }
 
-    // Snapshots
-    if (year === -5000) { techSnapshots.after_antiquity = [...tech]; popSnapshots.after_antiquity = [...pop]; }
-    else if (year === -2000) { techSnapshots.after_serial = [...tech]; popSnapshots.after_serial = [...pop]; }
-    else if (year === -500) { techSnapshots.after_colonial = [...tech]; popSnapshots.after_colonial = [...pop]; }
-    else if (year === -200) { techSnapshots.after_industrial = [...tech]; popSnapshots.after_industrial = [...pop]; }
+    // Era snapshots keyed to tech-threshold crossings, not fixed calendar years.
+    // Each snapshot fires the first time any core reaches the threshold — so the
+    // snapshot always captures a meaningful transition regardless of seed pacing.
+    const maxCoreTech = cores.length > 0 ? Math.max(...cores.map(c => tech[c])) : 0;
+    if (!techSnapshots.after_antiquity && maxCoreTech >= 3.0) {
+      techSnapshots.after_antiquity = [...tech]; popSnapshots.after_antiquity = [...pop];
+    }
+    if (!techSnapshots.after_serial && maxCoreTech >= 5.0) {
+      techSnapshots.after_serial = [...tech]; popSnapshots.after_serial = [...pop];
+    }
+    if (!techSnapshots.after_colonial && maxCoreTech >= 7.0) {
+      techSnapshots.after_colonial = [...tech]; popSnapshots.after_colonial = [...pop];
+    }
+    if (!techSnapshots.after_industrial && maxCoreTech >= 9.0) {
+      techSnapshots.after_industrial = [...tech]; popSnapshots.after_industrial = [...pop];
+    }
 
     // Timeline snapshot (for future slider)
     if (tick % 4 === 0) { // Every 200 years
@@ -787,13 +811,17 @@ export function simulate(world, params = null) {
       status = "tributary";
     }
 
+    // Era-of-contact labelled by the absorbing polity's tech level at the moment
+    // of absorption, not by calendar year — so the label reflects what kind of
+    // civilisation did the absorbing, regardless of seed pacing.
     let era = null;
     if (absorbedTick[i] !== null) {
-      const cy = START_YEAR + absorbedTick[i] * TICK_YEARS;
-      if (cy < -2000) era = "sail";
-      else if (cy < -500) era = "colonial";
-      else if (cy < -200) era = "industrial";
-      else era = "nuclear";
+      const at = absorbedTech[i] ?? 1.0;
+      if (at < 3.0)      era = "stone";
+      else if (at < 5.0) era = "sail";
+      else if (at < 7.0) era = "colonial";
+      else if (at < 9.0) era = "industrial";
+      else               era = "nuclear";
     }
 
     states.push({

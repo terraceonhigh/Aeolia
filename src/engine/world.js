@@ -69,33 +69,12 @@ export function buildWorld(seed) {
       if (d < bestDot) { bestDot = d; reachArch = i; latticeArch = j; }
     }
   }
+  // Reach is whichever of the antipodal pair is further north — no geographic override.
+  // The antipodal selection already gives them maximally contrasting positions; peak
+  // geometry is left to the seed's own RNG so it can vary across worlds.
   if (archs[reachArch].cy < archs[latticeArch].cy) {
     [reachArch, latticeArch] = [latticeArch, reachArch];
   }
-
-  // ── Override core archs with bible-mandated geographies ──
-  function regenPeaks(arch, prng, size, n, wRange, hMul) {
-    const { cx, cy, cz } = arch;
-    let rx = -cz, ry = 0, rz = cx;
-    const rl = Math.sqrt(rx * rx + rz * rz) || 1; rx /= rl; rz /= rl;
-    const fx = cy * rz, fy = cz * rx - cx * rz, fz = -cy * rx;
-    const peaks = [];
-    for (let i = 0; i < n; i++) {
-      const ang = prng() * 6.283, dist = (0.2 + prng() * 0.8) * size * 0.12;
-      const ca = Math.cos(ang), sa = Math.sin(ang);
-      let px = cx + dist * (ca * rx + sa * fx);
-      let py = cy + dist * (ca * ry + sa * fy);
-      let pz = cz + dist * (ca * rz + sa * fz);
-      const pl = Math.sqrt(px * px + py * py + pz * pz); px /= pl; py /= pl; pz /= pl;
-      const w = wRange[0] + prng() * wRange[1] * size;
-      const rawH = ISLAND_MAX_HEIGHT * (0.4 + prng() * 0.6) * hMul;
-      peaks.push({ px, py, pz, h: Math.min(ISLAND_MAX_HEIGHT, rawH), w, w2inv: 3.0 / (w * w) });
-    }
-    arch.peaks = peaks;
-    arch.shelfR = size * 0.12;
-  }
-  regenPeaks(archs[reachArch], mulberry32(seed * 7 + 1), 1.8, 14, [0.005, 0.008], 1.2);
-  regenPeaks(archs[latticeArch], mulberry32(seed * 13 + 2), 0.8, 22, [0.004, 0.006], 1.0);
 
   // ── Generate plateau edge network from proximity ──
   const pairDists = [];
