@@ -23,6 +23,7 @@
 | `the_malthusian_clamp.md` | Pre/post-tech-4 population regime; fishery exception; Boserupian release; interaction with desperation cascade | §22 | Malthus (1798), Boserup (1965) |
 | `the_collapse_cascade.md` | maintenance_cost = tech²; Tainter diminishing returns; Cline network contagion; asymmetric decay/recovery | §23 | Tainter (1988), Cline (2014) |
 | `the_desperation_trap.md` | Desperation cascade mechanics; why rational expansion makes things worse; expansion-failure spiral | §23 (related) | — |
+| `the_environmental_shocks.md` | Crop failure (Le Roy Ladurie; Davis; tech-gated probability); fishery depletion (Hardin 1968 tragedy of the commons; Ostrom 1990); commons governance gap | — | Hardin (1968), Ostrom (1990), Davis (2001) |
 | `the_piety_dynamics.md` | Norris-Inglehart secular transition; Grzymala-Busse schism (§20); centripetal force mechanic (§21); gaps | §19, §20, §21 | Norris & Inglehart (2004), Grzymala-Busse (2023), Weber (1904) |
 | `the_veto_players_trap.md` | Tsebelis veto players; institutional crisis fragility; desperation cascade interaction | — | Tsebelis (2002) |
 | `the_disease_arc.md` | Virgin-soil (Diamond); endemicity transition (McNeill); epidemic waves (§17); urban sink (§18) | §14, §15, §17, §18 | Diamond (1997), McNeill (1976), Davenport (2020) |
@@ -68,4 +69,4 @@
 
 ---
 
-*Index last updated: 2026-04-09, Session 5. 23 observations, 10 fragments.*
+*Index last updated: 2026-04-09, Session 5. 24 observations, 10 fragments.*
