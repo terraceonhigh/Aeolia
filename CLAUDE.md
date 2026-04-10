@@ -152,7 +152,7 @@ Aeolia/
 
 SimParams now has **33 optimizer-tunable parameters**.
 
-**Worldbuilding corpus (2026-04-09 sessions 3-6):** 5 series, 46 chapters, 24 garden observations + 10 fragments:
+**Worldbuilding corpus (2026-04-09 sessions 3-6):** 5 series, 46 chapters, 26 garden observations + 11 fragments:
 - **Reach history**: 12 chapters (Ch. 1-12, complete)
 - **Reach civics** (Our Reach Our Trade, 11th ed. "Young Person's Guide"): **8 chapters** (Ch. 1-2: ch1.md, ch2.md; Ch. 3-6: guide_ch3-6.md; Ch. 7: guide_ch7.md; Ch. 8: guide_ch8.md)
   - Ch. 7: The World the Reach Made — commercial language, institutional persistence, North/Greif
@@ -161,15 +161,21 @@ SimParams now has **33 optimizer-tunable parameters**.
 - **Lattice history** (Intro to Lattice History): 10 chapters (Ch. 1-10, complete)
 - **Lattice civics** (The Circuit and the Contract): 9 chapters (Ch. 1-9, complete series)
   - Ch. 9: Reform, Tradition, and the Sovereignty's Future — North/Pierson path dependence, Putnam social capital, Ostrom polycentric governance, Tilly
-- **Garden** (Clio's working space): 24 observations, 10 fragments + GARDEN_INDEX.md
-  - **All 29 ACADEMIC_GROUNDING.md sections (§1–§29) now have `→ Garden:` cross-references**
-  - §26–§27 (Environmental Mechanics) added session 5; §28–§29 (Collective Action + Veto Players) added session 6
-  - Observations added session 5: crop_culture_seed, malthusian_clamp, three_layer_trade, growth_machine, thalassocratic_condition, strange_equilibrium, collapse_cascade, relay_advantage, resource_curse, culture_engine, disease_arc, environmental_shocks
-  - All pre-existing observations (desperation_trap, veto_players_trap, piety_dynamics, etc.) now have § cross-references
+- **Garden** (Clio's working space): 26 observations, 11 fragments + GARDEN_INDEX.md
+  - **All 32 ACADEMIC_GROUNDING.md sections (§1–§32) now have garden cross-references or worldbuilding coverage**
+  - Observations added session 6: the_scramble_dynamics.md, the_culture_allocation_link.md
+  - the_strange_equilibrium.md updated with new "Approach to Parity" section (§30 Organski/Gilpin)
+  - Fragments added session 6: sovereignty_commerce_council_y98.md (Year 98 SP, Sovereignty internal review)
+
+**Engine improvements (session 6):**
+- Davis (2001) crop failure amplification by extractiveness (`davis_amplification=0.30`)
+- Ostrom (1990) commons governance in fishery depletion (`ostrom_commons_factor=0.55`)
+- McNeill tech-gated wave epidemic mortality (`waveMortScale` in Stage 5b)
+- SimParams now has **36 optimizer-tunable parameters** (added: davis_amplification, ostrom_commons_factor; stubs in Python sim)
 
 **Next steps:**
 - GitHub push (requires MacBook Neo — Aomori lacks stored credentials)
-- Optimizer rerun with all 33 parameters if DF timing refinement is desired (optional — current defaults well-calibrated)
+- Optimizer rerun optional — new mechanics (davis, ostrom, wave mortality) may affect calibration at margin
 
 ## Running the Sim
 
