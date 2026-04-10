@@ -18,6 +18,7 @@
 | `the_lock_in_mechanics.md` | AR extractiveness buildup formula; reversal-of-fortune diagnostic; Spearman r on seed 216089 | §25 | Acemoglu-Robinson (2001, 2012), North (1990) |
 | `the_terms_of_trade_ratchet.md` | Prebisch-Singer bulk discount; Greif administered relay; historical commodity price cycles | §10 | Prebisch (1950), Singer (1950) |
 | `the_relay_advantage.md` | Greif Maghribi trader coalition; relayBonusA formula; geographic chokepoints; coalition enforcement gap | §9 | Greif (1989, 1993) |
+| `the_staple_trap.md` | Innis staple trap; nori relay specialist economies; relay prosperity → structural exposure at transitions; post-DF proxy competition vulnerability | §33 | Innis (1930, 1940), Watkins (1963) |
 | `the_three_layer_trade_system.md` | Subsistence (Braudel material life) / Relay (Abu-Lughod polycentric) / Administered (Wallerstein core/periphery) | §8 | Wallerstein (1974), Braudel (1979), Abu-Lughod (1989) |
 | `the_resource_curse.md` | Naphtha curse formula; pyra curse at 60%; Dutch Disease/patronage/conflict mechanisms; Vitalis critique | §11 | Sachs-Warner (1995), Ross (2012) |
 | `the_scramble_dynamics.md` | Three-threshold resource model; naphtha/pyra scramble prisoner's dilemma; Kennedy overextension; Le Billon resource geography | §31 | Le Billon (2012), Kennedy (1987), Westing (1986) |
@@ -73,4 +74,4 @@
 
 ---
 
-*Index last updated: 2026-04-09, Session 6. 26 observations, 12 fragments. ACADEMIC_GROUNDING: 32 sections (§1–§32), all with garden cross-references or worldbuilding coverage.*
+*Index last updated: 2026-04-09, Session 6. 27 observations, 12 fragments. ACADEMIC_GROUNDING: 33 sections (§1–§33), all with garden cross-references or worldbuilding coverage.*

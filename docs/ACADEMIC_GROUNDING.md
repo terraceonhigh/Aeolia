@@ -522,7 +522,28 @@ The Acemoglu-Robinson "reversal of fortune" applies to Aeolia: polities that dev
 
 ---
 
-## XIII. Resource Competition and Strategic Scrambles
+## XIII. Staple Trap and Specialist Economies
+
+### 33. Relay specialist economies and the staple trap (Innis 1930; Watkins 1963)
+**Grade: B−** (emergent, not explicitly encoded)  
+**Files:** `src/engine/SimEngine.js` (relay layer trade, Greif relay bonus), `sim_proxy_v2.py`
+
+**Claim:** Economies built on commodity export develop infrastructure, institutions, and political economies oriented toward that commodity, creating structural barriers to diversification — the "staple trap." In Aeolia, nori-culture relay specialist polities develop commercial dependencies on the relay layer that make them prosperous during the relay era and structurally exposed during transitions to administered trade and post-DF proxy competition. The success of relay specialization creates the conditions for its vulnerability.
+
+**Sources:**
+- Innis, H. (1930). *The Fur Trade in Canada*. University of Toronto Press.
+- Innis, H. (1940). *The Cod Fisheries: The History of an International Economy*. Yale University Press.
+- Watkins, M. (1963). "A Staple Theory of Economic Growth." *Canadian Journal of Economics and Political Science* 29(2).
+
+**Implementation:** The staple trap is emergent rather than mechanically encoded. Nori polities' initial culture seed ([0.35, 0.65] outward/individual) drives high relay bonus capture (Greif mechanism), which drives prosperity → reinforced outward drift. The loop reinforces relay specialization without a mechanic forcing diversification. The trap appears in the data: nori polities in the relay chokepoint position are commercially central and strategically exposed in the post-DF era.
+
+**Gap:** Transportation infrastructure is not modeled; the spatial dimension of Innis's argument (infrastructure orientation constrains switching costs) is absent. The staple trap is visible in commercial data but not in explicit infrastructure constraints.
+
+**→ Garden:** `garden/observations/the_staple_trap.md`
+
+---
+
+## XIV. Resource Competition and Strategic Scrambles
 
 ### 31. Three-threshold resource model and strategic scrambles (Le Billon 2012; Kennedy 1987)
 **Grade: B**  
@@ -543,7 +564,7 @@ The Acemoglu-Robinson "reversal of fortune" applies to Aeolia: polities that dev
 
 ---
 
-## XIV. Collective Action and Institutional Fragility
+## XV. Collective Action and Institutional Fragility
 
 ### 28. Desperation expansion as collective action failure (Olson 1965; Tainter 1988)
 **Grade: B**  
@@ -583,7 +604,7 @@ The Acemoglu-Robinson "reversal of fortune" applies to Aeolia: polities that dev
 
 ---
 
-## XV. Known Gaps (Priority Order)
+## XVI. Known Gaps (Priority Order)
 
 | Gap | Status | Notes |
 |-----|--------|-------|
