@@ -269,10 +269,15 @@ export default function TurnDashboard({
                 <span style={{ ...S.statValue, color: piColor }}>{piLabel} {(piety * 100).toFixed(0)}%</span>
               </>);
             })()}
-            {ps.hasPu && <>
-              <span style={{ ...S.statLabel, color: '#a04030' }}>Plutonium</span>
-              <span style={{ ...S.statValue, color: '#a04030' }}>ACTIVE</span>
-            </>}
+            {snapshot?.pu_scramble_onset_tick && ps.hasPu && (() => {
+              const nuclear = ps.tech >= 9.0;
+              const color = nuclear ? '#a04030' : '#7a6a2a';
+              const label = nuclear ? 'WEAPONS' : 'DEPOSITS';
+              return (<>
+                <span style={{ ...S.statLabel, color }}>Pyra</span>
+                <span style={{ ...S.statValue, color }}>{label}</span>
+              </>);
+            })()}
           </div>
         )}
 
