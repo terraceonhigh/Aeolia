@@ -1184,7 +1184,12 @@ export class SimEngine {
       // Probability: base × contact bonus × density. ~3-8% per tick for trade hubs.
       const epiProb = p.epi_base_severity * 0.015 * (1.0 + nc * 0.2) * Math.max(0.3, density);
       if (this.rng() < epiProb) {
-        const mortality = 0.04 + this.rng() * 0.12;  // 4–16% population loss
+        // McNeill (1976): industrial public health reduces wave epidemic severity.
+        // Pre-germ-theory (tech<5): full severity. Industrial era (tech 5-9): declining mortality.
+        // waveMortScale: 1.0 at tech≤4, down to floor 0.20 at tech≥12 (capped in practice by nuclear)
+        const coreTech = this.tech[core] ?? 0;
+        const waveMortScale = coreTech > 4.0 ? Math.max(0.20, 1.0 - (coreTech - 4.0) * 0.10) : 1.0;
+        const mortality = (0.04 + this.rng() * 0.12) * waveMortScale;  // 4–16% × tech scale
         const sourceName = core;
         // Spread to trade partners with ~35% probability each
         const affected = new Set([core]);

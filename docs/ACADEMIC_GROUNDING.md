@@ -257,9 +257,11 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 - McNeill, W. (1976). *Plagues and Peoples*. Anchor Books.
 - Schmid, B. et al. (2015). "Plague Pathogen Transmission Through Rat Flea." *PNAS* 112(30).
 
-**Implementation:** `priorContacts = count of non-null firstContactTick entries before current tick`. `immunity = min(0.6, priorContacts × 0.02)`. Caps at 60% severity reduction.
+**Implementation:** Per-pair relay contact age (not global count): `relayContactSince` Map records when each pair first established relay trade. `relayAge = tick − relayContactSince[pairKey]`. `immunity = min(0.6, relayAge × 0.04)`. Caps at 60% severity reduction after ~15 ticks of relay trade. Virgin-soil mortality still applies to pairs with no prior relay contact.
 
-**Gap:** The implementation uses a global prior-contact count as a proxy for population-level immunity. A more accurate model would track per-arch contact history and pathogen-specific immunity decay. The endemicity transition also applies only to first contacts, not to epidemic waves.
+Wave epidemic mortality (Stage 5b) uses tech-gated reduction: `waveMortScale = max(0.20, 1.0 − (tech − 4.0) × 0.10)` for tech > 4. At tech 5 → 90% of base; tech 7 → 70%; tech 9 → 50%, floor 20%. Encodes McNeill's finding that industrial public health (sanitation, germ theory, vaccination) substantially reduced epidemic severity even for recurring diseases.
+
+**Gap (partially resolved 2026-04-09):** Per-pair contact age fixed (was global count). Wave epidemic tech-gated mortality implemented. Remaining gap: no pathogen-specific immunity decay, no acquired immunity from prior epidemic waves.
 
 **→ Garden:** `garden/observations/the_disease_arc.md`
 
