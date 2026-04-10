@@ -447,9 +447,9 @@ The Acemoglu-Robinson "reversal of fortune" applies to Aeolia: polities that dev
 - Le Roy Ladurie, E. (1967). *Times of Feast, Times of Famine*. Doubleday.
 - Davis, M. (2001). *Late Victorian Holocausts: El Niño Famines and the Making of the Third World*. Verso.
 
-**Implementation:** `cropFailureModifier[]` per arch; failure probability tech-gated (higher for tech < 5). Failure reduces yield by 20–60%; recovery at +0.25/tick.
+**Implementation:** `cropFailureModifier[]` per arch; failure probability tech-gated (higher for tech < 5). Failure reduces yield by 20–60%; recovery at +0.25/tick. Davis amplification (SimEngine.js): `davisModifier = baseModifier × (1 − extractiveness[archCore] × davis_amplification)`, floored at 0.15. New param: `davis_amplification` (default 0.30) — at extractiveness=1.0, failure modifier is 30% worse than baseline. Not yet ported to Python reference.
 
-**Gap:** Failure impact does not vary by institutional quality. Davis's finding — that extractive administration amplifies crop failure mortality — is not modeled; all polities face uniform recovery regardless of administrative quality.
+**Gap (resolved 2026-04-09):** Davis amplification now implemented in SimEngine.js. Recovery rate remains uniform regardless of institutional quality — a secondary Davis finding (that distribution infrastructure affects recovery speed, not just severity) is not modeled.
 
 **→ Garden:** `garden/observations/the_environmental_shocks.md`
 

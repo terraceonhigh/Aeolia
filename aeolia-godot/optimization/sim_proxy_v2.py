@@ -148,6 +148,9 @@ class SimParams:
     fishery_recovery_rate:      float = 0.04
     fishery_overfish_rate:      float = 0.06
 
+    # Davis (2001) — extractive admin amplifies crop failure (SimEngine.js only; not yet in Python sim)
+    davis_amplification:        float = 0.30   # extractiveness=1.0 worsens failure modifier by 30%
+
 
 DEFAULT_PARAMS = SimParams()
 

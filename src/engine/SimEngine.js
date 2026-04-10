@@ -68,6 +68,8 @@ export const DEFAULT_PARAMS = {
   // Walt balance-of-threat alliance formation (Walt 1987)
   alliance_formation_rate: 0.04,   // alignment drift speed per tick
   alliance_protection_str: 2.5,    // max targeting penalty for aligned-against hegemon
+  // Davis (2001) — extractive administration amplifies crop failure mortality
+  davis_amplification: 0.30,       // extractiveness=1.0 worsens failure modifier by 30%
 };
 
 // ── Crop culture seeds ──────────────────────────────────────
@@ -529,7 +531,12 @@ export class SimEngine {
       const failureProb = p.crop_failure_rate * Math.max(0.3, 1.0 - archTech / 8.0);
       if (this.pop[j] > 2 && this.cropFailureModifier[j] >= 1.0 && this.rng() < failureProb) {
         // 40-75% yield retained during failure
-        this.cropFailureModifier[j] = 0.40 + this.rng() * 0.35;
+        // Davis (2001): extractive administration amplifies crop failure severity —
+        // colonial extraction prevents distribution infrastructure from buffering harvest shocks
+        const baseModifier = 0.40 + this.rng() * 0.35;
+        const extractAmp = this.extractiveness ? (this.extractiveness[archCore] ?? 0) : 0;
+        const davisModifier = baseModifier * (1.0 - extractAmp * (p.davis_amplification ?? 0.30));
+        this.cropFailureModifier[j] = Math.max(0.15, davisModifier);
         this.cropFailureLog.push({ arch: j, core: archCore, tick, year, modifier: this.cropFailureModifier[j] });
       }
     }
