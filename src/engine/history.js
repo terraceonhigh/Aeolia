@@ -49,12 +49,56 @@ export function assignPolitics(archs, plateauEdges, seed, reachArch, latticeArch
   // Build log for sidebar display
   const log = [];
 
-  // Era markers
-  log.push({ arch: -1, name: "Era", faction: "era", status: "marker", label: "Antiquity", contactYr: -20000 });
-  log.push({ arch: -1, name: "Era", faction: "era", status: "marker", label: "Serial Contact", contactYr: -5000 });
-  log.push({ arch: -1, name: "Era", faction: "era", status: "marker", label: "Colonial", contactYr: -2000 });
-  log.push({ arch: -1, name: "Era", faction: "era", status: "marker", label: "Industrial", contactYr: -500 });
-  log.push({ arch: -1, name: "Era", faction: "era", status: "marker", label: "Nuclear", contactYr: -200 });
+  // ── Dynamic era markers ────────────────────────────────────
+  // The sim runs from -20,000 to 0 (400 × 50-year ticks). Where
+  // expansion events actually cluster depends on the seed's tech
+  // pace — hardcoded thresholds leave most eras empty for fast
+  // seeds. Instead, derive pre-colonial boundaries from the data.
+  //
+  // Fixed late-era boundaries (match simulate.js eraOfContact):
+  //   cy < -2000 → "sail"   -2000..-500 → "colonial"
+  //   -500..-200 → "industrial"   ≥ -200 → "nuclear"
+  function _eraMarker(label, contactYr) {
+    return { arch: -1, name: 'Era', faction: 'era', status: 'marker', label, contactYr };
+  }
+
+  // Gather all expansion-event years
+  const _expYears = result.log
+    .filter(e => e.year != null)
+    .map(e => e.year)
+    .sort((a, b) => a - b);
+
+  const _simStart = _expYears.length > 0 ? _expYears[0] - 2000 : -20000;
+
+  // Pre-colonial events (cy < -2000): split into two eras at the median
+  const _preCYears = _expYears.filter(y => y < -2000);
+
+  if (_preCYears.length === 0) {
+    // No events before colonial — just show founding + sail stubs
+    log.push(_eraMarker('Founding',     -20000));
+    log.push(_eraMarker('Age of Sail',  -10000));
+  } else {
+    const _first   = _preCYears[0];
+    const _midIdx  = Math.floor(_preCYears.length / 2);
+    const _midYear = _preCYears[_midIdx];
+
+    // "Founding" starts the entire timeline (no events here by definition)
+    log.push(_eraMarker('Founding', _simStart));
+
+    // "First Contact" label lands at the very first expansion event
+    log.push(_eraMarker('First Contact', _first));
+
+    // "Age of Sail" splits the remaining pre-colonial events at the median —
+    // only emit if it would create a non-trivial second bucket (> 200 years gap)
+    if (_midYear > _first + 200 && _midYear < -2100) {
+      log.push(_eraMarker('Age of Sail', _midYear));
+    }
+  }
+
+  // Fixed late-era markers (always present, match sim canonical thresholds)
+  log.push(_eraMarker('Colonial',   -2000));
+  log.push(_eraMarker('Industrial',  -500));
+  log.push(_eraMarker('Nuclear',     -200));
 
   // Expansion events
   for (const ev of result.log) {

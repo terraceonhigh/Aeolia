@@ -341,34 +341,34 @@ export function getDispatchEntry(type, data, names, tick) {
         'A generation of sustained trade contact has reoriented your people outward.',
         'The last century of consolidation has turned your institutions inward.',
         'Prosperity and open markets have individualized your commercial culture.',
-        'Resource pressure and collective response have reinforced communal institutions.',
-        'Absorbing new territory has introduced competing cultural currents.',
-        'The intellectual class in your qahwa houses has turned the political conversation.',
+        'Resource pressure and collective response have reinforced your communal institutions.',
+        'Absorbing new territory has introduced competing cultural currents into your home archipelago.',
+        'The intellectual class in your qahwa houses has turned your political conversation.',
       ], s);
-      return `CULTURAL OBSERVER — Disposition has shifted to ${label}. ${reason}`;
+      return `CULTURAL OBSERVER — Your disposition has shifted to ${label}. ${reason}`;
     }
 
     case 'sovereignty_stabilized': {
       const name = data?.name || 'the territory';
       const how = pick([
-        'Garrison rotations have normalized. Tax collection is proceeding.',
-        'A new administrative compact has reduced local resistance.',
-        'The harbor market has recovered. Revenue is flowing.',
-        'Three years without incident. The occupation has become administration.',
+        'Your garrison rotations have normalized. Tax collection is proceeding.',
+        'A new administrative compact has reduced local resistance to your authority.',
+        'Your harbor market has recovered. Revenue is flowing again.',
+        'Three years without incident. Your occupation has become administration.',
       ], s);
-      return `INTERNAL AFFAIRS — ${name} has stabilized. ${how}`;
+      return `INTERNAL AFFAIRS — Your holding ${name} has stabilized. ${how}`;
     }
 
     case 'sovereignty_critical': {
       const name = data?.name || 'a holding';
       const incident = pick([
-        'tax resistance at three collection points',
-        'a garrison incident near the harbor market',
-        'public demonstrations outside the administrative compound',
-        'underground organizing among dock workers',
-        'two administrators requesting emergency relief',
+        'tax resistance at three of your collection points',
+        'a garrison incident near your harbor market',
+        'public demonstrations outside your administrative compound',
+        'underground organizing among your dock workers',
+        'two of your administrators requesting emergency relief',
       ], s);
-      return `INTERNAL AFFAIRS — ${name} approaching revolt threshold. Reports of ${incident}.`;
+      return `INTERNAL AFFAIRS — Your holding ${name} is approaching revolt threshold. Reports of ${incident}.`;
     }
 
     case 'trade_growth': {
@@ -376,98 +376,98 @@ export function getDispatchEntry(type, data, names, tick) {
       const good = pick([
         `Dried bakala stockfish has appeared in your waterfront markets from a source four hops distant.`,
         `Marich from southern routes has entered your spice trade for the first time.`,
-        `Saak oil from a newly contacted northern partner is displacing local sources.`,
+        `Saak oil from a newly contacted northern partner is displacing local sources in your harbor district.`,
         `Char from a western archipelago has arrived in your qahwa houses.`,
-        `Seric cloth of foreign weave is appearing in the upper-harbor markets.`,
+        `Seric cloth of foreign weave is appearing in your upper-harbor markets.`,
         `Kauri shell currency from an eastern contact is circulating in your port districts.`,
       ], s);
-      return `MERCHANT GUILD — Network now spans ${ct} foreign polities. ${good}`;
+      return `MERCHANT GUILD — Your trade network now spans ${ct} foreign polities. ${good}`;
     }
 
     case 'saak_displacement': {
       const name = data?.name || 'a contact';
       return pick([
-        `MERCHANT GUILD — Naphtha refineries have undercut saak oil prices on the relay network. ${name}'s rendering economy faces structural disruption. The grease trails that made them wealthy are becoming unprofitable one route at a time.`,
-        `MERCHANT GUILD — Saak oil has lost its margin against naphtha in your common markets. ${name}'s coastal fishing communities are bearing the cost. Their relay relationships will survive only if they find new commodities to carry.`,
-        `MERCHANT GUILD — The price of saak oil has fallen below the rendering cost for the smaller operations in ${name} territory. The fishing villages continue; the commercial network around them is contracting.`,
+        `MERCHANT GUILD — Naphtha refineries have undercut saak oil prices on your relay network. ${name}'s rendering economy faces structural disruption. The grease trails that made them wealthy are becoming unprofitable one route at a time.`,
+        `MERCHANT GUILD — Saak oil has lost its margin against naphtha in your common markets. ${name}'s coastal fishing communities are bearing the cost. Their relay relationships with your merchants will survive only if they find new commodities to carry.`,
+        `MERCHANT GUILD — The price of saak oil has fallen below the rendering cost for the smaller operations in ${name} territory. Your relay relationships with their fishing villages continue; the commercial network around them is contracting.`,
       ], s);
     }
 
     case 'epidemic_wave': {
       const name = data?.name || 'a contact';
       const severity = data?.severity || 'moderate';
-      return `ADMIRALTY INTELLIGENCE — ${severity === 'severe' ? 'Severe' : 'Moderate'} epidemic wave reported in ${name}. Trade-route propagation is likely. Your port authorities have been advised.`;
+      return `ADMIRALTY INTELLIGENCE — ${severity === 'severe' ? 'Severe' : 'Moderate'} epidemic wave has hit ${name}. Your trade routes create propagation vectors. Your port authorities have been advised.`;
     }
 
     case 'naphtha_scramble': {
-      return `ADMIRALTY INTELLIGENCE — Multiple powers are now contesting naphtha-bearing islands on your frontier. The scramble is underway. Commercial control will precede political control — for now.`;
+      return `ADMIRALTY INTELLIGENCE — Multiple powers are now contesting naphtha-bearing islands on your frontier. Your commercial access is at risk. Control of deposits will precede political control — for now.`;
     }
 
     case 'pyra_revaluation': {
-      return `ADMIRALTY INTELLIGENCE — Fission has been demonstrated. Every pyra deposit on Aeolia has changed strategic value overnight. Geological surveys are being reclassified. The scramble has a new object.`;
+      return `ADMIRALTY INTELLIGENCE — Fission has been demonstrated. Every pyra deposit in your survey records has changed strategic value overnight. Your geological files are being reclassified. The scramble has a new object.`;
     }
 
     case 'tech_decay': {
       const from = data?.from?.toFixed(1) || '?';
       const to = data?.to?.toFixed(1) || '?';
       const deficit = pick([
-        'Energy reserves below maintenance threshold.',
-        'Research institution funding has lapsed.',
-        'Scholar recruitment and retention has collapsed.',
+        'Your energy reserves have fallen below the maintenance threshold.',
+        'Your research institution funding has lapsed.',
+        'Your scholar recruitment and retention has collapsed.',
       ], s);
-      return `INTERNAL AFFAIRS — Technology has declined: ${from} → ${to}. ${deficit}`;
+      return `INTERNAL AFFAIRS — Your technology level has declined: ${from} → ${to}. ${deficit}`;
     }
 
     case 'piracy_incident': {
       const route = pick([
-        'the northern relay corridor',
-        'frontier trade lanes',
-        'southern convoy routes',
+        'your northern relay corridor',
+        'your frontier trade lanes',
+        'your southern convoy routes',
         'the island chain connecting your outer holdings',
       ], s);
-      return `MERCHANT GUILD — Piracy reported on ${route}. Cargo losses above seasonal average. Escort allocation review underway.`;
+      return `MERCHANT GUILD — Your cargo ships are reporting losses on ${route}. Seizures above seasonal average. Your escort allocation is under review.`;
     }
 
     case 'crop_failure': {
       const archName = data?.archName || 'a holding';
       const pct = data?.pct || '?';
       const cause = pick([
-        'Unseasonal drought reduced standing water depth across the paddy terraces.',
-        'Late-season storm damage has cut yield estimates substantially.',
-        'Disease pressure in the grain stores detected post-harvest.',
-        'Pest outbreak across the cultivated terraces reported by agricultural surveyors.',
+        'Unseasonal drought reduced standing water depth across your paddy terraces.',
+        'Late-season storm damage has cut your yield estimates substantially.',
+        'Disease pressure in your grain stores detected post-harvest.',
+        'Pest outbreak across your cultivated terraces reported by your agricultural surveyors.',
       ], s);
-      return `INTERNAL AFFAIRS — Crop failure in ${archName}. Yield reduced ${pct}% this season. ${cause} Food surplus will contract.`;
+      return `INTERNAL AFFAIRS — Crop failure in your holding ${archName}. Yield reduced ${pct}% this season. ${cause} Your food surplus will contract.`;
     }
 
     case 'fishery_collapse': {
       const archName = data?.archName || 'a coastal territory';
       const stock = data?.stock != null ? `${Math.round(data.stock * 100)}%` : 'critically low';
       const note = pick([
-        'Sustained extraction above regenerative capacity has triggered stock collapse.',
-        'Commercial harvest has outpaced natural recovery for multiple seasons.',
-        'The fishing villages continue operating; the returns are no longer there.',
+        'Sustained extraction above regenerative capacity has triggered stock collapse in your waters.',
+        'Your commercial harvest has outpaced natural recovery for multiple seasons.',
+        'Your fishing villages continue operating; the returns are no longer there.',
       ], s);
-      return `MERCHANT GUILD — Fishery collapse in ${archName}. Stock at ${stock} of sustainable level. ${note} Caloric shortfall imminent.`;
+      return `MERCHANT GUILD — Fishery collapse in your waters near ${archName}. Stock at ${stock} of sustainable level. ${note} Caloric shortfall imminent.`;
     }
 
     case 'dark_forest_detected': {
       return pick([
-        `ADMIRALTY INTELLIGENCE — NUCLEAR PEER DETECTED. Reactor-isotope signatures from survey aircraft confirm a second pyra-capable civilization. Dark Forest protocol initiated. Every subsequent interaction carries systemic risk.`,
-        `ADMIRALTY INTELLIGENCE — NUCLEAR PEER CONFIRMED. Signals intelligence has resolved a second-strike-capable peer across the dark water. The mutual-annihilation constraint is now operative. Expansion between hegemons is frozen.`,
-        `ADMIRALTY INTELLIGENCE — FISSION PEER DETECTED. We are no longer the only civilization with this capability. They know about us. The Strange Peace has begun — not by agreement, but by the math of mutual destruction.`,
+        `ADMIRALTY INTELLIGENCE — NUCLEAR PEER DETECTED. Reactor-isotope signatures from your survey aircraft confirm a second pyra-capable civilization. Your Dark Forest protocol is initiated. Every subsequent interaction carries systemic risk.`,
+        `ADMIRALTY INTELLIGENCE — NUCLEAR PEER CONFIRMED. Your signals intelligence has resolved a second-strike-capable peer across the dark water. The mutual-annihilation constraint is now operative. Your expansion is frozen against theirs.`,
+        `ADMIRALTY INTELLIGENCE — FISSION PEER DETECTED. You are no longer the only civilization with this capability. They know about you. The Strange Peace has begun — not by agreement, but by the math of mutual destruction.`,
       ], s);
     }
 
     case 'schism': {
       const count = data?.count || 1;
       const cause = pick([
-        'Reports of doctrinal dispute in peripheral communities have resolved into territorial fact.',
-        'The religious revival that began as ferment has become fracture.',
-        'Long-standing regional grievance found its expression in doctrinal rather than political language — and has now become both.',
-        'Peripheral communities that lacked the means to resist taxation have found in religious autonomy what they lacked in military strength.',
+        'Reports of doctrinal dispute in your peripheral communities have resolved into territorial fact.',
+        'The religious revival that began in your outer islands as ferment has become fracture.',
+        'Long-standing grievance against your center found its expression in doctrinal language — and has now become both.',
+        'Your peripheral communities, lacking military means to resist your taxation, have found in religious autonomy what they lacked in arms.',
       ], s);
-      return `INTERNAL AFFAIRS — Schism event: ${count} peripheral holding${count > 1 ? 's' : ''} lost to religious fragmentation. ${cause} Sovereignty has collapsed in the affected territory. Administrative and religious response required.`;
+      return `INTERNAL AFFAIRS — Schism: ${count} of your peripheral holding${count > 1 ? 's have' : ' has'} broken to religious fragmentation. ${cause} Your sovereignty has collapsed in the affected territory. Administrative and religious response required.`;
     }
 
     default:
@@ -651,9 +651,9 @@ export function getReligiousRevivalDispatch(polityName, piety, seed) {
   const s = seed ?? 0;
   const intensity = piety > 0.80 ? 'HIGH' : piety > 0.65 ? 'ELEVATED' : 'MODERATE';
   return pick([
-    `INTERNAL AFFAIRS — Religious activity index at ${intensity} across ${polityName} territory. Integration rates in newly absorbed archipelagos exceeding baseline. Sovereignty acceleration detected.`,
-    `INTERNAL AFFAIRS — Piety index elevated to ${intensity} in ${polityName}. Missionary expansion pressure building. Absorption efficiency in tropical territories above projection.`,
-    `INTERNAL AFFAIRS — Fervor reading: ${intensity}. ${polityName} faith infrastructure deployment in peripheral territories outpacing administrative settlement. Recommend monitoring conversion rates.`,
+    `INTERNAL AFFAIRS — Your religious activity index is at ${intensity}. Your integration rates in newly absorbed archipelagos are exceeding baseline. Sovereignty acceleration detected.`,
+    `INTERNAL AFFAIRS — Your piety index has elevated to ${intensity}. Missionary expansion pressure is building in your outer territories. Your absorption efficiency in tropical holdings is above projection.`,
+    `INTERNAL AFFAIRS — Your fervor reading: ${intensity}. Your faith infrastructure is deploying in peripheral territories faster than your administrative settlement. Conversion rates recommended for monitoring.`,
   ], s);
 }
 
@@ -680,9 +680,9 @@ export function getColonialResistanceDispatch(archName, grievanceLevel, seed) {
   const s = seed ?? 0;
   const level = grievanceLevel > 0.7 ? 'HIGH' : grievanceLevel > 0.45 ? 'ELEVATED' : 'MODERATE';
   return pick([
-    `INTERNAL AFFAIRS — Grievance index ${level} in ${archName}. Extraction above tolerable threshold. Sovereignty recovery rate accelerating. Recommend extraction reduction or administrative investment.`,
-    `INTERNAL AFFAIRS — ${archName} resistance indicators at ${level}. Non-compliance with administered extraction quotas. Historical pattern: this precedes formal sovereignty challenges by 2–4 generations.`,
-    `INTERNAL AFFAIRS — Colonial resistance reading ${level}. ${archName} population demonstrating coordinated withdrawal from administered market participation. Extraction efficiency declining despite unchanged rates.`,
+    `INTERNAL AFFAIRS — Your holding ${archName}: grievance index ${level}. Your extraction is above the tolerable threshold. Sovereignty recovery rate accelerating against you. Recommend extraction reduction or administrative investment.`,
+    `INTERNAL AFFAIRS — Your holding ${archName}: resistance indicators at ${level}. Non-compliance with your administered extraction quotas. Historical pattern: this precedes formal sovereignty challenges by 2–4 generations.`,
+    `INTERNAL AFFAIRS — Your holding ${archName}: colonial resistance reading ${level}. Your population is demonstrating coordinated withdrawal from administered market participation. Your extraction efficiency is declining despite unchanged rates.`,
   ], s);
 }
 

@@ -211,8 +211,16 @@ export function computeSubstrate(archs, plateauEdges, seed, naphthaRichness = 2.
       crops: {
         primary_crop: primaryCrop, secondary_crop: secondaryCrop,
         primary_yield: primaryYield,
+        can_grow: canGrow,
       },
-      trade_goods: { total_trade_value: totalTradeValue },
+      trade_goods: {
+        total_trade_value: totalTradeValue,
+        stimulant: stimType || null, stimulant_prod: stimProd,
+        fiber: fiberType || null, fiber_prod: fiberProd,
+        protein: protType || null, protein_prod: protProd,
+        nori_export: noriExport,
+        stimulant_deficit: stimType === "" && stimProd === 0.0,
+      },
       minerals,
       culture_pos: culturePos,
       culture: _cultureLabelFromPos(culturePos),
@@ -289,6 +297,7 @@ export function computeSubstrate(archs, plateauEdges, seed, naphthaRichness = 2.
       const oldCrop = sub.crops.primary_crop;
       sub.crops.primary_crop = cropName;
       sub.crops.primary_yield = Math.max(0.5, Math.round(bestScore * 100) / 100);
+      if (sub.crops.can_grow) sub.crops.can_grow[cropName] = true;
 
       // Update trade goods deterministically (no rng)
       const stimP  = STIM_MAP2[cropName]  ? 0.45 : 0.0;
@@ -299,6 +308,14 @@ export function computeSubstrate(archs, plateauEdges, seed, naphthaRichness = 2.
         : (sub.climate.upwelling > 0.2 ? 0.15 : 0.0);
       sub.trade_goods.total_trade_value =
         stimP * 0.4 + fiberP * 0.3 + protP * 0.2 + noriX * 0.3;
+      sub.trade_goods.stimulant      = STIM_MAP2[cropName]  || null;
+      sub.trade_goods.stimulant_prod = stimP;
+      sub.trade_goods.fiber          = FIBER_MAP2[cropName] || null;
+      sub.trade_goods.fiber_prod     = fiberP;
+      sub.trade_goods.protein        = PROT_MAP2[cropName]  || null;
+      sub.trade_goods.protein_prod   = protP;
+      sub.trade_goods.nori_export    = noriX;
+      sub.trade_goods.stimulant_deficit = !STIM_MAP2[cropName];
 
       // Shift culture_pos toward new crop's seed while preserving geographic offset
       const oldSeed = _CROP_CULTURE_SEED[oldCrop]  || [0, 0];

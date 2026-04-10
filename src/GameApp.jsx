@@ -13,7 +13,7 @@ import { mulberry32 } from './engine/rng.js';
 import { generateSituationCards } from './engine/cardGenerator.js';
 import { getDispatchEntry, getCultureLabel, describeCulture, getReligiousRevivalDispatch, getColonialResistanceDispatch } from './engine/narrativeText.js';
 import PolitySelect from './components/PolitySelect.jsx';
-import TurnDashboard from './components/TurnDashboard.jsx';
+import TurnDashboard, { CommandBar, FeedZone } from './components/TurnDashboard.jsx';
 import EventPopup, { ERA_DESCRIPTIONS, TECH_MILESTONES } from './components/EventPopup.jsx';
 import { FOCUSES } from './components/TurnDashboard.jsx';
 
@@ -107,6 +107,8 @@ const INITIAL_STATE = {
   culturePolicyIO: 0,
   sovFocusTargets: new Set(),
   scoutActive: false,
+  // Globe selection
+  selectedArch: null,
   // Per-turn situation cards
   pendingCards: [],
   dismissedCardIds: new Map(), // cardId → tick dismissed; cleared after 25 turns
@@ -155,9 +157,27 @@ function gameReducer(state, action) {
     }
 
     case 'APPLY_CARD': {
-      // Remove the card, then optionally execute its sub-action
+      // Find the card for its title
+      const card = state.pendingCards.find(c => c.id === action.cardId);
       const nextCards = state.pendingCards.filter(c => c.id !== action.cardId);
-      const base = { ...state, pendingCards: nextCards };
+
+      // Emit a confirmation dispatch entry (player feedback / Zeigarnik loop)
+      const label = (action.actionLabel || '').toUpperCase();
+      const isDismiss = !action.subAction || label === 'DISMISS';
+      let confirmText = '';
+      if (card && !isDismiss) {
+        confirmText = `YOUR ORDERS — ${card.title}: ${label}. Order logged.`;
+      } else if (card) {
+        confirmText = `YOUR ORDERS — ${card.title}: situation filed. No immediate action taken.`;
+      }
+      const tick = state.snapshot?.tick || 60;
+      const year = state.snapshot?.year;
+      const yr = year != null ? (year < 0 ? `${Math.abs(year)}BP` : `${year}CE`) : `T${tick}`;
+      const confirmEntry = confirmText
+        ? [{ yearStr: yr, text: confirmText, color: '#6a8a6a' }]
+        : [];
+
+      const base = { ...state, pendingCards: nextCards, eventLog: [...state.eventLog, ...confirmEntry] };
       return action.subAction ? gameReducer(base, action.subAction) : base;
     }
 
@@ -187,6 +207,12 @@ function gameReducer(state, action) {
 
     case 'DISMISS_POPUP':
       return { ...state, pendingPopup: null, timerKey: state.timerKey + 1 };
+
+    case 'SELECT_ARCH': {
+      // Toggle selection — clicking same arch again clears it
+      const next = state.selectedArch === action.archIdx ? null : action.archIdx;
+      return { ...state, selectedArch: next };
+    }
 
     case 'TOGGLE_TARGET': {
       const next = new Set(state.selectedTargets);
@@ -1070,7 +1096,9 @@ function GameInner({ seed, onBack }) {
         const ai = hits[0].object.userData.archIdx;
         if (ai !== undefined) {
           if (game.phase === 'PLAYING') {
-            // Toggle expansion target if on frontier
+            // Select arch to show detail panel (any visible arch)
+            dispatch({ type: 'SELECT_ARCH', archIdx: ai });
+            // Also toggle expansion target if on frontier
             const onFrontier = game.frontier.some(f => f.index === ai);
             if (onFrontier) dispatch({ type: 'TOGGLE_TARGET', target: ai });
           }
@@ -1144,11 +1172,14 @@ function GameInner({ seed, onBack }) {
     dispatch({ type: 'TOGGLE_SCOUT' });
   }, []);
 
-  const handleApplyCard = useCallback((cardId, subAction) => {
-    dispatch({ type: 'APPLY_CARD', cardId, subAction });
+  const handleApplyCard = useCallback((cardId, subAction, actionLabel) => {
+    dispatch({ type: 'APPLY_CARD', cardId, subAction, actionLabel });
   }, []);
 
   // ── Render ─────────────────────────────────────────────
+
+  const isPlaying = game.phase === 'PLAYING' || game.phase === 'GAME_OVER';
+  const timerDuration = game.speed > 0 ? 10000 / game.speed : 10000;
 
   return (
     <div style={{
@@ -1156,43 +1187,52 @@ function GameInner({ seed, onBack }) {
       fontFamily: "'JetBrains Mono','Fira Code',monospace",
       display: 'flex', flexDirection: 'column', overflow: 'hidden',
     }}>
-      {/* Header */}
+      {/* ── App header (slim title bar) ── */}
       <div style={{
-        padding: '8px 20px', borderBottom: '1px solid #2a1f14', flexShrink: 0,
+        padding: '5px 16px', borderBottom: '1px solid #2a1f14', flexShrink: 0,
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         background: 'linear-gradient(180deg,#120e08,#0a0804)',
+        height: 32,
       }}>
-        <div>
-          <div style={{ fontSize: 9, color: '#8a7a5a', letterSpacing: '3px', textTransform: 'uppercase', marginBottom: 1 }}>
-            Game Mode
-          </div>
-          <div style={{ fontSize: 14, color: '#d4b896', fontWeight: 600 }}>
-            AEOLIA — STRATEGY
-          </div>
+        <div style={{ fontSize: 11, color: '#d4b896', fontWeight: 600, letterSpacing: '2px' }}>
+          AEOLIA
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ fontSize: 8, color: '#6a5a3a' }}>seed {seed}</div>
+          <div style={{ fontSize: 8, color: '#4a3a2a', letterSpacing: '1px' }}>seed {seed}</div>
           <button onClick={onBack} style={{
-            padding: '4px 12px', fontSize: 8, fontFamily: 'inherit', cursor: 'pointer',
+            padding: '2px 10px', fontSize: 8, fontFamily: 'inherit', cursor: 'pointer',
             background: '#14100a', border: '1px solid #2a1f14', color: '#8a7a5a',
             letterSpacing: '1px', borderRadius: 2,
-          }}>
-            Observatory
-          </button>
+          }}>Observatory</button>
         </div>
       </div>
 
-      {/* Content */}
+      {/* ── Zone A: CommandBar (turn stats + timer + focus) ── */}
+      {isPlaying && (
+        <CommandBar
+          snapshot={game.snapshot}
+          playerCore={game.playerCore}
+          activeFocus={game.activeFocus}
+          speed={game.speed}
+          onSetSpeed={handleSetSpeed}
+          timerKey={game.timerKey}
+          timerDuration={timerDuration}
+          timerPaused={!!game.pendingPopup}
+          onAdvance={handleAdvance}
+          finished={game.phase === 'GAME_OVER'}
+        />
+      )}
+
+      {/* ── Zone B (globe) + Zone C (context panel) ── */}
       <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
-        {/* Globe */}
+
+        {/* Globe — map primacy */}
         <div style={{ flex: 1, position: 'relative', overflow: 'hidden', minWidth: 0 }}>
           <div ref={mountRef} style={{ width: '100%', height: '100%', cursor: 'grab' }}
             onPointerDown={onPointerDown} onPointerMove={onPointerMove}
             onPointerUp={onPointerUp} onPointerLeave={() => { dragData.current.active = false; }}
             onWheel={onWheel}
           />
-
-          {/* Polity Select overlay */}
           {game.phase === 'SELECT_POLITY' && (
             <PolitySelect
               archs={world.archs}
@@ -1204,8 +1244,8 @@ function GameInner({ seed, onBack }) {
           )}
         </div>
 
-        {/* Dashboard (right panel) — only during gameplay */}
-        {(game.phase === 'PLAYING' || game.phase === 'GAME_OVER') && (
+        {/* Zone C: Context panel (decisions / diplomacy / ops) */}
+        {isPlaying && (
           <TurnDashboard
             snapshot={game.snapshot}
             frontier={game.frontier}
@@ -1215,13 +1255,6 @@ function GameInner({ seed, onBack }) {
             onSetFocus={handleSetFocus}
             selectedTargets={game.selectedTargets}
             onToggleTarget={handleToggleTarget}
-            onAdvance={handleAdvance}
-            eventLog={game.eventLog}
-            speed={game.speed}
-            onSetSpeed={handleSetSpeed}
-            timerDuration={game.speed > 0 ? 10000 / game.speed : 10000}
-            timerPaused={!!game.pendingPopup}
-            timerKey={game.timerKey}
             embargoTargets={game.embargoTargets}
             onToggleEmbargo={handleToggleEmbargo}
             rivalCores={game.rivalCores}
@@ -1235,11 +1268,21 @@ function GameInner({ seed, onBack }) {
             onToggleSovFocus={handleToggleSovFocus}
             scoutActive={game.scoutActive}
             onToggleScout={handleToggleScout}
-            pendingCards={game.pendingCards}
-            onApplyCard={handleApplyCard}
+            selectedArch={game.selectedArch}
+            onSelectArch={(ai) => dispatch({ type: 'SELECT_ARCH', archIdx: ai })}
+            substrate={world.substrate}
           />
         )}
       </div>
+
+      {/* ── Zone D: FeedZone (dispatches + situation cards) ── */}
+      {isPlaying && (
+        <FeedZone
+          eventLog={game.eventLog}
+          pendingCards={game.pendingCards}
+          onApplyCard={handleApplyCard}
+        />
+      )}
 
       {/* Event popup overlay */}
       {game.pendingPopup && (

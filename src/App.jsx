@@ -1061,12 +1061,17 @@ function AeoliaLODInner({ seed, onSeedChange }) {
           <div style={{flex:1,overflowY:"auto",padding:"6px 10px"}}>
             {world.history.log.map((entry,idx)=>{
               const fColor = {reach:"#ffccaa",lattice:"#aaccff",independent:"#9ab0c8",uncontacted:"#607888",unknown:"#484848",contact:"#ff6644",era:"#daa540",other:"#9ab0c8"}[entry.faction]||"#9ab0c8";
-              const isEra = entry.status==="era";
+              const isEra = entry.faction==="era";
               const isContact = entry.status==="contact";
-              if (isEra) return <div key={idx} style={{margin:"10px 0 6px",padding:"6px 0 4px",borderBottom:"1px solid #1a2a3a"}}>
-                <div style={{fontSize:"9px",color:"#daa540",fontWeight:600,letterSpacing:"1.5px",textTransform:"uppercase"}}>{entry.name}</div>
-                <div style={{fontSize:"7px",color:"#8aa0b8",marginTop:2,lineHeight:1.4}}>{entry.label}</div>
-              </div>;
+              if (isEra) {
+                const yrLabel = entry.contactYr != null
+                  ? (entry.contactYr < 0 ? Math.abs(entry.contactYr).toLocaleString() + ' BP' : 'present')
+                  : null;
+                return <div key={idx} style={{margin:"10px 0 4px",padding:"5px 0 4px",borderBottom:"1px solid #1a2a3a"}}>
+                  <div style={{fontSize:"9px",color:"#daa540",fontWeight:700,letterSpacing:"2px",textTransform:"uppercase"}}>{entry.label}</div>
+                  {yrLabel && <div style={{fontSize:"7px",color:"#607888",marginTop:1,letterSpacing:"0.5px"}}>{yrLabel}</div>}
+                </div>;
+              }
               const icon = entry.status==="core"?"\u2605":entry.status==="colony"?"\u25A0":entry.status==="absorbed"?"\u25A3":entry.status==="garrison"?"\u25B2":entry.status==="trade"?"\u25C6":entry.status==="unknown"?"\u2022":isContact?"\u26A0":"\u25CF";
               return <div key={idx} style={{marginBottom:isContact?0:4, paddingLeft:8, borderLeft:`2px solid ${fColor}`,
                 marginTop:isContact?10:0, paddingTop:isContact?8:0, borderTop:isContact?"1px solid #1a2a3a":"none"}}>
@@ -1110,23 +1115,23 @@ function AeoliaLODInner({ seed, onSeedChange }) {
                 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"6px 12px",fontSize:"8px",lineHeight:1.5}}>
                   <div>
                     <div style={{color:"#daa540",fontWeight:600,fontSize:"7px",letterSpacing:"1px",textTransform:"uppercase",marginBottom:2}}>Climate</div>
-                    <div style={{color:"#9ab0c8"}}>{sub.climate.latitude.toFixed(1)}° · {sub.climate.windBelt}</div>
-                    <div style={{color:"#9ab0c8"}}>{sub.climate.meanTemp.toFixed(0)}°C · {Math.round(sub.climate.effectiveRainfall)}mm</div>
-                    <div style={{color:"#9ab0c8"}}>tidal {sub.climate.tidalRange.toFixed(1)}m · fish {(sub.climate.fisheriesRichness*100).toFixed(0)}%</div>
+                    <div style={{color:"#9ab0c8"}}>{sub.climate.latitude.toFixed(1)}° · {sub.climate.wind_belt}</div>
+                    <div style={{color:"#9ab0c8"}}>{sub.climate.mean_temp.toFixed(0)}°C · {Math.round(sub.climate.effective_rainfall)}mm</div>
+                    <div style={{color:"#9ab0c8"}}>tidal {sub.climate.tidal_range.toFixed(1)}m · fish {(sub.climate.fisheries_richness*100).toFixed(0)}%</div>
                   </div>
                   <div>
                     <div style={{color:"#daa540",fontWeight:600,fontSize:"7px",letterSpacing:"1px",textTransform:"uppercase",marginBottom:2}}>Agriculture</div>
-                    <div style={{color:"#c8d4e0"}}>{cropIcon[sub.crops.primaryCrop]||""} <span style={{fontWeight:600}}>{sub.crops.primaryCrop}</span> (yield {sub.crops.primaryYield.toFixed(1)})</div>
-                    {sub.crops.secondaryCrop && <div style={{color:"#8aa0b8"}}>+ {sub.crops.secondaryCrop}</div>}
-                    <div style={{color:"#607888",fontSize:"7px"}}>{Object.entries(sub.crops.canGrow).filter(([,v])=>v).map(([k])=>k).join(" · ")}</div>
+                    <div style={{color:"#c8d4e0"}}>{cropIcon[sub.crops.primary_crop]||""} <span style={{fontWeight:600}}>{sub.crops.primary_crop}</span> (yield {(sub.crops.primary_yield||0).toFixed(1)})</div>
+                    {sub.crops.secondary_crop && <div style={{color:"#8aa0b8"}}>+ {sub.crops.secondary_crop}</div>}
+                    {sub.crops.can_grow && <div style={{color:"#607888",fontSize:"7px"}}>{Object.entries(sub.crops.can_grow).filter(([,v])=>v).map(([k])=>k).join(" · ")}</div>}
                   </div>
                   <div>
                     <div style={{color:"#daa540",fontWeight:600,fontSize:"7px",letterSpacing:"1px",textTransform:"uppercase",marginBottom:2}}>Trade</div>
-                    {sub.tradeGoods.stimulant.type && <div style={{color:"#9ab0c8"}}>{sub.tradeGoods.stimulant.type} <span style={{color:"#607888"}}>(stim)</span></div>}
-                    {sub.tradeGoods.fiber.type && <div style={{color:"#9ab0c8"}}>{sub.tradeGoods.fiber.type} <span style={{color:"#607888"}}>(fiber)</span></div>}
-                    {sub.tradeGoods.protein.type && <div style={{color:"#9ab0c8"}}>{sub.tradeGoods.protein.type} <span style={{color:"#607888"}}>(prot)</span></div>}
-                    {sub.tradeGoods.noriExport > 0.05 && <div style={{color:"#9ab0c8"}}>nori {(sub.tradeGoods.noriExport*100).toFixed(0)}%</div>}
-                    {sub.tradeGoods.stimulantDeficit && <div style={{color:"#c87070",fontSize:"7px"}}>needs stimulant import</div>}
+                    {sub.trade_goods.stimulant && <div style={{color:"#9ab0c8"}}>{sub.trade_goods.stimulant} <span style={{color:"#607888"}}>(stim)</span></div>}
+                    {sub.trade_goods.fiber && <div style={{color:"#9ab0c8"}}>{sub.trade_goods.fiber} <span style={{color:"#607888"}}>(fiber)</span></div>}
+                    {sub.trade_goods.protein && <div style={{color:"#9ab0c8"}}>{sub.trade_goods.protein} <span style={{color:"#607888"}}>(prot)</span></div>}
+                    {sub.trade_goods.nori_export > 0.05 && <div style={{color:"#9ab0c8"}}>nori {(sub.trade_goods.nori_export*100).toFixed(0)}%</div>}
+                    {!sub.trade_goods.stimulant && !sub.trade_goods.fiber && !sub.trade_goods.protein && <div style={{color:"#607888",fontStyle:"italic"}}>subsistence only</div>}
                   </div>
                   <div>
                     <div style={{color:"#daa540",fontWeight:600,fontSize:"7px",letterSpacing:"1px",textTransform:"uppercase",marginBottom:2}}>Minerals</div>
@@ -1135,18 +1140,19 @@ function AeoliaLODInner({ seed, onSeedChange }) {
                       {sub.minerals.Cu && <span style={{color:"#e8a040",marginRight:4}}>Cu</span>}
                       {sub.minerals.Au && <span style={{color:"#e8d040",marginRight:4}}>Au</span>}
                       {sub.minerals.Pu && <span style={{color:"#e84040",fontWeight:700}}>Pu</span>}
-                      {!sub.minerals.Cu && !sub.minerals.Au && !sub.minerals.Pu && <span style={{color:"#607888"}}>Fe only</span>}
+                      {sub.minerals.C > 0 && <span style={{color:"#a0c880",marginLeft:2}}>C({sub.minerals.C.toFixed(2)})</span>}
+                      {!sub.minerals.Cu && !sub.minerals.Au && !sub.minerals.Pu && !sub.minerals.C && <span style={{color:"#607888"}}>Fe only</span>}
                     </div>
                   </div>
                   <div>
                     <div style={{color:"#daa540",fontWeight:600,fontSize:"7px",letterSpacing:"1px",textTransform:"uppercase",marginBottom:2}}>Political Culture</div>
-                    <div style={{color:"#c8d4e0",fontWeight:600}}>{sub.politicalCulture.label}</div>
-                    <div style={{color:"#8aa0b8"}}>aware {(sub.politicalCulture.awareness*100).toFixed(0)}% · partic {(sub.politicalCulture.participation*100).toFixed(0)}%</div>
+                    <div style={{color:"#c8d4e0",fontWeight:600}}>{sub.culture}</div>
+                    {sub.culture_pos && <div style={{color:"#8aa0b8"}}>CI {sub.culture_pos[0].toFixed(2)} · IO {sub.culture_pos[1].toFixed(2)}</div>}
                   </div>
                   <div>
-                    <div style={{color:"#daa540",fontWeight:600,fontSize:"7px",letterSpacing:"1px",textTransform:"uppercase",marginBottom:2}}>Production</div>
-                    <div style={{color:modeColors[sub.production.modeLabel]||"#9ab0c8",fontWeight:600}}>{sub.production.modeLabel}</div>
-                    <div style={{color:"#8aa0b8"}}>surplus {(sub.production.surplus*100).toFixed(0)}% · labor {(sub.production.labor*100).toFixed(0)}%</div>
+                    <div style={{color:"#daa540",fontWeight:600,fontSize:"7px",letterSpacing:"1px",textTransform:"uppercase",marginBottom:2}}>Climate Zone</div>
+                    <div style={{color:"#9ab0c8",fontWeight:600}}>{sub.climate.climate_zone?.replace(/_/g,' ')}</div>
+                    <div style={{color:"#8aa0b8"}}>warmth {(sub.climate.ocean_warmth*100).toFixed(0)}% · up {(sub.climate.upwelling||0).toFixed(2)}</div>
                   </div>
                 </div>
               </div>}
