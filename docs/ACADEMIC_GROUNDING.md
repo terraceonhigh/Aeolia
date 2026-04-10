@@ -387,7 +387,7 @@ The Acemoglu-Robinson "reversal of fortune" applies to Aeolia: polities that dev
 
 | Gap | Status | Notes |
 |-----|--------|-------|
-| Axelrod freezing: divergent cultures don't converge | Open | Add `frozen_divergence` threshold — cultures too far apart stop trading and polarize |
+| Axelrod freezing: divergent cultures don't converge | ✓ Implemented | culture_dist >= 0.85 → comp = 0; full cultural isolation above freeze threshold |
 | Alliance formation mechanic | Open | Walt balance-of-threat predicts formal alliances; currently only informal contact bonuses |
 | AR reversal-of-fortune diagnostic | Open | Track pre-colonial prosperity rank vs. post-colonial status for AJR validation |
 | Proxy war casualties | ✓ Implemented | Population losses in DF-era expansion into rival's sub-nuclear periphery |
