@@ -491,6 +491,8 @@ export class SimEngine {
 
     // Store scouting state for snapshot visibility
     this._scouting = !!(playerDecision?.scoutActive);
+    // Cache decision for Stage 5 (tech growth uses player's actual techShare allocation)
+    this._playerDecisionCache = playerDecision || null;
 
     const tick = this.tick;
     const year = this.year;
@@ -1129,7 +1131,16 @@ export class SimEngine {
       const effNc = Math.min(nc, Math.floor(this.tech[core] * 2) + 1);
       const contactMult = 1.0 + _log2(effNc + 1) * 0.3;
       const energyMult = er * p.energy_to_tfp;
-      const shareMult = this._sharesFromPos(this.cpos[core])[1] / 0.3;
+
+      // Bug fix: for the player core, use the actual decision techShare rather than
+      // the culture-derived share. Culture position drifts slowly; the player's Focus
+      // card (Innovate = 60% tech, Expand = 20%) should have immediate effect on growth.
+      // AI cores still use their culture position as before.
+      const isPlayerCore = core === this.playerCore && this._playerDecisionCache;
+      const tecSForGrowth = isPlayerCore
+        ? this._playerDecisionCache.techShare
+        : this._sharesFromPos(this.cpos[core])[1];
+      const shareMult = tecSForGrowth / 0.3;
 
       const cropExp = cropY ** 0.3;
       const baseFloor = cropExp * 0.003;
@@ -1145,6 +1156,15 @@ export class SimEngine {
       const accel = a0 * cropExp * shareMult * accelRate * contactMult * energyMult;
       let delta = baseFloor + accel;
       if (t > 9.0) delta *= _clamp((11.0 - t) / 2.0, 0, 1);
+
+      // Strategy-mode isolation bonus: all 30 Observatory polities trade from tick 0,
+      // giving them high contactMult from the start. The Strategy player starts isolated
+      // for hundreds of turns. Compensate so the full tech arc (→ nuclear era) is
+      // reachable within the 340-turn game length.
+      // Only boost during actual gameplay; during skipToTick pre-game bootstrap,
+      // _playerDecisionCache is null so no artificial head-start is applied.
+      if (core === this.playerCore && this._playerDecisionCache) delta *= 1.8;
+
       this.tech[core] += delta;
 
       // Post-DF arms race: all nuclear polities (tech > 8.5) get extra tech investment
@@ -1301,9 +1321,9 @@ export class SimEngine {
     // ── STAGE 6: Thompson Sampling expansion ────────────────
     for (const core of cores) {
       let budget = expBudget[core] || 0;
-      // Game-mode gate: 1.0 (not 2.0) — skipToTick(60) leaves most polities at ~0.7–1.5,
-      // well below the Python reference threshold. Bronze-age projection is reachable at tech 1.0.
-      if (budget < 0.1 || this.tech[core] < 1.0) continue;
+      // Game-mode gate: 0.5 — player starts at tech ~0.7, so should be able to expand from
+      // turn 1. AI polities with tech < 0.5 are genuinely pre-organized and can't project.
+      if (budget < 0.1 || this.tech[core] < 0.5) continue;
 
       const isPlayer = core === this.playerCore && playerDecision;
       // Only build filter set when targets is non-empty. An empty array is truthy, so
@@ -1326,7 +1346,18 @@ export class SimEngine {
         // If player specified targets, only consider those
         if (playerTargets && !playerTargets.has(target)) continue;
 
-        let dist = _gcDistArch(this.archs[core], this.archs[target]);
+        // For the player: use nearest controlled arch as origin to enable island-hopping.
+        // For AI: use home-core arch distance only (prevents runaway AI expansion chains).
+        let dist;
+        if (isPlayer) {
+          dist = Infinity;
+          for (const c of ctrlSet) {
+            const d = _gcDistArch(this.archs[c], this.archs[target]);
+            if (d < dist) dist = d;
+          }
+        } else {
+          dist = _gcDistArch(this.archs[core], this.archs[target]);
+        }
         const tsScore = _betaSample(this.rng, tsA, tsB);
         const rv = _resourceValue(this.substrate[target].minerals, this.tech[core], p.cu_unlock_tech);
 

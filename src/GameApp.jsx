@@ -109,6 +109,9 @@ const INITIAL_STATE = {
   scoutActive: false,
   // Per-turn situation cards
   pendingCards: [],
+  dismissedCardIds: new Map(), // cardId → tick dismissed; cleared after 25 turns
+  lastContactPopupTick: -20,   // rate-limit first-contact popups to once per 10 turns
+  lastAbsorptionPopupTick: -15, // rate-limit absorption popups to once per 15 turns
   malariaUnlocked: false,       // tracks if malaria breakthrough card has been shown
   religiousRevivalShown: false, // resets when piety drops below 0.55 (piety cycle tracking)
 };
@@ -146,6 +149,8 @@ function gameReducer(state, action) {
         lastTech: snapshot.tech?.[playerCore] || 0,
         contactedSet: new Set(snapshot.contactedCores || []),
         pendingCards: [],
+        dismissedCardIds: new Map(),
+        lastContactPopupTick: -20,
       };
     }
 
@@ -157,9 +162,13 @@ function gameReducer(state, action) {
     }
 
     case 'DISMISS_CARD': {
+      const dTick = state.snapshot?.tick || 60;
+      const newDismissed = new Map(state.dismissedCardIds);
+      newDismissed.set(action.cardId, dTick);
       return {
         ...state,
         pendingCards: state.pendingCards.filter(c => c.id !== action.cardId),
+        dismissedCardIds: newDismissed,
       };
     }
 
@@ -260,10 +269,10 @@ function gameReducer(state, action) {
       const newEvents = [...eventLog];
       const vis = snapshot.visibility;
       let popup = null; // first popup-worthy event wins
+      const advTick = snapshot.tick || 60;
 
       for (const ev of snapshot.events) {
-        const yearStr = `Y${(snapshot.tick || 60) - 60}`;
-        const tick = snapshot.tick || 60;
+        const yearStr = `Y${advTick - 60}`;
         if (ev.core === playerCore) {
           const targetName = action.names[ev.target];
           const targetCrop = snapshot.crops?.[ev.target];
@@ -272,7 +281,9 @@ function gameReducer(state, action) {
             text: `ADMIRALTY INTELLIGENCE — ${targetName} has been absorbed into your domain.`,
             color: '#8a7a3a',
           });
-          if (!popup) {
+          // Rate-limit absorption popups to once per 15 turns to avoid burst spam
+          // during rapid expansion phases. Dispatch entries still log every absorption.
+          if (!popup && advTick - state.lastAbsorptionPopupTick >= 15) {
             popup = {
               type: 'absorption',
               data: {
@@ -330,13 +341,14 @@ function gameReducer(state, action) {
           const cropCC = snapshot.crops?.[cc];
           const techCC = snapshot.tech?.[cc];
           const contactName = action.names[cc] || `Nation ${cc}`;
-          const yearStr = `Y${(snapshot.tick || 60) - 60}`;
           newEvents.push({
-            yearStr,
+            yearStr: `Y${advTick - 60}`,
             text: `DIPLOMATIC CORPS — First contact established with ${contactName} (tech ${techCC?.toFixed(1) || '?'}, ${cultureLabel}).`,
             color: '#b8923a',
           });
-          if (!popup) {
+          // Rate-limit first-contact popups: max one every 10 turns.
+          // Contacts cluster in time (the "serial contact era"); batching prevents popup spam.
+          if (!popup && advTick - state.lastContactPopupTick >= 10) {
             popup = {
               type: 'first_contact',
               data: {
@@ -345,7 +357,7 @@ function gameReducer(state, action) {
                 culture: cultureLabel,
                 tech: techCC,
                 crop: cropCC,
-                year: (snapshot.tick || 60) - 60,
+                year: advTick - 60,
               },
             };
           }
@@ -602,6 +614,24 @@ function gameReducer(state, action) {
         }
       }
 
+      // ── Early-game flavor dispatches ──────────────────────
+      // Fill the T0-57 dead zone with one guaranteed navigator/merchant dispatch.
+      const turnNumber = (snapshot.tick || 60) - 60;
+      if (turnNumber === 5) {
+        newEvents.push({
+          yearStr: `Y${turnNumber}`,
+          text: 'MERCHANT GUILD — Navigator guilds report favorable currents beyond the home shelf. Relay traders have begun mapping seasonal routes between nearby fishing grounds.',
+          color: '#5a6a4a',
+        });
+      }
+      if (turnNumber === 20) {
+        newEvents.push({
+          yearStr: `Y${turnNumber}`,
+          text: 'INTERNAL AFFAIRS — Population surveys confirm stable yields across all home islands. Administrative scribes note increased movement between archipelago settlements.',
+          color: '#6a5a3a',
+        });
+      }
+
       // ── Generate situation cards for next turn ────────────
       const nextCards = generateSituationCards(
         snapshot,
@@ -628,6 +658,29 @@ function gameReducer(state, action) {
         ? false  // piety dropped — allow card to fire again in next revival
         : state.religiousRevivalShown || nextCards.some(c => c.id === 'religious_revival');
 
+      // ── Card merge with dismissal tracking ────────────────
+      // Replace-every-tick causes dismissed cards to reappear immediately.
+      // Instead: keep existing cards that are still relevant, add new ones,
+      // suppress recently dismissed IDs for 25 turns.
+      // (advTick already defined above)
+      const newDismissedMap = new Map(state.dismissedCardIds);
+      for (const [id, t] of newDismissedMap) {
+        if (advTick - t > 25) newDismissedMap.delete(id); // expire old dismissals
+      }
+      const validNextIds = new Set(nextCards.map(c => c.id));
+      const mergedCards = [
+        // Keep existing cards whose condition still holds and weren't dismissed
+        ...state.pendingCards.filter(c => validNextIds.has(c.id) && !newDismissedMap.has(c.id)),
+        // Add newly relevant cards not already visible and not dismissed
+        ...nextCards.filter(c =>
+          !state.pendingCards.some(e => e.id === c.id) && !newDismissedMap.has(c.id)
+        ),
+      ].slice(0, 6); // cap at 6 visible cards
+
+      // Track when popup types last fired (for rate-limiting)
+      const newLastContactTick = popup?.type === 'first_contact' ? advTick : state.lastContactPopupTick;
+      const newLastAbsorptionTick = popup?.type === 'absorption' ? advTick : state.lastAbsorptionPopupTick;
+
       return {
         ...state,
         snapshot,
@@ -640,7 +693,10 @@ function gameReducer(state, action) {
         lastEra: eraName,
         lastTech: playerTech,
         contactedSet: newContactedSet,
-        pendingCards: nextCards,
+        pendingCards: mergedCards,
+        dismissedCardIds: newDismissedMap,
+        lastContactPopupTick: newLastContactTick,
+        lastAbsorptionPopupTick: newLastAbsorptionTick,
         malariaUnlocked: newMalariaUnlocked,
         religiousRevivalShown: newReligiousRevivalShown,
       };
