@@ -66,6 +66,22 @@ There is also a structural argument: in the three-hegemon case, the stability-in
 
 ---
 
+## The Approach to Parity: Power Transition Before Dark Forest
+
+The Dark Forest does not appear from nowhere. It is the endpoint of a power transition period — the simulation-decades when two proto-hegemons are racing toward nuclear capability from behind the cover of the industrial and pyra scrambles.
+
+Organski (1958) and Gilpin (1981) identified the approach to parity as the most dangerous period in great-power relations, more dangerous than either the established hegemonic period (one dominant power, stable hierarchy) or the post-parity deterrence period (mutual capability, stable deterrence). The transition period — when the challenger is closing the gap but has not yet reached parity — is when preemptive war is most tempting to the declining hegemon: the window for successful preemption is closing, and the cost of waiting is an opponent who will eventually be as capable as you are.
+
+The simulation's version of this period runs from approximately tech 7 (when pyra scramble begins and both proto-hegemons are acquiring strategic energy assets) to the DF firing point (when both have tech ≥ 9 and mutual awareness has accumulated to the threshold). This is approximately 8 ticks = 400 simulation-years. During this period:
+
+The pyra military-industrial resource curse applies at tech ≥ 8.5 — polities controlling the largest shares of pyra stock receive a 60% resource curse penalty, reducing their TFP growth. This creates a counterintuitive dynamic: the polities scrambling hardest for strategic advantage simultaneously acquire the resource that penalizes their institutional development. The polity that wins the scramble acquires an early deterrence advantage and a late institutional disadvantage.
+
+The nuclear peer awareness accumulates at 0.04/tick per side once both have tech ≥ 9. The 0.30 threshold is reached in approximately 7–8 ticks from when both cross the nuclear threshold. This 7-8 tick window is the simulation's most concentrated danger period — both sides have strategic capability, neither has formalized deterrence, and the awareness that would stabilize their relationship is still accumulating.
+
+The simulation does not model preemptive war during this window. There is no mechanic for a nuclear first strike before deterrence is formalized; the DF firing either stabilizes the relationship or doesn't apply. This is consistent with how the historical Cold War unfolded (despite the Organski prediction, the United States did not launch preemptive war during the Soviet Union's approach to nuclear parity) but it is a gap: the simulation assumes that both proto-hegemons behave as if they understand the deterrence logic before the DF formally fires.
+
+---
+
 ## The Long Equilibrium
 
 The most striking feature of the post-DF simulation is that the Strange Peace is indeed strange: it endures.
@@ -84,3 +100,5 @@ The Strange Peace is not just strange. It is, in the simulation's mechanics, loa
 *Waltz, K.N. (1981). "The Spread of Nuclear Weapons: More May Be Better."* Adelphi Paper 171. *IISS.*
 *Sagan, S.D. (1993).* The Limits of Safety: Organizations, Accidents, and Nuclear Weapons. *Princeton University Press.*
 *Brodie, B. (1959).* Strategy in the Missile Age. *Princeton University Press.*
+*Organski, A.F.K. (1958).* World Politics. *Knopf.*
+*Gilpin, R. (1981).* War and Change in World Politics. *Cambridge University Press.*

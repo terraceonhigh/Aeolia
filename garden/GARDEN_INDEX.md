@@ -29,7 +29,7 @@
 | `the_disease_arc.md` | Virgin-soil (Diamond); endemicity transition (McNeill); epidemic waves (§17); urban sink (§18) | §14, §15, §17, §18 | Diamond (1997), McNeill (1976), Davenport (2020) |
 | `the_fever_belt.md` | Malaria cap formula; abs_lat < 20°; tech ≥ 6 resolution; compound equatorial disadvantage | §16 | Gallup & Sachs (2001) |
 | `the_intermediate_belt_problem.md` | Walt balance-of-threat; alignment formula; non-aligned movement analog; proxy competition stability | §4 | Walt (1987) |
-| `the_strange_equilibrium.md` | Post-DF deterrence and arms race; Snyder stability-instability paradox; proxy belt; why two hegemons | §5, §6 | Snyder (1965), Waltz (1981), Brodie (1959) |
+| `the_strange_equilibrium.md` | Post-DF deterrence and arms race; Snyder stability-instability paradox; proxy belt; why two hegemons; Organski power transition period before DF | §5, §6, §30 | Snyder (1965), Waltz (1981), Brodie (1959), Organski (1958), Gilpin (1981) |
 | `the_thalassocratic_condition.md` | Spykman/Mackinder displacement; four degraded land-power properties; Braudel instability premium | §24 | Spykman (1942), Mackinder (1904), Kirch (2000) |
 
 **Structural Analysis**

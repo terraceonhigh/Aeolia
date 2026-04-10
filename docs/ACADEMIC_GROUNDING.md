@@ -475,7 +475,28 @@ The Acemoglu-Robinson "reversal of fortune" applies to Aeolia: polities that dev
 
 ---
 
-## X. Collective Action and Institutional Fragility
+## X. Power Transition
+
+### 30. Approach to parity: power transition period (Organski 1958; Gilpin 1981)
+**Grade: B−** (emergent, not explicitly encoded)  
+**Files:** `src/engine/SimEngine.js` (Stage 3 industrial signals, Stage 4 DF detection), `sim_proxy_v2.py`
+
+**Claim:** The most dangerous period in great-power competition is not hegemonic dominance or post-parity deterrence, but the transition when the challenger closes the capability gap. The incumbent has incentive for preemptive war (closing window for successful prevention); the challenger has incentive to accelerate (closing window for being destroyed while vulnerable). Organski (1958) proposed this as power transition theory; Gilpin (1981) extended it to hegemonic war theory.
+
+**Sources:**
+- Organski, A.F.K. (1958). *World Politics*. Knopf.
+- Gilpin, R. (1981). *War and Change in World Politics*. Cambridge University Press.
+- Modelski, G. (1987). *Long Cycles in World Politics*. University of Washington Press.
+
+**Implementation:** The power transition period in Aeolia runs from tech ~7 (pyra scramble, proto-hegemons acquiring strategic energy assets) to DF firing (tech ≥ 9 in both, awareness > 0.30). Duration: approximately 8 ticks (400 years). The pyra resource curse (tech ≥ 8.5, 60% curse strength) fires during this window — polities racing for strategic advantage simultaneously acquire the resource that penalizes institutional development. Nuclear peer awareness accumulates at 0.04/tick per side from when both reach tech ≥ 9; the 0.30 threshold requires ~7–8 ticks, producing a brief window of mutual nuclear capability before formal deterrence.
+
+**Gap:** The simulation does not model preemptive war during the approach-to-parity window. No mechanic for first-strike incentives before DF fires; both proto-hegemons are implicitly assumed to behave deterrence-rationally before the deterrence relationship is formalized. This is consistent with the historical Cold War outcome (no US preemptive strike against Soviet nuclear development) but skips the power transition theory prediction of maximum conflict risk during parity approach.
+
+**→ Garden:** `garden/observations/the_strange_equilibrium.md` (§ "The Approach to Parity: Power Transition Before Dark Forest")
+
+---
+
+## XII. Collective Action and Institutional Fragility
 
 ### 28. Desperation expansion as collective action failure (Olson 1965; Tainter 1988)
 **Grade: B**  
@@ -515,7 +536,7 @@ The Acemoglu-Robinson "reversal of fortune" applies to Aeolia: polities that dev
 
 ---
 
-## XI. Known Gaps (Priority Order)
+## XIII. Known Gaps (Priority Order)
 
 | Gap | Status | Notes |
 |-----|--------|-------|
@@ -529,4 +550,4 @@ The Acemoglu-Robinson "reversal of fortune" applies to Aeolia: polities that dev
 
 ---
 
-*Last updated: 2026-04-09. Maintained by Clio. Walt alliance formation implemented same date. §26–§27 environmental mechanics added. §28–§29 collective action and veto players added. Garden cross-references added to all sections with corresponding observations (§1, §4–§11, §13, §19–§20, §22–§29).*
+*Last updated: 2026-04-09. Maintained by Clio. §26–§27 environmental mechanics; §28–§29 collective action / veto players; §30 power transition (Organski/Gilpin). Davis (2001) crop failure amplification and McNeill wave epidemic tech-gating implemented. Garden cross-references complete (§1–§30 where garden observations exist).*
