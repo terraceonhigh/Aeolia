@@ -147,10 +147,22 @@ Aeolia/
 - Pyra/military-industrial complex resource curse (tech ≥ 8.5)
 - Axelrod cultural freezing threshold (culture_dist ≥ 0.85 → no trade)
 - verify_seed() fixed to use json.load (not load_world) — avoids silent fishery-field regression
-- garden/ directory created: 2 observations, 2 parables, 2 fragments (3 registers)
+- **AJR reversal-of-fortune diagnostic** (2026-04-09 session 3): `pre_colonial_state` + `reversal_of_fortune_r` (Spearman r) in output; Card 20 shows reversal note when r < -0.20
+
+**Worldbuilding corpus (2026-04-09 session 3):** 4 series, 32 chapters, 12 garden pieces:
+- **Reach history**: 12 chapters (Ch. 1-12, complete)
+- **Reach civics** (Our Reach Our Trade): 6 chapters (Ch. 3-8)
+- **Lattice history**: 10 chapters (Ch. 1-10, **complete** as of session 3)
+  - Ch. 1-3: Circuit formation, First Connectivity, founding bargain
+  - Ch. 4-8: Reach contact, administered trade, constitution, colonial era, industrial prelude
+  - Ch. 9-10: Catch-Up, Strange Peace (Lattice perspective)
+- **Lattice civics** (The Circuit and the Contract): 4 chapters (Ch. 1-4, Part One)
+- **Garden** (Clio's working space): 3 parables, 5 observations, 4 fragments
+  - Notable fragments: Kauri Consortium internal briefing (Year -240 BP); Oran Confederacy address (Year 47 SP)
+  - Notable observations: desperation trap (Tainter/Cline), two bargains (military vs. legal empire), grateful to be neutral (intermediate belt)
 
 **Next steps:**
-- Run optimizer (run_optimization.py, 10K trials) to further refine all 28 parameters (2 new AR params)
+- Run optimizer (run_optimization.py, 10K trials) to further refine all 29 parameters (3 new AR+proxy params)
 - GitHub push (requires MacBook Neo — Aomori lacks stored credentials)
 
 ## Running the Sim
