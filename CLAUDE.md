@@ -171,11 +171,18 @@ SimParams now has **33 optimizer-tunable parameters**.
 - Davis (2001) crop failure amplification by extractiveness (`davis_amplification=0.30`)
 - Ostrom (1990) commons governance in fishery depletion (`ostrom_commons_factor=0.55`)
 - McNeill tech-gated wave epidemic mortality (`waveMortScale` in Stage 5b)
-- SimParams now has **36 optimizer-tunable parameters** (added: davis_amplification, ostrom_commons_factor; stubs in Python sim)
+- SimParams: **36 optimizer-tunable parameters** total (2 new stubs in Python sim)
+
+**Worldbuilding additions (session 6, full):**
+- Garden observations added: the_scramble_dynamics.md, the_culture_allocation_link.md, the_staple_trap.md
+- Garden fragments added: sovereignty_commerce_council_y98.md (Year 98 SP), first_detonation_dispatch.md (Year -8 BP)
+- the_strange_equilibrium.md updated with pre-DF power transition section
+- ACADEMIC_GROUNDING now **33 sections** (§1–§33), all with garden cross-references
+- GARDEN_INDEX: 27 observations, 12 fragments
 
 **Next steps:**
 - GitHub push (requires MacBook Neo — Aomori lacks stored credentials)
-- Optimizer rerun optional — new mechanics (davis, ostrom, wave mortality) may affect calibration at margin
+- Optimizer rerun optional — new mechanics (davis, ostrom, wave mortality) change energy dynamics at margin
 
 ## Running the Sim
 
