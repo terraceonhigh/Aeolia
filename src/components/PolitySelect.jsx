@@ -100,7 +100,7 @@ export default function PolitySelect({ archs, substrate, names, onSelect, onHigh
         </div>
 
         <div style={STYLES.list}>
-          {archList.map(({ i, crop, yield_, mineralStr, fishR, peaks, name }) => (
+          {archList.map(({ i, crop, yield_, mineralStr, fishR, peaks, name, cropLore, fishSpecies, stimulant }) => (
             <div key={i}
               style={STYLES.item(selected === i, hovered === i)}
               onClick={() => { setSelected(i); onHighlight?.(i); }}
