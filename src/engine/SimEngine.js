@@ -544,6 +544,11 @@ export class SimEngine {
     }
 
     // ── TRADE PRE-PASS ──────────────────────────────────────
+    // Three-layer trade system (Braudel 1949 / Abu-Lughod 1989 / Wallerstein 1974):
+    //   • Subsistence (tech 0+): direct neighbour exchange, bulk staples, low markup
+    //   • Relay (tech 2+): multi-hop luxury circuits, Greif information-asymmetry rents
+    //   • Administered (tech 5+): polity-directed bulk extraction, Wallerstein core/periphery
+    // Gravity-model volumes: sqrt(mass_A × mass_B) / dist²
     const tradeNet = {};
     for (const c of cores) tradeNet[c] = 0;
 
@@ -637,6 +642,12 @@ export class SimEngine {
     }
 
     // ── STAGE 1: Resource accounting ────────────────────────
+    // Energy-budget production function: total_cal = crop_y × land_factor + fish_y × coast_factor
+    // Malthusian clamp (Malthus 1798): population constrained by carrying capacity for tech < 4.
+    // Boserupian release (Boserup 1965): tech advance relaxes the constraint at tech 4+ via
+    // storage, irrigation, and crop intensification.
+    // Energy → TFP coupling (Ayres & Warr 2005): energy_mult = er × energy_to_tfp feeds directly
+    // into the tech growth formula as an explicit production factor.
     const energyRatio = {};
     const energySurplus = {};
     const resourcePressure = {};
@@ -712,9 +723,14 @@ export class SimEngine {
         conS = (playerDecision.consolidation || 0.34) / norm;
       } else {
         // AI allocation (same as simulate.js)
+        // Putnam (1993) / Inglehart (1997): culture position maps to economic behaviour —
+        // outward civic cultures invest more in expansion + tech; inward collective cultures
+        // default to consolidation. See _sharesFromPos() for the formula.
         [expS, tecS, conS] = this._sharesFromPos(this.cpos[core]);
 
-        // IR posture
+        // IR posture (Mearsheimer 2001 / Schweller 1994 / Walt 1987):
+        // High capability + high threat → offensive expansion (offensive realism).
+        // Low capability + high threat → alignment (balance-of-threat).
         const ownCap = _categorizeCap(energySurplus[core], maxSurplus);
         const otherSurpluses = cores.filter(c => c !== core).map(c => energySurplus[c]);
         const maxOther = otherSurpluses.length > 0 ? Math.max(...otherSurpluses) : 0;
@@ -728,7 +744,11 @@ export class SimEngine {
         let t = expS + tecS + conS;
         expS /= t; tecS /= t; conS /= t;
 
-        // Desperation override
+        // Desperation override (Tainter 1988 / Olson 1965):
+        // Resource shortfall triggers a rational but collectively destructive
+        // reallocation toward expansion — the polity's individually optimal response
+        // to resource pressure that, when all polities pursue it simultaneously,
+        // produces cascading attrition (Bronze Age Collapse pattern, Cline 2014).
         const rp = resourcePressure[core] || 0;
         if (rp > 0) {
           let dExp, dTec, dCon;
@@ -764,6 +784,11 @@ export class SimEngine {
     }
 
     // ── STAGE 2b: Culture-space drift ───────────────────────
+    // Axelrod (1997): culture spreads through interaction; polities with large cultural
+    // distance interact less and eventually freeze (culture_dist ≥ 0.85 → no trade).
+    // Boyd & Richerson (1985): dual-inheritance — cultural norms drift under material pressure.
+    // Inglehart (1997, 2018): prosperity → self-expression values (Individual/Outward);
+    // crisis → survival values (Collective/Inward) — empirically validated cross-national.
     for (const core of cores) {
       let [ci, io] = this.cpos[core];
       const [, tecS, conS] = this._sharesFromPos(this.cpos[core]);
@@ -809,8 +834,11 @@ export class SimEngine {
     }
 
     // ── STAGE 2c: Piety drift ───────────────────────────────
-    // Crisis → faith rises. Prosperity → slow secularization.
-    // Collective culture → piety reinforced. Tech > 7 → secularization pressure.
+    // Norris & Inglehart (2004) *Sacred and Secular*: secularisation is driven by
+    // existential security, not scientific sophistication. Societies under existential
+    // stress show rising religiosity; prosperous societies show declining religiosity.
+    // The tech ≥ 7 secularisation trigger encodes this as a long-run developmental
+    // shift rather than a direct prosperity effect.
     for (const core of cores) {
       let piety = this.piety[core];
       const er = energyRatio[core];
@@ -836,9 +864,12 @@ export class SimEngine {
     }
 
     // ── STAGE 2d: Schism pressure (centrifugal force) ────────
-    // High piety + overstretched empire (many low-sovereignty holdings) builds schism
-    // pressure. Tech ≥ 7 dissolves the risk (secular state institutions replace
-    // religious authority as the glue of empire). Reformation model.
+    // Grzymala-Busse (2023) "Tilly Goes to Church": the Reformation produced enduring
+    // state fragmentation in the Holy Roman Empire (weak sovereignty, high piety) but
+    // not in France or England (strong sovereignty). Schism mechanic fires under the
+    // same joint condition: high piety AND fragmented peripheral sovereignty AND pre-
+    // industrial tech (dissipates at tech ≥ 7 when secular nationalism replaces
+    // religious authority as the imperial binding force).
     for (const core of cores) {
       const pi = this.piety[core];
       const t = this.tech[core];
@@ -1078,6 +1109,14 @@ export class SimEngine {
         }
       }
 
+      // ── Tech growth: Solow-Romer with energy coupling (Ayres & Warr 2005) ───────
+      // delta_tech = A₀ × crop_exp × share_mult × accelRate × contact_mult × energy_mult
+      //   A₀: TFP from culture position (Putnam 1993 civic culture → productivity)
+      //   crop_exp: crop_y^0.3 — diminishing returns on land (Solow 1956 capital input analog)
+      //   share_mult: tech_share / 0.3 — allocation coupling
+      //   accelRate: 5-regime table (foraging → nuclear); models learning-curve acceleration
+      //   contact_mult: 1 + log₂(contacts+1) × 0.3 — Romer (1990) knowledge spillovers
+      //   energy_mult: er × energy_to_tfp — Ayres & Warr (2005) energy as explicit TFP factor
       const nc = this.contactSet[core].size;
       const er = this.tech[core] >= 9.0 && !this._hasPu(core)
         ? energyRatio[core] * p.pu_dependent_factor
@@ -1112,7 +1151,12 @@ export class SimEngine {
         this.tech[core] += armsBonus;
       }
 
-      // Tech decay
+      // ── Tech decay: Tainter (1988) diminishing returns on complexity ────────────
+      // maintenance_cost = tech² × rate — quadratic scaling encodes rising complexity
+      // costs as polities extend administrative, military, and infrastructure systems.
+      // When energy surplus falls below maintenance cost, net decline begins.
+      // Cline (2014) 1177 BC: cross-polity cascade when multiple polities simultaneously
+      // cannot afford their maintenance — what the desperation override accelerates.
       const maintenanceCost = this.tech[core] * this.tech[core] * p.maintenance_rate;
       const availE = energySurplus[core];
       if (availE < maintenanceCost) {
@@ -1133,15 +1177,19 @@ export class SimEngine {
         let cap = this.carryCap[j];
         if (this.tech[core] >= 7.0 && this.cRemaining[j] > 0) cap *= (1.0 + er * 0.5);
         if (this.tech[core] >= 9.0) cap *= 1.5;
-        // Malaria belt: reduce effective carrying capacity in tropical archipelagos
-        // Medical knowledge (tech ≥ 6) cuts the penalty to 30%
+        // ── Malaria carrying-capacity penalty (Gallup & Sachs 2001; McNeill 1976) ───
+        // Malaria reduces effective carrying capacity in tropical belts (abs_lat < 20°).
+        // Gallup & Sachs estimated malaria reduces GDP per capita growth by ~1.3%/year.
+        // Medical resolution at tech ≥ 6 (germ-theory / vector-control analogue).
         const mSev = this.malariaFactor[j];
         if (mSev > 0) {
           const mPenalty = mSev * p.malaria_cap_penalty * (this.tech[core] >= 6.0 ? 0.30 : 1.0);
           cap *= (1.0 - mPenalty);
         }
         let growthRate = 0.03 * er * (1.0 - this.pop[j] / Math.max(1, cap));
-        // Urban disease sink: density-dependent mortality above 70% capacity
+        // ── Urban disease sink (Davenport 2020; Wrigley & Schofield 1981) ──────────
+        // Pre-modern cities had negative natural population growth sustained only by
+        // rural immigration. High density above carrying-capacity threshold → mortality.
         const densityRatio = this.pop[j] / Math.max(1, cap);
         if (densityRatio > 0.7) {
           growthRate -= (densityRatio - 0.7) * p.urban_disease_rate;
@@ -1167,10 +1215,14 @@ export class SimEngine {
       if (worldMaxTech > this.tech[core] + 1.0) this.tech[core] += (worldMaxTech - this.tech[core]) * 0.03;
     }
 
-    // ── STAGE 5b: Epidemic waves ────────────────────────────
+    // ── STAGE 5b: Epidemic waves (McNeill 1976 / Schmid et al. 2015) ───────────
+    // McNeill: trade hubs function as disease amplifiers — the Antonine Plague and
+    // Black Death spread along the same networks as silk and spices.
     // Periodic disease events propagating through trade contact networks.
     // Probability per tick scales with contact count × population density.
-    // Separate from contact epidemics (which fire on first-contact absorption).
+    // Mortality tech-gated: industrial public health (Wrigley & Schofield 1981)
+    // reduces severity at tech > 4; floor 20% at tech ≥ 12.
+    // Separate from first-contact epidemics (which fire on absorption, Stage 6).
     for (const core of cores) {
       const nc = this.contactSet[core].size;
       if (nc < 2) continue;  // isolated polities don't originate waves
@@ -1432,6 +1484,11 @@ export class SimEngine {
     }
 
     // ── STAGE 7: Sovereignty drift ──────────────────────────
+    // Wallerstein (1974) world-systems hierarchy: sovereignty is a continuous spectrum
+    // (full autonomy → tributary → client → garrison → colony → full core integration)
+    // determined by the extraction/recovery balance, not by categorical assignment.
+    // Recovery ∝ (local pop / core pop) × grievance_resistance_mult — Scott's resistance
+    // mechanic (Scott 1985, 1990) makes extraction above tolerable threshold self-limiting.
     const sovFocusSet = playerDecision?.sovFocusTargets ? new Set(playerDecision.sovFocusTargets) : null;
     for (let i = 0; i < N; i++) {
       if (this.controller[i] === i) continue;
