@@ -129,9 +129,9 @@ export function generateSituationCards(snapshot, playerCore, names, frontier, op
           title: 'Technological Edge',
           body: `Your technology exceeds all known rivals by ${((techRatio - 1) * 100).toFixed(0)}%. ${names[target.index]} (tech ${target.tech?.toFixed(1)}) is within reach. Such advantages are perishable — they diffuse through the relay trade faster than any state can suppress.`,
           actions: [
-            { label: 'TARGET', action: { type: 'TOGGLE_TARGET', target: target.index } },
-            { label: 'EXPAND', action: { type: 'SET_FOCUS', focus: 'expand' } },
-            { label: 'DISMISS', action: null },
+            { label: 'TARGET',      action: { type: 'TOGGLE_TARGET', target: target.index } },
+            { label: 'SHIFT FOCUS', action: { type: 'SET_FOCUS', focus: 'expand' } },
+            { label: 'DISMISS',     action: null },
           ],
         });
       }
@@ -255,9 +255,9 @@ export function generateSituationCards(snapshot, playerCore, names, frontier, op
         title: ps.territory <= 1 ? 'First Expansion Window' : 'Vulnerable Frontier',
         body: `${opener} ${names[t.index]} ${techStr}.${resStr} Their ${cropLabel} would strengthen your position. Every turn of hesitation narrows the window.`,
         actions: [
-          { label: 'TARGET', action: { type: 'TOGGLE_TARGET', target: t.index } },
-          { label: 'EXPAND', action: { type: 'SET_FOCUS', focus: 'expand' } },
-          { label: 'DISMISS', action: null },
+          { label: 'TARGET',      action: { type: 'TOGGLE_TARGET', target: t.index } },
+          { label: 'SHIFT FOCUS', action: { type: 'SET_FOCUS', focus: 'expand' } },
+          { label: 'DISMISS',     action: null },
         ],
       });
     }

@@ -116,23 +116,35 @@ const INITIAL_STATE = {
   lastAbsorptionPopupTick: -15, // rate-limit absorption popups to once per 15 turns
   malariaUnlocked: false,       // tracks if malaria breakthrough card has been shown
   religiousRevivalShown: false, // resets when piety drops below 0.55 (piety cycle tracking)
+  // Culture tracking — uses the full 8-way getCultureLabel, not the engine's 3-way label.
+  // Prevents the Cultural Shift card from re-firing due to label function divergence.
+  lastAcknowledgedCulture: null,
 };
 
 function gameReducer(state, action) {
   switch (action.type) {
     case 'SELECT_POLITY': {
       const { playerCore, world, substrate } = action;
-      const engine = new SimEngine(
+      const _makeEngine = () => new SimEngine(
         { archs: world.archs, plateauEdges: world.plateauEdges, seed: world.seed, substrate },
         DEFAULT_PARAMS,
         playerCore
       );
-      // Skip the boring early game — start at tick 60 (~17000 BP, tech ~1.5)
+      // Skip the boring early game — start at tick 60 (~17000 BP, tech ~1.5).
+      // Guard: if the player's archipelago was already conquered during the skip,
+      // back off to tick 0 so they don't immediately receive a defeat popup.
+      let engine = _makeEngine();
       engine.skipToTick(60);
-      const snapshot = engine.snapshot();
+      let snapshot = engine.snapshot();
+      if (snapshot.playerStats && snapshot.playerStats.territory === 0) {
+        engine = _makeEngine(); // fresh engine at tick 0
+        snapshot = engine.snapshot();
+      }
       const frontier = engine.getFrontier(playerCore);
       const eraName = snapshot.year < -5000 ? 'Antiquity' : snapshot.year < -2000 ? 'Serial Contact'
         : snapshot.year < -500 ? 'Colonial' : snapshot.year < -200 ? 'Industrial' : 'Nuclear';
+      const initCulturePos = snapshot.playerStats?.culturePos ?? [0, 0];
+      const initCultureLabel = getCultureLabel(initCulturePos[0], initCulturePos[1]);
       return {
         ...state,
         phase: 'PLAYING',
@@ -153,6 +165,7 @@ function gameReducer(state, action) {
         pendingCards: [],
         dismissedCardIds: new Map(),
         lastContactPopupTick: -20,
+        lastAcknowledgedCulture: initCultureLabel,
       };
     }
 
@@ -177,7 +190,26 @@ function gameReducer(state, action) {
         ? [{ yearStr: yr, text: confirmText, color: '#6a8a6a' }]
         : [];
 
-      const base = { ...state, pendingCards: nextCards, eventLog: [...state.eventLog, ...confirmEntry] };
+      // Always add the card to dismissedCardIds so it can't re-fire next tick.
+      // Culture drift cards also update lastAcknowledgedCulture so the card
+      // generator (which uses getCultureLabel, not the engine's 3-way label)
+      // doesn't re-fire due to the label-function divergence at boundary positions.
+      const dTick = state.snapshot?.tick || 60;
+      const newDismissedOnApply = new Map(state.dismissedCardIds);
+      newDismissedOnApply.set(action.cardId, dTick);
+      let newAcknowledgedCulture = state.lastAcknowledgedCulture;
+      if (card && card.id?.startsWith('culture_drift_')) {
+        // Extract the target culture from the card id: 'culture_drift_<label>'
+        newAcknowledgedCulture = card.id.slice('culture_drift_'.length);
+      }
+
+      const base = {
+        ...state,
+        pendingCards: nextCards,
+        eventLog: [...state.eventLog, ...confirmEntry],
+        dismissedCardIds: newDismissedOnApply,
+        lastAcknowledgedCulture: newAcknowledgedCulture,
+      };
       return action.subAction ? gameReducer(base, action.subAction) : base;
     }
 
@@ -185,10 +217,15 @@ function gameReducer(state, action) {
       const dTick = state.snapshot?.tick || 60;
       const newDismissed = new Map(state.dismissedCardIds);
       newDismissed.set(action.cardId, dTick);
+      let newAck = state.lastAcknowledgedCulture;
+      if (action.cardId?.startsWith('culture_drift_')) {
+        newAck = action.cardId.slice('culture_drift_'.length);
+      }
       return {
         ...state,
         pendingCards: state.pendingCards.filter(c => c.id !== action.cardId),
         dismissedCardIds: newDismissed,
+        lastAcknowledgedCulture: newAck,
       };
     }
 
@@ -670,7 +707,10 @@ function gameReducer(state, action) {
           activeFocus: state.activeFocus,
           selectedTargets: nextTargets,
           scoutActive: state.scoutActive,
-          prevCultureLabel,
+          // Use lastAcknowledgedCulture (8-way getCultureLabel) rather than the
+          // raw snapshot cultureLabel (3-way engine label) to prevent the card
+          // re-firing due to label function divergence near boundary positions.
+          prevCultureLabel: state.lastAcknowledgedCulture ?? prevCultureLabel,
           prevTech: state.lastTech,
           malariaUnlocked: state.malariaUnlocked,
           religiousRevivalShown: state.religiousRevivalShown,
@@ -725,6 +765,14 @@ function gameReducer(state, action) {
         lastAbsorptionPopupTick: newLastAbsorptionTick,
         malariaUnlocked: newMalariaUnlocked,
         religiousRevivalShown: newReligiousRevivalShown,
+        // If no culture card was generated this tick (card condition didn't fire),
+        // advance lastAcknowledgedCulture to keep it current so it doesn't
+        // trigger a spurious card after the dismissed-ID window expires.
+        lastAcknowledgedCulture: nextCards.some(c => c.id?.startsWith('culture_drift_'))
+          ? state.lastAcknowledgedCulture  // card pending — keep old value so card fires
+          : (snapshot.playerStats?.culturePos
+              ? getCultureLabel(snapshot.playerStats.culturePos[0], snapshot.playerStats.culturePos[1])
+              : state.lastAcknowledgedCulture),
       };
     }
 
