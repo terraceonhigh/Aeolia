@@ -685,3 +685,29 @@ export function getColonialResistanceDispatch(archName, grievanceLevel, seed) {
     `INTERNAL AFFAIRS — Colonial resistance reading ${level}. ${archName} population demonstrating coordinated withdrawal from administered market participation. Extraction efficiency declining despite unchanged rates.`,
   ], s);
 }
+
+// ── Institutional Reform (Acemoglu-Robinson) ─────────────────────────────────
+// Fired when extractiveness_index is high — elite rent-protection blocking TFP.
+
+export function getInstitutionalReformText(extractivenessLevel, seed) {
+  const s = seed ?? 0;
+  const severity = extractivenessLevel > 0.7 ? 'entrenched' : extractivenessLevel > 0.45 ? 'significant' : 'nascent';
+  return pick([
+    `Administrative analysis indicates ${severity} institutional lock-in. Extraction-focused administrations are diverting capital from broad-based investment. Creative destruction is being suppressed by rent-seeking in the commercial and administrative sectors. TFP growth is below projection.`,
+    `Internal review: extractive institutional patterns have reached ${severity} levels. Elite commercial interests are using administered trade access as a barrier to new entry. Recommend structural reform to incentive structures — current configuration is self-perpetuating and will compound over time.`,
+    `The Council of Factors reports ${severity} rent-seeking in the colonial administration. Well-connected factions are blocking competition that would displace them. Civic institutions for broadening economic participation have atrophied. This is the classic institutional lock-in — difficult to reform from within.`,
+  ], s);
+}
+
+// ── Cultural Freeze Warning (Axelrod) ────────────────────────────────────────
+// Fired when a trade partner is approaching cultural freeze distance.
+
+export function getCulturalFreezeText(partnerName, cultureDist, seed) {
+  const s = seed ?? 0;
+  const proximity = cultureDist > 0.78 ? 'critical' : 'elevated';
+  return pick([
+    `MERCHANT GUILD — Cultural distance to ${partnerName} has reached ${proximity} levels (${(cultureDist * 100).toFixed(0)}% of freeze threshold). Shared institutional frameworks are eroding. Quality standards, contract procedures, and credit instruments are becoming mutually incomprehensible. If distance reaches threshold, trade will cease without active cultural engagement.`,
+    `MERCHANT GUILD — Trade friction with ${partnerName} has increased to ${proximity} levels. Our factors report that ${partnerName} commercial practices and our own have diverged substantially. Without shared norms, price discovery fails. Active cultural outreach is recommended before the circuit closes permanently.`,
+    `MERCHANT GUILD — ${proximity.charAt(0).toUpperCase() + proximity.slice(1)} divergence warning for ${partnerName}. The Axelrod threshold is near: below it, cultural distance creates friction and cost; above it, trade simply does not happen. Recommend adjusting cultural policy to maintain sufficient overlap for commercial continuity.`,
+  ], s);
+}

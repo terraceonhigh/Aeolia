@@ -22,6 +22,8 @@ import {
   getRogueAircraftText,
   getSchismBody,
   getColonialResistanceText,
+  getInstitutionalReformText,
+  getCulturalFreezeText,
 } from './narrativeText.js';
 
 // ── Mineral labels ───────────────────────────────────────────
@@ -620,6 +622,62 @@ export function generateSituationCards(snapshot, playerCore, names, frontier, op
           { label: 'REDUCE EXTRACTION', action: { type: 'SET_FOCUS', focus: 'fortify' } },
           { label: 'INVEST IN SOV FOCUS', action: { type: 'SET_SOV_FOCUS', archIndex: resistanceArch } },
           { label: 'ACKNOWLEDGE',         action: null },
+        ],
+      });
+    }
+  }
+
+  // ── Card 20: Institutional Reform (Acemoglu-Robinson) ─────────────────────
+  // Fires when the player's extractiveness_index is high — elite rent-protection
+  // blocking TFP growth. Actions: reduce extraction focus, cultural policy shift.
+  const extractivenessArr = snapshot?.extractiveness || [];
+  const playerExtractiveness = extractivenessArr[playerCore] ?? 0;
+  if (playerExtractiveness > 0.30) {
+    const reformSeed = hashStr('institutional_reform' + Math.floor((snapshot?.tick || 0) / 5));
+    const severity = playerExtractiveness > 0.65 ? 'CRITICAL' : playerExtractiveness > 0.45 ? 'ELEVATED' : 'WARNING';
+    cards.push({
+      id: `institutional_reform_${Math.floor((snapshot?.tick || 0) / 5)}`,
+      icon: '⚖',
+      title: `Institutional Lock-in — ${severity}`,
+      body: getInstitutionalReformText(playerExtractiveness, reformSeed),
+      actions: [
+        { label: 'PURSUE INCLUSIVE REFORM',   action: { type: 'SET_CULTURE_POLICY', ci: 0.3, io: 0.2 } },
+        { label: 'REDUCE EXTRACTION RATE',    action: { type: 'SET_FOCUS', focus: 'fortify' } },
+        { label: 'ACKNOWLEDGE',               action: null },
+      ],
+    });
+  }
+
+  // ── Card 21: Cultural Freeze Warning (Axelrod) ─────────────────────────────
+  // Fires when a key trade contact's cultural distance approaches the freeze
+  // threshold (0.85). Warns player to adjust cultural policy before trade ceases.
+  const cposArr = snapshot?.cpos || [];
+  if (cposArr.length > playerCore && cposArr[playerCore]) {
+    const [pCI, pIO] = cposArr[playerCore];
+    let maxFreezeRisk = 0;
+    let freezeRiskPartner = null;
+    const contactedList = snapshot?.contactedCores || [];
+    for (const partner of contactedList) {
+      if (partner === playerCore || !cposArr[partner]) continue;
+      const [ci2, io2] = cposArr[partner];
+      const dist = Math.sqrt((pCI - ci2) ** 2 + (pIO - io2) ** 2) / 2.828;
+      if (dist > maxFreezeRisk) {
+        maxFreezeRisk = dist;
+        freezeRiskPartner = partner;
+      }
+    }
+    if (maxFreezeRisk > 0.70 && freezeRiskPartner !== null) {
+      const partnerName = names?.[freezeRiskPartner] || `Nation ${freezeRiskPartner}`;
+      const freezeSeed = hashStr('cultural_freeze' + Math.floor((snapshot?.tick || 0) / 6) + freezeRiskPartner);
+      cards.push({
+        id: `cultural_freeze_${Math.floor((snapshot?.tick || 0) / 6)}_${freezeRiskPartner}`,
+        icon: '❄',
+        title: `Cultural Divergence — ${maxFreezeRisk > 0.78 ? 'CRITICAL' : 'WARNING'}`,
+        body: getCulturalFreezeText(partnerName, maxFreezeRisk, freezeSeed),
+        actions: [
+          { label: 'SHIFT CULTURE (OUTWARD)', action: { type: 'SET_CULTURE_POLICY', ci: 0.0, io: 0.3 } },
+          { label: 'ENGAGE DIPLOMATICALLY',   action: { type: 'SET_PARTNER', core: freezeRiskPartner } },
+          { label: 'ACKNOWLEDGE',             action: null },
         ],
       });
     }
