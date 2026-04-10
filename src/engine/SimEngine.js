@@ -65,6 +65,9 @@ export const DEFAULT_PARAMS = {
   // Acemoglu-Robinson institutional stagnation (Why Nations Fail, 2012)
   institutional_lock_rate: 0.12,   // extraction → extractiveness buildup rate
   extractiveness_tfp_penalty: 0.40, // max TFP penalty at extractiveness=1.0
+  // Walt balance-of-threat alliance formation (Walt 1987)
+  alliance_formation_rate: 0.04,   // alignment drift speed per tick
+  alliance_protection_str: 2.5,    // max targeting penalty for aligned-against hegemon
 };
 
 // ── Crop culture seeds ──────────────────────────────────────
@@ -301,6 +304,11 @@ export class SimEngine {
     this.dfYear = null;
     this.dfArch = null;
     this.dfDetector = null;
+    this.dfHegemonPair = null;  // [dfArch, dfDetector] set on DF fire for Walt alignment
+    // Walt balance-of-threat alignment (Walt 1987):
+    // alignment[i] ∈ [-1, 1]: positive → toward dfDetector (h_b), negative → toward dfArch (h_a).
+    // Initialized to zero; non-hegemons drift toward less threatening hegemon post-DF.
+    this.alignment = new Float64Array(this.N);
     this.scrambleOnset = null;
     this.puScrambleOnset = null;
     this.techSnapshots = {};
@@ -988,6 +996,32 @@ export class SimEngine {
         if (this.dfYear !== null) break;
       }
     }
+    // Record hegemon pair on first DF fire
+    if (this.dfYear !== null && this.dfHegemonPair === null) {
+      this.dfHegemonPair = [this.dfArch, this.dfDetector];
+    }
+
+    // ── STAGE 4.5: Walt balance-of-threat alignment update ──────────────────
+    // Non-hegemon polities drift toward whichever hegemon poses less threat.
+    // Threat = tech × (1 + extractiveness) × fleet_scale / distance
+    // (Walt 1987: The Origins of Alliances)
+    if (this.dfHegemonPair !== null) {
+      const [hA, hB] = this.dfHegemonPair;
+      const allFormRate = p.alliance_formation_rate ?? 0.04;
+      for (const core of cores) {
+        if (core === hA || core === hB) continue;
+        const distA = Math.max(_gcDistArch(this.archs[core], this.archs[hA]), 0.05);
+        const distB = Math.max(_gcDistArch(this.archs[core], this.archs[hB]), 0.05);
+        const threatA = (this.tech[hA] * (1.0 + this.extractiveness[hA])
+                         * Math.max(this.fleetScale[hA], 0.1)) / distA;
+        const threatB = (this.tech[hB] * (1.0 + this.extractiveness[hB])
+                         * Math.max(this.fleetScale[hB], 0.1)) / distB;
+        const denom = Math.max(threatA + threatB, 0.001);
+        const netThreat = (threatA - threatB) / denom;  // positive → hA more threatening
+        this.alignment[core] += (netThreat - this.alignment[core]) * allFormRate;
+        this.alignment[core] = _clamp(this.alignment[core], -1.0, 1.0);
+      }
+    }
 
     // ── STAGE 5: Tech growth + decay + population ───────────
     for (const core of cores) {
@@ -1273,7 +1307,21 @@ export class SimEngine {
           }
         }
 
-        candidates.push([tsScore + p.resource_targeting_weight * rv + despBonus + diploBonus + pietyBonus + proxyBonus - deterrencePenalty - dist * 1.5, target, dist, rv, proxyBonus > 0]);
+        // ── Walt balance-of-threat: alliance protection ─────────────────────
+        // Polities aligned toward a hegemon resist absorption by the opposing hegemon.
+        // (Walt 1987: states balance against threats, not just power.)
+        let alliancePenalty = 0;
+        if (this.dfHegemonPair !== null) {
+          const [hA, hB] = this.dfHegemonPair;
+          const tAlign = this.alignment[this.controller[target]];
+          if (core === hA && tAlign > 0) {
+            alliancePenalty = tAlign * (p.alliance_protection_str ?? 2.5);
+          } else if (core === hB && tAlign < 0) {
+            alliancePenalty = (-tAlign) * (p.alliance_protection_str ?? 2.5);
+          }
+        }
+
+        candidates.push([tsScore + p.resource_targeting_weight * rv + despBonus + diploBonus + pietyBonus + proxyBonus - deterrencePenalty - alliancePenalty - dist * 1.5, target, dist, rv, proxyBonus > 0]);
       }
       candidates.sort((a, b) => b[0] - a[0]);
 
@@ -1521,6 +1569,9 @@ export class SimEngine {
       extractiveness: Array.from(this.extractiveness, v => Math.round(v * 1000) / 1000),
       // AJR reversal-of-fortune score (Spearman r of pre-colonial vs final tech rank)
       reversal_of_fortune_r: this._spearmanReversal(),
+      // Walt balance-of-threat alignment per polity core
+      alignment: Array.from(this.alignment, v => Math.round(v * 1000) / 1000),
+      dfHegemonPair: this.dfHegemonPair,
       // Scramble onset ticks (for one-time dispatch events in GameApp)
       scramble_onset_tick: this.scrambleOnset,
       pu_scramble_onset_tick: this.puScrambleOnset,

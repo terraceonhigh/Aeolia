@@ -56,9 +56,9 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 
 ## II. International Relations
 
-### 4. IR posture matrix (Mearsheimer; Walt; Schweller)
-**Grade: B**  
-**Files:** `src/engine/SimEngine.js` (Stage 2 `_POSTURE_TABLE`), `sim_proxy_v2.py`
+### 4. IR posture matrix + alliance formation (Mearsheimer; Walt; Schweller)
+**Grade: A−**  
+**Files:** `src/engine/SimEngine.js` (Stage 2 `_POSTURE_TABLE`, Stage 4.5 Walt alignment), `sim_proxy_v2.py`
 
 **Claim:** High capability + high threat → offensive expansion (offensive realism). Medium capability + high threat → alliance-seeking (balance-of-threat). Low capability + high threat → bandwagoning (Schweller revisionist states).
 
@@ -66,6 +66,10 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 - Mearsheimer, J. (2001). *The Tragedy of Great Power Politics*. Norton.
 - Walt, S. (1987). *The Origins of Alliances*. Cornell University Press.
 - Schweller, R. (1994). "Bandwagoning for Profit." *International Security* 19(1).
+
+**Implementation:** 
+- Stage 2 posture table (expansion share) implements Mearsheimer/Schweller via culture→posture mapping.
+- Stage 4.5 implements Walt's balance-of-threat: post-DF, each non-hegemon polity maintains `alignment[i] ∈ [-1, 1]` that drifts toward the less-threatening hegemon each tick. Threat = `tech × (1 + extractiveness) × fleet_scale / distance`. Aligned polities impose a penalty (up to `alliance_protection_str × |alignment|`, default 2.5) on the opposing hegemon's expansion attempts against them. Two new params: `alliance_formation_rate` (0.04), `alliance_protection_str` (2.5). Effect visible on seeds with DF year < -500 (e.g., seed 2: DF year -1200, 5 non-zero alignments in range 0.1–0.3 after 20 ticks).
 
 ---
 
@@ -388,7 +392,7 @@ The Acemoglu-Robinson "reversal of fortune" applies to Aeolia: polities that dev
 | Gap | Status | Notes |
 |-----|--------|-------|
 | Axelrod freezing: divergent cultures don't converge | ✓ Implemented | culture_dist >= 0.85 → comp = 0; full cultural isolation above freeze threshold |
-| Alliance formation mechanic | Open | Walt balance-of-threat predicts formal alliances; currently only informal contact bonuses |
+| Alliance formation mechanic | ✓ Implemented | Stage 4.5 Walt alignment: `alignment[i]` drifts toward less-threatening hegemon post-DF; opposed-hegemon targeting penalty up to 2.5× |alignment| |
 | AR reversal-of-fortune diagnostic | ✓ Implemented | `pre_colonial_state` + `reversal_of_fortune_r` (Spearman r) in output; r ≈ +0.03 on seed 216089 (cross-sectional pattern, not single-path) |
 | Proxy war casualties | ✓ Implemented | Population losses in DF-era expansion into rival's sub-nuclear periphery |
 | Doctrinal innovation in schism | ✓ Implemented | Ungoverned breakaway polities receive Reformed culture shift (+0.30 CI, +0.15 IO); Weber (1904) |
@@ -397,4 +401,4 @@ The Acemoglu-Robinson "reversal of fortune" applies to Aeolia: polities that dev
 
 ---
 
-*Last updated: 2026-04-09. Maintained by Clio.*
+*Last updated: 2026-04-09. Maintained by Clio. Walt alliance formation implemented same date.*

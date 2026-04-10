@@ -137,6 +137,13 @@ class SimParams:
     # losses proportional to target's defensive capacity (tech gap inverse).
     proxy_war_casualty_rate:    float = 0.10   # base population loss rate per proxy conquest
 
+    # Walt balance-of-threat alliance formation (Walt 1987)
+    # Non-hegemon polities align toward the less-threatening hegemon; aligned polities
+    # resist absorption by the opposing hegemon. Threat = tech × (1 + extractiveness)
+    # × fleet_scale / distance.
+    alliance_formation_rate:    float = 0.04   # alignment drift speed per tick
+    alliance_protection_str:    float = 2.5    # max targeting penalty for aligned-against hegemon
+
     # Fishery mechanics (calibrated in SimEngine.js; mirrored here for optimizer)
     fishery_recovery_rate:      float = 0.04
     fishery_overfish_rate:      float = 0.06
@@ -187,6 +194,9 @@ PARAM_BOUNDS: list = [
     ("extractiveness_tfp_penalty",  0.10,  0.60),
     # Proxy war
     ("proxy_war_casualty_rate",     0.02,  0.25),
+    # Walt alliance formation
+    ("alliance_formation_rate",     0.01,  0.12),
+    ("alliance_protection_str",     1.0,   5.0),
 ]
 
 
@@ -807,11 +817,19 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
     epi_log            = []
     expansion_log      = []
     df_year = df_arch = df_detector = None
+    df_hegemon_pair    = None   # [df_arch, df_detector] set once on DF fire
     scramble_onset     = None   # tick when C-rich targeting begins
     pu_scramble_onset  = None
     tech_snapshots     = {}
     pop_snapshots      = {}
     wave_epi_log       = []     # accumulated across all ticks (Stage 5b)
+
+    # ── Walt balance-of-threat alignment (post-DF) ────────────────────────
+    # alignment[i] ∈ [-1, 1]: positive → aligned toward df_detector (h_b),
+    # negative → aligned toward df_arch (h_a). Initialized after DF fires.
+    # Walt (1987): states balance against threats (power × extractiveness ×
+    # fleet_scale / distance), not raw power alone.
+    alignment = [0.0] * N
     tech_decay_log     = []     # §11: records of tech decay events
     desperation_log    = []     # §11: records of desperation-mode activations
 
@@ -1299,6 +1317,32 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
                             break
                 if df_year is not None:
                     break
+        # Record hegemon pair once on first DF fire
+        if df_year is not None and df_hegemon_pair is None:
+            df_hegemon_pair = [df_arch, df_detector]
+
+        # ──────────────────────────────────────────────────────────────
+        # STAGE 4.5: Walt balance-of-threat alignment update (post-DF)
+        # Non-hegemon polities drift their alignment toward whichever
+        # hegemon poses less threat.  Threat = tech × (1+extractiveness)
+        # × fleet_scale / distance  (Walt 1987, Origins of Alliances).
+        # ──────────────────────────────────────────────────────────────
+        if df_hegemon_pair is not None:
+            h_a, h_b = df_hegemon_pair
+            for core in cores:
+                if core in (h_a, h_b):
+                    continue  # hegemons do not align
+                dist_a = max(_gc_dist_arch(archs[core], archs[h_a]), 0.05)
+                dist_b = max(_gc_dist_arch(archs[core], archs[h_b]), 0.05)
+                threat_a = (tech[h_a] * (1.0 + extractiveness[h_a])
+                            * max(fleet_scale[h_a], 0.1)) / dist_a
+                threat_b = (tech[h_b] * (1.0 + extractiveness[h_b])
+                            * max(fleet_scale[h_b], 0.1)) / dist_b
+                denom = max(threat_a + threat_b, 0.001)
+                # positive net_threat → h_a more threatening → align toward h_b (positive)
+                net_threat = (threat_a - threat_b) / denom
+                alignment[core] += (net_threat - alignment[core]) * p.alliance_formation_rate
+                alignment[core] = _clamp(alignment[core], -1.0, 1.0)
 
         # ──────────────────────────────────────────────────────────────
         # STAGE 5: Solow-Romer production + tech growth (plan §5.2, §5.8)
@@ -1576,8 +1620,24 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
                     if tech[core] - tech[controller[target]] > 1.5:
                         piety_bonus += (c_piety - 0.65) * 1.5
 
+                # ── Walt balance-of-threat: alliance protection ──────────────────
+                # Polities aligned toward a hegemon gain resistance against the
+                # other hegemon's expansion attempts. Resistance ∝ alignment strength.
+                # (Walt 1987: states balance against threats, not just power.)
+                alliance_penalty = 0.0
+                if df_hegemon_pair is not None:
+                    h_a, h_b = df_hegemon_pair
+                    t_align = alignment[controller[target]]  # alignment of target's polity
+                    if core == h_a and t_align > 0:
+                        # h_a attacking a polity aligned toward h_b → resistance
+                        alliance_penalty = t_align * p.alliance_protection_str
+                    elif core == h_b and t_align < 0:
+                        # h_b attacking a polity aligned toward h_a → resistance
+                        alliance_penalty = (-t_align) * p.alliance_protection_str
+
                 score = (ts_score + p.resource_targeting_weight * rv + desp_bonus
-                         + piety_bonus + proxy_bonus - dist * 1.5 - deterrence_penalty)
+                         + piety_bonus + proxy_bonus - dist * 1.5
+                         - deterrence_penalty - alliance_penalty)
                 candidates.append((score, target, dist, proxy_bonus > 0))
 
             candidates.sort(key=lambda x: -x[0])
@@ -1837,6 +1897,8 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
             "fleet_scale":      fleet_scale[i],
             "c_remaining":      c_remaining[i],
             "controller":       controller[i],
+            # Walt alignment of the controlling polity (post-DF only)
+            "alignment":        round(alignment[controller[i]], 3),
         })
 
     # Backward-compat faction labels: map civic→reach, subject→lattice
@@ -1951,6 +2013,11 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
         #   Positive = no reversal (prosperity advantage persisted through colonization).
         "pre_colonial_state":   pre_colonial_state,
         "reversal_of_fortune_r": _spearman_reversal(pre_colonial_state, tech, N),
+        # Walt balance-of-threat alignment (Walt 1987)
+        # alignment[i] ∈ [-1, 1]: final alignment of each polity core.
+        # Positive = aligned toward df_detector (h_b); negative = toward df_arch (h_a).
+        "alignment":            alignment,
+        "hegemon_pair":         df_hegemon_pair,
     }
 
 
