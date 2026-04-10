@@ -555,16 +555,19 @@ export class SimEngine {
         }
         comp = Math.min(comp, 2.0);
 
-        // ── Axelrod cultural polarization (1997): polities with maximally
-        // divergent culture-space positions trade less and exchange culture
-        // less effectively — they have fewer shared traits to interact around.
-        // Cultural distance reduces trade volume (shared language, practice,
-        // legal norms all lower transaction costs — their absence raises them).
+        // ── Axelrod cultural polarization + freezing (1997) ──────────────────
+        // Polities with maximal cultural distance trade less effectively, and
+        // beyond a freeze threshold (0.85 normalized distance) stop interacting
+        // entirely — frozen divergence with no remaining cultural overlap.
+        // Axelrod (1997): "The Dissemination of Culture." J. Conflict Resolution 41(2).
         const [ciA, ioA] = this.cpos[tc];
         const [ciB, ioB] = this.cpos[other];
         const cultureDist = Math.sqrt((ciA - ciB) ** 2 + (ioA - ioB) ** 2) / 2.828; // 0–1
-        const axelrodFriction = 1.0 - Math.max(0, (cultureDist - 0.6) * 0.5); // penalty above 0.6 distance
-        comp *= axelrodFriction;
+        if (cultureDist >= 0.85) {
+          comp = 0;  // frozen: no cultural overlap → no trade interaction
+        } else {
+          comp *= (1.0 - Math.max(0, (cultureDist - 0.6) * 0.5));
+        }
 
         let effMarkup, layerMult;
         if (effTech < 2.0) {
