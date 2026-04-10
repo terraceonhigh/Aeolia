@@ -354,6 +354,8 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 - Kennedy, H. (2004). *The Prophet and the Age of the Caliphates*. Pearson.
 - MacCulloch, D. (2009). *A History of Christianity*. Penguin.
 
+**→ Garden:** `garden/observations/the_piety_dynamics.md` (centripetal force mechanic documented in "The Centripetal Force Mechanic" section)
+
 ---
 
 ## VII. Population Dynamics
