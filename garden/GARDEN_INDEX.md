@@ -19,6 +19,7 @@
 | `the_relay_advantage.md` | Greif Maghribi trader coalition; relayBonusA formula; geographic chokepoints; coalition enforcement gap | §9 | Greif (1989, 1993) |
 | `the_three_layer_trade_system.md` | Subsistence (Braudel material life) / Relay (Abu-Lughod polycentric) / Administered (Wallerstein core/periphery) | §8 | Wallerstein (1974), Braudel (1979), Abu-Lughod (1989) |
 | `the_resource_curse.md` | Naphtha curse formula; pyra curse at 60%; Dutch Disease/patronage/conflict mechanisms; Vitalis critique | §11 | Sachs-Warner (1995), Ross (2012) |
+| `the_scramble_dynamics.md` | Three-threshold resource model; naphtha/pyra scramble prisoner's dilemma; Kennedy overextension; Le Billon resource geography | §31 | Le Billon (2012), Kennedy (1987), Westing (1986) |
 | `the_growth_machine.md` | delta_tech formula terms; Solow A₀×crop_exp; Ayres-Warr energy_mult (calibrated 0.51); Romer contact_mult; accel_rate table | §7 | Solow (1956), Romer (1990), Ayres & Warr (2005) |
 | `the_malthusian_clamp.md` | Pre/post-tech-4 population regime; fishery exception; Boserupian release; interaction with desperation cascade | §22 | Malthus (1798), Boserup (1965) |
 | `the_collapse_cascade.md` | maintenance_cost = tech²; Tainter diminishing returns; Cline network contagion; asymmetric decay/recovery | §23 | Tainter (1988), Cline (2014) |
@@ -70,4 +71,4 @@
 
 ---
 
-*Index last updated: 2026-04-09, Session 6. 24 observations, 11 fragments. All observations now have ACADEMIC_GROUNDING § cross-references.*
+*Index last updated: 2026-04-09, Session 6. 25 observations, 11 fragments.*

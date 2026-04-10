@@ -496,6 +496,27 @@ The Acemoglu-Robinson "reversal of fortune" applies to Aeolia: polities that dev
 
 ---
 
+## XI. Resource Competition and Strategic Scrambles
+
+### 31. Three-threshold resource model and strategic scrambles (Le Billon 2012; Kennedy 1987)
+**Grade: B**  
+**Files:** `src/engine/SimEngine.js` (Stage 3 detection, Stage 8 naphtha depletion), `sim_proxy_v2.py`
+
+**Claim:** Resources cross three discrete thresholds: geological Detection (always possible), tech-gated Exploitation (profitable only above tech threshold), and Strategic Valuation (event-triggered recognition of military-industrial necessity). The Strategic Valuation threshold triggers the scramble — a punctuated competitive rush for control of a resource that was previously treated as commercially ordinary. Geographic concentration of strategic resources produces prisoner's dilemma dynamics: rational individual scrambling produces collectively destructive outcomes (overextension, institutional degradation, conflict in contested zones).
+
+**Sources:**
+- Le Billon, P. (2012). *Wars of Plunder: Conflicts, Profits and the Politics of Resources*. Columbia University Press.
+- Kennedy, P. (1987). *The Rise and Fall of the Great Powers*. Random House.
+- Westing, A.H. (1986). *Global Resources and International Conflict*. Oxford University Press.
+
+**Implementation:** `naphtha_desire_mult` expansion bonus fires at tech ~5 for polities below naphtha-fraction threshold. `pyra_desire_mult` fires at tech ~8. Strategic Valuation applies simultaneously to all polities at threshold crossing (no private-information first-mover advantage implemented).
+
+**Gap:** Simultaneous Strategic Valuation overstates coordination in scramble recognition. Historical scrambles involve private-information early movers who pre-position before collective recognition. No differential harm modeling for resource-motivated vs. non-resource territorial expansion.
+
+**→ Garden:** `garden/observations/the_scramble_dynamics.md`
+
+---
+
 ## XII. Collective Action and Institutional Fragility
 
 ### 28. Desperation expansion as collective action failure (Olson 1965; Tainter 1988)
@@ -536,7 +557,7 @@ The Acemoglu-Robinson "reversal of fortune" applies to Aeolia: polities that dev
 
 ---
 
-## XIII. Known Gaps (Priority Order)
+## XIV. Known Gaps (Priority Order)
 
 | Gap | Status | Notes |
 |-----|--------|-------|
