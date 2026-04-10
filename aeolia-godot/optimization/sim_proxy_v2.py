@@ -692,6 +692,7 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
     grievance       = [0.0] * N
     extractiveness  = [0.0] * N   # Acemoglu-Robinson: institutional lock-in index (0=inclusive, 1=extractive)
     proxy_war_log   = []           # Snyder/Kahn: proxy war events in nuclear era
+    relay_contact_since = {}       # (core, other) → tick: per-pair relay contact age for endemicity
 
     # Initialise
     for i, arch in enumerate(archs):
@@ -1183,6 +1184,11 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
                         if other_core != core and other_core not in contact_set[core]:
                             contact_set[core].add(other_core)
                             contact_set[other_core].add(core)
+                            # Record per-pair relay contact age for endemicity transition
+                            # (McNeill 1976: relay-trade contact before formal absorption
+                            #  builds partial pathogen immunity in the contacted population)
+                            relay_contact_since[(core, other_core)] = tick
+                            relay_contact_since[(other_core, core)] = tick
                             new_this_tick += 1
                             if new_this_tick >= max_new: break
 
@@ -1560,18 +1566,19 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
                     ct = substrate[target]["crops"]["primary_crop"]
                     cdist = _crop_distance(cc, ct)
                     sev = p.epi_base_severity + rng.next_float() * 0.15
-                    # Endemicity factor: prior contact exposure reduces severity.
-                    # Each tick of relay-trade contact (via contact_set) builds partial
-                    # immunity before formal political absorption.
-                    prior_contact_ticks = sum(
-                        1 for fc in first_contact_tick if fc is not None and fc < tick
-                    )
-                    immunity = _clamp(prior_contact_ticks * 0.02, 0.0, 0.6)
+                    # ── Endemicity transition (McNeill 1976): per-pair relay-trade contact
+                    # age determines immunity before formal political absorption.
+                    # Fixed: now uses per-pair contact duration (time since core and target
+                    # first appeared in each other's contact_set via relay trade) rather
+                    # than global count.  0.04/tick → max 0.6 immunity after 15 ticks (~750 yr).
+                    relay_ticks = tick - relay_contact_since.get((core, target), tick)
+                    immunity = _clamp(relay_ticks * 0.04, 0.0, 0.6)
                     mort = sev * cdist * (1.0 - immunity)
                     pop[target] *= (1.0 - mort)
                     epi_log.append({"arch": target, "contactor": core,
                                     "mortality_rate": mort, "tick": tick, "year": year,
-                                    "immunity_factor": immunity})
+                                    "immunity_factor": immunity,
+                                    "relay_contact_age": relay_ticks})
 
                 # Transfer all archs controlled by target to core
                 for j in range(N):

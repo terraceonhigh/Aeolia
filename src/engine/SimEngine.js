@@ -283,6 +283,10 @@ export class SimEngine {
     // Builds from concentrated extraction under collectivist culture;
     // penalizes TFP independently of the naphtha resource curse.
     this.extractiveness = new Float64Array(this.N);
+    // Per-pair relay contact age: maps `${core}_${other}` → tick when contact first established.
+    // Used for endemicity transition (McNeill 1976): longer relay-trade contact → more immunity
+    // before formal political absorption.
+    this.relayContactSince = new Map();
 
     // ── Logs ───────────────────────────────────────────────
     this.epiLog = [];
@@ -900,6 +904,12 @@ export class SimEngine {
             if (otherCore !== core && !this.contactSet[core].has(otherCore)) {
               this.contactSet[core].add(otherCore);
               this.contactSet[otherCore].add(core);
+              // Record per-pair relay contact tick for endemicity immunity calculation
+              const key1 = `${core}_${otherCore}`, key2 = `${otherCore}_${core}`;
+              if (!this.relayContactSince.has(key1)) {
+                this.relayContactSince.set(key1, tick);
+                this.relayContactSince.set(key2, tick);
+              }
               newThisTick++;
               if (newThisTick >= maxNew) break outer;
             }
@@ -1287,13 +1297,18 @@ export class SimEngine {
           const ct = this.substrate[target].crops.primary_crop;
           const cdist = _cropDistance(cc, ct);
           const sev = p.epi_base_severity + this.rng() * 0.15;
-          // Count prior first-contact events as proxy for global pathogen exposure pool
-          const priorContacts = this.firstContactTick.filter(t => t !== null && t < tick).length;
-          const immunity = Math.min(0.6, priorContacts * 0.02);
+          // ── Endemicity transition (McNeill 1976): per-pair relay contact age ──
+          // How long core and target have been in relay-trade contact before
+          // formal political absorption determines partial pathogen immunity.
+          // 0.04/tick → max 0.6 immunity after 15 ticks of relay trade (~750 yrs).
+          const relayKey = `${core}_${target}`;
+          const relaySinceTick = this.relayContactSince.get(relayKey) ?? tick;
+          const relayAge = tick - relaySinceTick;
+          const immunity = Math.min(0.6, relayAge * 0.04);
           const mort = sev * cdist * (1.0 - immunity);
           this.pop[target] *= (1 - mort);
           this.epiLog.push({ arch: target, contactor: core, mortality_rate: mort,
-                             immunity_factor: immunity, tick, year });
+                             immunity_factor: immunity, relay_contact_age: relayAge, tick, year });
         }
 
         // Transfer
