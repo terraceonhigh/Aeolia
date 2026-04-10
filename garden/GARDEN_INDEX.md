@@ -52,6 +52,7 @@
 |------|------|---------------------|---------|
 | `kauri_consortium_briefing.md` | Year -240 BP | Commercial consortium (pre-DF era) | Pre-Strange Peace commercial meeting; first strategic resource awareness |
 | `reach_planning_document.md` | Year -12 BP | Reach military/strategic planning | Pre-Strange Peace Reach strategic assessment |
+| `first_detonation_dispatch.md` | Year -8 BP | Thornset Commercial Registry (Circuit emergency dispatch) | First nuclear detonation at Haugen Test Facility; commercial implications; pyra market shock |
 | `dispatch_year_zero.md` | Year 0 (Strange Peace establishment) | Unnamed journalist/observer | Moment of Strange Peace establishment |
 | `the_two_flags.md` | Early Strange Peace | Unnamed | Two hegemon founding moment and symbolism |
 | `sargasso_basin_circular.md` | Year 2 SP | Sargasso Basin relay council | Intermediate belt commercial adaptation to Strange Peace |
@@ -72,4 +73,4 @@
 
 ---
 
-*Index last updated: 2026-04-09, Session 6. 26 observations, 11 fragments. ACADEMIC_GROUNDING: 32 sections (§1–§32), all with garden cross-references or worldbuilding coverage.*
+*Index last updated: 2026-04-09, Session 6. 26 observations, 12 fragments. ACADEMIC_GROUNDING: 32 sections (§1–§32), all with garden cross-references or worldbuilding coverage.*
