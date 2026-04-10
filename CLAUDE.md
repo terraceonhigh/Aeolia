@@ -139,30 +139,35 @@ Aeolia/
 - 17 situation cards, 10+ popup types, source-tagged dispatches feed
 - **Dark Forest now fires correctly** (fixed 2026-04-09): Added distance-independent nuclear peer awareness accumulation (0.04/tick per side once both polities tech ≥ 9). Calibrated `energy_to_tfp=0.51` so tech 9 is reached around year -400 and DF fires at year ~-200 on primary seed (216089). **Note:** DF now fires at -250 on primary seed after per-pair relay contact age endemicity fix (2026-04-09 session 2) — both hegemons still confirmed, all 4 verification checks pass.
 
-**Academic grounding (2026-04-09 session 2):** All major gaps in `docs/ACADEMIC_GROUNDING.md` resolved:
+**Academic grounding (2026-04-09 sessions 2-4):** ALL gaps in `docs/ACADEMIC_GROUNDING.md` resolved — Known Gaps table 7/7 ✓ Implemented:
 - Acemoglu-Robinson institutional lock-in (`extractiveness` index, TFP penalty)
 - Proxy war casualties (Snyder stability-instability paradox, nuclear era)
 - Doctrinal innovation in schism (Weber Protestant Ethic — Reformed culture shift)
 - Per-pair relay contact age for endemicity (McNeill 1976, corrected from global count)
 - Pyra/military-industrial complex resource curse (tech ≥ 8.5)
 - Axelrod cultural freezing threshold (culture_dist ≥ 0.85 → no trade)
-- verify_seed() fixed to use json.load (not load_world) — avoids silent fishery-field regression
-- **AJR reversal-of-fortune diagnostic** (2026-04-09 session 3): `pre_colonial_state` + `reversal_of_fortune_r` (Spearman r) in output; Card 20 shows reversal note when r < -0.20
+- **AJR reversal-of-fortune diagnostic**: `pre_colonial_state` + `reversal_of_fortune_r` (Spearman r)
+- **Walt balance-of-threat alliance formation** (session 4): Stage 4.5 — `alignment[i]` drifts toward less-threatening hegemon post-DF; penalty for opposed-hegemon expansion up to 2.5×|alignment|. Params: `alliance_formation_rate` (0.04), `alliance_protection_str` (2.5). 2 new PARAM_BOUNDS entries.
+- **Observatory StatsPanel**: shows `reversal_of_fortune_r` with color-coded label and AJR citation
 
-**Worldbuilding corpus (2026-04-09 session 3):** 4 series, 32 chapters, 12 garden pieces:
+SimParams now has **33 optimizer-tunable parameters**.
+
+**Worldbuilding corpus (2026-04-09 sessions 3-4):** 5 series, 37+ chapters, 15+ garden pieces:
 - **Reach history**: 12 chapters (Ch. 1-12, complete)
-- **Reach civics** (Our Reach Our Trade): 6 chapters (Ch. 3-8)
-- **Lattice history**: 10 chapters (Ch. 1-10, **complete** as of session 3)
-  - Ch. 1-3: Circuit formation, First Connectivity, founding bargain
-  - Ch. 4-8: Reach contact, administered trade, constitution, colonial era, industrial prelude
-  - Ch. 9-10: Catch-Up, Strange Peace (Lattice perspective)
-- **Lattice civics** (The Circuit and the Contract): 4 chapters (Ch. 1-4, Part One)
-- **Garden** (Clio's working space): 3 parables, 5 observations, 4 fragments
-  - Notable fragments: Kauri Consortium internal briefing (Year -240 BP); Oran Confederacy address (Year 47 SP)
-  - Notable observations: desperation trap (Tainter/Cline), two bargains (military vs. legal empire), grateful to be neutral (intermediate belt)
+- **Reach civics** (Our Reach Our Trade, 11th ed. "Young Person's Guide"): 3 chapters (Ch. 1-3; Ch. 3 as `guide_ch3.md`)
+  - Separate elementary series ("Social Studies for Young Learners"): Ch. 3-8 (pre-existing)
+- **Lattice history** (Intro to Lattice History): 10 chapters (Ch. 1-10, complete)
+- **Lattice civics** (The Circuit and the Contract): 7 chapters (Ch. 1-7, Part One + Part Two beginning)
+  - Ch. 5: RSC (Relay Standards Commission) — neutral arbitrator innovation, Keohane regime theory
+  - Ch. 6: Sovereignty governance — veto players, Tsebelis, Madisonian federalism
+  - Ch. 7: Circuit economy — Prebisch-Singer terms of trade, Nurkse capital formation
+- **Garden** (Clio's working space): 4 parables, 8 observations, 6 fragments
+  - New fragments: Reach military planning memo (Year -12 BP); Sovereignty Commerce Council RSC memo (Year 12 SP)
+  - New observations: fever belt (epidemiology), veto players trap (Tsebelis), intermediate belt problem (Walt)
+  - New parables: reform dividend (Weber schism), mutual recognition (Schelling/Brodie deterrence)
 
 **Next steps:**
-- Run optimizer (run_optimization.py, 10K trials) to further refine all 29 parameters (3 new AR+proxy params)
+- Run optimizer (run_optimization.py, 10K trials) to further refine all 33 parameters (5 new since last run)
 - GitHub push (requires MacBook Neo — Aomori lacks stored credentials)
 
 ## Running the Sim
