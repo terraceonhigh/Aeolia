@@ -597,4 +597,4 @@ The Acemoglu-Robinson "reversal of fortune" applies to Aeolia: polities that dev
 
 ---
 
-*Last updated: 2026-04-09. Maintained by Clio. §26–§27 environmental mechanics; §28–§29 collective action / veto players; §30 power transition (Organski/Gilpin). Davis (2001) crop failure amplification and McNeill wave epidemic tech-gating implemented. Garden cross-references complete (§1–§30 where garden observations exist).*
+*Last updated: 2026-04-09 (Session 6). Maintained by Clio. 32 sections total. §28–§32 added this session (collective action, veto players, power transition, resource competition, culture-to-behavior). Davis crop failure amplification, Ostrom commons governance, McNeill tech-gated wave mortality implemented in SimEngine.js. Garden cross-references complete (§1–§32).*
