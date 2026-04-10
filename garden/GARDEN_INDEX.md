@@ -22,10 +22,10 @@
 | `the_growth_machine.md` | delta_tech formula terms; Solow A₀×crop_exp; Ayres-Warr energy_mult (calibrated 0.51); Romer contact_mult; accel_rate table | §7 | Solow (1956), Romer (1990), Ayres & Warr (2005) |
 | `the_malthusian_clamp.md` | Pre/post-tech-4 population regime; fishery exception; Boserupian release; interaction with desperation cascade | §22 | Malthus (1798), Boserup (1965) |
 | `the_collapse_cascade.md` | maintenance_cost = tech²; Tainter diminishing returns; Cline network contagion; asymmetric decay/recovery | §23 | Tainter (1988), Cline (2014) |
-| `the_desperation_trap.md` | Desperation cascade mechanics; why rational expansion makes things worse; expansion-failure spiral | §23 (related) | — |
-| `the_environmental_shocks.md` | Crop failure (Le Roy Ladurie; Davis; tech-gated probability); fishery depletion (Hardin 1968 tragedy of the commons; Ostrom 1990); commons governance gap | — | Hardin (1968), Ostrom (1990), Davis (2001) |
+| `the_desperation_trap.md` | Desperation cascade mechanics; why rational expansion makes things worse; expansion-failure spiral; Olson collective action failure | §28 | Olson (1965), Tainter (1988), Cline (2014) |
+| `the_environmental_shocks.md` | Crop failure (Le Roy Ladurie; Davis; tech-gated probability); fishery depletion (Hardin 1968 tragedy of the commons; Ostrom 1990); commons governance gap | §26, §27 | Hardin (1968), Ostrom (1990), Davis (2001) |
 | `the_piety_dynamics.md` | Norris-Inglehart secular transition; Grzymala-Busse schism (§20); centripetal force mechanic (§21); gaps | §19, §20, §21 | Norris & Inglehart (2004), Grzymala-Busse (2023), Weber (1904) |
-| `the_veto_players_trap.md` | Tsebelis veto players; institutional crisis fragility; desperation cascade interaction | — | Tsebelis (2002) |
+| `the_veto_players_trap.md` | Tsebelis veto players; institutional crisis fragility; desperation cascade interaction; Olson distributional coalitions | §29 | Tsebelis (2002), Olson (1982), North (1990) |
 | `the_disease_arc.md` | Virgin-soil (Diamond); endemicity transition (McNeill); epidemic waves (§17); urban sink (§18) | §14, §15, §17, §18 | Diamond (1997), McNeill (1976), Davenport (2020) |
 | `the_fever_belt.md` | Malaria cap formula; abs_lat < 20°; tech ≥ 6 resolution; compound equatorial disadvantage | §16 | Gallup & Sachs (2001) |
 | `the_intermediate_belt_problem.md` | Walt balance-of-threat; alignment formula; non-aligned movement analog; proxy competition stability | §4 | Walt (1987) |
@@ -69,4 +69,4 @@
 
 ---
 
-*Index last updated: 2026-04-09, Session 5. 24 observations, 10 fragments.*
+*Index last updated: 2026-04-09, Session 6. 24 observations, 10 fragments. All observations now have ACADEMIC_GROUNDING § cross-references.*

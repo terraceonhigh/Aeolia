@@ -473,6 +473,46 @@ The Acemoglu-Robinson "reversal of fortune" applies to Aeolia: polities that dev
 
 ---
 
+## X. Collective Action and Institutional Fragility
+
+### 28. Desperation expansion as collective action failure (Olson 1965; Tainter 1988)
+**Grade: B**  
+**Files:** `src/engine/SimEngine.js` (Stage 6 expansion targeting under desperation), `sim_proxy_v2.py`
+
+**Claim:** The desperation cascade produces expansion that is locally rational for each polity but collectively catastrophic — a collective action failure in which multiple polities simultaneously under resource stress attack each other, consuming resources none of them can afford to spend. The mechanism is structurally identical to Olson's logic of collective action applied to inter-polity competition: each actor's individually rational response to the common-pool problem intensifies the problem for all actors.
+
+**Sources:**
+- Olson, M. (1965). *The Logic of Collective Action*. Harvard University Press.
+- Tainter, J. (1988). *The Collapse of Complex Societies*. Cambridge University Press.
+- Cline, E. (2014). *1177 B.C.: The Year Civilization Collapsed*. Princeton University Press.
+
+**Implementation:** Desperation cascade overrides the polity's normal cultural allocation, boosting expansion share. Polities under equal resource stress from the same systemic cause (crop failure year, fishery depletion, epidemic) simultaneously target each other — neighboring polities that are also under stress and do not have surplus to offer the conqueror. The cascade is self-reinforcing because failed expansion raises maintenance cost and deepens the resource shortfall.
+
+**Gap:** The simulation does not model the coordination mechanism by which real polities have sometimes escaped this collective action failure (Concert of Europe analog, mutual contraction agreements). The Strange Peace's deterrence structure is a partial implementation — the −12.0 targeting penalty between hegemons prevents the cascade at the nuclear tier — but pre-nuclear polities have no equivalent coordination mechanism.
+
+**→ Garden:** `garden/observations/the_desperation_trap.md`
+
+---
+
+### 29. Veto players and crisis reallocation lag (Tsebelis 2002; Olson 1982)
+**Grade: B**  
+**Files:** `src/engine/SimEngine.js` (desperation threshold, allocation override speed), `sim_proxy_v2.py`
+
+**Claim:** Polities with distributed governance — multiple veto players who must agree before resource allocation shifts — respond more slowly to resource crises than polities with unified command structures. Tsebelis's core finding: more veto players → greater policy stability in normal times → greater policy fragility in crisis times. The tradeoff is structural, not correctable by intent. Olson's Rise and Decline adds the distributional dimension: established veto coalitions capture allocation rents and resist shifts that would cost their constituency.
+
+**Sources:**
+- Tsebelis, G. (2002). *Veto Players: How Political Institutions Work*. Princeton University Press.
+- Olson, M. (1982). *The Rise and Decline of Nations*. Yale University Press.
+- North, D. (1990). *Institutions, Institutional Change and Economic Performance*. Cambridge University Press.
+
+**Implementation:** `desperation_threshold` varies by polity but does not explicitly encode governance type. The mechanic operationalizes governance type through outcome proxies: Sovereignty-type polities (high veto players) enter the cascade more readily under equivalent resource stress than Reach-type polities (unified command). The simulation does not track veto-player count directly; the variation is embedded in the effective allocation override speed.
+
+**Gap:** The veto players mechanic is not explicitly parameterized in SimParams. The variation is implicit in initial culture-space positioning and allocation share functions. A more explicit implementation would encode a `governance_concentration` variable that modifies allocation override speed and `desperation_threshold` directly, allowing the Tsebelis tradeoff to be studied across the parameter space.
+
+**→ Garden:** `garden/observations/the_veto_players_trap.md`
+
+---
+
 ## XI. Known Gaps (Priority Order)
 
 | Gap | Status | Notes |
@@ -487,4 +527,4 @@ The Acemoglu-Robinson "reversal of fortune" applies to Aeolia: polities that dev
 
 ---
 
-*Last updated: 2026-04-09. Maintained by Clio. Walt alliance formation implemented same date. Garden cross-references added to all sections with corresponding observations (§1, §4–§11, §13, §19–§20, §22–§25).*
+*Last updated: 2026-04-09. Maintained by Clio. Walt alliance formation implemented same date. §26–§27 environmental mechanics added. §28–§29 collective action and veto players added. Garden cross-references added to all sections with corresponding observations (§1, §4–§11, §13, §19–§20, §22–§29).*
