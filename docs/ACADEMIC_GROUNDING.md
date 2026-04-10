@@ -24,6 +24,8 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 
 **Gap:** Wittfogel's hypothesis has been criticized for being unfalsifiable and selecting on the dependent variable (Levi 1988). Aeolia uses it as a generative starting condition, not a deterministic law — polities drift from their seed positions based on material circumstances.
 
+**→ Garden:** `garden/observations/the_crop_culture_seed.md`
+
 ---
 
 ### 2. Continuous culture-space drift (Axelrod 1997; Boyd & Richerson 1985)
@@ -71,6 +73,8 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 - Stage 2 posture table (expansion share) implements Mearsheimer/Schweller via culture→posture mapping.
 - Stage 4.5 implements Walt's balance-of-threat: post-DF, each non-hegemon polity maintains `alignment[i] ∈ [-1, 1]` that drifts toward the less-threatening hegemon each tick. Threat = `tech × (1 + extractiveness) × fleet_scale / distance`. Aligned polities impose a penalty (up to `alliance_protection_str × |alignment|`, default 2.5) on the opposing hegemon's expansion attempts against them. Two new params: `alliance_formation_rate` (0.04), `alliance_protection_str` (2.5). Effect visible on seeds with DF year < -500 (e.g., seed 2: DF year -1200, 5 non-zero alignments in range 0.1–0.3 after 20 ticks).
 
+**→ Garden:** `garden/observations/the_intermediate_belt_problem.md`
+
 ---
 
 ### 5. Dark Forest / Security Dilemma at civilizational scale
@@ -86,6 +90,8 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 
 **Implementation:** `otherAwareness` accumulates at 0.04/tick once both polities have tech ≥ 9.0; fires DF when awareness > 0.30. Arms race continues post-DF with tech bonus for hegemons above 8.5.
 
+**→ Garden:** `garden/observations/the_strange_equilibrium.md`
+
 ---
 
 ### 6. Stability-instability paradox (Snyder 1965; Waltz 1981)
@@ -99,6 +105,8 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 - Waltz, K. (1981). *The Spread of Nuclear Weapons*. IISS.
 
 **Implementation:** After DF fires, nuclear hegemons receive a +3.0 expansion bonus targeting non-nuclear territory in the rival hegemon's contact network, partially offsetting the −12.0 deterrence penalty against each other.
+
+**→ Garden:** `garden/observations/the_strange_equilibrium.md`
 
 ---
 
@@ -117,6 +125,8 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 
 **Implementation:** `delta_tech = A₀ × crop_exp × share_mult × accel_rate × contact_mult × energy_mult`. `energy_mult = er × energy_to_tfp` directly couples energy surplus to TFP.
 
+**→ Garden:** `garden/observations/the_growth_machine.md`
+
 ---
 
 ### 8. Three-layer trade system: Subsistence → Relay → Administered (Abu-Lughod; Wallerstein; Braudel)
@@ -129,6 +139,8 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 - Abu-Lughod, J. (1989). *Before European Hegemony*. Oxford University Press.
 - Wallerstein, I. (1974). *The Modern World-System*, Vol. I. Academic Press.
 - Braudel, F. (1949/1972). *The Mediterranean*. University of California Press.
+
+**→ Garden:** `garden/observations/the_three_layer_trade_system.md`
 
 ---
 
@@ -144,6 +156,8 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 
 **Implementation:** `relayBonusA = min(0.40, contactSet[tc].size × greif_relay_bonus)`. Nodes with more contacts capture a larger share of the trade surplus.
 
+**→ Garden:** `garden/observations/the_relay_advantage.md`
+
 ---
 
 ### 10. Prebisch-Singer declining terms of trade (Prebisch 1950; Singer 1950)
@@ -157,6 +171,8 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 - Singer, H. (1950). "The Distribution of Gains between Investing and Borrowing Countries." *American Economic Review* 40(2).
 
 **Implementation:** `psA = prebisch_bulk_discount (0.75)` for bulk crops, `1.0` for specialty crops. Applied per trading side, producing asymmetric benefits from the same trade relationship.
+
+**→ Garden:** `garden/observations/the_terms_of_trade_ratchet.md`
 
 ---
 
@@ -174,6 +190,8 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 **Implementation:** Fires when polity controls > ~13% of world initial C stock, tech 6–9.5. `curse = clamp(polityFrac × 3.0 − 0.4, 0, 0.5); a0 × = (1 − curse × resource_curse_strength)`.
 
 **Gap:** None. See Mechanic 25 (Acemoglu-Robinson) below.
+
+**→ Garden:** `garden/observations/the_resource_curse.md`
 
 ---
 
@@ -204,6 +222,8 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 **Implementation:** `grievance[i]` accumulates from excess extraction above `sov_extraction_decay × 0.5`. `resistanceMult = 1 + grievance × grievance_resistance_mult` amplifies the recovery term in sovereignty drift.
 
 **Gap:** Scott's model emphasizes micro-level everyday resistance, not just aggregate sovereignty recovery. The current implementation operationalizes the structural outcome (extraction → resistance → recovery) without modeling the cultural/cognitive mechanism (consciousness-raising, participation axis drift).
+
+**→ Garden:** `garden/observations/the_grievance_accumulation.md`
 
 ---
 
@@ -293,6 +313,8 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 
 **Implementation:** `if (er < 0.6) piety += dRate × (0.6 − er) × 2.5`. High tech → secular via `piety −= dRate × (tech − 7.0) × 0.25` (mediated by prosperity, compressed for sim resolution).
 
+**→ Garden:** `garden/observations/the_piety_dynamics.md`
+
 ---
 
 ### 20. Reformation-model schism: piety + weak sovereignty → fragmentation (Grzymala-Busse 2023)
@@ -305,6 +327,8 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 - Grzymala-Busse, A. (2023). "Tilly Goes to Church: The Religious and Medieval Roots of European State Fragmentation." *American Political Science Review* 117(1).
 
 **Implementation:** Pressure = `(piety − 0.60) × lowSovFrac × 3.0 × techDamp`. Fires at pressure > 1.0 → bottom third of low-sovereignty peripherals break away.
+
+**→ Garden:** `garden/observations/the_piety_dynamics.md`
 
 ---
 
@@ -333,6 +357,8 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 - Malthus, T. (1798). *An Essay on the Principle of Population*.
 - Boserup, E. (1965). *The Conditions of Agricultural Growth*. Aldine.
 
+**→ Garden:** `garden/observations/the_malthusian_clamp.md`
+
 ---
 
 ### 23. Tech decay / collapse cascade (Tainter 1988; Cline 2014)
@@ -346,6 +372,8 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 - Cline, E. (2014). *1177 B.C.: The Year Civilization Collapsed*. Princeton University Press.
 
 **Implementation:** `maintenance_cost = tech² × maintenance_rate`. If `energy_surplus < maintenance_cost`, `tech −= shortfall × decay_rate`. Desperation cascade then overrides allocation toward resource acquisition.
+
+**→ Garden:** `garden/observations/the_collapse_cascade.md`
 
 ---
 
@@ -363,6 +391,8 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 - Kirch, P. (2000). *On the Road of the Winds*. University of California Press.
 
 **Note:** No direct academic precedent exists for a ~95% ocean world. This is the thought-experiment frontier. Internal consistency with thalassocratic dynamics is the primary validity criterion.
+
+**→ Garden:** `garden/observations/the_thalassocratic_condition.md`
 
 ---
 
@@ -385,6 +415,8 @@ The Acemoglu-Robinson "reversal of fortune" applies to Aeolia: polities that dev
 
 **Reversal-of-fortune diagnostic (implemented 2026-04-09):** `pre_colonial_state` dict records each archipelago's tech and population at the tick of first absorption. `reversal_of_fortune_r` (Spearman rank correlation) in the output dict measures the correlation between pre-colonial tech rank and final tech rank. A negative value confirms the AJR reversal pattern: formerly more-prosperous polities ended up comparatively worse off after colonization. On seed 216089, r ≈ +0.03 (no strong reversal), consistent with AJR's finding that reversal appears in cross-section, not on individual simulation paths. The diagnostic is now available for optimizer-level analysis across seeds.
 
+**→ Garden:** `garden/observations/the_lock_in_mechanics.md`
+
 ---
 
 ## X. Known Gaps (Priority Order)
@@ -401,4 +433,4 @@ The Acemoglu-Robinson "reversal of fortune" applies to Aeolia: polities that dev
 
 ---
 
-*Last updated: 2026-04-09. Maintained by Clio. Walt alliance formation implemented same date.*
+*Last updated: 2026-04-09. Maintained by Clio. Walt alliance formation implemented same date. Garden cross-references added to all sections with corresponding observations (§1, §4–§11, §13, §19–§20, §22–§25).*
