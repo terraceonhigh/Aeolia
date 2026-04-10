@@ -1048,9 +1048,9 @@ function GameInner({ seed, onBack }) {
             sprite.material.opacity = 0.5;
             sprite.visible = true;
           } else if (v === 'rumor') {
-            sprite.material.color.set(0x6a5a3a); // very faded
-            sprite.material.opacity = 0.2;
-            sprite.visible = true;
+            // Rumor: island presence hinted by the dim marker dot, but no name shown.
+            // "Here be dragons" — you've heard something is out there, not what it's called.
+            sprite.visible = false;
           } else {
             sprite.visible = false;
           }

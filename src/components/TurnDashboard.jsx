@@ -435,9 +435,14 @@ function ArchDetailPanel({
     : ctrl !== undefined ? '#a09060'
     : '#5a4a3a';
 
-  // Minerals — from frontier entry or substrate fallback
-  const minerals = fEntry?.minerals ?? substrate?.[archIdx]?.minerals ?? {};
-  const crop     = fEntry?.crop ?? substrate?.[archIdx]?.crops?.primary_crop;
+  // Intelligence gate — only expose details for owned territory or formally-contacted polities.
+  // Frontier islands that haven't been contacted yet are "uncharted waters."
+  const contactedCores = snapshot?.contactedCores ?? [];
+  const isContacted = isOwned || (ctrl !== undefined && contactedCores.includes(ctrl));
+
+  // Minerals — from frontier entry or substrate fallback (only if contacted/owned)
+  const minerals = isContacted ? (fEntry?.minerals ?? substrate?.[archIdx]?.minerals ?? {}) : {};
+  const crop     = isContacted ? (fEntry?.crop ?? substrate?.[archIdx]?.crops?.primary_crop) : null;
   const mineralList = Object.entries(minerals)
     .filter(([k, v]) => MINERAL_DISPLAY_KEYS.has(k) && v > 0)
     .map(([k]) => MINERAL_LABELS[k] || k);
@@ -465,13 +470,16 @@ function ArchDetailPanel({
         </div>
       </div>
 
-      {/* Stats row — only for frontier/known */}
+      {/* Stats row — distance always visible; pop/tech/crop only after formal contact */}
       {(fEntry || isOwned) && (
         <div style={{ fontSize: 7, color: '#8a7a5a', display: 'flex', gap: 10, marginBottom: 4 }}>
-          {fEntry?.pop !== undefined && <span>pop {(fEntry.pop / 1000).toFixed(1)}k</span>}
-          {fEntry?.tech !== undefined && <span>tech {fEntry.tech}</span>}
           {fEntry?.distance !== undefined && <span>dist {fEntry.distance.toFixed(2)}</span>}
-          {crop && <span>{crop}</span>}
+          {isContacted && fEntry?.pop !== undefined && <span>pop {(fEntry.pop / 1000).toFixed(1)}k</span>}
+          {isContacted && fEntry?.tech !== undefined && <span>tech {fEntry.tech}</span>}
+          {isContacted && crop && <span>{crop}</span>}
+          {!isContacted && isOnFrontier && (
+            <span style={{ color: '#4a3a24', fontStyle: 'italic' }}>uncharted waters</span>
+          )}
         </div>
       )}
 
@@ -620,6 +628,9 @@ export default function TurnDashboard({
           {frontier.map(f => {
             const sel  = selectedTargets.has(f.index);
             const held = f.controller !== f.index;
+            // Intelligence gate: only reveal pop/tech/crop/minerals for polities
+            // we've formally contacted. Uncontacted frontier shows distance only.
+            const known = f.contacted;
             return (
               <div key={f.index} style={S.targetItem(sel)}
                 onClick={() => onToggleTarget(f.index)}>
@@ -628,13 +639,19 @@ export default function TurnDashboard({
                     {sel ? '[×] ' : '[  ] '}{names[f.index]}
                     {held && <span style={{ color: '#a07030', marginLeft: 4 }}>(held)</span>}
                   </div>
-                  <div style={{ fontSize: 7, color: '#6a5a3a', marginTop: 2 }}>
-                    p{f.pop} · t{f.tech} · {f.crop}
-                    {f.minerals.Cu && ' · Cu'}
-                    {f.minerals.Au && ' · Au'}
-                    {f.minerals.C > 0 && ' · C'}
-                    {f.minerals.Pu && ' · Pu'}
-                  </div>
+                  {known ? (
+                    <div style={{ fontSize: 7, color: '#6a5a3a', marginTop: 2 }}>
+                      p{f.pop} · t{f.tech} · {f.crop}
+                      {f.minerals.Cu && ' · Cu'}
+                      {f.minerals.Au && ' · Au'}
+                      {f.minerals.C > 0 && ' · C'}
+                      {f.minerals.Pu && ' · Pu'}
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: 7, color: '#4a3a24', marginTop: 2, fontStyle: 'italic' }}>
+                      uncharted waters
+                    </div>
+                  )}
                 </div>
                 <div style={{ fontSize: 7, color: '#6a5a3a', marginLeft: 6, flexShrink: 0 }}>
                   d={f.distance.toFixed(2)}

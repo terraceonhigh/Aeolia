@@ -446,6 +446,7 @@ export class SimEngine {
 
   getFrontier(core) {
     const ctrlSet = new Set(this._controlled(core));
+    const contactSet = this.contactSet[core]; // Set of formally-contacted polity cores
     const frontier = [];
     const seen = new Set();
     for (const j of ctrlSet) {
@@ -454,13 +455,18 @@ export class SimEngine {
           seen.add(nb);
           const dist = _gcDistArch(this.archs[core], this.archs[nb]);
           const rv = _resourceValue(this.substrate[nb].minerals, this.tech[core], this.p.cu_unlock_tech);
+          const nbCtrl = this.controller[nb];
+          // contacted = true means the player has formally met this polity,
+          // which unlocks intelligence about their population, tech, and resources.
+          const contacted = contactSet.has(nbCtrl) || nbCtrl === core;
           frontier.push({
             index: nb,
             distance: dist,
             resourceValue: rv,
             pop: Math.round(this.pop[nb]),
             tech: Math.round(this.tech[nb] * 10) / 10,
-            controller: this.controller[nb],
+            controller: nbCtrl,
+            contacted,
             crop: this.substrate[nb].crops.primary_crop,
             minerals: { ...this.substrate[nb].minerals },
           });
