@@ -435,7 +435,45 @@ The Acemoglu-Robinson "reversal of fortune" applies to Aeolia: polities that dev
 
 ---
 
-## X. Known Gaps (Priority Order)
+## X. Environmental Mechanics
+
+### 26. Crop failure stochasticity (Le Roy Ladurie 1967; Davis 2001)
+**Grade: B**  
+**Files:** `src/engine/SimEngine.js` (Stage 0 environmental pre-pass), `sim_proxy_v2.py`
+
+**Claim:** Pre-industrial agricultural yields were stochastic, subject to periodic failure from climate variability, pests, and soil exhaustion. Tech development reduces failure probability (storage, irrigation, crop variety buffering). Failure events in extractively-administered territories produce amplified mortality per Davis (2001).
+
+**Sources:**
+- Le Roy Ladurie, E. (1967). *Times of Feast, Times of Famine*. Doubleday.
+- Davis, M. (2001). *Late Victorian Holocausts: El Niño Famines and the Making of the Third World*. Verso.
+
+**Implementation:** `cropFailureModifier[]` per arch; failure probability tech-gated (higher for tech < 5). Failure reduces yield by 20–60%; recovery at +0.25/tick.
+
+**Gap:** Failure impact does not vary by institutional quality. Davis's finding — that extractive administration amplifies crop failure mortality — is not modeled; all polities face uniform recovery regardless of administrative quality.
+
+**→ Garden:** `garden/observations/the_environmental_shocks.md`
+
+---
+
+### 27. Fishery depletion: tragedy of the commons (Hardin 1968; Ostrom 1990)
+**Grade: B**  
+**Files:** `src/engine/SimEngine.js` (Stage 0 fishery stock update), `sim_proxy_v2.py`
+
+**Claim:** Open-access fisheries are subject to progressive depletion when extraction rate exceeds recovery rate, with stock collapse as the endpoint. Commons governance (Ostrom) can prevent collapse; absence of governance produces the Hardin tragedy.
+
+**Sources:**
+- Hardin, G. (1968). "The Tragedy of the Commons." *Science* 162(3859).
+- Ostrom, E. (1990). *Governing the Commons*. Cambridge University Press.
+
+**Implementation:** `fisheryStock[]` recovers at 8%/tick; depletes proportional to coastal population × fishing_intensity. Collapse below threshold produces yield reduction until stock recovers.
+
+**Gap:** All polities face open-access depletion dynamics. Ostrom-style commons governance (which would produce sustainable-yield harvesting in polities with effective institutions) is not implemented; depletion rate is institution-blind.
+
+**→ Garden:** `garden/observations/the_environmental_shocks.md`
+
+---
+
+## XI. Known Gaps (Priority Order)
 
 | Gap | Status | Notes |
 |-----|--------|-------|
