@@ -137,10 +137,20 @@ Aeolia/
 - Post-DF deterrence: hegemons frozen against each other; arms race continues
 - Observatory mode: 3-chart panel (tech/pop/piety) + world map + event timeline + scrubber
 - 17 situation cards, 10+ popup types, source-tagged dispatches feed
-- **Dark Forest now fires correctly** (fixed 2026-04-09): Added distance-independent nuclear peer awareness accumulation (0.04/tick per side once both polities tech ≥ 9). Calibrated `energy_to_tfp=0.51` so tech 9 is reached around year -400 and DF fires at year -200 on primary seed (216089).
+- **Dark Forest now fires correctly** (fixed 2026-04-09): Added distance-independent nuclear peer awareness accumulation (0.04/tick per side once both polities tech ≥ 9). Calibrated `energy_to_tfp=0.51` so tech 9 is reached around year -400 and DF fires at year ~-200 on primary seed (216089). **Note:** DF now fires at -250 on primary seed after per-pair relay contact age endemicity fix (2026-04-09 session 2) — both hegemons still confirmed, all 4 verification checks pass.
+
+**Academic grounding (2026-04-09 session 2):** All major gaps in `docs/ACADEMIC_GROUNDING.md` resolved:
+- Acemoglu-Robinson institutional lock-in (`extractiveness` index, TFP penalty)
+- Proxy war casualties (Snyder stability-instability paradox, nuclear era)
+- Doctrinal innovation in schism (Weber Protestant Ethic — Reformed culture shift)
+- Per-pair relay contact age for endemicity (McNeill 1976, corrected from global count)
+- Pyra/military-industrial complex resource curse (tech ≥ 8.5)
+- Axelrod cultural freezing threshold (culture_dist ≥ 0.85 → no trade)
+- verify_seed() fixed to use json.load (not load_world) — avoids silent fishery-field regression
+- garden/ directory created: 2 observations, 2 parables, 2 fragments (3 registers)
 
 **Next steps:**
-- Run optimizer (run_optimization.py, 10K trials) to further refine all 26 parameters
+- Run optimizer (run_optimization.py, 10K trials) to further refine all 28 parameters (2 new AR params)
 - GitHub push (requires MacBook Neo — Aomori lacks stored credentials)
 
 ## Running the Sim
