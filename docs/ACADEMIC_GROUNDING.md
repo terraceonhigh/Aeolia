@@ -209,6 +209,8 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 - Wallerstein, I. (1974). *The Modern World-System*. Academic Press.
 - Frank, A.G. & Gills, B. (1993). *The World System: Five Hundred Years or Five Thousand?*. Routledge.
 
+**→ Garden:** `garden/observations/two_bargains.md` (Reach military vs. Lattice legal colonial founding; extractiveness_index differentiation); `garden/observations/the_three_layer_trade_system.md` (Administered layer as Wallerstein core/periphery extraction)
+
 ---
 
 ### 13. Scott's resistance: self-limiting colonialism (Scott 1985, 1990)
