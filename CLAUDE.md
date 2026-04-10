@@ -152,21 +152,24 @@ Aeolia/
 
 SimParams now has **33 optimizer-tunable parameters**.
 
-**Worldbuilding corpus (2026-04-09 sessions 3-5):** 5 series, 43+ chapters, 33 garden pieces:
+**Worldbuilding corpus (2026-04-09 sessions 3-6):** 5 series, 46 chapters, 24 garden observations + 10 fragments:
 - **Reach history**: 12 chapters (Ch. 1-12, complete)
-- **Reach civics** (Our Reach Our Trade, 11th ed. "Young Person's Guide"): 6 chapters (Ch. 1-6: ch1.md, ch2.md, guide_ch3-6.md)
+- **Reach civics** (Our Reach Our Trade, 11th ed. "Young Person's Guide"): **8 chapters** (Ch. 1-2: ch1.md, ch2.md; Ch. 3-6: guide_ch3-6.md; Ch. 7: guide_ch7.md; Ch. 8: guide_ch8.md)
+  - Ch. 7: The World the Reach Made — commercial language, institutional persistence, North/Greif
+  - Ch. 8: Living Inside the Network — administered territory populations, legitimacy gap, Scott/Tsebelis
   - Separate elementary series ("Social Studies for Young Learners"): Ch. 3-8 (pre-existing)
 - **Lattice history** (Intro to Lattice History): 10 chapters (Ch. 1-10, complete)
 - **Lattice civics** (The Circuit and the Contract): 9 chapters (Ch. 1-9, complete series)
   - Ch. 9: Reform, Tradition, and the Sovereignty's Future — North/Pierson path dependence, Putnam social capital, Ostrom polycentric governance, Tilly
-- **Garden** (Clio's working space): 23 observations, 10 fragments + GARDEN_INDEX.md
-  - All ACADEMIC_GROUNDING.md sections (§1-§25) now have `→ Garden:` cross-references
-  - Observations added session 5: crop_culture_seed, malthusian_clamp, three_layer_trade, growth_machine, thalassocratic_condition, strange_equilibrium, collapse_cascade, relay_advantage, resource_curse, culture_engine, disease_arc
-  - Fragments added session 5: sargasso_basin_circular, commerce_council_internal, the_kalapa_deliberation (Year 29 SP), civil_registry_assessment_y80 (Year 80 SP, classified), strange_peace_retrospective (Year 140 SP, joint academic)
+- **Garden** (Clio's working space): 24 observations, 10 fragments + GARDEN_INDEX.md
+  - **All 29 ACADEMIC_GROUNDING.md sections (§1–§29) now have `→ Garden:` cross-references**
+  - §26–§27 (Environmental Mechanics) added session 5; §28–§29 (Collective Action + Veto Players) added session 6
+  - Observations added session 5: crop_culture_seed, malthusian_clamp, three_layer_trade, growth_machine, thalassocratic_condition, strange_equilibrium, collapse_cascade, relay_advantage, resource_curse, culture_engine, disease_arc, environmental_shocks
+  - All pre-existing observations (desperation_trap, veto_players_trap, piety_dynamics, etc.) now have § cross-references
 
 **Next steps:**
-- Run optimizer (run_optimization.py, 10K trials) to further refine all 33 parameters (5 new since last run)
 - GitHub push (requires MacBook Neo — Aomori lacks stored credentials)
+- Optimizer rerun with all 33 parameters if DF timing refinement is desired (optional — current defaults well-calibrated)
 
 ## Running the Sim
 
