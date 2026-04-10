@@ -152,19 +152,18 @@ Aeolia/
 
 SimParams now has **33 optimizer-tunable parameters**.
 
-**Worldbuilding corpus (2026-04-09 sessions 3-4):** 5 series, 37+ chapters, 15+ garden pieces:
+**Worldbuilding corpus (2026-04-09 sessions 3-5):** 5 series, 42+ chapters, 29 garden pieces:
 - **Reach history**: 12 chapters (Ch. 1-12, complete)
-- **Reach civics** (Our Reach Our Trade, 11th ed. "Young Person's Guide"): 3 chapters (Ch. 1-3; Ch. 3 as `guide_ch3.md`)
+- **Reach civics** (Our Reach Our Trade, 11th ed. "Young Person's Guide"): 5 chapters (Ch. 3-5 as `guide_ch3/4/5.md`)
   - Separate elementary series ("Social Studies for Young Learners"): Ch. 3-8 (pre-existing)
 - **Lattice history** (Intro to Lattice History): 10 chapters (Ch. 1-10, complete)
-- **Lattice civics** (The Circuit and the Contract): 7 chapters (Ch. 1-7, Part One + Part Two beginning)
-  - Ch. 5: RSC (Relay Standards Commission) — neutral arbitrator innovation, Keohane regime theory
-  - Ch. 6: Sovereignty governance — veto players, Tsebelis, Madisonian federalism
-  - Ch. 7: Circuit economy — Prebisch-Singer terms of trade, Nurkse capital formation
-- **Garden** (Clio's working space): 4 parables, 8 observations, 6 fragments
-  - New fragments: Reach military planning memo (Year -12 BP); Sovereignty Commerce Council RSC memo (Year 12 SP)
-  - New observations: fever belt (epidemiology), veto players trap (Tsebelis), intermediate belt problem (Walt)
-  - New parables: reform dividend (Weber schism), mutual recognition (Schelling/Brodie deterrence)
+- **Lattice civics** (The Circuit and the Contract): 9 chapters (Ch. 1-9, complete series)
+  - Ch. 8: Taxation, three-tier membership, Olson collective action, Lindahl benefit taxation
+  - Ch. 9: Reform, Tradition, and the Sovereignty's Future — North/Pierson path dependence, Putnam social capital, Ostrom polycentric governance, Tilly state formation
+- **Garden** (Clio's working space): 21 observations, 8 fragments
+  - ACADEMIC_GROUNDING.md now has `→ Garden:` cross-references on all documented sections
+  - Observations added this session: crop_culture_seed, malthusian_clamp, three_layer_trade, growth_machine, thalassocratic_condition, strange_equilibrium, collapse_cascade, relay_advantage, resource_curse
+  - Fragments added this session: sargasso_basin_circular (Year 2 SP), commerce_council_internal (Year 12 SP), the_kalapa_deliberation (Year 29 SP — intermediate belt alignment debate)
 
 **Next steps:**
 - Run optimizer (run_optimization.py, 10K trials) to further refine all 33 parameters (5 new since last run)
