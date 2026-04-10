@@ -211,6 +211,47 @@ def _log2(x: float) -> float:
 def _clamp(x: float, lo: float, hi: float) -> float:
     return max(lo, min(hi, x))
 
+
+def _spearman_reversal(pre_colonial_state: dict, final_tech: list, N: int) -> float:
+    """Compute Spearman rank correlation between pre-colonial tech and final tech.
+
+    AJR reversal-of-fortune hypothesis (Acemoglu, Johnson & Robinson 2001):
+    polities with higher pre-colonial prosperity (proxy: tech at first absorption)
+    should end up *lower* in the final tech distribution if colonial institutions
+    created extractive lock-in — producing a negative correlation.
+
+    Returns float in [-1, 1] or 0.0 if fewer than 3 data points.
+    """
+    if len(pre_colonial_state) < 3:
+        return 0.0
+    indices = sorted(pre_colonial_state.keys())
+    pre  = [pre_colonial_state[i]["tech"] for i in indices]
+    post = [final_tech[i] for i in indices]
+    n = len(indices)
+
+    def _ranks(vals):
+        sorted_idx = sorted(range(n), key=lambda k: vals[k])
+        ranks = [0.0] * n
+        i = 0
+        while i < n:
+            j = i
+            while j < n - 1 and vals[sorted_idx[j + 1]] == vals[sorted_idx[j]]:
+                j += 1
+            avg_rank = (i + j) / 2.0 + 1.0
+            for k in range(i, j + 1):
+                ranks[sorted_idx[k]] = avg_rank
+            i = j + 1
+        return ranks
+
+    r_pre  = _ranks(pre)
+    r_post = _ranks(post)
+    d2_sum = sum((r_pre[k] - r_post[k]) ** 2 for k in range(n))
+    denom = n * (n * n - 1)
+    if denom == 0:
+        return 0.0
+    return 1.0 - 6.0 * d2_sum / denom
+
+
 _ISLAND_MAX_HEIGHT = 3000.0
 
 # ---------------------------------------------------------------------------
@@ -693,6 +734,7 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
     extractiveness  = [0.0] * N   # Acemoglu-Robinson: institutional lock-in index (0=inclusive, 1=extractive)
     proxy_war_log   = []           # Snyder/Kahn: proxy war events in nuclear era
     relay_contact_since = {}       # (core, other) → tick: per-pair relay contact age for endemicity
+    pre_colonial_state = {}        # AJR reversal-of-fortune: arch → {tick, pop, tech} at first absorption
 
     # Initialise
     for i, arch in enumerate(archs):
@@ -1588,9 +1630,19 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
                                     "relay_contact_age": relay_ticks})
 
                 # Transfer all archs controlled by target to core
+                # AJR reversal-of-fortune: record pre-colonial state at first absorption
+                if target not in pre_colonial_state:
+                    pre_colonial_state[target] = {
+                        "tick": tick, "pop": pop[target], "tech": tech[target]
+                    }
                 for j in range(N):
                     if controller[j] == target:
                         controller[j] = core
+                        # Also record sub-islands under target if not yet tracked
+                        if j != target and j not in pre_colonial_state:
+                            pre_colonial_state[j] = {
+                                "tick": tick, "pop": pop[j], "tech": tech[j]
+                            }
                 controller[target] = core
                 absorbed_tick[target] = tick
                 sovereignty[target] = _clamp(0.15 + dist * 0.3, 0.10, 0.50)
@@ -1892,6 +1944,13 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
         # Proxy war casualties (Snyder/Kahn; stability-instability paradox)
         "proxy_war_log":        proxy_war_log,
         "n_proxy_wars":         len(proxy_war_log),
+        # AJR reversal-of-fortune (Acemoglu, Johnson & Robinson 2001)
+        # Tracks pre-colonial prosperity (tech/pop at first absorption) vs. final tech rank.
+        # reversal_of_fortune_r: Spearman rank correlation in [-1, 1].
+        #   Negative = reversal confirmed (formerly prosperous polities now lag).
+        #   Positive = no reversal (prosperity advantage persisted through colonization).
+        "pre_colonial_state":   pre_colonial_state,
+        "reversal_of_fortune_r": _spearman_reversal(pre_colonial_state, tech, N),
     }
 
 

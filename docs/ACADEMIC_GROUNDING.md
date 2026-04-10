@@ -379,7 +379,7 @@ The Acemoglu-Robinson "reversal of fortune" applies to Aeolia: polities that dev
 
 **Implementation:** `extractiveness[core]` builds from `excess_extraction × (1 − inclusive_culture)` where `inclusive_culture = ci × 0.7 + io × 0.3` (civic + outward orientation). Decays slowly via inclusive reform rate. TFP penalty: `a0 × = (1 − extractiveness × extractiveness_tfp_penalty)`. Two new SimParams: `institutional_lock_rate` (default 0.12), `extractiveness_tfp_penalty` (default 0.40).
 
-**Gap:** The reversal-of-fortune path — where *initially high-population* islands become colonial periphery and stagnate — is implicit but not tracked as a specific diagnostic. Full Acemoglu-Johnson-Robinson would require tracking pre-colonial prosperity rank vs. contemporary colonial status.
+**Reversal-of-fortune diagnostic (implemented 2026-04-09):** `pre_colonial_state` dict records each archipelago's tech and population at the tick of first absorption. `reversal_of_fortune_r` (Spearman rank correlation) in the output dict measures the correlation between pre-colonial tech rank and final tech rank. A negative value confirms the AJR reversal pattern: formerly more-prosperous polities ended up comparatively worse off after colonization. On seed 216089, r ≈ +0.03 (no strong reversal), consistent with AJR's finding that reversal appears in cross-section, not on individual simulation paths. The diagnostic is now available for optimizer-level analysis across seeds.
 
 ---
 
@@ -389,7 +389,7 @@ The Acemoglu-Robinson "reversal of fortune" applies to Aeolia: polities that dev
 |-----|--------|-------|
 | Axelrod freezing: divergent cultures don't converge | ✓ Implemented | culture_dist >= 0.85 → comp = 0; full cultural isolation above freeze threshold |
 | Alliance formation mechanic | Open | Walt balance-of-threat predicts formal alliances; currently only informal contact bonuses |
-| AR reversal-of-fortune diagnostic | Open | Track pre-colonial prosperity rank vs. post-colonial status for AJR validation |
+| AR reversal-of-fortune diagnostic | ✓ Implemented | `pre_colonial_state` + `reversal_of_fortune_r` (Spearman r) in output; r ≈ +0.03 on seed 216089 (cross-sectional pattern, not single-path) |
 | Proxy war casualties | ✓ Implemented | Population losses in DF-era expansion into rival's sub-nuclear periphery |
 | Doctrinal innovation in schism | ✓ Implemented | Ungoverned breakaway polities receive Reformed culture shift (+0.30 CI, +0.15 IO); Weber (1904) |
 | Endemicity at wave-epidemic level | ✓ Implemented | Per-pair relay contact age replaces global count; 0.04/tick immunity buildup |

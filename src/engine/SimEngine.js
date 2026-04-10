@@ -287,6 +287,9 @@ export class SimEngine {
     // Used for endemicity transition (McNeill 1976): longer relay-trade contact → more immunity
     // before formal political absorption.
     this.relayContactSince = new Map();
+    // AJR reversal-of-fortune (Acemoglu, Johnson & Robinson 2001):
+    // records pre-colonial {tick, pop, tech} for each arch at first absorption.
+    this.preColonialState = new Map();
 
     // ── Logs ───────────────────────────────────────────────
     this.epiLog = [];
@@ -1314,9 +1317,18 @@ export class SimEngine {
                              immunity_factor: immunity, relay_contact_age: relayAge, tick, year });
         }
 
+        // AJR reversal-of-fortune: record pre-colonial state at first absorption
+        if (!this.preColonialState.has(target)) {
+          this.preColonialState.set(target, { tick, pop: this.pop[target], tech: this.tech[target] });
+        }
         // Transfer
         for (let j = 0; j < N; j++) {
-          if (this.controller[j] === target) this.controller[j] = core;
+          if (this.controller[j] === target) {
+            if (j !== target && !this.preColonialState.has(j)) {
+              this.preColonialState.set(j, { tick, pop: this.pop[j], tech: this.tech[j] });
+            }
+            this.controller[j] = core;
+          }
         }
         this.controller[target] = core;
         this.absorbedTick[target] = tick;
@@ -1507,10 +1519,44 @@ export class SimEngine {
       // Grievance per arch (Scott resistance mechanic — for situation cards)
       grievance: Array.from(this.grievance, v => Math.round(v * 1000) / 1000),
       extractiveness: Array.from(this.extractiveness, v => Math.round(v * 1000) / 1000),
+      // AJR reversal-of-fortune score (Spearman r of pre-colonial vs final tech rank)
+      reversal_of_fortune_r: this._spearmanReversal(),
       // Scramble onset ticks (for one-time dispatch events in GameApp)
       scramble_onset_tick: this.scrambleOnset,
       pu_scramble_onset_tick: this.puScrambleOnset,
     };
+  }
+
+  /** Spearman rank correlation between pre-colonial tech and current tech.
+   *  Negative = AJR reversal confirmed (formerly prosperous polities now lag).
+   *  Returns 0 if fewer than 3 data points.
+   */
+  _spearmanReversal() {
+    const pcs = this.preColonialState;
+    if (pcs.size < 3) return 0;
+    const indices = [...pcs.keys()].sort((a, b) => a - b);
+    const pre  = indices.map(i => pcs.get(i).tech);
+    const post = indices.map(i => this.tech[i]);
+    const n = indices.length;
+
+    const rank = vals => {
+      const sorted = [...vals].map((v, i) => [v, i]).sort((a, b) => a[0] - b[0]);
+      const r = new Array(n).fill(0);
+      let i = 0;
+      while (i < n) {
+        let j = i;
+        while (j < n - 1 && sorted[j + 1][0] === sorted[j][0]) j++;
+        const avg = (i + j) / 2.0 + 1.0;
+        for (let k = i; k <= j; k++) r[sorted[k][1]] = avg;
+        i = j + 1;
+      }
+      return r;
+    };
+
+    const r1 = rank(pre), r2 = rank(post);
+    const d2 = r1.reduce((s, v, k) => s + (v - r2[k]) ** 2, 0);
+    const denom = n * (n * n - 1);
+    return denom === 0 ? 0 : 1.0 - 6.0 * d2 / denom;
   }
 
   // ── Finalize: same return shape as simulate() ──────────
