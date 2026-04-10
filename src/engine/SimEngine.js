@@ -842,6 +842,7 @@ export class SimEngine {
           .sort((a, b) => this.sovereignty[a] - this.sovereignty[b]);
         const nRelease = Math.max(1, Math.floor(candidates.length / 3));
         let released = 0;
+        let reformedCount = 0;
 
         for (const island of candidates.slice(0, nRelease)) {
           // Transfer to nearest adjacent rival, or drop to ungoverned
@@ -858,15 +859,29 @@ export class SimEngine {
             this.controller[island] = bestRival;
             this.sovereignty[island] = 0.08;
           } else {
-            // No adjacent rival — sovereignty collapses (ungoverned)
+            // No adjacent rival — sovereignty collapses (ungoverned) + doctrinal innovation
+            this.controller[island] = island;
             this.sovereignty[island] = 0.04;
+            // ── Weber (1904): Doctrinal innovation — Reformed culture shift ──────────
+            // Breaking from hierarchical religious authority (Reformation model) pushes
+            // the breakaway polity toward individualist/outward orientation. The Protestant
+            // Ethic thesis: reformed theology correlates with market-compatible individualism.
+            // Grzymala-Busse (2023): schism enables state capacity building outside empire.
+            const [oldCI, oldIO] = this.cpos[island];
+            this.cpos[island] = [
+              _clamp(oldCI + 0.30, -1, 1),  // Reformed: more individualist
+              _clamp(oldIO + 0.15, -1, 1),  // Reformed: slightly more outward (proselytizing)
+            ];
+            // Schism breaks prior religious structure — reduces piety in breakaway
+            this.piety[island] = Math.max(0.05, this.piety[island] * 0.60);
+            reformedCount++;
           }
           released++;
         }
 
         this.schismPressure[core] = 0;
         if (released > 0) {
-          this.schismLog.push({ tick, year, core, count: released });
+          this.schismLog.push({ tick, year, core, count: released, reformed: reformedCount });
         }
       }
     }
@@ -983,6 +998,25 @@ export class SimEngine {
       // protecting elite rents against competitive entry. Independent of naphtha.
       // Source: Acemoglu & Robinson (2012). *Why Nations Fail*. Crown.
       a0 *= (1.0 - this.extractiveness[core] * (p.extractiveness_tfp_penalty ?? 0.40));
+
+      // ── Pyra / military-industrial complex resource curse ────────────────────
+      // Monopoly on Pu access in the nuclear era creates MIC rents that crowd out
+      // civilian innovation — analogous to the oil curse but for strategic minerals.
+      // Fires at tech >= 8.5 (nuclear era). Ross (2012); Acemoglu-Robinson logic.
+      if (this.tech[core] >= 8.5) {
+        let puIslands = 0, totalPuIslands = 0;
+        for (let j = 0; j < N; j++) {
+          if (this.substrate[j].minerals.Pu) {
+            totalPuIslands++;
+            if (this.controller[j] === core) puIslands++;
+          }
+        }
+        if (totalPuIslands > 0) {
+          const puFrac = puIslands / totalPuIslands;
+          const micCurse = Math.min(0.4, Math.max(0, puFrac * 2.5 - 0.5));
+          a0 *= (1.0 - micCurse * (p.resource_curse_strength ?? 0.30) * 0.6);
+        }
+      }
 
       const nc = this.contactSet[core].size;
       const er = this.tech[core] >= 9.0 && !this._hasPu(core)

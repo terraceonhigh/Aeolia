@@ -392,7 +392,7 @@ The Acemoglu-Robinson "reversal of fortune" applies to Aeolia: polities that dev
 | Doctrinal innovation in schism | C | Schism should sometimes produce breakaway "reformed" culture — doctrinal heterodoxy as trigger |
 | Endemicity at wave-epidemic level | C | Wave epidemic severity should decay with contact age per-pair, not globally |
 | Alliance formation mechanic | B→C | Walt balance-of-threat predicts formal alliances; currently only informal contact bonuses |
-| Resource curse without naphtha | C | Extractive institutions can form around pyra, Au, or monopoly trade routes — not only naphtha |
+| Resource curse without naphtha | ~~C~~ | Implemented: pyra MIC curse added (tech ≥ 8.5; 60% of naphtha curse strength) |
 | AR reversal-of-fortune diagnostic | C | Track pre-colonial prosperity rank vs. post-colonial status for AJR validation |
 
 ---

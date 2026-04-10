@@ -1121,6 +1121,7 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
                 low_sov_sorted = sorted(low_sov, key=lambda j: sovereignty[j])
                 n_release = max(1, len(low_sov_sorted) // 3)
                 released = 0
+                reformed_count = 0
                 for j in low_sov_sorted[:n_release]:
                     # Transfer to nearest independent arch or make ungoverned
                     nearest_other = None
@@ -1137,11 +1138,30 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
                     else:
                         controller[j] = j   # ungoverned
                         sovereignty[j] = 0.04
+                        # ── Doctrinal innovation: Reformed culture shift ───────────────
+                        # Weber (1904): Reformation heterodoxy correlates with Protestant
+                        # ethic — individualist, outward-facing, market-compatible culture.
+                        # Breaking from collective/hierarchical religious authority creates
+                        # impetus toward individualist orientation (creative destruction,
+                        # Protestant work ethic, priesthood of all believers).
+                        # Source: Weber, M. (1904). *The Protestant Ethic and the Spirit
+                        #         of Capitalism*. Routledge.
+                        #         Grzymala-Busse (2023): religious fragmentation and state
+                        #         capacity building outside imperial control.
+                        old_ci, old_io = cpos[j]
+                        # Reformed: push toward individualist (+CI) and slightly outward (+IO)
+                        reform_ci = _clamp(old_ci + 0.30, -1.0, 1.0)
+                        reform_io = _clamp(old_io + 0.15, -1.0, 1.0)
+                        cpos[j] = [reform_ci, reform_io]
+                        # Also reduce piety (schism breaks the prior religious structure)
+                        piety[j] = max(0.05, piety[j] * 0.60)
+                        reformed_count += 1
                     released += 1
                 schism_pressure[core] = 0.0
                 if released > 0:
                     schism_log.append({"tick": tick, "year": year,
-                                       "core": core, "count": released})
+                                       "core": core, "count": released,
+                                       "reformed": reformed_count})
 
         # ──────────────────────────────────────────────────────────────
         # STAGE 3: Rumor propagation (plan §5.4)
@@ -1259,6 +1279,22 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
             # Source: Acemoglu & Robinson (2012). *Why Nations Fail*. Crown.
             #         Acemoglu, Johnson & Robinson (2001). AER 91(5).
             a0 *= (1.0 - extractiveness[core] * p.extractiveness_tfp_penalty)
+
+            # ── Pyra / military-industrial complex resource curse ─────────────
+            # Polities monopolising Pu access in the nuclear era develop a
+            # different form of resource curse: military-industrial rents crowd
+            # out civilian innovation.  Analogous to Ross (2012) oil curse, but
+            # applied to strategic minerals rather than energy commodities.
+            # Note: this is distinct from the naphtha curse — it fires at tech >= 8.5
+            # (nuclear era) rather than 6–9.5 (industrial era).
+            if tech[core] >= 8.5:
+                pu_islands = sum(1 for j in range(N)
+                                 if controller[j] == core and substrate[j]["minerals"].get("Pu"))
+                total_pu_islands = sum(1 for j in range(N) if substrate[j]["minerals"].get("Pu"))
+                if total_pu_islands > 0:
+                    pu_frac = pu_islands / total_pu_islands
+                    mic_curse = _clamp(pu_frac * 2.5 - 0.5, 0.0, 0.4)
+                    a0 *= (1.0 - mic_curse * p.resource_curse_strength * 0.6)  # 60% of naphtha curse strength
 
             # Pu dependency at nuclear era
             if tech[core] >= 9.0 and not _has_pu(core):
