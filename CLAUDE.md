@@ -152,18 +152,17 @@ Aeolia/
 
 SimParams now has **33 optimizer-tunable parameters**.
 
-**Worldbuilding corpus (2026-04-09 sessions 3-5):** 5 series, 42+ chapters, 29 garden pieces:
+**Worldbuilding corpus (2026-04-09 sessions 3-5):** 5 series, 43+ chapters, 33 garden pieces:
 - **Reach history**: 12 chapters (Ch. 1-12, complete)
-- **Reach civics** (Our Reach Our Trade, 11th ed. "Young Person's Guide"): 5 chapters (Ch. 3-5 as `guide_ch3/4/5.md`)
+- **Reach civics** (Our Reach Our Trade, 11th ed. "Young Person's Guide"): 6 chapters (Ch. 1-6: ch1.md, ch2.md, guide_ch3-6.md)
   - Separate elementary series ("Social Studies for Young Learners"): Ch. 3-8 (pre-existing)
 - **Lattice history** (Intro to Lattice History): 10 chapters (Ch. 1-10, complete)
 - **Lattice civics** (The Circuit and the Contract): 9 chapters (Ch. 1-9, complete series)
-  - Ch. 8: Taxation, three-tier membership, Olson collective action, Lindahl benefit taxation
-  - Ch. 9: Reform, Tradition, and the Sovereignty's Future — North/Pierson path dependence, Putnam social capital, Ostrom polycentric governance, Tilly state formation
-- **Garden** (Clio's working space): 21 observations, 8 fragments
-  - ACADEMIC_GROUNDING.md now has `→ Garden:` cross-references on all documented sections
-  - Observations added this session: crop_culture_seed, malthusian_clamp, three_layer_trade, growth_machine, thalassocratic_condition, strange_equilibrium, collapse_cascade, relay_advantage, resource_curse
-  - Fragments added this session: sargasso_basin_circular (Year 2 SP), commerce_council_internal (Year 12 SP), the_kalapa_deliberation (Year 29 SP — intermediate belt alignment debate)
+  - Ch. 9: Reform, Tradition, and the Sovereignty's Future — North/Pierson path dependence, Putnam social capital, Ostrom polycentric governance, Tilly
+- **Garden** (Clio's working space): 23 observations, 10 fragments + GARDEN_INDEX.md
+  - All ACADEMIC_GROUNDING.md sections (§1-§25) now have `→ Garden:` cross-references
+  - Observations added session 5: crop_culture_seed, malthusian_clamp, three_layer_trade, growth_machine, thalassocratic_condition, strange_equilibrium, collapse_cascade, relay_advantage, resource_curse, culture_engine, disease_arc
+  - Fragments added session 5: sargasso_basin_circular, commerce_council_internal, the_kalapa_deliberation (Year 29 SP), civil_registry_assessment_y80 (Year 80 SP, classified), strange_peace_retrospective (Year 140 SP, joint academic)
 
 **Next steps:**
 - Run optimizer (run_optimization.py, 10K trials) to further refine all 33 parameters (5 new since last run)
