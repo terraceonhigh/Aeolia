@@ -13,16 +13,17 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 **Grade: B**  
 **Files:** `src/engine/SimEngine.js` (§10 `_CROP_CULTURE_SEED`), `aeolia-godot/optimization/sim_proxy_v2.py`
 
-**Claim:** Hydraulic agriculture (paddi) produces Subject cultures (bureaucratic, collectively organized); dryland grain agriculture (emmer) produces Civic cultures (competitive, pluralistic); marginal or maritime crops produce Parochial cultures.
+**Claim:** Legible, taxable grain agriculture (paddi) produces Subject cultures (bureaucratic, collectively organized); dryland grain agriculture (emmer) produces Civic cultures (competitive, pluralistic); marginal or maritime crops produce Parochial cultures.
 
 **Sources:**
-- Wittfogel, K. (1957). *Oriental Despotism: A Comparative Study of Total Power*. Yale University Press.
-- Almond, G. & Verba, S. (1963). *The Civic Culture*. Princeton University Press.
+- Scott, J. (2017). *Against the Grain: A Deep History of the Earliest States*. Yale University Press. (Primary: grain legibility thesis)
+- Wittfogel, K. (1957). *Oriental Despotism: A Comparative Study of Total Power*. Yale University Press. (Historical precedent; used as generative starting condition, not deterministic law — see Gap)
+- Almond, G. & Verba, S. (1963). *The Civic Culture*. Princeton University Press. (Parochial/Subject/Civic typology used metaphorically at civilizational scale, not as individual-level survey instrument — see Jackman & Miller 1996 critique)
 - Inglehart, R. & Welzel, C. (2005). *Modernization, Cultural Change, and Democracy*. Cambridge University Press.
 
 **Implementation:** `_CROP_CULTURE_SEED` seeds each crop in a 2D continuous culture space (CI = Collective↔Individual, IO = Inward↔Outward). Paddi at (−0.55, −0.20) encodes hydraulic bureaucracy; emmer at (0.45, 0.55) encodes mercantile pluralism.
 
-**Gap:** Wittfogel's hypothesis has been criticized for being unfalsifiable and selecting on the dependent variable (Levi 1988). Aeolia uses it as a generative starting condition, not a deterministic law — polities drift from their seed positions based on material circumstances.
+**Gap:** Wittfogel's hypothesis has been criticized for being unfalsifiable and selecting on the dependent variable (Levi 1988; Mitch 1992). Bali's subak irrigation system is the classic counterexample — hydraulic agriculture without centralized despotism. Aeolia uses crop-to-culture mapping as a generative starting condition, not a deterministic law — polities drift from their seed positions based on material circumstances. The better theoretical grounding is Scott's (2017) "grain thesis": legible, storable, taxable crops enable state formation because they are visible to tax collectors, not because irrigation requires central coordination. See also Tilly (1990) on coercion-capital paths to state formation as an alternative framework.
 
 **→ Garden:** `garden/observations/the_crop_culture_seed.md`
 
@@ -39,7 +40,11 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 - Boyd, R. & Richerson, P. (1985). *Culture and the Evolutionary Process*. University of Chicago Press.
 - Norris, P. & Inglehart, R. (2004). *Sacred and Secular*. Cambridge University Press.
 
-**Implementation note:** Axelrod's freezing prediction is implemented: `culture_dist >= 0.85` → `complement = 0`, fully isolating maximally divergent cultures from trade and cultural exchange. Five drift terms: prosperity → Individual, crisis → Collective, trade exposure → Outward, resource stress → Inward, piety feedback → Collective/Inward mild pull.
+**Implementation note:** Two Axelrod mechanisms now implemented:
+1. **Convergence-through-contact** (primary Axelrod mechanism): Trading partners with culture_dist < `axelrod_freeze_threshold` (default 0.85) drift toward each other proportional to trade volume fraction × `culture_convergence_rate` (default 0.005) × (1 − culture_dist). This produces emergent cultural regions through local interaction.
+2. **Freeze at maximum divergence**: `culture_dist >= 0.85` → `complement = 0` in trade, fully isolating maximally divergent cultures from trade and cultural exchange. This is Axelrod's polarization prediction.
+
+Five environmental drift terms: prosperity → Individual, crisis → Collective, trade exposure → Outward, resource stress → Inward, piety feedback → Collective/Inward mild pull. The environmental drifts are closer to Boyd & Richerson's (1985) biased cultural transmission (pressures select for traits); the convergence-through-contact is closer to Axelrod's (1997) feature-copying.
 
 **→ Garden:** `garden/observations/the_culture_engine.md`
 
@@ -72,25 +77,32 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 - Schweller, R. (1994). "Bandwagoning for Profit." *International Security* 19(1).
 
 **Implementation:** 
-- Stage 2 posture table (expansion share) implements Mearsheimer/Schweller via culture→posture mapping.
-- Stage 4.5 implements Walt's balance-of-threat: post-DF, each non-hegemon polity maintains `alignment[i] ∈ [-1, 1]` that drifts toward the less-threatening hegemon each tick. Threat = `tech × (1 + extractiveness) × fleet_scale / distance`. Aligned polities impose a penalty (up to `alliance_protection_str × |alignment|`, default 2.5) on the opposing hegemon's expansion attempts against them. Two new params: `alliance_formation_rate` (0.04), `alliance_protection_str` (2.5). Effect visible on seeds with DF year < -500 (e.g., seed 2: DF year -1200, 5 non-zero alignments in range 0.1–0.3 after 20 ticks).
+- Stage 2: Walt multi-variable threat calculus replaces the old capability-bin posture lookup. Per-neighbor threat = `tech[other] × sqrt(territory[other]) × (1 + extractiveness[other]) / dist`. Max threat feeds into posture table. This encodes Walt's four variables: aggregate power (tech × territory), proximity (1/dist), offensive capability (extractiveness amplifies), perceived intent (implicit in extractiveness).
+- Stage 4.5 implements Walt's balance-of-threat: post-DF, each non-hegemon polity maintains `alignment[i] ∈ [-1, 1]` that drifts toward the less-threatening hegemon each tick. Threat = `tech × sqrt(territory) × (1 + extractiveness) / distance`. Aligned polities impose a penalty (up to `alliance_protection_str × |alignment|`, default 2.5) on the opposing hegemon's expansion attempts against them. Two new params: `alliance_formation_rate` (0.04), `alliance_protection_str` (2.5).
+
+**Additional sources (2026-04-10):**
+- Fearon, J. (1995). "Rationalist Explanations for War." *International Organization* 49(3). (Commitment problems in expansion targeting)
+- Jervis, R. (1978). "Cooperation Under the Security Dilemma." *World Politics* 30(2). (Spiral model vs. deterrence model — awareness accumulation can lead to either)
 
 **→ Garden:** `garden/observations/the_intermediate_belt_problem.md`
 
 ---
 
-### 5. Dark Forest / Security Dilemma at civilizational scale
+### 5. The Strange Peace: Security Dilemma at civilizational scale
 **Grade: A**  
 **Files:** `src/engine/SimEngine.js` (Stage 3–4), `sim_proxy_v2.py`
 
 **Claim:** First contact between nuclear-capable civilizations replicates the security dilemma: defensive preparations are indistinguishable from offensive ones. Mutual awareness triggers a deterrence equilibrium, not open war.
 
+**Note on naming:** The mechanic is internally labeled "Dark Forest" after Liu Cixin's *The Dark Forest* (2008), but the simulation's outcome is the opposite of Liu's prediction. Liu's Dark Forest hypothesis predicts preemptive annihilation — the rational response to detecting another civilization is immediate destruction, because you cannot verify intent. Aeolia's simulation instead produces mutual deterrence (the "Strange Peace"): nuclear peer detection triggers a −12.0 expansion penalty that freezes hegemons against each other, not a preemptive strike. This divergence is structurally significant — the simulation implicitly argues that when two civilizations reach nuclear capability roughly simultaneously (within ~7 ticks / 350 years), the conditions for Dark Forest preemption do not hold because neither side has a credible first-strike window. The Strange Peace is Schelling's and Waltz's prediction, not Liu Cixin's. The "Dark Forest" label is retained as the internal trigger name but the academic paper should reference the mechanic as the nuclear security dilemma, not the Dark Forest hypothesis.
+
 **Sources:**
 - Schelling, T. (1960). *The Strategy of Conflict*. Harvard University Press.
 - Schelling, T. (1966). *Arms and Influence*. Yale University Press.
 - Waltz, K. (1981). "The Spread of Nuclear Weapons: More May Be Better." *Adelphi Paper* 171. IISS.
+- Powell, R. (1990). *Nuclear Deterrence Theory: The Search for Credibility*. Cambridge University Press. (Second-strike credibility through resource control)
 
-**Implementation:** `otherAwareness` accumulates at 0.04/tick once both polities have tech ≥ 9.0; fires DF when awareness > 0.30. Arms race continues post-DF with tech bonus for hegemons above 8.5.
+**Implementation:** `otherAwareness` accumulates at 0.04/tick once both polities have tech ≥ 9.0; fires at awareness > 0.30. Arms race continues post-DF with tech bonus for hegemons above 8.5. Post-DF deterrence penalty (−12.0) + proxy war bonus (+3.0 in rival periphery) + alliance formation produce the Strange Peace: hegemons frozen against each other but competing aggressively in non-nuclear client territories.
 
 **→ Garden:** `garden/observations/the_strange_equilibrium.md`
 
@@ -106,7 +118,7 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 - Snyder, G. (1965). "The Balance of Power and the Balance of Terror." In *Balance of Power*, ed. Paul Seabury.
 - Waltz, K. (1981). *The Spread of Nuclear Weapons*. IISS.
 
-**Implementation:** After DF fires, nuclear hegemons receive a +3.0 expansion bonus targeting non-nuclear territory in the rival hegemon's contact network, partially offsetting the −12.0 deterrence penalty against each other.
+**Implementation (upgraded 2026-04-10):** After DF fires, nuclear hegemons receive `+proxy_war_bonus` (default 3.0) expansion bonus targeting non-nuclear territory in the rival hegemon's contact network, partially offsetting the −12.0 deterrence penalty against each other. Population losses in proxy zones are multiplied by `proxy_casualty_rate` (default 1.4), modeling the elevated cost of proxy competition. New SimParams: `proxy_war_bonus` (3.0), `proxy_casualty_rate` (1.4).
 
 **→ Garden:** `garden/observations/the_strange_equilibrium.md`
 
@@ -114,18 +126,26 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 
 ## III. Political Economy and Trade
 
-### 7. Solow-Romer growth with energy coupling (Ayres & Warr 2005)
-**Grade: B**  
+### 7. Technology accumulation with energy coupling and knowledge stock
+**Grade: B+** (upgraded 2026-04-10: Ayres-Warr conversion efficiency + Romer knowledge stock)  
 **Files:** `src/engine/SimEngine.js` (Stage 5), `sim_proxy_v2.py`
 
-**Claim:** Output is a function of capital, labor, and TFP; TFP depends on energy availability and trade-network connectivity. Energy is a fundamental production factor, not merely an input cost.
+**Claim:** Technology grows as a reduced-form function of TFP, energy availability (with tech-dependent conversion efficiency), cumulative knowledge stock, and trade-network connectivity.
 
 **Sources:**
-- Solow, R. (1956). "A Contribution to the Theory of Economic Growth." *Quarterly Journal of Economics* 70(1).
-- Romer, P. (1990). "Endogenous Technological Change." *Journal of Political Economy* 98(5).
-- Ayres, R. & Warr, B. (2005). "Accounting for Growth: The Role of Physical Work." *Structural Change and Economic Dynamics* 16.
+- Ayres, R. & Warr, B. (2005). "Accounting for Growth: The Role of Physical Work." *Structural Change and Economic Dynamics* 16. (Conversion efficiency curve: thermodynamic efficiency of energy use improves with tech)
+- Romer, P. (1990). "Endogenous Technological Change." *Journal of Political Economy* 98(5). (Knowledge stock: non-rival, cumulative, positive spillovers)
+- Stern, D. (2011). "The Role of Energy in Economic Growth." *Annals of the New York Academy of Sciences*. (Broader energy-growth coupling)
+- Jackson, M. (2008). *Social and Economic Networks*. Princeton University Press. (Network externalities in knowledge diffusion)
+- Krugman, P. (1991). "Increasing Returns and Economic Geography." *Journal of Political Economy* 99(3). (Agglomeration externalities from market access)
 
-**Implementation:** `delta_tech = A₀ × crop_exp × share_mult × accel_rate × contact_mult × energy_mult`. `energy_mult = er × energy_to_tfp` directly couples energy surplus to TFP.
+**Implementation:**
+- `delta_tech = A₀ × crop_exp × share_mult × accel_rate × contact_mult × energy_mult`
+- `energy_mult = er × energy_to_tfp × conversionEff` where `conversionEff = 0.15 + 0.75 × clamp((tech−1)/9, 0, 1)^0.6` (Ayres-Warr: pre-industrial ~15%, industrial ~55%, modern ~85%)
+- `contact_mult = 1 + log₂(effNc+1) × 0.15 + log₂(knowledgeStock+1) × 0.15` (split between raw contacts and cumulative knowledge)
+- `knowledgeStock` accumulates from tech investment × energy surplus × `knowledge_accumulation_rate`; neighbors spill over via `knowledge_spillover_rate`
+
+**Note:** This is a reduced-form technology accumulation function, not a structural Solow or Romer model. There is no capital accumulation with diminishing returns (Solow) and no R&D sector with non-rival ideas (Romer in the strict sense). The knowledge stock captures Romer's key insight (cumulative, non-rival, positive externalities) without the full microfoundation. The contact-based diffusion is closer to Krugman (1991) agglomeration or Jackson (2008) network economics than to Romer's R&D formulation.
 
 **→ Garden:** `garden/observations/the_growth_machine.md`
 
@@ -179,7 +199,7 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 ---
 
 ### 11. Resource curse: Sachs-Warner / Ross (extractive institutions)
-**Grade: B**  
+**Grade: A−** (upgraded 2026-04-10: now fully implemented with TFP penalty + pyra MIC curse)  
 **Files:** `src/engine/SimEngine.js` (Stage 5 `a0` penalty), `sim_proxy_v2.py`
 
 **Claim:** Naphtha-rich polities in the industrial era develop extractive institutions — elite resource rents that divert investment from broad-based human capital development, penalizing TFP growth.
@@ -207,9 +227,30 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 
 **Sources:**
 - Wallerstein, I. (1974). *The Modern World-System*. Academic Press.
-- Frank, A.G. & Gills, B. (1993). *The World System: Five Hundred Years or Five Thousand?*. Routledge.
 
 **→ Garden:** `garden/observations/two_bargains.md` (Reach military vs. Lattice legal colonial founding; extractiveness_index differentiation); `garden/observations/the_three_layer_trade_system.md` (Administered layer as Wallerstein core/periphery extraction)
+
+---
+
+### 36. Frank/Cardoso dependency: unequal exchange at administered trade (Frank 1967; Cardoso & Faletto 1979)
+**Grade: B**  
+**Files:** `src/engine/SimEngine.js` (trade pre-pass, administered layer), `sim_proxy_v2.py`
+
+**Claim:** In asymmetric colonial trade relationships, the more extractive polity captures a disproportionate share of trade surplus — "unequal exchange." This is distinct from the Prebisch-Singer terms-of-trade effect (§10), which is about commodity type; the Frank/Cardoso mechanism is about institutional asymmetry. Even when trading identical goods, the extractive party extracts surplus from the less extractive.
+
+**Sources:**
+- Frank, A.G. (1967). *Capitalism and Underdevelopment in Latin America*. Monthly Review Press.
+- Cardoso, F.H. & Faletto, E. (1979). *Dependency and Development in Latin America*. University of California Press.
+- Frank, A.G. & Gills, B. (1993). *The World System: Five Hundred Years or Five Thousand?*. Routledge.
+- Emmanuel, A. (1972). *Unequal Exchange*. Monthly Review Press. (Formalization of the wage-differential mechanism underlying unequal exchange)
+
+**Implementation (2026-04-09):** At tech ≥ 5 (administered trade tier), when `extractiveness[A] > extractiveness[B] + 0.05`: `drain = (ext_A − ext_B) × 0.3`. `benefit_A ×= (1 + drain)`, `benefit_B ×= (1 − drain)`. The 0.05 threshold prevents noise from triggering redistribution; the 0.3 factor is a half-drain of the extractiveness delta. This applies symmetrically — a less-extractive polity trading with a more-extractive one loses surplus proportional to the institutional gap.
+
+**Effect:** Inclusive polities suffer a trade penalty when engaged in administered-tier exchange with extractive counterparts. This creates an incentive for inclusive-culture polities to either (a) avoid administered trade with extractive partners, (b) build their own institutional capacity, or (c) seek military protection. Mirrors Cardoso's "associated-dependent development" — some local growth is possible, but structural surplus flows upward.
+
+**Gap:** The Emmanuel (1972) mechanism involves differential wage rates enabling the same technical composition to generate unequal exchange — this requires a labor price variable the simulation does not model. The current implementation proxies institutional extraction for all mechanisms of surplus drain, which captures the direction but not the full political economy.
+
+**→ Garden:** `garden/observations/the_three_layer_trade_system.md` (unequal exchange as administered layer dynamic)
 
 ---
 
@@ -223,11 +264,35 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 - Scott, J. (1985). *Weapons of the Weak: Everyday Forms of Peasant Resistance*. Yale University Press.
 - Scott, J. (1990). *Domination and the Arts of Resistance*. Yale University Press.
 
-**Implementation:** `grievance[i]` accumulates from excess extraction above `sov_extraction_decay × 0.5`. `resistanceMult = 1 + grievance × grievance_resistance_mult` amplifies the recovery term in sovereignty drift.
+**Implementation (upgraded 2026-04-10):** `grievance[i]` accumulates from excess extraction above `sov_extraction_decay × 0.5`. Culture distance amplifier: colonies culturally distant from their controller accumulate grievance faster (Hechter internal colonialism model). `resistanceMult = 1 + grievance × grievance_resistance_mult` amplifies the recovery term in sovereignty drift. Grievance decays at 2%/tick (slow memory — resistance fades over generations).
 
-**Gap:** Scott's model emphasizes micro-level everyday resistance, not just aggregate sovereignty recovery. The current implementation operationalizes the structural outcome (extraction → resistance → recovery) without modeling the cultural/cognitive mechanism (consciousness-raising, participation axis drift).
+**Additional source:** Hechter, M. (1975). *Internal Colonialism: The Celtic Fringe in British National Development*. University of California Press. (Structural resistance at the level the simulation operates — culture distance as proxy for institutional alienation.)
+
+**Remaining gap:** Scott's model emphasizes micro-level everyday resistance (foot-dragging, false compliance, hidden transcripts), not just aggregate sovereignty recovery. The current implementation captures the structural outcome (extraction → resistance → recovery) with a culture distance amplifier. The cultural/cognitive mechanism (consciousness-raising) is now partially addressed by Mechanic 35 below: high grievance in colonial periphery drifts the colonizer's culture toward Collective+Inward, modeling the ideological feedback of colonial resistance on metropolitan political culture (c.f. Fanon 1961, Césaire 1955).
 
 **→ Garden:** `garden/observations/the_grievance_accumulation.md`
+
+---
+
+### 35. Grievance → consciousness-raising: colonial resistance feedback (Scott 1990; Fanon 1961)
+**Grade: B**  
+**Files:** `src/engine/SimEngine.js` (Stage 2b, after Axelrod convergence), `sim_proxy_v2.py`
+
+**Claim:** High colonial grievance in the periphery feeds back on the colonizer's metropolitan culture, shifting it toward collectivism and inwardness — a consciousness-raising effect in which the resistance of the colonized reshapes the political culture of the colonizer. Historically: anti-colonial movements in France and Britain stimulated metropolitan left politics; Portuguese colonial wars drove the Carnation Revolution.
+
+**Sources:**
+- Scott, J. (1990). *Domination and the Arts of Resistance*. Yale University Press. (Consciousness-raising as the cognitive mechanism of resistance, not merely structural sovereignty recovery)
+- Fanon, F. (1961). *The Wretched of the Earth*. Grove Press. (Colonial violence as a mirror deforming the colonizer's culture — the colonized subject's resistance redefines the categories of the metropole)
+- Césaire, A. (1955). *Discourse on Colonialism*. Monthly Review Press. (Colonialism brutalizes the colonizer — "colonization works to decivilize the colonizer")
+- Memmi, A. (1957). *The Colonizer and the Colonized*. Beacon Press. (Colonizer's identity distorted by the colonial relationship)
+
+**Implementation (2026-04-10):** Stage 2b, after Axelrod cultural convergence. `avgGrievance` = mean `grievance[j]` across all non-core controlled islands. If `avgGrievance > 0.20`: `gPush = grievance_culture_drift_rate × (avgGrievance − 0.20)`. Colonizer CI `−= gPush` (→ Collective), IO `−= gPush` (→ Inward). New param: `grievance_culture_drift_rate = 0.008` (bounds [0.001, 0.03]).
+
+**Effect on gameplay:** Extractive empires that accumulate high colonial grievance gradually drift their own culture toward collectivist/inward values, depressing their TFP growth (civic culture produces tech externalities) and reducing trade exposure. This creates an endogenous limit on extractive expansion — the empire's cultural profile becomes less competitive as the human cost of empire rises.
+
+**Gap:** The direction of the effect (always toward Collective+Inward) is a simplification. Historically, colonial feedback could also produce nationalist/militarist drift (Inward but also more Individual in the fascist sense). A more complete model would allow culture drift direction to depend on which political faction absorbs the colonial feedback.
+
+**→ Garden:** `garden/observations/the_consciousness_raising_feedback.md` (to be written)
 
 ---
 
@@ -449,7 +514,7 @@ The Acemoglu-Robinson "reversal of fortune" applies to Aeolia: polities that dev
 - Le Roy Ladurie, E. (1967). *Times of Feast, Times of Famine*. Doubleday.
 - Davis, M. (2001). *Late Victorian Holocausts: El Niño Famines and the Making of the Third World*. Verso.
 
-**Implementation:** `cropFailureModifier[]` per arch; failure probability tech-gated (higher for tech < 5). Failure reduces yield by 20–60%; recovery at +0.25/tick. Davis amplification (SimEngine.js): `davisModifier = baseModifier × (1 − extractiveness[archCore] × davis_amplification)`, floored at 0.15. New param: `davis_amplification` (default 0.30) — at extractiveness=1.0, failure modifier is 30% worse than baseline. Not yet ported to Python reference.
+**Implementation:** `cropFailureModifier[]` per arch; failure probability tech-gated (higher for tech < 5). Failure reduces yield by 20–60%; recovery at +0.25/tick. Davis amplification (both engines): `davisModifier = baseModifier × (1 − extractiveness[archCore] × davis_amplification)`, floored at 0.15. New param: `davis_amplification` (default 0.30) — at extractiveness=1.0, failure modifier is 30% worse than baseline. Ported to Python reference engine 2026-04-10.
 
 **Gap (resolved 2026-04-09):** Davis amplification now implemented in SimEngine.js. Recovery rate remains uniform regardless of institutional quality — a secondary Davis finding (that distribution infrastructure affects recovery speed, not just severity) is not modeled.
 
@@ -467,7 +532,7 @@ The Acemoglu-Robinson "reversal of fortune" applies to Aeolia: polities that dev
 - Hardin, G. (1968). "The Tragedy of the Commons." *Science* 162(3859).
 - Ostrom, E. (1990). *Governing the Commons*. Cambridge University Press.
 
-**Implementation:** `fisheryStock[]` recovers at 8%/tick; depletes proportional to coastal population × fishing_intensity. Collapse below threshold produces yield reduction until stock recovers. Ostrom commons governance (SimEngine.js): `commonsGov = clamp((ioPos × 0.5 + inclus × 0.5 + 0.5) × 0.5, 0, 0.70)` where `ioPos` = IO culture axis, `inclus = 1 − extractiveness`. `overExploit × = (1 − commonsGov × ostrom_commons_factor)`. At max governance (outward, inclusive): depletion reduced by ~38.5%. New param: `ostrom_commons_factor` (default 0.55). Not yet ported to Python reference.
+**Implementation:** `fisheryStock[]` recovers at 8%/tick; depletes proportional to coastal population × fishing_intensity. Collapse below threshold produces yield reduction until stock recovers. Ostrom commons governance (both engines): `commonsGov = clamp((ioPos × 0.5 + inclus × 0.5 + 0.5) × 0.5, 0, 0.70)` where `ioPos` = IO culture axis, `inclus = 1 − extractiveness`. `overExploit × = (1 − commonsGov × ostrom_commons_factor)`. At max governance (outward, inclusive): depletion reduced by ~38.5%. New param: `ostrom_commons_factor` (default 0.55). Ported to Python reference engine 2026-04-10.
 
 **Gap (partially resolved 2026-04-09):** Institutional differentiation implemented via culture-space + extractiveness proxy. Remaining gap: Ostrom's specific governance conditions (territorial use rights, seasonal closures, graduated sanctions, monitoring) are not individually modeled — governance capacity is a continuous function of culture/extractiveness rather than a discrete institutional choice.
 
@@ -490,7 +555,9 @@ The Acemoglu-Robinson "reversal of fortune" applies to Aeolia: polities that dev
 
 **Implementation:** The power transition period in Aeolia runs from tech ~7 (pyra scramble, proto-hegemons acquiring strategic energy assets) to DF firing (tech ≥ 9 in both, awareness > 0.30). Duration: approximately 8 ticks (400 years). The pyra resource curse (tech ≥ 8.5, 60% curse strength) fires during this window — polities racing for strategic advantage simultaneously acquire the resource that penalizes institutional development. Nuclear peer awareness accumulates at 0.04/tick per side from when both reach tech ≥ 9; the 0.30 threshold requires ~7–8 ticks, producing a brief window of mutual nuclear capability before formal deterrence.
 
-**Gap:** The simulation does not model preemptive war during the approach-to-parity window. No mechanic for first-strike incentives before DF fires; both proto-hegemons are implicitly assumed to behave deterrence-rationally before the deterrence relationship is formalized. This is consistent with the historical Cold War outcome (no US preemptive strike against Soviet nuclear development) but skips the power transition theory prediction of maximum conflict risk during parity approach.
+**Implementation (added 2026-04-10):** When two polities both have tech ≥ 7.0 and mutual awareness > 0.10 but DF hasn't fired: the technologically leading polity receives `+power_transition_bonus` (default 2.0) in expansion targeting against the lagging polity's territory. This creates a pre-DF "scramble" where the incumbent has incentive for territorial pre-positioning. New SimParam: `power_transition_bonus` (default 2.0).
+
+**Remaining gap:** The mechanic models increased expansion pressure but not the full Organski/Gilpin prediction of preemptive war incentives. The leading polity gets an expansion bonus, not a first-strike mechanic. The lagging polity does not receive a defensive posture correction.
 
 **→ Garden:** `garden/observations/the_strange_equilibrium.md` (§ "The Approach to Parity: Power Transition Before Dark Forest")
 
@@ -540,6 +607,23 @@ The Acemoglu-Robinson "reversal of fortune" applies to Aeolia: polities that dev
 **Gap:** Transportation infrastructure is not modeled; the spatial dimension of Innis's argument (infrastructure orientation constrains switching costs) is absent. The staple trap is visible in commercial data but not in explicit infrastructure constraints.
 
 **→ Garden:** `garden/observations/the_staple_trap.md`
+
+---
+
+### 34. Tilly coercion-capital differentiation (Tilly 1990)
+**Grade: B** (added 2026-04-10)  
+**Files:** `src/engine/SimEngine.js` (Stage 6 expansion scoring, Stage 7 sovereignty init), `sim_proxy_v2.py`
+
+**Claim:** States form through two structurally different paths: coercion-intensive (military conquest, garrison occupation, low initial sovereignty) and capital-intensive (trade dominance, commercial integration, higher initial sovereignty). Culture position on the CI/IO axes determines which path a polity follows: collective+inward = high coercion; individual+outward = high capital.
+
+**Sources:**
+- Tilly, C. (1990). *Coercion, Capital, and European States, AD 990–1992*. Blackwell.
+- Mann, M. (1986). *The Sources of Social Power*, Vol. 1. Cambridge University Press. (Infrastructural vs. despotic power — related framework)
+- Herbst, J. (2000). *States and Power in Africa*. Princeton University Press. (Cost of projecting sovereignty over distance — directly relevant to archipelago world)
+
+**Implementation:** `coercion = ((1 − ci) + (1 − io)) / 4` from core culture position. High-coercion polities get expansion bonus for close targets and penalty for distant targets (garrison projection). Low-coercion (capital-intensive) polities get bonus for high-trade-value targets. On conquest, initial sovereignty = `base + (1 − coercion) × 0.20`, so civic conquests start with higher sovereignty (trade integration) while coercive conquests start lower (garrison occupation).
+
+**Gap:** Tilly's argument is specifically about the interaction of war-making, state-making, extraction, and capital accumulation as four interdependent processes. The simulation captures the coercion-capital axis but not the war-making → extraction → state-making feedback loop. Infrastructure (Mann's infrastructural power) is not modeled.
 
 ---
 
@@ -615,7 +699,10 @@ The Acemoglu-Robinson "reversal of fortune" applies to Aeolia: polities that dev
 | Doctrinal innovation in schism | ✓ Implemented | Ungoverned breakaway polities receive Reformed culture shift (+0.30 CI, +0.15 IO); Weber (1904) |
 | Endemicity at wave-epidemic level | ✓ Implemented | Per-pair relay contact age replaces global count; 0.04/tick immunity buildup |
 | Resource curse without naphtha | ✓ Implemented | Pyra MIC curse (tech ≥ 8.5; 60% of naphtha curse strength) |
+| Davis / Ostrom not ported to Python | ✓ Ported | Both Davis amplification and Ostrom commons governance ported to sim_proxy_v2.py (2026-04-10) |
+| Scott consciousness-raising gap | ✓ Partially implemented | Mechanic 35: high colonial grievance drifts colonizer culture → Collective+Inward; models ideological feedback of resistance on metropole (Fanon/Césaire) |
+| Frank/Cardoso unequal exchange | ✓ Implemented | Mechanic 36: administered-layer trade surplus drains toward more-extractive party proportional to extractiveness gap |
 
 ---
 
-*Last updated: 2026-04-09 (Session 6). Maintained by Clio. 32 sections total. §28–§32 added this session (collective action, veto players, power transition, resource competition, culture-to-behavior). Davis crop failure amplification, Ostrom commons governance, McNeill tech-gated wave mortality implemented in SimEngine.js. Garden cross-references complete (§1–§32).*
+*Last updated: 2026-04-10 (Session 7). Maintained by Clio. 36 sections total. §35–§36 added this session (consciousness-raising feedback, Frank/Cardoso unequal exchange). Davis and Ostrom ported to Python reference. Hegemonic guard added to DF detection (top-3 by territory). 45 SimParams total. Garden cross-references complete (§1–§34); §35–§36 gardens pending.*
