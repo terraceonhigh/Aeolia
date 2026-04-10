@@ -241,6 +241,8 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 
 **Implementation:** `_cropDistance(cc, ct)` returns 0.2 (same crop), 0.5 (same zone), 0.8 (cross-zone), 1.0 (paddi↔papa maximum divergence). `mort = sev × cdist × (1 − immunity)`.
 
+**→ Garden:** `garden/observations/the_disease_arc.md` (§§14–15, 17–18 treated as a system)
+
 ---
 
 ### 15. Endemicity transition (McNeill 1976)
@@ -256,6 +258,8 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 **Implementation:** `priorContacts = count of non-null firstContactTick entries before current tick`. `immunity = min(0.6, priorContacts × 0.02)`. Caps at 60% severity reduction.
 
 **Gap:** The implementation uses a global prior-contact count as a proxy for population-level immunity. A more accurate model would track per-arch contact history and pathogen-specific immunity decay. The endemicity transition also applies only to first contacts, not to epidemic waves.
+
+**→ Garden:** `garden/observations/the_disease_arc.md`
 
 ---
 
@@ -290,6 +294,8 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 
 **Implementation:** `epiProb = epi_base_severity × 0.015 × (1 + nc × 0.2) × urbanFactor`. Spreads to trade partners with 35% probability each. Mortality 4–16% of affected population.
 
+**→ Garden:** `garden/observations/the_disease_arc.md`
+
 ---
 
 ### 18. Urban disease sink (Davenport 2020; Wrigley & Schofield 1981)
@@ -301,6 +307,8 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 **Sources:**
 - Davenport, R. (2020). "Urbanization and Mortality in Britain, c.1520–c.1850." *Economic History Review* 73(2).
 - Wrigley, E.A. & Schofield, R. (1981). *The Population History of England, 1541–1871*. Arnold.
+
+**→ Garden:** `garden/observations/the_disease_arc.md`
 
 ---
 
