@@ -39,7 +39,9 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 - Boyd, R. & Richerson, P. (1985). *Culture and the Evolutionary Process*. University of Chicago Press.
 - Norris, P. & Inglehart, R. (2004). *Sacred and Secular*. Cambridge University Press.
 
-**Gap:** Axelrod's model predicts cultural freezing/polarization for maximally divergent cultures. Aeolia currently does not implement a freezing threshold — divergent cultures converge more readily than the literature predicts.
+**Implementation note:** Axelrod's freezing prediction is implemented: `culture_dist >= 0.85` → `complement = 0`, fully isolating maximally divergent cultures from trade and cultural exchange. Five drift terms: prosperity → Individual, crisis → Collective, trade exposure → Outward, resource stress → Inward, piety feedback → Collective/Inward mild pull.
+
+**→ Garden:** `garden/observations/the_culture_engine.md`
 
 ---
 
@@ -270,6 +272,8 @@ Grading scale for empirical grounding: **A** (directly empirically validated), *
 - Packard, R. (2007). *The Making of a Tropical Disease*. Johns Hopkins University Press.
 
 **Implementation:** `malariaFactor[i] = max(0, (20 − absLat) / 20)` for absLat < 20. `cap × = max(0.1, 1 − mSev × malaria_cap_penalty × (tech ≥ 6 ? 0.3 : 1.0))`.
+
+**→ Garden:** `garden/observations/the_fever_belt.md`
 
 ---
 
