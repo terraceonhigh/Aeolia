@@ -1329,15 +1329,19 @@ def simulate(world: dict, params: SimParams = None, seed: int = 0) -> dict:
         # ──────────────────────────────────────────────────────────────
         if df_hegemon_pair is not None:
             h_a, h_b = df_hegemon_pair
+            # fleet_scale is finalized post-sim; approximate it intra-sim using
+            # pyra availability (pu_dependent_factor vs full scale).
+            def _runtime_fleet(h):
+                return 1.0 if _has_pu(h) else p.pu_dependent_factor
+            fs_a = _runtime_fleet(h_a)
+            fs_b = _runtime_fleet(h_b)
             for core in cores:
                 if core in (h_a, h_b):
                     continue  # hegemons do not align
                 dist_a = max(_gc_dist_arch(archs[core], archs[h_a]), 0.05)
                 dist_b = max(_gc_dist_arch(archs[core], archs[h_b]), 0.05)
-                threat_a = (tech[h_a] * (1.0 + extractiveness[h_a])
-                            * max(fleet_scale[h_a], 0.1)) / dist_a
-                threat_b = (tech[h_b] * (1.0 + extractiveness[h_b])
-                            * max(fleet_scale[h_b], 0.1)) / dist_b
+                threat_a = tech[h_a] * (1.0 + extractiveness[h_a]) * fs_a / dist_a
+                threat_b = tech[h_b] * (1.0 + extractiveness[h_b]) * fs_b / dist_b
                 denom = max(threat_a + threat_b, 0.001)
                 # positive net_threat → h_a more threatening → align toward h_b (positive)
                 net_threat = (threat_a - threat_b) / denom

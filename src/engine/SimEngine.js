@@ -1008,14 +1008,15 @@ export class SimEngine {
     if (this.dfHegemonPair !== null) {
       const [hA, hB] = this.dfHegemonPair;
       const allFormRate = p.alliance_formation_rate ?? 0.04;
+      // fleetScale is finalized post-sim; approximate intra-sim via pyra availability.
+      const fsA = this._hasPu(hA) ? 1.0 : (p.pu_dependent_factor ?? 0.65);
+      const fsB = this._hasPu(hB) ? 1.0 : (p.pu_dependent_factor ?? 0.65);
       for (const core of cores) {
         if (core === hA || core === hB) continue;
         const distA = Math.max(_gcDistArch(this.archs[core], this.archs[hA]), 0.05);
         const distB = Math.max(_gcDistArch(this.archs[core], this.archs[hB]), 0.05);
-        const threatA = (this.tech[hA] * (1.0 + this.extractiveness[hA])
-                         * Math.max(this.fleetScale[hA], 0.1)) / distA;
-        const threatB = (this.tech[hB] * (1.0 + this.extractiveness[hB])
-                         * Math.max(this.fleetScale[hB], 0.1)) / distB;
+        const threatA = this.tech[hA] * (1.0 + this.extractiveness[hA]) * fsA / distA;
+        const threatB = this.tech[hB] * (1.0 + this.extractiveness[hB]) * fsB / distB;
         const denom = Math.max(threatA + threatB, 0.001);
         const netThreat = (threatA - threatB) / denom;  // positive → hA more threatening
         this.alignment[core] += (netThreat - this.alignment[core]) * allFormRate;
