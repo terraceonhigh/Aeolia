@@ -137,6 +137,70 @@ Status as of April 9, 2026. Everything above the line is implemented. Everything
 
 ## Pending: Architecture & UX
 
+### Playtester Issues (2026-04-10, three independent Haiku sessions)
+
+Six issues surfaced consistently across all three testers:
+
+1. **Action button feedback absent** — clicking TARGET / EXPAND / COUNTER on situation cards produces no visible confirmation. Players cannot tell if their input registered or changed anything.
+2. **National Focus invisible as a system** — testers did not recognize Focus cards as interactive or understand they drove tech/expansion allocations. Active focus not visually distinguished from inactive.
+3. **Stats scroll off-screen while reading cards** — the turn/stats header lives in the scrollable right panel. Scrolling to situation cards or dispatches hides game state.
+4. **Globe is decorative, not a decision surface** — all three testers noted they made no decisions via the map. All interaction was in the right panel, disconnected from geography.
+5. **No end-of-game summary** — game returns silently to main menu on defeat or completion. No closure, no stats, no story of the reign.
+6. **Player agency felt absent** — "I'm not sure if I did that or if it happened to me." Root cause: UI presents outcomes, not inputs. The player is not made to feel like a rational actor issuing directives.
+
+### UX Migration: Map-Game Convergence
+
+**Design principle:** The player IS a rational actor. The simulation's 30 polities each have an energy budget allocation, expansion targets, a culture position, and a piety level. The player substitutes for one. The UI should feel like setting parameters on a decision engine, not reading a report about one. Reference: EU4 (province click → sidebar populate), Victoria 3 (allocation bars as primary verb), CK3 (contextual entity panel).
+
+#### Phase 1 — Fixed layout (no mechanics changes)
+- [ ] Split right panel into three non-overlapping zones:
+  - **Zone A (fixed, never scrolls):** Compact stats strip — TURN/YEAR/ERA · Pop/Tech/Terr/Naph/Contacts/Culture/Piety in two rows · Turn timer bar · Speed controls · Active Focus badge showing focus name + allocation (e.g. "EXPAND · 50/30/20")
+  - **Zone B (scrollable, context-driven):** Default: National Focus cards + culture sliders + SOV targets. When globe arch selected: Arch Detail Panel. ~60% of panel height.
+  - **Zone C (fixed height, internally scrollable):** Situation cards + dispatches feed. Pinned to bottom.
+- [ ] Zone A height ~90px. Stat values in monospace small caps. No decoration.
+
+#### Phase 2 — National Focus visibility
+- [ ] Active Focus card: inverted color scheme (light on dark vs dark on light for inactive)
+- [ ] Each card shows three-segment allocation bar (expansion / tech / consolidation proportional to values)
+- [ ] Live allocation summary line below cards: "CURRENT: EXPANSION 50% · TECH 30% · CONSOLIDATION 20%"
+- [ ] On Focus change: emit INTERNAL AFFAIRS dispatch — "National focus shifted to [NAME]. Allocation now [X/Y/Z]."
+- [ ] Active focus badge in Zone A updates immediately
+
+#### Phase 3 — Action button feedback
+- [ ] Button inversion on click (dark/light flip 300ms) → committed state (✓ prefix for 2 seconds)
+- [ ] Every action emits a dispatch entry in Zone C:
+  - Set expansion target → "ADMIRALTY · [Arch] designated expansion target."
+  - Counter action → "INTERNAL AFFAIRS · Counter-strategy engaged against [Polity]."
+  - Propose alliance → "ADMIRALTY · Diplomatic dispatch sent to [Polity]."
+  - Focus change → "INTERNAL AFFAIRS · National focus shifted to [Focus]."
+- [ ] After action taken: situation card enters "resolved" state (dimmed, buttons replaced with "DIRECTIVE ISSUED · TURN X"), fades after 2 turns
+- [ ] Globe: expansion targets gain a crosshair annotation on their marker (antique cartography style)
+
+#### Phase 4 — Globe as primary decision surface
+- [ ] Add raycasting click handler to arch markers in GameApp.jsx Three.js scene
+- [ ] Hover tooltip on arch markers: name + ownership/relationship + pop/tech if known (cartographic annotation style — no rounded corners, no shadow)
+- [ ] Click foreign arch → Zone B becomes Arch Detail Panel:
+  - Arch name header
+  - Visibility tier label (RUMOR / CONTACTED / FRONTIER) + foggy values (~prefix for rumored data)
+  - Relationship status if contacted
+  - Stamp-style action row: [ SET EXPANSION TARGET ] [ SURVEY ] for frontier; [ PROPOSE ALLIANCE ] [ DECLARE RIVALRY ] [ IMPOSE EMBARGO ] for contacted; [ DISPATCH SURVEY VESSEL ] for unknown
+- [ ] Click owned arch → Zone B becomes Arch Detail Panel:
+  - Sovereignty level + stability dash-bar
+  - Local pop, naphtha, culture
+  - [ ADD TO SOV FOCUS ] / [ REMOVE FROM SOV FOCUS ]
+- [ ] Click ocean (deselect) → Zone B returns to default dashboard
+- [ ] Unknown/rumor arches are clickable but show "POSITION UNKNOWN" with no actions
+- [ ] When situation card references a specific arch, clicking card highlights that arch on globe
+
+#### Phase 5 — End-of-game Terminal Report
+- [ ] On defeat or turn 340: show Terminal Report screen instead of silent menu redirect
+- [ ] Header: "FINAL RECORD — [POLITY NAME]" / "TURNS 1–N · YEAR X" / outcome in large type (POLITY DISSOLVED / DOMINION ESTABLISHED / SIMULATION CONCLUDED)
+- [ ] Four stat columns: population trajectory (start/peak/final), territory (start/peak/final), tech (start/final + peak turn), diplomatic record (alliances/rivals/embargos count)
+- [ ] Rank among 30 polities at game end for each major stat
+- [ ] Key events log: 5–8 entries pulled from dispatch history (first expansion, first alliance, largest territorial gain, final event)
+- [ ] Decision record: breakdown of turns spent on each National Focus ("EXPAND: 87 turns · BALANCED: 120 turns")
+- [ ] Two buttons: [ PLAY AGAIN ] [ MAIN MENU ]
+
 ### Human-in-the-Loop Mode
 - [ ] Mode toggle on actor layer: player substitutes for deterministic rational actor on one polity
 - [ ] Bounded rationality, imperfect information, turn-based tick
