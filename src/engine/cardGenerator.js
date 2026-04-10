@@ -630,16 +630,21 @@ export function generateSituationCards(snapshot, playerCore, names, frontier, op
   // ── Card 20: Institutional Reform (Acemoglu-Robinson) ─────────────────────
   // Fires when the player's extractiveness_index is high — elite rent-protection
   // blocking TFP growth. Actions: reduce extraction focus, cultural policy shift.
+  // Also shows reversal-of-fortune diagnostic when negative (AJR reversal detected).
   const extractivenessArr = snapshot?.extractiveness || [];
   const playerExtractiveness = extractivenessArr[playerCore] ?? 0;
   if (playerExtractiveness > 0.30) {
     const reformSeed = hashStr('institutional_reform' + Math.floor((snapshot?.tick || 0) / 5));
     const severity = playerExtractiveness > 0.65 ? 'CRITICAL' : playerExtractiveness > 0.45 ? 'ELEVATED' : 'WARNING';
+    const reversalR = snapshot?.reversal_of_fortune_r ?? 0;
+    const reversalNote = reversalR < -0.20
+      ? ` The prosperity ranking of your absorbed territories shows a reversal pattern (r=${reversalR.toFixed(2)}): formerly productive polities now lag, consistent with extractive institutional lock-in.`
+      : '';
     cards.push({
       id: `institutional_reform_${Math.floor((snapshot?.tick || 0) / 5)}`,
       icon: '⚖',
       title: `Institutional Lock-in — ${severity}`,
-      body: getInstitutionalReformText(playerExtractiveness, reformSeed),
+      body: getInstitutionalReformText(playerExtractiveness, reformSeed) + reversalNote,
       actions: [
         { label: 'PURSUE INCLUSIVE REFORM',   action: { type: 'SET_CULTURE_POLICY', ci: 0.3, io: 0.2 } },
         { label: 'REDUCE EXTRACTION RATE',    action: { type: 'SET_FOCUS', focus: 'fortify' } },
