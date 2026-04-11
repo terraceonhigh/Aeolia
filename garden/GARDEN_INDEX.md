@@ -68,6 +68,7 @@
 | `vaanthi_petition_y96.md` | Year 96 SP | Vaanthi Basin Commercial Association (petition) | Administered territory petition to Commerce Council; terms-of-trade exclusion; observer access request |
 | `reach_civil_registry_y103.md` | Year 103 SP | Reach Civil Registry, Office of Administered Territory Affairs (internal memo) | Deputy Director's assessment of Vaanthi petition; administered framework "fit for purpose" review; reclassification pathway recommendation |
 | `centenary_commerce_committee_y100.md` | Year 100 SP | Commerce Council Centenary Committee (session record) | Third session: Vaanthi observer-access petition debate; Kova/Peloro vs. Haugen on standing; Reach Liaison requests deferral; 2-1 preliminary sense favoring access |
+| `laamu_basin_regrets_y100.md` | Year 100 SP | Laamu Basin Executive Office (private correspondence) | Why the swing vote was absent: intermediary revenue, institutional honesty, strategic non-attendance |
 
 ---
 
@@ -93,4 +94,4 @@
 
 ---
 
-*Index last updated: 2026-04-11. 29 observations, 15 fragments, 5 parables. ACADEMIC_GROUNDING: 33 sections (§1–§33), all with garden cross-references or worldbuilding coverage.*
+*Index last updated: 2026-04-11. 29 observations, 16 fragments, 5 parables. ACADEMIC_GROUNDING: 33 sections (§1–§33), all with garden cross-references or worldbuilding coverage.*
