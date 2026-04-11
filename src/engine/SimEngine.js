@@ -72,6 +72,10 @@ export const DEFAULT_PARAMS = {
   davis_amplification: 0.30,       // extractiveness=1.0 worsens failure modifier by 30%
   // Ostrom (1990) — civic/inclusive institutions produce commons governance reducing depletion
   ostrom_commons_factor: 0.55,     // max depletion rate reduction from commons governance
+  // Organski (1958) — power transition: rising challenger gets expansion bonus
+  power_transition_bonus: 2.0,     // expansion bonus for challenger approaching parity with dominant
+  // Famine-epidemic coupling (Mokyr 1983; Ó Gráda 2009)
+  famine_epidemic_coupling: 0.50,  // crop failure amplifies epidemic probability
 };
 
 // ── Crop culture seeds ──────────────────────────────────────
@@ -626,9 +630,12 @@ export class SimEngine {
         // terms of trade relative to luxury/specialty/relay nodes. Calorie staples
         // (paddi, taro, sago, papa) command lower per-unit value than emmer/nori
         // specialty goods (fellwork, byssus, char, qahwa).
+        // Fix: discount only applies when bulk trades with non-bulk. Bulk-bulk pairs
+        // (paddi↔taro) trade at parity — both face the same structural position.
         const BULK_CROPS = new Set(['paddi', 'taro', 'sago', 'papa']);
-        const psA = BULK_CROPS.has(cropA) ? (p.prebisch_bulk_discount ?? 0.75) : 1.0;
-        const psB = BULK_CROPS.has(cropB) ? (p.prebisch_bulk_discount ?? 0.75) : 1.0;
+        const bulkA = BULK_CROPS.has(cropA), bulkB = BULK_CROPS.has(cropB);
+        const psA = (bulkA && !bulkB) ? (p.prebisch_bulk_discount ?? 0.75) : 1.0;
+        const psB = (bulkB && !bulkA) ? (p.prebisch_bulk_discount ?? 0.75) : 1.0;
 
         // ── Greif (1989): high-connectivity relay nodes capture price differential.
         // Maghribi trader coalition model: information asymmetry at bottleneck nodes.
@@ -1075,6 +1082,29 @@ export class SimEngine {
       }
     }
 
+    // ── Power transition danger zone (Organski 1958; Tammen et al. 2000) ──
+    // Rising challenger approaching parity (~75-80% of dominant power) gets
+    // expansion bonus against the dominant power's territory. Bonus goes to
+    // the CHALLENGER, not the dominant power (contra Gilpin preventive-war framing).
+    // Threshold: challenger tech >= 0.75 × dominant tech (danger zone).
+    const powerTransitionPairs = []; // [challenger, dominant]
+    if (this.dfYear === null) {
+      for (const c1 of cores) {
+        if (this.tech[c1] < 7.0) continue;
+        for (const c2 of cores) {
+          if (c2 <= c1 || this.tech[c2] < 7.0) continue;
+          const aw = this.awareness.get(`${c1},${c2}`) || 0;
+          if (aw > 0.10) {
+            const dominant   = this.tech[c1] >= this.tech[c2] ? c1 : c2;
+            const challenger = dominant === c1 ? c2 : c1;
+            if (this.tech[challenger] >= 0.75 * this.tech[dominant]) {
+              powerTransitionPairs.push([challenger, dominant]);
+            }
+          }
+        }
+      }
+    }
+
     // ── STAGE 5: Tech growth + decay + population ───────────
     for (const core of cores) {
       let a0 = this._A0FromPos(this.cpos[core]);
@@ -1157,6 +1187,9 @@ export class SimEngine {
       else if (t < 3.0) accelRate = 0.002;
       else if (t < 5.0) accelRate = 0.008;
       else if (t < 7.0) accelRate = 0.025;
+      // Lindström fix: linear ramp 7.0→8.5 instead of hard step.
+      // Prevents compressing naphtha politics + Organski window into 2-3 ticks.
+      else if (t < 8.5) accelRate = 0.025 + (t - 7.0) / 1.5 * 0.095;
       else accelRate = 0.120;
 
       const accel = a0 * cropExp * shareMult * accelRate * contactMult * energyMult;
@@ -1264,8 +1297,22 @@ export class SimEngine {
         }
       }
       const density = totalCap > 0 ? totalPop / totalCap : 0;
-      // Probability: base × contact bonus × density. ~3-8% per tick for trade hubs.
-      const epiProb = p.epi_base_severity * 0.015 * (1.0 + nc * 0.2) * Math.max(0.3, density);
+      // ── Famine-epidemic coupling (Mokyr 1983; Ó Gráda 2009) ──────────────
+      // Crop failure → nutritional immunosuppression → epidemic amplification.
+      // "Famine and pestilence are not independent calamities" — Ó Gráda.
+      // nutritionalStress: mean crop failure severity across polity's territory.
+      let nutritionalStress = 0;
+      let archCount = 0;
+      for (let j = 0; j < N; j++) {
+        if (this.controller[j] === core) {
+          nutritionalStress += (1.0 - (this.cropFailureModifier[j] ?? 1.0));
+          archCount++;
+        }
+      }
+      if (archCount > 0) nutritionalStress /= archCount;
+      const famineAmp = 1.0 + (p.famine_epidemic_coupling ?? 0.50) * nutritionalStress;
+      // Probability: base × contact bonus × density × famine amplifier. ~3-8% per tick for trade hubs.
+      const epiProb = p.epi_base_severity * 0.015 * (1.0 + nc * 0.2) * Math.max(0.3, density) * famineAmp;
       if (this.rng() < epiProb) {
         // McNeill (1976): industrial public health reduces wave epidemic severity.
         // Pre-germ-theory (tech<5): full severity. Industrial era (tech 5-9): declining mortality.
@@ -1441,7 +1488,16 @@ export class SimEngine {
           }
         }
 
-        candidates.push([tsScore + p.resource_targeting_weight * rv + despBonus + diploBonus + pietyBonus + proxyBonus - deterrencePenalty - alliancePenalty - dist * 1.5, target, dist, rv, proxyBonus > 0]);
+        // Power transition: pre-DF bonus for challenger against dominant's territory
+        let ptBonus = 0;
+        for (const [challenger, dominant] of powerTransitionPairs) {
+          if (core === challenger && this.controller[target] === dominant) {
+            ptBonus = p.power_transition_bonus;
+            break;
+          }
+        }
+
+        candidates.push([tsScore + p.resource_targeting_weight * rv + despBonus + diploBonus + pietyBonus + proxyBonus + ptBonus - deterrencePenalty - alliancePenalty - dist * 1.5, target, dist, rv, proxyBonus > 0]);
       }
       candidates.sort((a, b) => b[0] - a[0]);
 
@@ -1578,17 +1634,23 @@ export class SimEngine {
 
       // ── Acemoglu-Robinson institutional buildup ─────────────────────────────
       // Extractive institutions crystallise from the practice of extraction.
-      // Collectivist/inward culture → less incentive to extend property rights
-      // to subjects → higher institutional lock-in. Inclusive cultures decay faster.
+      // Accumulation fires at base rate whenever excess extraction > 0, regardless
+      // of culture — even civic/outward polities build extractive institutions
+      // when they run empires. Culture gates the DECAY rate, not accumulation.
       // Source: Acemoglu & Robinson (2012). *Why Nations Fail*. Crown.
+      // Fix (Afolabi LSE review): separated accumulation from reform gate.
+      if (excess > 0) {
+        this.extractiveness[core] += excess * (p.institutional_lock_rate ?? 0.12);
+      }
+    }
+    // Extractiveness decay: inclusive cultures reform institutions faster
+    for (const core of cores) {
       const [ciCore, ioCore] = this.cpos[core];
       const inclusiveCulture = ciCore * 0.7 + ioCore * 0.3;     // civic/outward = more inclusive
-      const extractivePressure = excess * (1.0 - inclusiveCulture) * (p.institutional_lock_rate ?? 0.12);
-      const inclusiveReform = inclusiveCulture * 0.02;           // slow liberalisation
-      this.extractiveness[core] = _clamp(
-        this.extractiveness[core] * (1.0 - inclusiveReform) + extractivePressure,
-        0, 1.0
-      );
+      // Base decay + inclusive-culture bonus: civic/outward polities reform ~3× faster
+      const decayRate = 0.02 * (1 + Math.max(0, inclusiveCulture) * 2);
+      this.extractiveness[core] -= this.extractiveness[core] * decayRate;
+      this.extractiveness[core] = _clamp(this.extractiveness[core], 0, 1.0);
     }
 
     // ── STAGE 8: Naphtha depletion ──────────────────────────
