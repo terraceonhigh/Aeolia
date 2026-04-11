@@ -69,6 +69,20 @@
 
 ---
 
+## Parables
+
+*Narrative essays bridging simulation mechanics with institutional theory. Longer-form analytic pieces.*
+
+| File | Subject | Academic Sources |
+|------|---------|-----------------|
+| `the_relay_node.md` | What it means to be a relay node — commercial neutrality as structural position, not moral choice | Greif (1993), Abu-Lughod (1989) |
+| `the_reversal.md` | Institutional persistence after the extracting power leaves; why independence doesn't reset the ledger | Acemoglu-Robinson (2001), North (1990) |
+| `the_reform_dividend.md` | When institutional reform generates growth — and when it doesn't; path dependence in reform timing | North (1990), Pierson (2000) |
+| `the_mutual_recognition.md` | Two polities recognizing each other as peers; the diplomatic structure of the Strange Peace | Wendt (1992), Bull (1977) |
+| `the_second_charter.md` | Frameworks outgrowing their design; administered territories developing endogenous institutional capacity; the distance between administration and governance | North (1990), Ostrom (1990), Scott (1998) |
+
+---
+
 ## Navigation Notes
 
 - Garden observations are analytic documents in Clio's voice. They document the simulation's mechanics against their academic sources and note known approximations.
@@ -77,4 +91,4 @@
 
 ---
 
-*Index last updated: 2026-04-11. 28 observations, 14 fragments, 4 parables. ACADEMIC_GROUNDING: 33 sections (§1–§33), all with garden cross-references or worldbuilding coverage.*
+*Index last updated: 2026-04-11. 28 observations, 14 fragments, 5 parables. ACADEMIC_GROUNDING: 33 sections (§1–§33), all with garden cross-references or worldbuilding coverage.*
