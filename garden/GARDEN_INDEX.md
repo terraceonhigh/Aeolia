@@ -35,6 +35,7 @@
 | `the_strange_equilibrium.md` | Post-DF deterrence and arms race; Snyder stability-instability paradox; proxy belt; why two hegemons; Organski power transition period before DF | §5, §6, §30 | Snyder (1965), Waltz (1981), Brodie (1959), Organski (1958), Gilpin (1981) |
 | `the_thalassocratic_condition.md` | Spykman/Mackinder displacement; four degraded land-power properties; Braudel instability premium | §24 | Spykman (1942), Mackinder (1904), Kirch (2000) |
 | `the_inclusive_extraction_paradox.md` | Why civic/inclusive polities still accumulate extractiveness when running empires; endogenous institution boundary; Cain-Hopkins gentlemanly capitalism | §25 | Acemoglu-Robinson (2001, 2012), Cain & Hopkins (1993), Putnam (1993) |
+| `the_legibility_problem.md` | Scott legibility applied to administered territory classification; what frameworks can see vs. endogenous institutional capacity; counter-legibility; Ostrom crowding-out | §13 | Scott (1998), Ostrom (1990), Acemoglu-Robinson (2001) |
 
 **Structural Analysis**
 
@@ -66,6 +67,7 @@
 | `strange_peace_retrospective.md` | Year 140 SP | Joint academic editors (Reach + Sovereignty) | Centenary retrospective; military-strategic vs. institutional position; provisional synthesis |
 | `vaanthi_petition_y96.md` | Year 96 SP | Vaanthi Basin Commercial Association (petition) | Administered territory petition to Commerce Council; terms-of-trade exclusion; observer access request |
 | `reach_civil_registry_y103.md` | Year 103 SP | Reach Civil Registry, Office of Administered Territory Affairs (internal memo) | Deputy Director's assessment of Vaanthi petition; administered framework "fit for purpose" review; reclassification pathway recommendation |
+| `centenary_commerce_committee_y100.md` | Year 100 SP | Commerce Council Centenary Committee (session record) | Third session: Vaanthi observer-access petition debate; Kova/Peloro vs. Haugen on standing; Reach Liaison requests deferral; 2-1 preliminary sense favoring access |
 
 ---
 
@@ -91,4 +93,4 @@
 
 ---
 
-*Index last updated: 2026-04-11. 28 observations, 14 fragments, 5 parables. ACADEMIC_GROUNDING: 33 sections (§1–§33), all with garden cross-references or worldbuilding coverage.*
+*Index last updated: 2026-04-11. 29 observations, 15 fragments, 5 parables. ACADEMIC_GROUNDING: 33 sections (§1–§33), all with garden cross-references or worldbuilding coverage.*
