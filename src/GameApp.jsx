@@ -826,6 +826,66 @@ function gameReducer(state, action) {
 // Main component
 // ═══════════════════════════════════════════════════════════
 
+// ── How to Play overlay ──────────────────────────────────
+
+const HELP_SECTIONS = [
+  { title: 'THE GAME', body: 'You rule an archipelago civilization across 10,000 years of ocean history (340 turns, 50 years each). Expand your territory, develop technology, manage culture, and navigate the emergence of nuclear deterrence.' },
+  { title: 'NATIONAL FOCUS', body: 'Each turn, your focus allocates resources between Expansion (seizing new territory), Innovation (tech growth), and Consolidation (sovereignty in held territory). The allocation bar shows the split. Change focus as conditions demand.' },
+  { title: 'THE GLOBE', body: 'Click any archipelago on the globe to inspect it. Owned and contacted territories show population, tech, and resources. Frontier territories can be targeted for expansion. Set diplomatic stances (Rival/Partner) on contacted polities.' },
+  { title: 'SITUATION CARDS', body: 'Cards appear in the bottom-right panel as events develop. Each card offers 2–3 responses — choose based on your strategic priorities. Dismissed cards cannot be reviewed (watch the dispatches feed for consequences).' },
+  { title: 'DISPATCHES', body: 'The bottom-left panel shows intelligence from your institutions: ADMIRALTY (military), MERCHANT GUILD (trade), INTERNAL AFFAIRS (governance). Use the filter buttons to focus on one source.' },
+  { title: 'CULTURE POLICY', body: 'Two axes shape your civilization\'s character. Collectivist societies resist schism and hold piety; Individualist societies innovate faster. Inward cultures consolidate; Outward cultures build stronger trade networks and discover contacts.' },
+  { title: 'OPERATIONS', body: 'Scout extends your fog-of-war frontier by one hop. Sovereignty Focus reduces extraction on selected territories, stabilizing them faster. Embargo cuts trade with a target polity.' },
+  { title: 'RESOURCES', body: 'Naphtha (carbon) triggers the industrial scramble around tech 5. Pyra (fissile) triggers the nuclear scramble around tech 8. Control of these resources shapes the endgame. The Dark Forest fires when two nuclear powers detect each other.' },
+];
+
+function HelpOverlay({ onClose }) {
+  return (
+    <div style={{
+      position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+      background: 'rgba(10,8,4,0.92)', zIndex: 18,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+    }} onClick={onClose}>
+      <div style={{
+        width: '90%', maxWidth: 620, maxHeight: '85vh', overflowY: 'auto',
+        background: '#0e0a06', border: '1px solid #4a3a2a', borderRadius: 6,
+        fontFamily: "'JetBrains Mono','Fira Code',monospace",
+        padding: '20px 24px',
+      }} onClick={e => e.stopPropagation()}>
+        <div style={{
+          fontSize: 12, fontWeight: 700, color: '#b8923a', letterSpacing: '3px',
+          textTransform: 'uppercase', marginBottom: 16, textAlign: 'center',
+        }}>
+          How to Play
+        </div>
+        {HELP_SECTIONS.map((s, i) => (
+          <div key={i} style={{ marginBottom: 14 }}>
+            <div style={{
+              fontSize: 8, fontWeight: 700, color: '#d4b896', letterSpacing: '1.5px',
+              textTransform: 'uppercase', marginBottom: 4,
+            }}>
+              {s.title}
+            </div>
+            <div style={{ fontSize: 8, color: '#a8906a', lineHeight: 1.7 }}>
+              {s.body}
+            </div>
+          </div>
+        ))}
+        <div style={{ textAlign: 'center', marginTop: 8 }}>
+          <button onClick={onClose} style={{
+            padding: '6px 24px', fontSize: 9, fontFamily: 'inherit',
+            cursor: 'pointer', fontWeight: 600, letterSpacing: '1.5px',
+            background: '#1a1408', border: '1px solid #4a3a2a',
+            color: '#d4b896', borderRadius: 3, textTransform: 'uppercase',
+          }}>
+            Continue
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function GameInner({ seed, onBack }) {
   const mountRef = useRef(null);
   const sceneRef = useRef({});
@@ -836,6 +896,7 @@ function GameInner({ seed, onBack }) {
   const lastM = useRef({ x: 0, y: 0 });
   const clickStart = useRef({ x: 0, y: 0 });
   const [highlightedArch, setHighlightedArch] = useState(null);
+  const [showHelp, setShowHelp] = useState(false);
 
   const world = useMemo(() => {
     // Build world without running full history (we'll use SimEngine instead)
@@ -1288,6 +1349,11 @@ function GameInner({ seed, onBack }) {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{ fontSize: 8, color: '#4a3a2a', letterSpacing: '1px' }}>seed {seed}</div>
+          <button onClick={() => setShowHelp(h => !h)} style={{
+            padding: '2px 8px', fontSize: 9, fontFamily: 'inherit', cursor: 'pointer',
+            background: showHelp ? '#1a1408' : '#14100a', border: `1px solid ${showHelp ? '#6a5430' : '#2a1f14'}`,
+            color: showHelp ? '#d4b896' : '#8a7a5a', borderRadius: 2, fontWeight: 600,
+          }}>?</button>
           <button onClick={onBack} style={{
             padding: '2px 10px', fontSize: 8, fontFamily: 'inherit', cursor: 'pointer',
             background: '#14100a', border: '1px solid #2a1f14', color: '#8a7a5a',
@@ -1372,6 +1438,9 @@ function GameInner({ seed, onBack }) {
           onApplyCard={handleApplyCard}
         />
       )}
+
+      {/* Help overlay */}
+      {showHelp && <HelpOverlay onClose={() => setShowHelp(false)} />}
 
       {/* Event popup overlay */}
       {game.pendingPopup && (
