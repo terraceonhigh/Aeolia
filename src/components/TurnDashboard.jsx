@@ -142,6 +142,11 @@ export function CommandBar({
                   : lbl === 'PYRA' ? { ...S.value, color: ps.tech >= 9.0 ? '#a04030' : '#7a6a2a' }
                   : lbl === 'TERR' ? { ...S.value, color: ps.territory <= 1 ? '#a04030' : ps.territory <= 3 ? '#c47830' : S.value.color }
                   : S.value}>{val}</div>
+                {lbl === 'PIETY' && piety !== undefined && (
+                  <div style={{ width: 40, height: 2, borderRadius: 1, background: '#1a120a', marginTop: 2, overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${Math.min(piety, 1) * 100}%`, background: piColor, transition: 'width 0.3s' }} />
+                  </div>
+                )}
               </div>
               {i < arr.length - 1 && <div style={S.pipe}>·</div>}
             </div>
