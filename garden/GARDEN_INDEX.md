@@ -65,6 +65,7 @@
 | `sovereignty_commerce_council_y98.md` | Year 98 SP | Sovereignty Commerce Council Secretariat (internal) | First-century Circuit performance review; administered-transition dynamics; strategic position assessment |
 | `strange_peace_retrospective.md` | Year 140 SP | Joint academic editors (Reach + Sovereignty) | Centenary retrospective; military-strategic vs. institutional position; provisional synthesis |
 | `vaanthi_petition_y96.md` | Year 96 SP | Vaanthi Basin Commercial Association (petition) | Administered territory petition to Commerce Council; terms-of-trade exclusion; observer access request |
+| `reach_civil_registry_y103.md` | Year 103 SP | Reach Civil Registry, Office of Administered Territory Affairs (internal memo) | Deputy Director's assessment of Vaanthi petition; administered framework "fit for purpose" review; reclassification pathway recommendation |
 
 ---
 
@@ -76,4 +77,4 @@
 
 ---
 
-*Index last updated: 2026-04-11. 28 observations, 13 fragments, 4 parables. ACADEMIC_GROUNDING: 33 sections (§1–§33), all with garden cross-references or worldbuilding coverage.*
+*Index last updated: 2026-04-11. 28 observations, 14 fragments, 4 parables. ACADEMIC_GROUNDING: 33 sections (§1–§33), all with garden cross-references or worldbuilding coverage.*
