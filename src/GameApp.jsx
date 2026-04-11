@@ -122,6 +122,8 @@ const INITIAL_STATE = {
   lastAcknowledgedCulture: null,
   // Focus history: one entry per turn for terminal report
   focusHistory: [],
+  // Card history: last 80 cards with decisions, for review
+  cardHistory: [],
   // Terminal report dismissed (player chose Play Again or Main Menu)
   showReignSummary: false,
 };
@@ -222,12 +224,23 @@ function gameReducer(state, action) {
         newAcknowledgedCulture = card.id.slice('culture_drift_'.length);
       }
 
+      // Record in card history for player review
+      const histEntry = card ? {
+        title: card.title, body: card.body, icon: card.icon,
+        action: isDismiss ? 'Dismissed' : (action.actionLabel || 'Unknown'),
+        yearStr: yr, tick: dTick,
+      } : null;
+      const newHistory = histEntry
+        ? [...state.cardHistory, histEntry].slice(-80)
+        : state.cardHistory;
+
       const base = {
         ...state,
         pendingCards: nextCards,
         eventLog: [...state.eventLog, ...confirmEntry],
         dismissedCardIds: newDismissedOnApply,
         lastAcknowledgedCulture: newAcknowledgedCulture,
+        cardHistory: newHistory,
       };
       return action.subAction ? gameReducer(base, action.subAction) : base;
     }
@@ -240,11 +253,21 @@ function gameReducer(state, action) {
       if (action.cardId?.startsWith('culture_drift_')) {
         newAck = action.cardId.slice('culture_drift_'.length);
       }
+      const dismissedCard = state.pendingCards.find(c => c.id === action.cardId);
+      const dYear = state.snapshot?.year;
+      const dYr = dYear != null ? (dYear < 0 ? `${Math.abs(dYear)}BP` : `${dYear}CE`) : `T${dTick}`;
+      const dHistEntry = dismissedCard ? {
+        title: dismissedCard.title, body: dismissedCard.body, icon: dismissedCard.icon,
+        action: 'Dismissed', yearStr: dYr, tick: dTick,
+      } : null;
       return {
         ...state,
         pendingCards: state.pendingCards.filter(c => c.id !== action.cardId),
         dismissedCardIds: newDismissed,
         lastAcknowledgedCulture: newAck,
+        cardHistory: dHistEntry
+          ? [...state.cardHistory, dHistEntry].slice(-80)
+          : state.cardHistory,
       };
     }
 
@@ -1435,6 +1458,7 @@ function GameInner({ seed, onBack }) {
         <FeedZone
           eventLog={game.eventLog}
           pendingCards={game.pendingCards}
+          cardHistory={game.cardHistory}
           onApplyCard={handleApplyCard}
         />
       )}

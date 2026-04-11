@@ -203,8 +203,9 @@ const DISPATCH_FILTERS = [
   { key: 'other',      label: 'OTH' },
 ];
 
-export function FeedZone({ eventLog, pendingCards, onApplyCard }) {
+export function FeedZone({ eventLog, pendingCards, cardHistory, onApplyCard }) {
   const [dispatchFilter, setDispatchFilter] = useState('all');
+  const [cardTab, setCardTab] = useState('active'); // 'active' | 'history'
 
   const filteredLog = dispatchFilter === 'all' ? eventLog
     : eventLog.filter(ev => {
@@ -300,7 +301,7 @@ export function FeedZone({ eventLog, pendingCards, onApplyCard }) {
         </div>
       </div>
 
-      {/* ── Situation Cards ── */}
+      {/* ── Situation Cards (active + history tabs) ── */}
       <div style={{
         flex: '0 0 45%',
         display: 'flex', flexDirection: 'column', overflow: 'hidden',
@@ -308,56 +309,107 @@ export function FeedZone({ eventLog, pendingCards, onApplyCard }) {
         <div style={{
           flexShrink: 0, padding: '5px 14px 4px', borderBottom: '1px solid #1a1408',
           fontSize: 8, color: '#7a6a3a', letterSpacing: '2px', textTransform: 'uppercase',
-          fontWeight: 600,
+          fontWeight: 600, display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}>
-          Situation
-          {pendingCards?.length > 0 && (
-            <span style={{ color: '#6a5a3a', fontWeight: 400, marginLeft: 6, fontSize: 7 }}>
-              {pendingCards.length}
-            </span>
-          )}
+          <span>
+            Situation
+            {cardTab === 'active' && pendingCards?.length > 0 && (
+              <span style={{ color: '#6a5a3a', fontWeight: 400, marginLeft: 6, fontSize: 7 }}>
+                {pendingCards.length}
+              </span>
+            )}
+          </span>
+          <div style={{ display: 'flex', gap: 2 }}>
+            {[
+              { key: 'active', label: 'Active' },
+              { key: 'history', label: 'History' },
+            ].map(t => {
+              const active = cardTab === t.key;
+              return (
+                <button key={t.key} onClick={() => setCardTab(t.key)} style={{
+                  padding: '1px 5px', fontSize: 6, fontFamily: MONO,
+                  cursor: 'pointer', fontWeight: active ? 700 : 400,
+                  background: active ? '#1a1408' : 'transparent',
+                  border: `1px solid ${active ? '#4a3a20' : '#1a1408'}`,
+                  color: active ? '#c8a878' : '#4a3a2a',
+                  borderRadius: 2, letterSpacing: '0.3px', textTransform: 'uppercase',
+                }}>
+                  {t.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
         <div style={{ flex: 1, overflowY: 'auto', padding: '6px 10px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {(!pendingCards || pendingCards.length === 0) && (
-            <div style={{ color: '#4a3a2a', fontStyle: 'italic', fontSize: 8, padding: '4px 0' }}>
-              No active situations
-            </div>
+          {cardTab === 'active' && (
+            <>
+              {(!pendingCards || pendingCards.length === 0) && (
+                <div style={{ color: '#4a3a2a', fontStyle: 'italic', fontSize: 8, padding: '4px 0' }}>
+                  No active situations
+                </div>
+              )}
+              {pendingCards?.map(card => (
+                <div key={card.id} style={{
+                  padding: '7px 9px', borderRadius: 3, flexShrink: 0,
+                  background: '#110d07', border: '1px solid #3a2a14',
+                }}>
+                  <div style={{
+                    fontSize: 8, color: '#d4b896', fontWeight: 700,
+                    letterSpacing: '0.5px', marginBottom: 4,
+                  }}>
+                    {card.icon} {card.title}
+                  </div>
+                  <div style={{
+                    fontSize: 7.5, color: '#907858', lineHeight: 1.5, marginBottom: 6,
+                  }}>
+                    {card.body}
+                  </div>
+                  <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                    {card.actions.map((act, i) => (
+                      <button key={i}
+                        onClick={() => onApplyCard?.(card.id, act.action, act.label)}
+                        style={{
+                          padding: '2px 7px', fontSize: 7, fontFamily: MONO,
+                          cursor: 'pointer', fontWeight: 600, letterSpacing: '1px',
+                          background: act.action ? '#1a1408' : '#0e0a06',
+                          border: `1px solid ${act.action ? '#4a3a20' : '#2a1f14'}`,
+                          color: act.action ? '#c8a878' : '#6a5a3a',
+                          borderRadius: 2, textTransform: 'uppercase',
+                        }}
+                      >
+                        {act.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </>
           )}
-          {pendingCards?.map(card => (
-            <div key={card.id} style={{
-              padding: '7px 9px', borderRadius: 3, flexShrink: 0,
-              background: '#110d07', border: '1px solid #3a2a14',
-            }}>
-              <div style={{
-                fontSize: 8, color: '#d4b896', fontWeight: 700,
-                letterSpacing: '0.5px', marginBottom: 4,
-              }}>
-                {card.icon} {card.title}
-              </div>
-              <div style={{
-                fontSize: 7.5, color: '#907858', lineHeight: 1.5, marginBottom: 6,
-              }}>
-                {card.body}
-              </div>
-              <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                {card.actions.map((act, i) => (
-                  <button key={i}
-                    onClick={() => onApplyCard?.(card.id, act.action, act.label)}
-                    style={{
-                      padding: '2px 7px', fontSize: 7, fontFamily: MONO,
-                      cursor: 'pointer', fontWeight: 600, letterSpacing: '1px',
-                      background: act.action ? '#1a1408' : '#0e0a06',
-                      border: `1px solid ${act.action ? '#4a3a20' : '#2a1f14'}`,
-                      color: act.action ? '#c8a878' : '#6a5a3a',
-                      borderRadius: 2, textTransform: 'uppercase',
-                    }}
-                  >
-                    {act.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          ))}
+          {cardTab === 'history' && (
+            <>
+              {(!cardHistory || cardHistory.length === 0) && (
+                <div style={{ color: '#4a3a2a', fontStyle: 'italic', fontSize: 8, padding: '4px 0' }}>
+                  No card history yet
+                </div>
+              )}
+              {cardHistory?.slice().reverse().map((h, i) => (
+                <div key={i} style={{
+                  padding: '5px 8px', borderRadius: 2, flexShrink: 0,
+                  background: '#0c0906', border: '1px solid #1e1608',
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                    <span style={{ fontSize: 7.5, color: '#a8906a', fontWeight: 600 }}>
+                      {h.icon} {h.title}
+                    </span>
+                    <span style={{ fontSize: 6, color: '#4a3a2a' }}>{h.yearStr}</span>
+                  </div>
+                  <div style={{ fontSize: 6.5, color: '#6a5a3a', marginTop: 2 }}>
+                    → {h.action}
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
         </div>
       </div>
     </div>
