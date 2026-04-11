@@ -34,6 +34,7 @@
 | `the_intermediate_belt_problem.md` | Walt balance-of-threat; alignment formula; non-aligned movement analog; proxy competition stability | §4 | Walt (1987) |
 | `the_strange_equilibrium.md` | Post-DF deterrence and arms race; Snyder stability-instability paradox; proxy belt; why two hegemons; Organski power transition period before DF | §5, §6, §30 | Snyder (1965), Waltz (1981), Brodie (1959), Organski (1958), Gilpin (1981) |
 | `the_thalassocratic_condition.md` | Spykman/Mackinder displacement; four degraded land-power properties; Braudel instability premium | §24 | Spykman (1942), Mackinder (1904), Kirch (2000) |
+| `the_inclusive_extraction_paradox.md` | Why civic/inclusive polities still accumulate extractiveness when running empires; endogenous institution boundary; Cain-Hopkins gentlemanly capitalism | §25 | Acemoglu-Robinson (2001, 2012), Cain & Hopkins (1993), Putnam (1993) |
 
 **Structural Analysis**
 
@@ -63,6 +64,7 @@
 | `civil_registry_assessment_y80.md` | Year 80 SP | Reach Civil Registry (classified) | Administered territory network degradation assessment; three-option structural review |
 | `sovereignty_commerce_council_y98.md` | Year 98 SP | Sovereignty Commerce Council Secretariat (internal) | First-century Circuit performance review; administered-transition dynamics; strategic position assessment |
 | `strange_peace_retrospective.md` | Year 140 SP | Joint academic editors (Reach + Sovereignty) | Centenary retrospective; military-strategic vs. institutional position; provisional synthesis |
+| `vaanthi_petition_y96.md` | Year 96 SP | Vaanthi Basin Commercial Association (petition) | Administered territory petition to Commerce Council; terms-of-trade exclusion; observer access request |
 
 ---
 
@@ -74,4 +76,4 @@
 
 ---
 
-*Index last updated: 2026-04-09, Session 6. 27 observations, 12 fragments. ACADEMIC_GROUNDING: 33 sections (§1–§33), all with garden cross-references or worldbuilding coverage.*
+*Index last updated: 2026-04-11. 28 observations, 13 fragments, 4 parables. ACADEMIC_GROUNDING: 33 sections (§1–§33), all with garden cross-references or worldbuilding coverage.*
