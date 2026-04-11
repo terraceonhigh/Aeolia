@@ -16,6 +16,7 @@ import PolitySelect from './components/PolitySelect.jsx';
 import TurnDashboard, { CommandBar, FeedZone } from './components/TurnDashboard.jsx';
 import EventPopup, { ERA_DESCRIPTIONS, TECH_MILESTONES } from './components/EventPopup.jsx';
 import { FOCUSES } from './components/TurnDashboard.jsx';
+import ReignSummary from './components/ReignSummary.jsx';
 
 const R = 5;
 
@@ -119,6 +120,10 @@ const INITIAL_STATE = {
   // Culture tracking — uses the full 8-way getCultureLabel, not the engine's 3-way label.
   // Prevents the Cultural Shift card from re-firing due to label function divergence.
   lastAcknowledgedCulture: null,
+  // Focus history: one entry per turn for terminal report
+  focusHistory: [],
+  // Terminal report dismissed (player chose Play Again or Main Menu)
+  showReignSummary: false,
 };
 
 function gameReducer(state, action) {
@@ -179,7 +184,21 @@ function gameReducer(state, action) {
       const isDismiss = !action.subAction || label === 'DISMISS';
       let confirmText = '';
       if (card && !isDismiss) {
-        confirmText = `YOUR ORDERS — ${card.title}: ${label}. Order logged.`;
+        // Action-specific dispatch confirmation
+        const sub = action.subAction;
+        if (sub?.type === 'SET_FOCUS') {
+          const focusDef = FOCUSES.find(f => f.key === sub.focus);
+          const allocStr = focusDef ? `${focusDef.alloc.expansion}/${focusDef.alloc.techShare}/${focusDef.alloc.consolidation}` : '';
+          confirmText = `INTERNAL AFFAIRS — National focus shifted to ${(sub.focus || '').toUpperCase()}${allocStr ? ` (${allocStr})` : ''}. Guilds acknowledge new priority.`;
+        } else if (sub?.type === 'TOGGLE_TARGET') {
+          confirmText = `ADMIRALTY — Expansion target designated. Navy plotting approach.`;
+        } else if (sub?.type === 'TOGGLE_RIVAL') {
+          confirmText = `ADMIRALTY — Rival power designated. Intelligence assets reoriented.`;
+        } else if (sub?.type === 'TOGGLE_PARTNER') {
+          confirmText = `ADMIRALTY — Diplomatic alignment formalized. Trade protocols engaged.`;
+        } else {
+          confirmText = `YOUR ORDERS — ${card.title}: ${label}. Directive issued.`;
+        }
       } else if (card) {
         confirmText = `YOUR ORDERS — ${card.title}: situation filed. No immediate action taken.`;
       }
@@ -232,10 +251,22 @@ function gameReducer(state, action) {
     case 'SET_FOCUS': {
       const focus = FOCUSES.find(f => f.key === action.focus);
       if (!focus) return state;
+      const allocStr = `${focus.alloc.expansion}/${focus.alloc.techShare}/${focus.alloc.consolidation}`;
+      const tick = state.snapshot?.tick || 60;
+      const year = state.snapshot?.year;
+      const yr = year != null ? (year < 0 ? `${Math.abs(year)}BP` : `${year}CE`) : `T${tick}`;
+      // Only emit dispatch if not chained from APPLY_CARD (which has its own dispatch)
+      const focusEntry = action._fromCard ? [] : [{
+        yearStr: yr,
+        text: `INTERNAL AFFAIRS — National focus shifted to ${action.focus.toUpperCase()} (${allocStr}).`,
+        color: '#6a8a6a',
+        source: 'INTERNAL AFFAIRS',
+      }];
       return {
         ...state,
         activeFocus: action.focus,
         allocation: { ...focus.alloc },
+        eventLog: [...state.eventLog, ...focusEntry],
       };
     }
 
@@ -243,7 +274,10 @@ function gameReducer(state, action) {
       return { ...state, speed: action.speed };
 
     case 'DISMISS_POPUP':
-      return { ...state, pendingPopup: null, timerKey: state.timerKey + 1 };
+      return {
+        ...state, pendingPopup: null, timerKey: state.timerKey + 1,
+        showReignSummary: state.phase === 'GAME_OVER',
+      };
 
     case 'SELECT_ARCH': {
       // Toggle selection — clicking same arch again clears it
@@ -460,6 +494,11 @@ function gameReducer(state, action) {
       const defeated = playerTerritory === 0;
       if (defeated && !popup) {
         popup = { type: 'defeat', data: {} };
+      }
+
+      // Check for simulation completion (turn 340 / tick 400)
+      if (snapshot.finished && !defeated && !popup) {
+        popup = { type: 'simulation_complete', data: {} };
       }
 
       // ── Flavor events (non-blocking dispatch entries) ────
@@ -773,6 +812,8 @@ function gameReducer(state, action) {
           : (snapshot.playerStats?.culturePos
               ? getCultureLabel(snapshot.playerStats.culturePos[0], snapshot.playerStats.culturePos[1])
               : state.lastAcknowledgedCulture),
+        focusHistory: [...state.focusHistory, state.activeFocus],
+        showReignSummary: (snapshot.finished || defeated) && !popup,
       };
     }
 
@@ -1339,6 +1380,19 @@ function GameInner({ seed, onBack }) {
           onDismiss={handleDismissPopup}
           names={names}
           playerCore={game.playerCore}
+        />
+      )}
+
+      {/* Terminal report — shown after GAME_OVER once any popup is dismissed */}
+      {game.showReignSummary && !game.pendingPopup && (
+        <ReignSummary
+          snapshot={game.snapshot}
+          eventLog={game.eventLog}
+          names={names}
+          playerCore={game.playerCore}
+          focusHistory={game.focusHistory}
+          onPlayAgain={() => window.location.reload()}
+          onMainMenu={onBack}
         />
       )}
     </div>

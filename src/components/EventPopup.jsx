@@ -252,6 +252,18 @@ function buildEventDef(type, eventData, names, playerCore) {
       };
     }
 
+    // ─ Simulation Complete (turn 340) ─────────────────────
+    case 'simulation_complete': {
+      return {
+        icon: '◎',
+        color: '#8a9a6a',
+        title: 'End of Record',
+        subtitle: 'The simulation has concluded',
+        body: `Ten thousand years of ocean history have been played. The relay trade has risen and fragmented; the scrambles have been won and lost; the Strange Peace, if it came, holds or does not hold. What remains is the record — the institutions built, the territories held, the decisions made under uncertainty with imperfect information. The ocean does not judge. It simply continues.`,
+        secondary: `A full accounting of your reign follows.`,
+      };
+    }
+
     default:
       return null;
   }

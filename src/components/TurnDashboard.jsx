@@ -139,6 +139,7 @@ export function CommandBar({
                 <div style={S.label}>{lbl}</div>
                 <div style={lbl === 'PIETY' ? { ...S.value, color: piColor }
                   : lbl === 'PYRA' ? { ...S.value, color: ps.tech >= 9.0 ? '#a04030' : '#7a6a2a' }
+                  : lbl === 'TERR' ? { ...S.value, color: ps.territory <= 1 ? '#a04030' : ps.territory <= 3 ? '#c47830' : S.value.color }
                   : S.value}>{val}</div>
               </div>
               {i < arr.length - 1 && <div style={S.pipe}>·</div>}
