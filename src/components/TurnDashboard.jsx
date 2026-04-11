@@ -13,6 +13,7 @@
 // separate and intentionally full-screen.
 // ═══════════════════════════════════════════════════════════
 
+import { useState } from 'react';
 import TurnTimer from './TurnTimer.jsx';
 
 const MONO = "'JetBrains Mono','Fira Code',monospace";
@@ -194,7 +195,29 @@ export function CommandBar({
 // Full-width, pinned to bottom. Dispatches left, cards right.
 // ═══════════════════════════════════════════════════════════
 
+const DISPATCH_FILTERS = [
+  { key: 'all',       label: 'ALL' },
+  { key: 'admiralty',  label: 'ADM',  match: 'ADMIRALTY' },
+  { key: 'merchant',   label: 'MER',  match: 'MERCHANT' },
+  { key: 'internal',   label: 'INT',  match: 'INTERNAL' },
+  { key: 'other',      label: 'OTH' },
+];
+
 export function FeedZone({ eventLog, pendingCards, onApplyCard }) {
+  const [dispatchFilter, setDispatchFilter] = useState('all');
+
+  const filteredLog = dispatchFilter === 'all' ? eventLog
+    : eventLog.filter(ev => {
+        const sep = ev.text?.indexOf(' — ');
+        const source = (sep > 0 && sep < 32) ? ev.text.slice(0, sep) : '';
+        const filterDef = DISPATCH_FILTERS.find(f => f.key === dispatchFilter);
+        if (!filterDef?.match) {
+          // "other" — everything not matching admiralty/merchant/internal
+          return !source.includes('ADMIRALTY') && !source.includes('MERCHANT') && !source.includes('INTERNAL');
+        }
+        return source.includes(filterDef.match);
+      });
+
   return (
     <div style={{
       flexShrink: 0, borderTop: BORDER,
@@ -211,20 +234,38 @@ export function FeedZone({ eventLog, pendingCards, onApplyCard }) {
         <div style={{
           flexShrink: 0, padding: '5px 14px 4px', borderBottom: '1px solid #1a1408',
           fontSize: 8, color: '#7a6a3a', letterSpacing: '2px', textTransform: 'uppercase',
-          fontWeight: 600,
+          fontWeight: 600, display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}>
-          Dispatches
+          <span>Dispatches</span>
+          <div style={{ display: 'flex', gap: 2 }}>
+            {DISPATCH_FILTERS.map(f => {
+              const active = dispatchFilter === f.key;
+              return (
+                <button key={f.key} onClick={() => setDispatchFilter(f.key)} style={{
+                  padding: '1px 4px', fontSize: 6, fontFamily: MONO,
+                  cursor: 'pointer', fontWeight: active ? 700 : 400,
+                  background: active ? '#1a1408' : 'transparent',
+                  border: `1px solid ${active ? '#4a3a20' : '#1a1408'}`,
+                  color: active ? '#c8a878' : '#4a3a2a',
+                  borderRadius: 2, letterSpacing: '0.3px',
+                  textTransform: 'uppercase',
+                }}>
+                  {f.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
         <div style={{
           flex: 1, overflowY: 'auto', padding: '6px 14px',
           display: 'flex', flexDirection: 'column', gap: 5,
         }}>
-          {eventLog.length === 0 && (
+          {filteredLog.length === 0 && (
             <div style={{ color: '#4a3a2a', fontStyle: 'italic', fontSize: 8 }}>
-              No dispatches yet
+              {dispatchFilter === 'all' ? 'No dispatches yet' : 'No matching dispatches'}
             </div>
           )}
-          {eventLog.slice(-30).reverse().map((ev, i) => {
+          {filteredLog.slice(-50).reverse().map((ev, i) => {
             const sep = ev.text?.indexOf(' — ');
             const hasSource = sep > 0 && sep < 32;
             const source = hasSource ? ev.text.slice(0, sep) : null;
@@ -388,12 +429,18 @@ function FocusCard({ focus, active, locked, onSelect }) {
       }}>
         {focus.label.toUpperCase()}
       </div>
-      {/* Allocation bar — three segments, fully lit when active */}
+      {/* Allocation bar — three segments, bright when active, dimmed when inactive */}
       {alloc && (
         <div style={{ display: 'flex', marginTop: 5, height: active ? 4 : 2, borderRadius: 2, overflow: 'hidden', gap: 1, transition: 'height 0.15s' }}>
-          <div style={{ flex: alloc.expansion,     background: active ? '#c47830' : '#1e1608' }} />
-          <div style={{ flex: alloc.techShare,     background: active ? '#a09060' : '#1e1608' }} />
-          <div style={{ flex: alloc.consolidation, background: active ? '#7a8a5a' : '#1e1608' }} />
+          <div style={{ flex: alloc.expansion,     background: active ? '#c47830' : locked ? '#1e1608' : '#3a2410' }} />
+          <div style={{ flex: alloc.techShare,     background: active ? '#a09060' : locked ? '#1e1608' : '#302818' }} />
+          <div style={{ flex: alloc.consolidation, background: active ? '#7a8a5a' : locked ? '#1e1608' : '#283018' }} />
+        </div>
+      )}
+      {/* Allocation percentages — shown on all cards, not just active */}
+      {alloc && !active && !locked && (
+        <div style={{ fontSize: 5, color: '#4a3a2a', marginTop: 2, letterSpacing: '0.3px' }}>
+          {alloc.expansion}/{alloc.techShare}/{alloc.consolidation}
         </div>
       )}
     </div>
@@ -751,16 +798,23 @@ export default function TurnDashboard({
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {[
-            { label: ['Collect.', 'Indiv.'],  key: 'ci', val: culturePolicyCI },
-            { label: ['Inward',   'Outward'], key: 'io', val: culturePolicyIO },
-          ].map(({ label, key, val }) => (
-            <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              <span style={{ fontSize: 6, color: '#6a5a3a', width: 42 }}>{label[0]}</span>
-              <input type="range" min={-100} max={100}
-                value={Math.round((val || 0) * 100)}
-                onChange={e => onSetCulturePolicy?.(key, Number(e.target.value) / 100)}
-                style={{ flex: 1, accentColor: '#8a7a5a' }} />
-              <span style={{ fontSize: 6, color: '#6a5a3a', width: 42, textAlign: 'right' }}>{label[1]}</span>
+            { label: ['Collect.', 'Indiv.'],  key: 'ci', val: culturePolicyCI,
+              hint: 'Collective: resist schism, hold piety. Individual: faster trade, innovation.' },
+            { label: ['Inward',   'Outward'], key: 'io', val: culturePolicyIO,
+              hint: 'Inward: consolidate holdings, resist conquest. Outward: stronger relay trade, wider contacts.' },
+          ].map(({ label, key, val, hint }) => (
+            <div key={key}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                <span style={{ fontSize: 6, color: '#6a5a3a', width: 42 }}>{label[0]}</span>
+                <input type="range" min={-100} max={100}
+                  value={Math.round((val || 0) * 100)}
+                  onChange={e => onSetCulturePolicy?.(key, Number(e.target.value) / 100)}
+                  style={{ flex: 1, accentColor: '#8a7a5a' }} />
+                <span style={{ fontSize: 6, color: '#6a5a3a', width: 42, textAlign: 'right' }}>{label[1]}</span>
+              </div>
+              <div style={{ fontSize: 5.5, color: '#4a3a2a', marginTop: 2, lineHeight: 1.4, paddingLeft: 2 }}>
+                {hint}
+              </div>
             </div>
           ))}
         </div>
