@@ -63,6 +63,7 @@
 | `commerce_council_internal.md` | Year 12 SP | Sovereignty Commerce Council | RSC legitimacy and administered territory commercial doctrine |
 | `the_kalapa_deliberation.md` | Year 29 SP | Kalapa Confederacy council record | Intermediate belt choice between Circuit membership and Reach administration |
 | `the_contested_belt_address.md` | Year 47 SP | Oran Confederacy public address | Intermediate belt political identity in the Strange Peace |
+| `kalapa_connectivity_review_y72.md` | Year 72 SP | Kalapa Confederacy Assembly (public session) | Third Connectivity Renewal; commercial differential narrowing; institutional lock-in acknowledgment; Deneu-Oren assessment |
 | `civil_registry_assessment_y80.md` | Year 80 SP | Reach Civil Registry (classified) | Administered territory network degradation assessment; three-option structural review |
 | `sovereignty_commerce_council_y98.md` | Year 98 SP | Sovereignty Commerce Council Secretariat (internal) | First-century Circuit performance review; administered-transition dynamics; strategic position assessment |
 | `strange_peace_retrospective.md` | Year 140 SP | Joint academic editors (Reach + Sovereignty) | Centenary retrospective; military-strategic vs. institutional position; provisional synthesis |
@@ -96,4 +97,4 @@
 
 ---
 
-*Index last updated: 2026-04-11. 30 observations, 17 fragments, 5 parables. ACADEMIC_GROUNDING: 33 sections (§1–§33), all with garden cross-references or worldbuilding coverage.*
+*Index last updated: 2026-04-11. 30 observations, 18 fragments, 5 parables. ACADEMIC_GROUNDING: 33 sections (§1–§33), all with garden cross-references or worldbuilding coverage.*
