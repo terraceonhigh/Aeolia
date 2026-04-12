@@ -4,7 +4,7 @@
 // Fork of App.jsx rendering patterns; simulate.js untouched.
 // ═══════════════════════════════════════════════════════════
 
-import { useState, useEffect, useRef, useCallback, useMemo, useReducer } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo, useReducer, useSyncExternalStore } from 'react';
 import * as THREE from 'three';
 import { buildWorld } from './engine/world.js';
 import { SimEngine, DEFAULT_PARAMS } from './engine/SimEngine.js';
@@ -443,10 +443,11 @@ function gameReducer(state, action) {
               color: '#3a2a1a',
             });
           } else {
+            const proxyTag = ev.isProxy ? 'The conflict bears hallmarks of great-power competition. ' : '';
             newEvents.push({
               yearStr,
-              text: `ADMIRALTY INTELLIGENCE — ${action.names[ev.core]} has absorbed ${action.names[ev.target]}.`,
-              color: '#6a5a3a',
+              text: `ADMIRALTY INTELLIGENCE — ${action.names[ev.core]} has absorbed ${action.names[ev.target]}. ${proxyTag}`,
+              color: ev.isProxy ? '#8a3a4a' : '#6a5a3a',
             });
           }
         }
@@ -741,6 +742,29 @@ function gameReducer(state, action) {
         }
       }
 
+      // ── Pre-DF nuclear awareness dispatches ────────────────
+      // Twilight Struggle DEFCON analog: ramp tension with ADMIRALTY intelligence
+      // as nuclear peer awareness climbs toward the 0.30 DF threshold.
+      const prevAw = state.snapshot?.nuclearAwareness ?? null;
+      const currAw = snapshot.nuclearAwareness;
+      if (currAw !== null && currAw !== undefined) {
+        const thresholds = [
+          [0.08, 'Long-range signal analysis has detected anomalous energy signatures from an unknown source. Origin: indeterminate. Confidence: LOW.'],
+          [0.16, 'Pattern analysis confirms industrial-scale energy production beyond any known polity. A second advanced civilization exists. Confidence: MODERATE.'],
+          [0.24, 'Signals intelligence indicates weapons-grade material processing consistent with strategic deterrence capability. A nuclear peer may be observing us as we observe them. Confidence: HIGH.'],
+        ];
+        for (const [threshold, text] of thresholds) {
+          if (currAw >= threshold && (prevAw === null || prevAw < threshold)) {
+            newEvents.push({
+              yearStr: yearStr2,
+              text: `ADMIRALTY INTELLIGENCE — ${text}`,
+              color: currAw >= 0.24 ? '#a04030' : currAw >= 0.16 ? '#c47830' : '#8a7a2a',
+            });
+            break; // one dispatch per tick max
+          }
+        }
+      }
+
       // ── Early-game flavor dispatches ──────────────────────
       // Fill the T0-57 dead zone with one guaranteed navigator/merchant dispatch.
       const turnNumber = (snapshot.tick || 60) - 60;
@@ -912,7 +936,19 @@ function HelpOverlay({ onClose }) {
   );
 }
 
+// ── Mobile detection ──────────────────────────────────────
+const MOBILE_BREAKPOINT = 600;
+const mobileQuery = typeof window !== 'undefined' ? window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`) : null;
+function useIsMobile() {
+  return useSyncExternalStore(
+    cb => { mobileQuery?.addEventListener('change', cb); return () => mobileQuery?.removeEventListener('change', cb); },
+    () => mobileQuery?.matches ?? false,
+    () => false,
+  );
+}
+
 function GameInner({ seed, onBack }) {
+  const isMobile = useIsMobile();
   const mountRef = useRef(null);
   const sceneRef = useRef({});
   const globeQuat = useRef(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), 0.3));
@@ -923,6 +959,7 @@ function GameInner({ seed, onBack }) {
   const clickStart = useRef({ x: 0, y: 0 });
   const [highlightedArch, setHighlightedArch] = useState(null);
   const [showHelp, setShowHelp] = useState(false);
+  const [showPanel, setShowPanel] = useState(false); // mobile: toggle right panel
 
   const world = useMemo(() => {
     // Build world without running full history (we'll use SimEngine instead)
@@ -1401,11 +1438,12 @@ function GameInner({ seed, onBack }) {
           timerPaused={!!game.pendingPopup}
           onAdvance={handleAdvance}
           finished={game.phase === 'GAME_OVER'}
+          isMobile={isMobile}
         />
       )}
 
       {/* ── Zone B (globe) + Zone C (context panel) ── */}
-      <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
+      <div style={{ flex: 1, display: 'flex', minHeight: 0, position: 'relative' }}>
 
         {/* Globe — map primacy */}
         <div style={{ flex: 1, position: 'relative', overflow: 'hidden', minWidth: 0 }}>
@@ -1423,37 +1461,54 @@ function GameInner({ seed, onBack }) {
               onHighlight={setHighlightedArch}
             />
           )}
+          {/* Mobile: panel toggle button */}
+          {isMobile && isPlaying && (
+            <button onClick={() => setShowPanel(p => !p)} style={{
+              position: 'absolute', bottom: 8, right: 8, zIndex: 5,
+              padding: '6px 12px', fontSize: 8, fontFamily: "'JetBrains Mono',monospace",
+              cursor: 'pointer', fontWeight: 700, letterSpacing: '1px',
+              background: showPanel ? '#1a1408' : 'rgba(10,8,4,0.85)',
+              border: `1px solid ${showPanel ? '#6a5430' : '#3a2a1a'}`,
+              color: showPanel ? '#d4b896' : '#8a7a5a', borderRadius: 3,
+            }}>{showPanel ? '✕ CLOSE' : '☰ PANEL'}</button>
+          )}
         </div>
 
         {/* Zone C: Context panel (decisions / diplomacy / ops) */}
-        {isPlaying && (
-          <TurnDashboard
-            snapshot={game.snapshot}
-            frontier={game.frontier}
-            names={names}
-            playerCore={game.playerCore}
-            activeFocus={game.activeFocus}
-            onSetFocus={handleSetFocus}
-            selectedTargets={game.selectedTargets}
-            onToggleTarget={handleToggleTarget}
-            embargoTargets={game.embargoTargets}
-            onToggleEmbargo={handleToggleEmbargo}
-            rivalCores={game.rivalCores}
-            onToggleRival={handleToggleRival}
-            partnerCores={game.partnerCores}
-            onTogglePartner={handleTogglePartner}
-            culturePolicyCI={game.culturePolicyCI}
-            culturePolicyIO={game.culturePolicyIO}
-            onSetCulturePolicy={handleSetCulturePolicy}
-            sovFocusTargets={game.sovFocusTargets}
-            prevSovereignty={game.prevSovereignty}
-            onToggleSovFocus={handleToggleSovFocus}
-            scoutActive={game.scoutActive}
-            onToggleScout={handleToggleScout}
-            selectedArch={game.selectedArch}
-            onSelectArch={(ai) => dispatch({ type: 'SELECT_ARCH', archIdx: ai })}
-            substrate={world.substrate}
-          />
+        {isPlaying && (!isMobile || showPanel) && (
+          <div style={isMobile ? {
+            position: 'absolute', top: 0, right: 0, bottom: 0, width: '85%', maxWidth: 300,
+            zIndex: 6, boxShadow: '-4px 0 24px rgba(0,0,0,0.6)',
+          } : {}}>
+            <TurnDashboard
+              snapshot={game.snapshot}
+              frontier={game.frontier}
+              names={names}
+              playerCore={game.playerCore}
+              activeFocus={game.activeFocus}
+              onSetFocus={handleSetFocus}
+              selectedTargets={game.selectedTargets}
+              onToggleTarget={handleToggleTarget}
+              embargoTargets={game.embargoTargets}
+              onToggleEmbargo={handleToggleEmbargo}
+              rivalCores={game.rivalCores}
+              onToggleRival={handleToggleRival}
+              partnerCores={game.partnerCores}
+              onTogglePartner={handleTogglePartner}
+              culturePolicyCI={game.culturePolicyCI}
+              culturePolicyIO={game.culturePolicyIO}
+              onSetCulturePolicy={handleSetCulturePolicy}
+              sovFocusTargets={game.sovFocusTargets}
+              prevSovereignty={game.prevSovereignty}
+              onToggleSovFocus={handleToggleSovFocus}
+              scoutActive={game.scoutActive}
+              onToggleScout={handleToggleScout}
+              selectedArch={game.selectedArch}
+              onSelectArch={(ai) => dispatch({ type: 'SELECT_ARCH', archIdx: ai })}
+              substrate={world.substrate}
+              isMobile={isMobile}
+            />
+          </div>
         )}
       </div>
 
@@ -1464,6 +1519,7 @@ function GameInner({ seed, onBack }) {
           pendingCards={game.pendingCards}
           cardHistory={game.cardHistory}
           onApplyCard={handleApplyCard}
+          isMobile={isMobile}
         />
       )}
 

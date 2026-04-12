@@ -72,6 +72,7 @@ export function CommandBar({
   speed, onSetSpeed,
   timerKey, timerDuration, timerPaused, onAdvance,
   finished,
+  isMobile,
 }) {
   const ps = snapshot?.playerStats;
   const tick = snapshot?.tick || 60;
@@ -92,37 +93,41 @@ export function CommandBar({
     : piety >= 0.75 ? '#b8923a' : piety >= 0.50 ? '#9a8a5a' : '#6a5a3a';
 
   const S = {
-    label: { color: '#6a5a3a', fontSize: 7, letterSpacing: '0.5px' },
-    value: { color: '#d4b896', fontSize: 9, fontWeight: 600 },
-    pipe:  { color: '#3a2a1a', padding: '0 6px' },
+    label: { color: '#6a5a3a', fontSize: isMobile ? 5.5 : 7, letterSpacing: '0.5px' },
+    value: { color: '#d4b896', fontSize: isMobile ? 7 : 9, fontWeight: 600 },
+    pipe:  { color: '#3a2a1a', padding: '0 6px', display: isMobile ? 'none' : 'block' },
   };
 
   return (
     <div style={{
       flexShrink: 0, borderBottom: BORDER,
       background: 'linear-gradient(180deg,#130f09,#0c0806)',
-      fontFamily: MONO, display: 'flex', alignItems: 'stretch',
-      height: 52,
+      fontFamily: MONO, display: 'flex', alignItems: isMobile ? 'center' : 'stretch',
+      height: isMobile ? 'auto' : 52,
+      flexWrap: isMobile ? 'wrap' : 'nowrap',
+      padding: isMobile ? '4px 0' : 0,
     }}>
 
       {/* ── Turn / Era ── */}
       <div style={{
-        padding: '0 16px', borderRight: BORDER, display: 'flex',
-        flexDirection: 'column', justifyContent: 'center', flexShrink: 0, minWidth: 130,
+        padding: isMobile ? '2px 10px' : '0 16px', borderRight: isMobile ? 'none' : BORDER,
+        display: 'flex', flexDirection: isMobile ? 'row' : 'column',
+        justifyContent: 'center', alignItems: isMobile ? 'baseline' : 'flex-start',
+        flexShrink: 0, minWidth: isMobile ? 0 : 130, gap: isMobile ? 6 : 0,
       }}>
-        <div style={{ fontSize: 11, fontWeight: 700, color: '#d4b896', letterSpacing: '1px' }}>
-          TURN {gameYear}<span style={{ color: '#4a3a2a', fontWeight: 400 }}>/340</span>
+        <div style={{ fontSize: isMobile ? 9 : 11, fontWeight: 700, color: '#d4b896', letterSpacing: '1px' }}>
+          T{gameYear}<span style={{ color: '#4a3a2a', fontWeight: 400 }}>/340</span>
         </div>
-        <div style={{ fontSize: 7, color: '#7a6a4a', marginTop: 2, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
-          {eraName} Era
+        <div style={{ fontSize: isMobile ? 6 : 7, color: '#7a6a4a', marginTop: isMobile ? 0 : 2, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
+          {eraName}
         </div>
       </div>
 
       {/* ── Stat strip ── */}
       {ps && (
         <div style={{
-          flex: 1, padding: '0 14px', display: 'flex', alignItems: 'center',
-          gap: 0, overflow: 'hidden',
+          flex: 1, padding: isMobile ? '2px 6px' : '0 14px', display: 'flex', alignItems: 'center',
+          gap: 0, overflow: 'hidden', flexWrap: isMobile ? 'wrap' : 'nowrap',
         }}>
           {(() => {
             // Derive food security label from fishery + crop health
@@ -132,25 +137,44 @@ export function CommandBar({
               : foodAvg >= 0.35 ? 'Scarce' : 'Famine';
             const foodColor = foodAvg >= 0.85 ? S.value.color : foodAvg >= 0.6 ? '#8a7a2a'
               : foodAvg >= 0.35 ? '#c47830' : '#a04030';
+            // Institutional stability composite (extractiveness + grievance)
+            const stabScore = (ps.extractiveness ?? 0) * 0.6 + (ps.avgGrievance ?? 0) * 0.4;
+            const stabLabel = stabScore < 0.10 ? 'Stable' : stabScore < 0.25 ? 'Strained'
+              : stabScore < 0.45 ? 'Restive' : 'Crisis';
+            const stabColor = stabScore < 0.10 ? '#7a8a5a' : stabScore < 0.25 ? '#8a7a2a'
+              : stabScore < 0.45 ? '#c47830' : '#a04030';
+
+            // Pre-DF nuclear awareness (Twilight Struggle DEFCON analog)
+            const nucAw = snapshot?.nuclearAwareness;
+            const showTension = nucAw !== null && nucAw !== undefined;
+            const tensionPct = showTension ? Math.round(nucAw * 100) : 0;
+            const tensionColor = tensionPct < 40 ? '#8a7a2a' : tensionPct < 70 ? '#c47830' : '#a04030';
+
             return [
               ['POP',      ps.pop?.toLocaleString()],
               ['TECH',     ps.tech],
               ['TERR',     `${ps.territory} archs`],
               ['FOOD',     foodLabel],
+              ['TRADE',    ps.tradeIncome > 0 ? ps.tradeIncome.toFixed(1) : '—'],
               ['NAPH',     ps.naphtha > 0 ? ps.naphtha.toFixed(1) : '—'],
+              ['STABILITY', stabLabel],
               ['CONTACTS', ps.contacts],
               ['CULTURE',  ps.cultureLabel],
               ...(piLabel ? [['PIETY', piLabel]] : []),
               ...(snapshot?.pu_scramble_onset_tick && ps?.hasPu
                 ? [['PYRA', ps.tech >= 9.0 ? 'WEAPONS' : 'DEPOSITS']] : []),
+              ...(showTension ? [['TENSION', `${tensionPct}%`]] : []),
             ].map(([lbl, val], i, arr) => (
               <div key={lbl} style={{ display: 'flex', alignItems: 'center' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', padding: '0 10px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', padding: isMobile ? '1px 4px' : '0 10px' }}>
                   <div style={S.label}>{lbl}</div>
                   <div style={lbl === 'PIETY' ? { ...S.value, color: piColor }
                     : lbl === 'PYRA' ? { ...S.value, color: ps.tech >= 9.0 ? '#a04030' : '#7a6a2a' }
                     : lbl === 'TERR' ? { ...S.value, color: ps.territory <= 1 ? '#a04030' : ps.territory <= 3 ? '#c47830' : S.value.color }
                     : lbl === 'FOOD' ? { ...S.value, color: foodColor }
+                    : lbl === 'STABILITY' ? { ...S.value, color: stabColor }
+                    : lbl === 'TRADE' ? { ...S.value, color: ps.tradeIncome > 0 ? '#7a8a5a' : '#5a4a3a' }
+                    : lbl === 'TENSION' ? { ...S.value, color: tensionColor }
                     : S.value}>{val}</div>
                   {lbl === 'PIETY' && piety !== undefined && (
                     <div style={{ width: 40, height: 2, borderRadius: 1, background: '#1a120a', marginTop: 2, overflow: 'hidden' }}>
@@ -162,6 +186,16 @@ export function CommandBar({
                       <div style={{ height: '100%', width: `${foodAvg * 100}%`, background: foodColor, transition: 'width 0.3s' }} />
                     </div>
                   )}
+                  {lbl === 'STABILITY' && (
+                    <div style={{ width: 40, height: 2, borderRadius: 1, background: '#1a120a', marginTop: 2, overflow: 'hidden' }}>
+                      <div style={{ height: '100%', width: `${Math.min(stabScore / 0.6, 1) * 100}%`, background: stabColor, transition: 'width 0.3s' }} />
+                    </div>
+                  )}
+                  {lbl === 'TENSION' && (
+                    <div style={{ width: 40, height: 2, borderRadius: 1, background: '#1a120a', marginTop: 2, overflow: 'hidden' }}>
+                      <div style={{ height: '100%', width: `${Math.min(tensionPct / 30 * 100, 100)}%`, background: tensionColor, transition: 'width 0.3s' }} />
+                    </div>
+                  )}
                 </div>
                 {i < arr.length - 1 && <div style={S.pipe}>·</div>}
               </div>
@@ -170,8 +204,8 @@ export function CommandBar({
         </div>
       )}
 
-      {/* ── Focus badge ── */}
-      {activeFocusDef && (
+      {/* ── Focus badge (hidden on mobile — info is in panel) ── */}
+      {activeFocusDef && !isMobile && (
         <div style={{
           padding: '0 14px', borderLeft: BORDER, borderRight: BORDER,
           display: 'flex', flexDirection: 'column', justifyContent: 'center',
@@ -224,7 +258,7 @@ const DISPATCH_FILTERS = [
   { key: 'other',      label: 'OTH' },
 ];
 
-export function FeedZone({ eventLog, pendingCards, cardHistory, onApplyCard }) {
+export function FeedZone({ eventLog, pendingCards, cardHistory, onApplyCard, isMobile }) {
   const [dispatchFilter, setDispatchFilter] = useState('all');
   const [cardTab, setCardTab] = useState('active'); // 'active' | 'history'
 
@@ -245,12 +279,14 @@ export function FeedZone({ eventLog, pendingCards, cardHistory, onApplyCard }) {
       flexShrink: 0, borderTop: BORDER,
       background: 'linear-gradient(0deg,#0c0806,#100c06)',
       fontFamily: MONO, display: 'flex',
-      height: 190,
+      flexDirection: isMobile ? 'column' : 'row',
+      height: isMobile ? 150 : 190,
     }}>
 
       {/* ── Dispatches ── */}
       <div style={{
-        flex: '0 0 55%', borderRight: BORDER,
+        flex: isMobile ? '1 1 50%' : '0 0 55%', borderRight: isMobile ? 'none' : BORDER,
+        borderBottom: isMobile ? BORDER : 'none',
         display: 'flex', flexDirection: 'column', overflow: 'hidden',
       }}>
         <div style={{
@@ -381,10 +417,18 @@ export function FeedZone({ eventLog, pendingCards, cardHistory, onApplyCard }) {
                     {card.icon} {card.title}
                   </div>
                   <div style={{
-                    fontSize: 7.5, color: '#907858', lineHeight: 1.5, marginBottom: 6,
+                    fontSize: 7.5, color: '#907858', lineHeight: 1.5, marginBottom: card.why ? 3 : 6,
                   }}>
                     {card.body}
                   </div>
+                  {card.why && (
+                    <div style={{
+                      fontSize: 6.5, color: '#5a4a3a', fontStyle: 'italic',
+                      lineHeight: 1.4, marginBottom: 5, paddingLeft: 2,
+                    }}>
+                      {card.why}
+                    </div>
+                  )}
                   <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                     {card.actions.map((act, i) => (
                       <button key={i}
@@ -446,12 +490,12 @@ export function FeedZone({ eventLog, pendingCards, cardHistory, onApplyCard }) {
 
 const S = {
   panel: {
-    width: 240, flexShrink: 0, borderLeft: BORDER,
+    width: '100%', flexShrink: 0, borderLeft: BORDER,
     background: BG_PANEL,
     fontFamily: MONO,
     fontSize: 9, color: '#c8a878',
     display: 'flex', flexDirection: 'column',
-    overflowY: 'auto',
+    overflowY: 'auto', height: '100%',
   },
   section: {
     padding: '9px 12px', borderBottom: BORDER,
@@ -633,6 +677,34 @@ function ArchDetailPanel({
         </div>
       )}
 
+      {/* Institutional indicators for owned territories */}
+      {isOwned && (() => {
+        const gv = snapshot?.grievance?.[archIdx] ?? 0;
+        const ext = snapshot?.extractiveness?.[archIdx] ?? 0;
+        const sov = snapshot?.sovereignty?.[archIdx] ?? 1;
+        const isHome = archIdx === playerCore;
+        // Only show for non-home islands (home island has no grievance/extraction)
+        if (isHome) return null;
+        const gvColor = gv > 0.6 ? '#a04030' : gv > 0.35 ? '#c47830' : gv > 0.15 ? '#8a7a2a' : '#5a6a4a';
+        const extColor = ext > 0.5 ? '#a04030' : ext > 0.3 ? '#c47830' : ext > 0.15 ? '#8a7a2a' : '#5a6a4a';
+        const sovPct = Math.round(sov * 100);
+        const sovColor = sov > 0.65 ? '#5a6a4a' : sov > 0.35 ? '#8a7a2a' : '#c47830';
+        return (
+          <div style={{ fontSize: 7, color: '#8a7a5a', marginBottom: 4 }}>
+            <div style={{ display: 'flex', gap: 10, marginBottom: 2 }}>
+              <span style={{ color: gvColor }}>grievance {gv.toFixed(2)}</span>
+              <span style={{ color: extColor }}>extraction {ext.toFixed(2)}</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <span style={{ color: sovColor }}>sovereignty {sovPct}%</span>
+              <div style={{ flex: 1, maxWidth: 50, height: 2, borderRadius: 1, background: '#1a120a', overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${sovPct}%`, background: sovColor, transition: 'width 0.3s' }} />
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Action buttons */}
       <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
         {isOnFrontier && (
@@ -681,6 +753,7 @@ export default function TurnDashboard({
   // Selected arch from globe click (Phase 4)
   selectedArch, onSelectArch,
   substrate,
+  isMobile,
 }) {
   const ps = snapshot?.playerStats;
 
@@ -694,8 +767,12 @@ export default function TurnDashboard({
   const activeFocusDef = FOCUSES.find(f => f.key === activeFocus);
   const alloc = activeFocusDef?.alloc;
 
+  const panelStyle = isMobile
+    ? { ...S.panel, width: '100%' }
+    : { ...S.panel, width: 240 };
+
   return (
-    <div style={S.panel}>
+    <div style={panelStyle}>
 
       {/* ── Arch Detail Panel (globe click) ── */}
       {selectedArch !== null && selectedArch !== undefined && (
@@ -850,6 +927,15 @@ export default function TurnDashboard({
               const isRival   = rivalCores?.has(cc);
               const isPartner = partnerCores?.has(cc);
               const isEmbargo = embargoTargets?.has(cc);
+              // Relative tech comparison
+              const ccTech = snapshot?.tech?.[cc] ?? 0;
+              const playerTech = snapshot?.playerStats?.tech ?? 0;
+              const techDelta = ccTech - playerTech;
+              const techStr = Math.abs(techDelta) < 0.1 ? '=' : (techDelta > 0 ? `+${techDelta.toFixed(1)}` : techDelta.toFixed(1));
+              const techColor = techDelta > 1 ? '#a04030' : techDelta > 0 ? '#c47830' : techDelta < -1 ? '#5a6a4a' : '#6a5a3a';
+              // Walt alignment (post-DF only)
+              const alVal = snapshot?.alignment?.[cc] ?? 0;
+              const postDF = !!snapshot?.dfYear;
               return (
                 <div key={cc} style={{
                   padding: '3px 6px', marginBottom: 2, borderRadius: 2,
@@ -857,7 +943,17 @@ export default function TurnDashboard({
                   border: `1px solid ${isRival ? '#4a2020' : isPartner ? '#2a4a20' : '#1a1408'}`,
                   display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 }}>
-                  <span style={{ fontSize: 7.5, color: '#c8a878' }}>{names[cc] || `Nation ${cc}`}</span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    <span style={{ fontSize: 7.5, color: '#c8a878' }}>{names[cc] || `Nation ${cc}`}</span>
+                    <div style={{ fontSize: 6, color: '#5a4a3a', display: 'flex', gap: 6 }}>
+                      <span style={{ color: techColor }}>tech {techStr}</span>
+                      {postDF && Math.abs(alVal) > 0.05 && (
+                        <span style={{ color: alVal > 0 ? '#6a7a9a' : '#9a6a6a' }}>
+                          {alVal < -0.15 ? '← Reach' : alVal > 0.15 ? 'Lattice →' : 'non-aligned'}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                   <div style={{ display: 'flex', gap: 2 }}>
                     {[
                       { fn: onToggleRival,   active: isRival,   icon: '⚔', activeClr: '#c06040', activeBg: '#3a1010', activeBdr: '#6a3030', title: 'Rival' },

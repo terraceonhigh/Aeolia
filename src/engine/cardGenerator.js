@@ -326,6 +326,28 @@ export function generateSituationCards(snapshot, playerCore, names, frontier, op
       };
     }
 
+    // Pre-DF Nuclear Awareness (Twilight Struggle DEFCON analog)
+    // Fires when player's nuclear awareness is climbing toward the 0.30 threshold.
+    {
+      const nucAw = snapshot?.nuclearAwareness;
+      if (nucAw !== null && nucAw !== undefined && nucAw > 0.12 && !dfYear) {
+        const pctAw = Math.round(nucAw * 100);
+        const urgency = nucAw > 0.22 ? 'CRITICAL' : nucAw > 0.15 ? 'ELEVATED' : 'ADVISORY';
+        return {
+          id: `nuclear_awareness_${Math.floor(tick / 5)}`,
+          icon: '◈',
+          title: `Nuclear Awareness — ${urgency}`,
+          body: `Signal intelligence indicates ${pctAw}% confidence in the existence of a second nuclear-capable civilization. Detection threshold is estimated at 30%. Beyond that point, mutual awareness becomes irreversible — and the strategic calculus changes permanently. The world you have known is approaching its end. What replaces it depends on who is prepared.`,
+          why: `Awareness ${pctAw}% of 30% threshold — accumulating at ~4% per 50-year tick`,
+          actions: [
+            { label: 'ARMS RACE',   action: { type: 'SET_FOCUS', focus: 'innovate' } },
+            { label: 'CONSOLIDATE', action: { type: 'SET_FOCUS', focus: 'fortify' } },
+            { label: 'ACKNOWLEDGE', action: null },
+          ],
+        };
+      }
+    }
+
     // Deterrence Assessment (post-DF era, periodic)
     if (dfYear && dfHegemons.length === 2 && dfHegemons.includes(playerCore) && tick % 7 === 2) {
       const rivalHeg = dfHegemons.find(h => h !== playerCore);
@@ -432,11 +454,13 @@ export function generateSituationCards(snapshot, playerCore, names, frontier, op
         const archName = stateArr[resistanceArch]?.name ?? `archipelago ${resistanceArch}`;
         const seed = hashStr('colonial_resistance' + Math.floor(tick / 4) + resistanceArch);
         const urgency = maxGrievance > 0.65 ? 'CRITICAL' : 'WARNING';
+        const ext = (snapshot?.extractiveness || [])[resistanceArch] ?? 0;
         return {
           id: `colonial_resistance_${Math.floor(tick / 4)}`,
           icon: '⚑',
           title: `Colonial Resistance — ${urgency}`,
           body: getColonialResistanceText(maxGrievance, archName, seed),
+          why: `Grievance ${maxGrievance.toFixed(2)} in ${archName} — extractiveness ${ext.toFixed(2)} drives accumulation (Scott 1985)`,
           actions: [
             { label: 'REDUCE EXTRACTION', action: { type: 'SET_FOCUS', focus: 'fortify' } },
             { label: 'INVEST IN SOV FOCUS', action: { type: 'SET_SOV_FOCUS', archIndex: resistanceArch } },
@@ -457,11 +481,13 @@ export function generateSituationCards(snapshot, playerCore, names, frontier, op
         const reversalNote = reversalR < -0.20
           ? ` The prosperity ranking of your absorbed territories shows a reversal pattern (r=${reversalR.toFixed(2)}): formerly productive polities now lag, consistent with extractive institutional lock-in.`
           : '';
+        const tfpPenalty = Math.round(playerExtractiveness * 50); // rough: extractiveness maps ~linearly to TFP loss
         return {
           id: `institutional_reform_${Math.floor(tick / 5)}`,
           icon: '⚖',
           title: `Institutional Lock-in — ${severity}`,
           body: getInstitutionalReformText(playerExtractiveness, reformSeed) + reversalNote,
+          why: `Extractiveness ${playerExtractiveness.toFixed(2)} — TFP penalty ~${tfpPenalty}% (Acemoglu-Robinson 2001)`,
           actions: [
             { label: 'PURSUE INCLUSIVE REFORM',   action: { type: 'SET_CULTURE_POLICY', ci: 0.3, io: 0.2 } },
             { label: 'REDUCE EXTRACTION RATE',    action: { type: 'SET_FOCUS', focus: 'fortify' } },
@@ -569,11 +595,14 @@ export function generateSituationCards(snapshot, playerCore, names, frontier, op
         const worstIdx = failedArchs.reduce((w, j) => (cropMods[j] ?? 1) < (cropMods[w] ?? 1) ? j : w);
         const worstName = names[worstIdx] || `Arch ${worstIdx}`;
         const pct = Math.round((1 - (cropMods[worstIdx] ?? 1)) * 100);
+        const worstExt = (snapshot?.extractiveness || [])[worstIdx] ?? 0;
+        const davisNote = worstExt > 0.15 ? ` Davis amplification: +${Math.round(worstExt * 30)}% severity from extractiveness.` : '';
         return {
           id: `crop_failure_${tick}`,
           icon: '⚠',
           title: 'Crop Failure',
           body: `${failedArchs.length > 1 ? `${failedArchs.length} holdings` : worstName} experiencing yield loss — ${worstName} worst at ${pct}% reduction. Agricultural crisis compounds when surplus production is extracted. Reducing extraction or consolidating population preserves the harvest buffer.`,
+          why: `Yield reduced ${pct}% in ${worstName}.${davisNote}`,
           actions: [
             { label: 'FORTIFY',     action: { type: 'SET_FOCUS', focus: 'fortify' } },
             { label: 'SOV. FOCUS',  action: failedArchs.length === 1 ? { type: 'TOGGLE_SOV_FOCUS', target: worstIdx } : null },

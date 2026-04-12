@@ -1,0 +1,14 @@
+[
+  { "action": "assert", "selector": "#root", "contains": "AEOLIA" },
+  { "action": "click", "selector": "button", "text": "STRATEGY", "wait": 1000 },
+  { "action": "assertNoError" },
+  { "action": "assert", "selector": "#root", "contains": "Choose Your Archipelago" },
+  { "action": "screenshot", "path": "test/out/01_island_select.png" },
+  { "action": "eval", "js": "document.querySelectorAll('[style*=\"cursor: pointer\"]')[0]?.click()", "wait": 500, "_comment": "Click first archipelago row" },
+  { "action": "click", "selector": "button", "text": "Begin Game", "wait": 2000 },
+  { "action": "assertNoError" },
+  { "action": "screenshot", "path": "test/out/02_game_running.png" },
+  { "action": "wait", "ms": 3000, "_comment": "Let a few ticks advance" },
+  { "action": "assertNoError" },
+  { "action": "screenshot", "path": "test/out/03_after_ticks.png" }
+]

@@ -1,8 +1,27 @@
-import { useState } from 'react';
+import { useState, Component } from 'react';
 import { createRoot } from 'react-dom/client';
 import AeoliaLOD from './App.jsx';
 import GameApp from './GameApp.jsx';
 import Observatory from './Observatory.jsx';
+
+class ErrorBoundary extends Component {
+  constructor(props) { super(props); this.state = { error: null }; }
+  static getDerivedStateFromError(error) { return { error }; }
+  componentDidCatch(error, info) { console.error('ErrorBoundary caught:', error, info); }
+  render() {
+    if (this.state.error) {
+      return (
+        <div style={{ padding: 40, color: '#ff6644', background: '#0a0804', fontFamily: 'monospace', fontSize: 12, whiteSpace: 'pre-wrap', height: '100vh', overflow: 'auto' }}>
+          <div style={{ fontSize: 16, marginBottom: 16, color: '#ffaa66' }}>CRASH REPORT</div>
+          <div>{this.state.error.toString()}</div>
+          <div style={{ marginTop: 12, color: '#886644', fontSize: 10 }}>{this.state.error.stack}</div>
+          <button onClick={() => this.setState({ error: null })} style={{ marginTop: 20, padding: '8px 16px', background: '#1a1408', border: '1px solid #4a3a20', color: '#c8a878', cursor: 'pointer', fontFamily: 'inherit' }}>DISMISS</button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 function ModeSelector() {
   // null = menu, 'observatory' = history viewer, 'lod' = LOD terrain, 'game' = 1-player game
@@ -11,7 +30,7 @@ function ModeSelector() {
 
   if (mode === 'lod') return <AeoliaLOD />;
   if (mode === 'observatory') return <Observatory seed={seed} onBack={() => setMode(null)} />;
-  if (mode === 'game') return <GameApp seed={seed} onBack={() => setMode(null)} />;
+  if (mode === 'game') return <ErrorBoundary><GameApp seed={seed} onBack={() => setMode(null)} /></ErrorBoundary>;
 
   return (
     <div style={{

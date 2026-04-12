@@ -710,6 +710,7 @@ export class SimEngine {
         }
       }
 
+      if (core === this.playerCore) this._lastPlayerTradeIncome = tradeNet[core] || 0;
       energyRatio[core] = ratio;
       energySurplus[core] = surplus;
       const maintenance = ct * ct * p.maintenance_rate;
@@ -1585,7 +1586,7 @@ export class SimEngine {
         // Piety blending: conqueror absorbs a fraction of the conquered polity's piety
         this.piety[core] = _clamp(this.piety[core] * 0.92 + this.piety[target] * 0.08, 0.05, 0.95);
 
-        this.expansionLog.push({ core, target, tick, year, tech_gap: this.tech[core] - this.tech[target], resource_driven: rv > 0 });
+        this.expansionLog.push({ core, target, tick, year, tech_gap: this.tech[core] - this.tech[target], resource_driven: rv > 0, isProxy });
       }
     }
 
@@ -1705,11 +1706,12 @@ export class SimEngine {
     if (this.playerCore !== null) {
       const pc = this.playerCore;
       const territory = this._controlled(pc);
-      // Aggregate fishery stock and crop health across player territory
-      let fisherySum = 0, cropSum = 0;
+      // Aggregate fishery stock, crop health, and grievance across player territory
+      let fisherySum = 0, cropSum = 0, grievanceSum = 0;
       for (const t of territory) {
         fisherySum += this.fisheryStock[t];
         cropSum += this.cropFailureModifier[t];
+        grievanceSum += this.grievance[t];
       }
       const tLen = territory.length || 1;
 
@@ -1727,6 +1729,10 @@ export class SimEngine {
         // Environmental indicators (averaged across territory)
         fisheryHealth: Math.round((fisherySum / tLen) * 100) / 100,
         cropHealth: Math.round((cropSum / tLen) * 100) / 100,
+        // Institutional indicators
+        tradeIncome: Math.round((this._lastPlayerTradeIncome ?? 0) * 100) / 100,
+        avgGrievance: Math.round((grievanceSum / tLen) * 1000) / 1000,
+        extractiveness: Math.round(this.extractiveness[pc] * 1000) / 1000,
       };
     }
 
@@ -1777,6 +1783,19 @@ export class SimEngine {
       // Walt balance-of-threat alignment per polity core
       alignment: Array.from(this.alignment, v => Math.round(v * 1000) / 1000),
       dfHegemonPair: this.dfHegemonPair,
+      // Pre-DF nuclear awareness: max awareness involving playerCore (0–1, threshold 0.30)
+      nuclearAwareness: (() => {
+        if (this.playerCore === null || this.dfYear !== null) return null;
+        if (this.tech[this.playerCore] < 8.5) return null;
+        let maxAw = 0;
+        for (const [key, val] of this.awareness) {
+          const parts = key.split(',');
+          if (parts[0] === String(this.playerCore) || parts[1] === String(this.playerCore)) {
+            maxAw = Math.max(maxAw, val);
+          }
+        }
+        return Math.round(maxAw * 100) / 100;
+      })(),
       // Scramble onset ticks (for one-time dispatch events in GameApp)
       scramble_onset_tick: this.scrambleOnset,
       pu_scramble_onset_tick: this.puScrambleOnset,
