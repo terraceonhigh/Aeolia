@@ -105,10 +105,10 @@ function buildEventDef(type, eventData, names, playerCore) {
         color: '#8a7a3a',
         title: 'Territory Absorbed',
         subtitle: d.name,
-        body: `${d.name} has been brought under your control through ${d.method || 'military force'}. Sovereignty is low — garrison costs will be high until the population is administered. Your domain now spans ${d.territory} archipelagos.`,
+        body: `Your forces have taken ${d.name}. The ${d.name} council has been dissolved and replaced with an administered directorate. The population — accustomed to its own governance, its own trade relationships, its own institutional habits — now answers to yours. Sovereignty is near zero. What happens next depends on whether you administer or merely extract.`,
         secondary: d.crop
-          ? `The acquisition brings ${d.crop} cultivation and whatever other resources the geological survey confirms. Sovereignty stabilization will take several turns.`
-          : `Sovereignty stabilization will take several turns. Consider assigning administrative focus.`,
+          ? `The territory cultivates ${d.crop}. Its harbor and fisheries will contribute to your energy budget once the initial garrison period ends. Integration will take generations, not turns.`
+          : `The territory will resist until it has reason not to. Consider sovereignty focus — reduced extraction now for institutional stability later.`,
       };
     }
 
