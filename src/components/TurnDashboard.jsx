@@ -869,7 +869,7 @@ export default function TurnDashboard({
             })}
           </div>
           <div style={{ fontSize: 6, color: '#3a2a1a', marginTop: 3 }}>
-            ⚔ rival · ◆ partner · ✕ embargo
+            ⚔ rival (+2.0 targeting) · ◆ partner (+30% trade, -3.0 targeting) · ✕ embargo (blocks trade)
           </div>
         </div>
       )}
