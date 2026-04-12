@@ -71,7 +71,9 @@ export function generateSituationCards(snapshot, playerCore, names, frontier, op
   const {
     tech = [], controller = [], cpos = [],
     contactedCores = [], visibility = [], sovereignty = [],
+    dfYear = null, dfArch = null, dfDetector = null, alignment = [],
   } = snapshot;
+  const dfHegemons = dfYear && dfArch !== null && dfDetector !== null ? [dfArch, dfDetector] : [];
 
   const {
     rivalCores     = new Set(),
@@ -320,6 +322,42 @@ export function generateSituationCards(snapshot, playerCore, names, frontier, op
           { label: 'EXPAND INTEL', action: { type: 'SET_FOCUS', focus: 'fortify' } },
           { label: 'EXPAND NAVY',  action: { type: 'SET_FOCUS', focus: 'expand' } },
           { label: 'ACKNOWLEDGE',  action: null },
+        ],
+      };
+    }
+
+    // Deterrence Assessment (post-DF era, periodic)
+    if (dfYear && dfHegemons.length === 2 && dfHegemons.includes(playerCore) && tick % 7 === 2) {
+      const rivalHeg = dfHegemons.find(h => h !== playerCore);
+      const rivalTech = rivalHeg !== undefined ? (tech[rivalHeg] || 0) : 0;
+      const rivalName = rivalHeg !== undefined ? names[rivalHeg] : 'the rival hegemon';
+      const techDelta = ps.tech - rivalTech;
+      const absD = Math.abs(techDelta);
+      // Count alignment: how many non-hegemon polities lean toward us vs. rival
+      const cores = [...new Set(controller)].filter(c => !dfHegemons.includes(c));
+      // alignment > 0 means toward hegemon[1] (dfDetector), < 0 toward hegemon[0] (dfArch)
+      const playerIsDetector = dfHegemons[1] === playerCore;
+      let aligned = 0, opposed = 0;
+      for (const c of cores) {
+        const a = alignment[c] ?? 0;
+        if (playerIsDetector ? a > 0.15 : a < -0.15) aligned++;
+        else if (playerIsDetector ? a < -0.15 : a > 0.15) opposed++;
+      }
+      const parity = absD < 0.3 ? 'approximate parity' : techDelta > 0 ? 'your advantage' : `${rivalName}'s advantage`;
+      const alignNote = aligned > opposed + 2
+        ? `The intermediate belt favors you — ${aligned} polities oriented toward your network, ${opposed} toward ${rivalName}'s.`
+        : aligned < opposed - 2
+        ? `The intermediate belt tilts against you — ${opposed} polities lean toward ${rivalName}, only ${aligned} toward your network.`
+        : `The intermediate belt is divided — ${aligned} polities in your orbit, ${opposed} in ${rivalName}'s. The contest is open.`;
+      return {
+        id: `deterrence_${tick}`,
+        icon: '☢',
+        title: 'Deterrence Assessment',
+        body: `ADMIRALTY INTELLIGENCE — Arms race status: ${parity} (you: ${ps.tech.toFixed(1)}, ${rivalName}: ${rivalTech.toFixed(1)}). Direct conflict remains mutually annihilating. ${alignNote} The Strange Peace holds — for now.`,
+        actions: [
+          { label: 'INNOVATE',   action: { type: 'SET_FOCUS', focus: 'innovate' } },
+          { label: 'CONSOLIDATE', action: { type: 'SET_FOCUS', focus: 'fortify' } },
+          { label: 'ACKNOWLEDGE', action: null },
         ],
       };
     }
