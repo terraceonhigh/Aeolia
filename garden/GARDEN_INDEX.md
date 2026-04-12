@@ -54,6 +54,7 @@
 
 | File | Date | Institutional Voice | Subject |
 |------|------|---------------------|---------|
+| `missionary_field_report_y-1200.md` | Year ~-1200 BP | Missionary Office of the Southern Expansion | Third mission to Kelani Basin; institutional absorption through demonstration; piety as integration mechanism; the two buildings becoming one |
 | `kauri_consortium_briefing.md` | Year -240 BP | Commercial consortium (pre-DF era) | Pre-Strange Peace commercial meeting; first strategic resource awareness |
 | `reach_planning_document.md` | Year -12 BP | Reach military/strategic planning | Pre-Strange Peace Reach strategic assessment |
 | `first_detonation_dispatch.md` | Year -8 BP | Thornset Commercial Registry (Circuit emergency dispatch) | First nuclear detonation at Haugen Test Facility; commercial implications; pyra market shock |
@@ -97,4 +98,4 @@
 
 ---
 
-*Index last updated: 2026-04-11. 30 observations, 18 fragments, 5 parables. ACADEMIC_GROUNDING: 33 sections (§1–§33), all with garden cross-references or worldbuilding coverage.*
+*Index last updated: 2026-04-11. 30 observations, 19 fragments, 5 parables. ACADEMIC_GROUNDING: 33 sections (§1–§33), all with garden cross-references or worldbuilding coverage.*
