@@ -240,7 +240,15 @@ function StatsPanel({ snapshot, names }) {
     const arches = snapshot.controller.reduce((n, ctrl, j) => ctrl === c ? n + 1 : n, 0);
     const pop = snapshot.pop.reduce((s, p, j) => snapshot.controller[j] === c ? s + p : s, 0);
     const tech = snapshot.tech[c] || 0;
-    return { c, arches, pop, tech, name: names[c] || `Nation ${c}` };
+    // Average fishery stock across polity territory
+    let fishSum = 0, fishCount = 0;
+    if (snapshot.fisheryStock) {
+      for (let j = 0; j < snapshot.controller.length; j++) {
+        if (snapshot.controller[j] === c) { fishSum += (snapshot.fisheryStock[j] ?? 1); fishCount++; }
+      }
+    }
+    const fishAvg = fishCount > 0 ? fishSum / fishCount : 1;
+    return { c, arches, pop, tech, fishAvg, name: names[c] || `Nation ${c}` };
   }).sort((a, b) => b.pop - a.pop).slice(0, 8);
 
   const worldPop = snapshot.pop.reduce((s, v) => s + v, 0);
@@ -304,6 +312,11 @@ function StatsPanel({ snapshot, names }) {
             </div>
             <div style={{ fontSize: 7, color: '#6a5a3a' }}>
               T{p.tech.toFixed(1)}  ·  {p.arches} arch  ·  pop {(p.pop / 1000).toFixed(1)}k
+              {p.fishAvg < 0.8 && (
+                <span style={{ color: p.fishAvg < 0.3 ? '#a04030' : p.fishAvg < 0.6 ? '#c47830' : '#8a7a2a' }}>
+                  {' '}· fish {Math.round(p.fishAvg * 100)}%
+                </span>
+              )}
             </div>
           </div>
         </div>

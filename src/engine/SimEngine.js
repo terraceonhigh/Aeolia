@@ -473,6 +473,7 @@ export class SimEngine {
             contacted,
             crop: this.substrate[nb].crops.primary_crop,
             minerals: { ...this.substrate[nb].minerals },
+            fisheryStock: Math.round(this.fisheryStock[nb] * 100) / 100,
           });
         }
       }
@@ -1704,6 +1705,14 @@ export class SimEngine {
     if (this.playerCore !== null) {
       const pc = this.playerCore;
       const territory = this._controlled(pc);
+      // Aggregate fishery stock and crop health across player territory
+      let fisherySum = 0, cropSum = 0;
+      for (const t of territory) {
+        fisherySum += this.fisheryStock[t];
+        cropSum += this.cropFailureModifier[t];
+      }
+      const tLen = territory.length || 1;
+
       playerStats = {
         pop: Math.round(this._polityPop(pc)),
         tech: Math.round(this.tech[pc] * 10) / 10,
@@ -1715,6 +1724,9 @@ export class SimEngine {
         sovereignty: Math.round(this.sovereignty[pc] * 1000) / 1000,
         contacts: this.contactSet[pc].size,
         piety: Math.round(this.piety[pc] * 100) / 100,
+        // Environmental indicators (averaged across territory)
+        fisheryHealth: Math.round((fisherySum / tLen) * 100) / 100,
+        cropHealth: Math.round((cropSum / tLen) * 100) / 100,
       };
     }
 

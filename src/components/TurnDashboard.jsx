@@ -124,33 +124,49 @@ export function CommandBar({
           flex: 1, padding: '0 14px', display: 'flex', alignItems: 'center',
           gap: 0, overflow: 'hidden',
         }}>
-          {[
-            ['POP',      ps.pop?.toLocaleString()],
-            ['TECH',     ps.tech],
-            ['TERR',     `${ps.territory} archs`],
-            ['NAPH',     ps.naphtha > 0 ? ps.naphtha.toFixed(1) : '—'],
-            ['CONTACTS', ps.contacts],
-            ['CULTURE',  ps.cultureLabel],
-            ...(piLabel ? [['PIETY', piLabel]] : []),
-            ...(snapshot?.pu_scramble_onset_tick && ps?.hasPu
-              ? [['PYRA', ps.tech >= 9.0 ? 'WEAPONS' : 'DEPOSITS']] : []),
-          ].map(([lbl, val], i, arr) => (
-            <div key={lbl} style={{ display: 'flex', alignItems: 'center' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', padding: '0 10px' }}>
-                <div style={S.label}>{lbl}</div>
-                <div style={lbl === 'PIETY' ? { ...S.value, color: piColor }
-                  : lbl === 'PYRA' ? { ...S.value, color: ps.tech >= 9.0 ? '#a04030' : '#7a6a2a' }
-                  : lbl === 'TERR' ? { ...S.value, color: ps.territory <= 1 ? '#a04030' : ps.territory <= 3 ? '#c47830' : S.value.color }
-                  : S.value}>{val}</div>
-                {lbl === 'PIETY' && piety !== undefined && (
-                  <div style={{ width: 40, height: 2, borderRadius: 1, background: '#1a120a', marginTop: 2, overflow: 'hidden' }}>
-                    <div style={{ height: '100%', width: `${Math.min(piety, 1) * 100}%`, background: piColor, transition: 'width 0.3s' }} />
-                  </div>
-                )}
+          {(() => {
+            // Derive food security label from fishery + crop health
+            const fH = ps.fisheryHealth ?? 1, cH = ps.cropHealth ?? 1;
+            const foodAvg = (fH + cH) / 2;
+            const foodLabel = foodAvg >= 0.85 ? 'Secure' : foodAvg >= 0.6 ? 'Stressed'
+              : foodAvg >= 0.35 ? 'Scarce' : 'Famine';
+            const foodColor = foodAvg >= 0.85 ? S.value.color : foodAvg >= 0.6 ? '#8a7a2a'
+              : foodAvg >= 0.35 ? '#c47830' : '#a04030';
+            return [
+              ['POP',      ps.pop?.toLocaleString()],
+              ['TECH',     ps.tech],
+              ['TERR',     `${ps.territory} archs`],
+              ['FOOD',     foodLabel],
+              ['NAPH',     ps.naphtha > 0 ? ps.naphtha.toFixed(1) : '—'],
+              ['CONTACTS', ps.contacts],
+              ['CULTURE',  ps.cultureLabel],
+              ...(piLabel ? [['PIETY', piLabel]] : []),
+              ...(snapshot?.pu_scramble_onset_tick && ps?.hasPu
+                ? [['PYRA', ps.tech >= 9.0 ? 'WEAPONS' : 'DEPOSITS']] : []),
+            ].map(([lbl, val], i, arr) => (
+              <div key={lbl} style={{ display: 'flex', alignItems: 'center' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', padding: '0 10px' }}>
+                  <div style={S.label}>{lbl}</div>
+                  <div style={lbl === 'PIETY' ? { ...S.value, color: piColor }
+                    : lbl === 'PYRA' ? { ...S.value, color: ps.tech >= 9.0 ? '#a04030' : '#7a6a2a' }
+                    : lbl === 'TERR' ? { ...S.value, color: ps.territory <= 1 ? '#a04030' : ps.territory <= 3 ? '#c47830' : S.value.color }
+                    : lbl === 'FOOD' ? { ...S.value, color: foodColor }
+                    : S.value}>{val}</div>
+                  {lbl === 'PIETY' && piety !== undefined && (
+                    <div style={{ width: 40, height: 2, borderRadius: 1, background: '#1a120a', marginTop: 2, overflow: 'hidden' }}>
+                      <div style={{ height: '100%', width: `${Math.min(piety, 1) * 100}%`, background: piColor, transition: 'width 0.3s' }} />
+                    </div>
+                  )}
+                  {lbl === 'FOOD' && (
+                    <div style={{ width: 40, height: 2, borderRadius: 1, background: '#1a120a', marginTop: 2, overflow: 'hidden' }}>
+                      <div style={{ height: '100%', width: `${foodAvg * 100}%`, background: foodColor, transition: 'width 0.3s' }} />
+                    </div>
+                  )}
+                </div>
+                {i < arr.length - 1 && <div style={S.pipe}>·</div>}
               </div>
-              {i < arr.length - 1 && <div style={S.pipe}>·</div>}
-            </div>
-          ))}
+            ));
+          })()}
         </div>
       )}
 
@@ -582,6 +598,14 @@ function ArchDetailPanel({
           {isContacted && fEntry?.pop !== undefined && <span>pop {(fEntry.pop / 1000).toFixed(1)}k</span>}
           {isContacted && fEntry?.tech !== undefined && <span>tech {fEntry.tech}</span>}
           {isContacted && crop && <span>{crop}</span>}
+          {isContacted && (() => {
+            const fs = fEntry?.fisheryStock ?? snapshot?.fisheryStock?.[archIdx];
+            return fs !== undefined && fs < 0.8 ? (
+              <span style={{ color: fs < 0.3 ? '#a04030' : fs < 0.6 ? '#c47830' : '#8a7a2a' }}>
+                fish {Math.round(fs * 100)}%
+              </span>
+            ) : null;
+          })()}
           {!isContacted && isOnFrontier && (
             <span style={{ color: '#4a3a24', fontStyle: 'italic' }}>uncharted waters</span>
           )}
@@ -751,6 +775,11 @@ export default function TurnDashboard({
                       {f.minerals.Au && ' · Au'}
                       {f.minerals.C > 0 && ' · C'}
                       {f.minerals.Pu && ' · Pu'}
+                      {f.fisheryStock !== undefined && f.fisheryStock < 0.6 && (
+                        <span style={{ color: f.fisheryStock < 0.3 ? '#a04030' : '#c47830' }}>
+                          {' · fish '}{Math.round(f.fisheryStock * 100)}%
+                        </span>
+                      )}
                     </div>
                   ) : (
                     <div style={{ fontSize: 7, color: '#4a3a24', marginTop: 2, fontStyle: 'italic' }}>
