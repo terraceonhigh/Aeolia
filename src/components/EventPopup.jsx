@@ -120,8 +120,8 @@ function buildEventDef(type, eventData, names, playerCore) {
         color: '#a04030',
         title: 'Territory Seized',
         subtitle: d.name,
-        body: `${d.aggressor} has seized ${d.name} from your holdings. A military intervention was insufficient or not attempted. Your domain has contracted.`,
-        secondary: `This loss may create a vulnerability in your frontier. Intelligence assessment is recommended before further expansion in this region.`,
+        body: `${d.aggressor} has taken ${d.name}. Your administrative directorate has been expelled. The population — whatever institutions, trade relationships, and loyalties your administration built there — now passes to a different framework. The loss is not only territorial. It is institutional.`,
+        secondary: `Your frontier has contracted. The remaining holdings nearest the loss will feel the strategic exposure. Consider whether consolidation or counter-expansion serves your interests.`,
       };
     }
 
