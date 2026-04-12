@@ -36,6 +36,7 @@
 | `the_thalassocratic_condition.md` | Spykman/Mackinder displacement; four degraded land-power properties; Braudel instability premium | §24 | Spykman (1942), Mackinder (1904), Kirch (2000) |
 | `the_inclusive_extraction_paradox.md` | Why civic/inclusive polities still accumulate extractiveness when running empires; endogenous institution boundary; Cain-Hopkins gentlemanly capitalism | §25 | Acemoglu-Robinson (2001, 2012), Cain & Hopkins (1993), Putnam (1993) |
 | `the_legibility_problem.md` | Scott legibility applied to administered territory classification; what frameworks can see vs. endogenous institutional capacity; counter-legibility; Ostrom crowding-out | §13 | Scott (1998), Ostrom (1990), Acemoglu-Robinson (2001) |
+| `the_sovereignty_gradient.md` | Sovereignty as continuous extraction/recovery balance; spatial gradient as institutional diagnostic; Wallerstein core-periphery as continuous variable; sovereignty focus strategy | §12 | Wallerstein (1974), North (1990), Scott (1985) |
 
 **Structural Analysis**
 
@@ -68,6 +69,7 @@
 | `vaanthi_petition_y96.md` | Year 96 SP | Vaanthi Basin Commercial Association (petition) | Administered territory petition to Commerce Council; terms-of-trade exclusion; observer access request |
 | `reach_civil_registry_y103.md` | Year 103 SP | Reach Civil Registry, Office of Administered Territory Affairs (internal memo) | Deputy Director's assessment of Vaanthi petition; administered framework "fit for purpose" review; reclassification pathway recommendation |
 | `centenary_commerce_committee_y100.md` | Year 100 SP | Commerce Council Centenary Committee (session record) | Third session: Vaanthi observer-access petition debate; Kova/Peloro vs. Haugen on standing; Reach Liaison requests deferral; 2-1 preliminary sense favoring access |
+| `sovereignty_focus_field_report.md` | Year 67 SP | Oru Basin Revenue Office (internal memorandum) | Administered territory puzzles over unexplained 62% revenue decline; local reinvestment; readiness dossier; institutional gap between player action and field-level comprehension |
 | `laamu_basin_regrets_y100.md` | Year 100 SP | Laamu Basin Executive Office (private correspondence) | Why the swing vote was absent: intermediary revenue, institutional honesty, strategic non-attendance |
 
 ---
@@ -94,4 +96,4 @@
 
 ---
 
-*Index last updated: 2026-04-11. 29 observations, 16 fragments, 5 parables. ACADEMIC_GROUNDING: 33 sections (§1–§33), all with garden cross-references or worldbuilding coverage.*
+*Index last updated: 2026-04-11. 30 observations, 17 fragments, 5 parables. ACADEMIC_GROUNDING: 33 sections (§1–§33), all with garden cross-references or worldbuilding coverage.*
