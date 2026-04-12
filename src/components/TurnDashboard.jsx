@@ -606,6 +606,14 @@ function ArchDetailPanel({
               </span>
             ) : null;
           })()}
+          {isOwned && (() => {
+            const ch = snapshot?.cropHealth?.[archIdx];
+            return ch !== undefined && ch < 0.95 ? (
+              <span style={{ color: ch < 0.4 ? '#a04030' : ch < 0.7 ? '#c47830' : '#8a7a2a' }}>
+                crop {Math.round(ch * 100)}%
+              </span>
+            ) : null;
+          })()}
           {!isContacted && isOnFrontier && (
             <span style={{ color: '#4a3a24', fontStyle: 'italic' }}>uncharted waters</span>
           )}

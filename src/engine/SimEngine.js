@@ -1761,6 +1761,8 @@ export class SimEngine {
       cropFailures: this.cropFailureLog.filter(e => e.tick === this.tick - 1),
       // Current fishery stock per arch (for situation cards + Observatory)
       fisheryStock: Array.from(this.fisheryStock, s => Math.round(s * 100) / 100),
+      // Current crop failure modifier per arch (for situation cards; 1.0 = healthy, < 1.0 = active failure)
+      cropHealth: Array.from(this.cropFailureModifier, v => Math.round(v * 100) / 100),
       // Piety per core (for situation cards + dispatch)
       piety: Array.from(this.piety, v => Math.round(v * 100) / 100),
       // Schism pressure per core (for situation cards)

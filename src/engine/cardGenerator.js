@@ -558,6 +558,31 @@ export function generateSituationCards(snapshot, playerCore, names, frontier, op
       }
     }
 
+    // Crop failure alert
+    {
+      const cropMods = snapshot?.cropHealth || [];
+      const failedArchs = (snapshot?.controller || []).reduce((list, ctrl, j) => {
+        if (ctrl === playerCore && j !== playerCore && (cropMods[j] ?? 1.0) < 0.85) list.push(j);
+        return list;
+      }, []);
+      if (failedArchs.length > 0 && activeFocus !== 'fortify') {
+        const worstIdx = failedArchs.reduce((w, j) => (cropMods[j] ?? 1) < (cropMods[w] ?? 1) ? j : w);
+        const worstName = names[worstIdx] || `Arch ${worstIdx}`;
+        const pct = Math.round((1 - (cropMods[worstIdx] ?? 1)) * 100);
+        return {
+          id: `crop_failure_${tick}`,
+          icon: '⚠',
+          title: 'Crop Failure',
+          body: `${failedArchs.length > 1 ? `${failedArchs.length} holdings` : worstName} experiencing yield loss — ${worstName} worst at ${pct}% reduction. Agricultural crisis compounds when surplus production is extracted. Reducing extraction or consolidating population preserves the harvest buffer.`,
+          actions: [
+            { label: 'FORTIFY',     action: { type: 'SET_FOCUS', focus: 'fortify' } },
+            { label: 'SOV. FOCUS',  action: failedArchs.length === 1 ? { type: 'TOGGLE_SOV_FOCUS', target: worstIdx } : null },
+            { label: 'ACKNOWLEDGE', action: null },
+          ],
+        };
+      }
+    }
+
     // Epidemic risk
     if (contactedCores.length >= 3 && (tick % 7 === 2) && contactedCores.length > 3) {
       const sourceIdx = contactedCores.filter(c => c !== playerCore)[tick % Math.max(1, contactedCores.length - 1)];
