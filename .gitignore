@@ -24,3 +24,6 @@ aeolia-godot/gdextension/.sconsign.dblite
 __pycache__/
 *.pyc
 *.pyo
+
+# Clio's private notes
+garden/marginalia/
