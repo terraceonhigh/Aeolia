@@ -74,6 +74,7 @@
 | `centenary_commerce_committee_y100.md` | Year 100 SP | Commerce Council Centenary Committee (session record) | Third session: Vaanthi observer-access petition debate; Kova/Peloro vs. Haugen on standing; Reach Liaison requests deferral; 2-1 preliminary sense favoring access |
 | `sovereignty_focus_field_report.md` | Year 67 SP | Oru Basin Revenue Office (internal memorandum) | Administered territory puzzles over unexplained 62% revenue decline; local reinvestment; readiness dossier; institutional gap between player action and field-level comprehension |
 | `laamu_basin_regrets_y100.md` | Year 100 SP | Laamu Basin Executive Office (private correspondence) | Why the swing vote was absent: intermediary revenue, institutional honesty, strategic non-attendance |
+| `maaruf_house_private_log_y31.md` | Year 31 SP | Maaruf House (private family log) | Neutral intermediary family reacts to Sable Straits nuclear near-miss; eleven minutes; the gap between institutional design and individual judgment at 3 AM |
 | `lyceum_discussion_notes_y42.md` | Year 42 SP | Oru Basin Western Lyceum (instructor assessment) | Year 7 classroom discussion of Circuit and Contract Ch. 1 & 3; sago-family students and structural asymmetry; pedagogical function in administered territory |
 
 ---
@@ -100,4 +101,4 @@
 
 ---
 
-*Index last updated: 2026-04-11. 31 observations, 20 fragments, 5 parables. ACADEMIC_GROUNDING: 33 sections (§1–§33), all with garden cross-references or worldbuilding coverage.*
+*Index last updated: 2026-04-11. 31 observations, 21 fragments, 5 parables. ACADEMIC_GROUNDING: 33 sections (§1–§33), all with garden cross-references or worldbuilding coverage.*
