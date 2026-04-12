@@ -668,7 +668,7 @@ export default function TurnDashboard({
   rivalCores, onToggleRival,
   partnerCores, onTogglePartner,
   culturePolicyCI, culturePolicyIO, onSetCulturePolicy,
-  sovFocusTargets, onToggleSovFocus,
+  sovFocusTargets, prevSovereignty, onToggleSovFocus,
   scoutActive, onToggleScout,
   // Selected arch from globe click (Phase 4)
   selectedArch, onSelectArch,
@@ -929,6 +929,10 @@ export default function TurnDashboard({
               {ownedArchs.filter(i => i !== playerCore).map(i => {
                 const focused = sovFocusTargets?.has(i);
                 const sov     = snapshot?.sovereignty?.[i];
+                const prevSov = prevSovereignty?.[i];
+                const delta   = (sov !== undefined && prevSov !== undefined) ? sov - prevSov : 0;
+                const arrow   = delta > 0.005 ? '↑' : delta < -0.005 ? '↓' : '';
+                const arrowColor = delta > 0.005 ? '#5a8a4a' : '#a05030';
                 return (
                   <div key={i} onClick={() => onToggleSovFocus?.(i)} style={{
                     padding: '2px 5px', marginBottom: 1, cursor: 'pointer', borderRadius: 2,
@@ -939,14 +943,17 @@ export default function TurnDashboard({
                     <span style={{ color: focused ? '#d4b896' : '#8a7a5a' }}>
                       {focused ? '▣ ' : '□ '}{names[i]}
                     </span>
-                    {sov !== undefined && (
-                      <span style={{
-                        color: sov > 0.6 ? '#7a8a5a' : sov > 0.3 ? '#8a7a3a' : '#a05030',
-                        fontSize: 7,
-                      }}>
-                        {Math.round(sov * 100)}%
-                      </span>
-                    )}
+                    <span>
+                      {arrow && <span style={{ color: arrowColor, fontSize: 7, marginRight: 2 }}>{arrow}</span>}
+                      {sov !== undefined && (
+                        <span style={{
+                          color: sov > 0.6 ? '#7a8a5a' : sov > 0.3 ? '#8a7a3a' : '#a05030',
+                          fontSize: 7,
+                        }}>
+                          {Math.round(sov * 100)}%
+                        </span>
+                      )}
+                    </span>
                   </div>
                 );
               })}
