@@ -1,0 +1,10 @@
+[
+  { "action": "eval", "js": "window.innerWidth + 'x' + window.innerHeight", "_comment": "Check viewport" },
+  { "action": "click", "selector": "button", "text": "STRATEGY", "wait": 1000 },
+  { "action": "eval", "js": "document.querySelectorAll('[style*=\"cursor: pointer\"]')[0]?.click()", "wait": 500 },
+  { "action": "click", "selector": "button", "text": "Begin Game", "wait": 2000 },
+  { "action": "assertNoError" },
+  { "action": "screenshot", "path": "test/out/mobile_375.png" },
+  { "action": "wait", "ms": 3000 },
+  { "action": "screenshot", "path": "test/out/mobile_375_ticks.png" }
+]

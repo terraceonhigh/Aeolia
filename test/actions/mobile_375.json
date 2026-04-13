@@ -1,0 +1,11 @@
+[
+  { "action": "click", "selector": "button", "text": "STRATEGY", "wait": 2000 },
+  { "action": "eval", "js": "document.querySelectorAll('[style*=\"cursor: pointer\"]')[0]?.click()", "wait": 1000 },
+  { "action": "screenshot", "path": "test/out/reflow_375_selected.png" },
+  { "action": "click", "selector": "button", "text": "Begin Game", "wait": 3000 },
+  { "action": "screenshot", "path": "test/out/reflow_375_howtoplay.png" },
+  { "action": "click", "selector": "button", "text": "Continue", "wait": 2000 },
+  { "action": "screenshot", "path": "test/out/reflow_375_game.png" },
+  { "action": "wait", "ms": 8000 },
+  { "action": "screenshot", "path": "test/out/reflow_375_ticks.png" }
+]

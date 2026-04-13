@@ -1,0 +1,13 @@
+[
+  { "action": "click", "selector": "button", "text": "STRATEGY", "wait": 2000 },
+  { "action": "screenshot", "path": "test/out/m_01_select.png" },
+  { "action": "eval", "js": "const items = [...document.querySelectorAll('div')].filter(d => d.style.cursor === 'pointer'); items[0]?.click(); items.length", "wait": 1000, "_comment": "Click first archipelago row by cursor style" },
+  { "action": "screenshot", "path": "test/out/m_02_selected.png" },
+  { "action": "click", "selector": "button", "text": "Begin Game", "wait": 4000 },
+  { "action": "screenshot", "path": "test/out/m_03_howtoplay.png" },
+  { "action": "click", "selector": "button", "text": "Continue", "wait": 2000 },
+  { "action": "screenshot", "path": "test/out/m_04_game.png" },
+  { "action": "wait", "ms": 8000 },
+  { "action": "assertNoError" },
+  { "action": "screenshot", "path": "test/out/m_05_ticks.png" }
+]

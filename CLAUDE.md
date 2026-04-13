@@ -113,7 +113,7 @@ Aeolia/
 1. **Trade Embargo** — skips trade pair in trade pre-pass for embargoed cores
 2. **Cultural Policy** — ±30% of `culture_drift_rate` nudge per tick on CI/IO axes
 3. **Sovereignty Focus** — 60% extraction reduction on focused islands (faster stabilization)
-4. **Scout/Explore** — extends fog-of-war frontier by one extra adjacency hop
+4. **Scout/Explore** — extends fog-of-war frontier by one extra adjacency hop; costs 35% of expansion budget
 5. **Diplomacy Stance** — rivals get +2.0 expansion targeting bonus; partners get -3.0 penalty + 30% trade bonus
 
 **UI features:**
@@ -122,9 +122,15 @@ Aeolia/
 - National Focus cards (Expand/Innovate/Fortify/Balanced/Exploit)
 - Fog of war with 5 visibility levels (owned/frontier/contacted/rumor/unknown)
 - Event popups: first contact (tech-gated: pre-industrial vs. nuclear-era variants), absorption, territory lost, era transition, tech milestones, dark forest (deterrence + arms race text), naphtha/pyra scramble, epidemic wave, fishery collapse, schism, defeat
-- 18 situation cards (cardGenerator.js): tech assessment, resource detection, expansion opportunity, culture drift, epidemic risk, naphtha/pyra, era transition, administered trade, fishery collapse, piracy warning, tech decay, navigator guild dispute, malaria breakthrough, religious revival, rogue aircraft alert, schism warning
-- Dispatches panel: ADMIRALTY / MERCHANT GUILD / INTERNAL AFFAIRS source-tagged intelligence feed
+- 19 situation cards (cardGenerator.js): tech assessment, resource detection, expansion opportunity, culture drift, epidemic risk, naphtha/pyra, era transition, administered trade, fishery collapse, piracy warning, tech decay, navigator guild dispute, malaria breakthrough, religious revival, rogue aircraft alert, schism warning, nuclear awareness; cards carry `why` field (causal citations)
+- Dispatches panel: ADMIRALTY / MERCHANT GUILD / INTERNAL AFFAIRS source-tagged intelligence feed; dispatch filtering (ADM/MER/INT/OTH/ALL)
+- CommandBar stat strip: POP, TECH, LAND, FOOD, NAPH, TRADE, STABILITY (composite institutional health), TENSION (pre-DF awareness %)
 - Player stats panel: piety reading (fervent/devout/moderate/secular) with color coding
+- ArchDetailPanel: owned islands show grievance, extraction rate, sovereignty with color coding
+- Diplomacy panel: alignment indicator (post-DF), relative tech delta per contact
+- Pre-DF awareness dispatches: ADMIRALTY signals at 8%/16%/24% awareness thresholds
+- Mobile reflow: `useIsMobile()` hook (600px breakpoint), panel becomes slide-in drawer
+- ErrorBoundary in main.jsx: catches crashes visibly instead of silent bounce to mode select
 - Defeat condition on 0 territory
 - Observatory mode: 3-chart panel (tech/pop/piety) + equirectangular world map + event timeline + scrubber
 
@@ -180,8 +186,30 @@ SimParams now has **33 optimizer-tunable parameters**.
 - ACADEMIC_GROUNDING now **33 sections** (§1–§33), all with garden cross-references
 - GARDEN_INDEX: 27 observations, 12 fragments
 
-**Next steps:**
-- GitHub push (requires MacBook Neo — Aomori lacks stored credentials)
+**Strategy game UX (2026-04-12 sessions):**
+- Surfaced institutional engine to player: TRADE, STABILITY, TENSION stats in CommandBar
+- ArchDetailPanel shows grievance/extraction/sovereignty for owned territories
+- Diplomacy panel shows Walt alignment (post-DF) and relative tech delta
+- Pre-DF awareness dispatches (3 thresholds) + nuclear awareness situation card
+- Causal citations (`why` field) on Colonial Resistance, Institutional Lock-in, Crop Failure cards
+- Proxy war labels on third-party expansion dispatches
+- Mobile reflow: useIsMobile() hook, TurnDashboard becomes drawer on ≤600px
+- ErrorBoundary wrapping GameApp for visible crash reports
+- Antiquity darkness: skip reduced 60→40 (starts ~1000 yrs earlier), rumor visibility gated on tech ≥ 2.0
+- Exploration costs: scouting costs 35% expansion budget, navigation penalty 3×→1× (tech 1→5), contact rate slowed (tech ≥ 2.0 required, max 1/tick until tech 6.0)
+- GitHub Pages deployment: auto-deploys on push to master via `.github/workflows/deploy.yml`
+- Smoke test harness: `test/smoke.js` (Puppeteer) with JSON action files
+
+**Deployed:** GitHub Pages at `/Aeolia/` — live on push to master.
+
+**Smoke tests:** `AEOLIA_URL=http://localhost:5173/Aeolia/ node test/smoke.js test/actions/boot_strategy.json`
+
+**Pending fixes (from playtester waves):**
+- Prebisch-Singer tech-dependent discount with kapas escape (Takeshi Kimura / Wave 9)
+- Correlated ENSO crop failure (Farida Hussain / Wave 6)
+- AJR reversal-of-fortune diagnostic measuring wrong comparison (Yetunde Afolabi)
+- Tribute income visibility (Kwabena Asante / Wave 7)
+- Famine-epidemic coupling (Dr. Annelise Vogel / Wave 8)
 - Optimizer rerun optional — new mechanics (davis, ostrom, wave mortality) change energy dynamics at margin
 
 ## Running the Sim
