@@ -517,6 +517,63 @@ export function generateSituationCards(snapshot, playerCore, names, frontier, op
       }
     }
 
+    // ── Early-game homeland cards ────────────────────────────────
+    // The founding period: where institutional character forms.
+    // North (1990): institutions formed under specific conditions persist for centuries.
+
+    // Institutional Foundation — fires once at tick 2-8 when homeland-only
+    if (ps.territory <= 1 && tick >= 2 && tick <= 8) {
+      return {
+        id: 'institutional_foundation',
+        icon: '▣',
+        title: 'Institutional Foundation',
+        body: `Your archipelago is small. Your institutions are yours. The question — one that empires never revisit — is what kind of governance you are building before you have anyone to govern but yourselves. The choices made now, under no pressure, will determine the institutional character of everything that follows.`,
+        why: 'North (1990): institutional quality before expansion determines long-run extractiveness.',
+        actions: [
+          { label: 'INNOVATE', action: { type: 'SET_FOCUS', focus: 'innovate' } },
+          { label: 'CONSOLIDATE', action: { type: 'SET_FOCUS', focus: 'fortify' } },
+          { label: 'BALANCED', action: { type: 'SET_FOCUS', focus: 'balanced' } },
+        ],
+      };
+    }
+
+    // Navigator Guild Petition — fires at tech 1.5-2.5, homeland-only
+    if (ps.territory <= 1 && ps.tech >= 1.5 && ps.tech < 2.5 && tick > 4) {
+      return {
+        id: 'navigator_guild_petition',
+        icon: '⊕',
+        title: 'Navigator Guild Petition',
+        body: `The navigator's guild has petitioned for exclusive chartering rights on gap-crossing expeditions. Their knowledge is the only knowledge — the currents, the seasonal wind shifts, the reef passages that look impassable from the chart table. The question is whether to grant a monopoly that will accelerate exploration or resist one that will entrench a faction whose leverage is absolute because no one else knows how to do what they do.`,
+        why: 'Greif (1993): coalition enforcement as institutional foundation; information asymmetry as structural power.',
+        actions: [
+          { label: 'GRANT CHARTER', action: { type: 'SET_FOCUS', focus: 'expand' } },
+          { label: 'DENY', action: null },
+          { label: 'NEGOTIATE', action: { type: 'SET_FOCUS', focus: 'balanced' } },
+        ],
+      };
+    }
+
+    // Cultural Identity — fires at tech 2.0-3.5 after first contact
+    if (ps.territory <= 2 && ps.tech >= 2.0 && ps.tech < 3.5 && contactedCores.length >= 1) {
+      const firstContact = contactedCores.find(c => c !== playerCore);
+      const contactName = firstContact !== undefined ? names[firstContact] : 'a foreign polity';
+      const contactCrop = firstContact !== undefined && snapshot.crops?.[firstContact]
+        ? snapshot.crops[firstContact] : null;
+      const cropDetail = contactCrop ? ` — their harbors cultivate ${CROP_ARTICLE[contactCrop] || contactCrop}` : '';
+      return {
+        id: `cultural_identity_${Math.floor(tick / 6)}`,
+        icon: '◬',
+        title: 'Cultural Identity',
+        body: `Contact with ${contactName} has introduced your people to new commodities${cropDetail} and to the idea that governance can be organized differently than yours. The question is not whether outside influence changes you — it will — but which parts of your institutional character you choose to defend.`,
+        why: 'Axelrod (1997): culture spreads through interaction; Boyd & Richerson (1985): transmission bias.',
+        actions: [
+          { label: 'PRESERVE TRADITION', action: { type: 'CULTURE_POLICY', culturePolicyIO: -0.3 } },
+          { label: 'EMBRACE EXCHANGE', action: { type: 'CULTURE_POLICY', culturePolicyIO: 0.3 } },
+          { label: 'OBSERVE', action: null },
+        ],
+      };
+    }
+
     return null;
   }
 
@@ -759,6 +816,29 @@ export function generateSituationCards(snapshot, playerCore, names, frontier, op
           };
         }
       }
+    }
+
+    // ── Harvest Assessment — fires every 8 ticks, territory ≤ 2 ──────────
+    // The commons governance decision: Ostrom (1990).
+    // "Fishery stock is a commons. What you extract is yours; what remains is everyone's."
+    if (ps.territory <= 2 && tick % 8 === 2 && tick >= 4) {
+      const crop = snapshot.crops?.[playerCore] || 'foraging';
+      const fishHealth = snapshot.fisheryStock?.[playerCore] ?? 1.0;
+      const fishLabel = fishHealth > 0.7 ? 'healthy' : fishHealth > 0.4 ? 'stressed' : 'depleted';
+      const fishColor = fishHealth > 0.7 ? '' : fishHealth > 0.4 ? ' Your elders note the catch has thinned.' : ' The boats return half-empty. The oldest fishers say they remember when it was different.';
+      const cropName = CROP_ARTICLE[crop] || crop;
+      return {
+        id: `harvest_${tick}`,
+        icon: '◬',
+        title: 'Harvest Assessment',
+        body: `The ${cropName} harvest has been ${fishHealth > 0.6 ? 'adequate' : 'poor'}. Your fisheries show ${fishLabel} stocks.${fishColor} The question every maritime polity faces eventually: how much to take from the commons this generation, and how much to leave for the next.`,
+        why: 'Ostrom (1990): commons governance as early institutional test; Hardin (1968): tragedy of the commons.',
+        actions: [
+          { label: 'EXPAND FISHERIES', action: { type: 'SET_FOCUS', focus: 'exploit' } },
+          { label: 'CONSERVE', action: { type: 'SET_FOCUS', focus: 'fortify' } },
+          { label: 'ACKNOWLEDGE', action: null },
+        ],
+      };
     }
 
     return null;

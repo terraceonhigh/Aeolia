@@ -98,6 +98,9 @@ function buildEventDef(type, eventData, names, playerCore) {
     }
 
     // ─ Absorption ──────────────────────────────────────────
+    // The founding-bargain choice: administer or extract.
+    // North (1990): institutional quality at founding determines long-run trajectory.
+    // AJR (2001): extractive vs. inclusive institutions persist for centuries.
     case 'absorption': {
       const d = eventData || {};
       return {
@@ -105,10 +108,14 @@ function buildEventDef(type, eventData, names, playerCore) {
         color: '#8a7a3a',
         title: 'Territory Absorbed',
         subtitle: d.name,
-        body: `Your forces have taken ${d.name}. The ${d.name} council has been dissolved and replaced with an administered directorate. The population — accustomed to its own governance, its own trade relationships, its own institutional habits — now answers to yours. Sovereignty is near zero. What happens next depends on whether you administer or merely extract.`,
+        body: `Your forces have taken ${d.name}. The ${d.name} council has been dissolved. The population — accustomed to its own governance, its own trade relationships, its own institutional habits — now answers to yours. Sovereignty is near zero. What happens next depends on whether you administer or merely extract.`,
         secondary: d.crop
           ? `The territory cultivates ${d.crop}. Its harbor and fisheries will contribute to your energy budget once the initial garrison period ends. Integration will take generations, not turns.`
-          : `The territory will resist until it has reason not to. Consider sovereignty focus — reduced extraction now for institutional stability later.`,
+          : `The territory will resist until it has reason not to. The choice you make now will determine the institutional character of your relationship for centuries.`,
+        // Two-button founding bargain choice
+        governanceChoice: true,
+        targetIndex: d.targetIndex,
+        targetName: d.name,
       };
     }
 
@@ -271,7 +278,7 @@ function buildEventDef(type, eventData, names, playerCore) {
 
 // ── Component ───────────────────────────────────────────────
 
-export default function EventPopup({ event, onDismiss, names, playerCore }) {
+export default function EventPopup({ event, onDismiss, onGovernanceChoice, names, playerCore }) {
   if (!event) return null;
 
   const def = buildEventDef(event.type, event.data, names, playerCore);
@@ -280,7 +287,7 @@ export default function EventPopup({ event, onDismiss, names, playerCore }) {
   const color = def.color;
 
   return (
-    <div style={STYLES.overlay} onClick={onDismiss}>
+    <div style={STYLES.overlay} onClick={def.governanceChoice ? undefined : onDismiss}>
       <div style={STYLES.card(color)} onClick={e => e.stopPropagation()}>
         <div style={STYLES.header(color)}>
           <span style={STYLES.icon(color)}>{def.icon}</span>
@@ -296,9 +303,28 @@ export default function EventPopup({ event, onDismiss, names, playerCore }) {
           <div style={STYLES.secondaryBlock(color)}>{def.secondary}</div>
         )}
         <div style={STYLES.footer}>
-          <button style={STYLES.button(color)} onClick={onDismiss}>
-            Continue
-          </button>
+          {def.governanceChoice ? (
+            <>
+              <button
+                style={{ ...STYLES.button('#5a7a5a'), marginRight: 8, flex: 1 }}
+                onClick={() => onGovernanceChoice?.(def.targetIndex, def.targetName, true)}
+                title="Lower extraction, lower grievance, slower integration — but durable. The territory gains an advisory council."
+              >
+                ADMINISTER
+              </button>
+              <button
+                style={{ ...STYLES.button('#8a5a3a'), flex: 1 }}
+                onClick={() => onGovernanceChoice?.(def.targetIndex, def.targetName, false)}
+                title="Full extraction, fast yield — but structural fragility. Grievance accumulates. The territory will resist."
+              >
+                EXTRACT
+              </button>
+            </>
+          ) : (
+            <button style={STYLES.button(color)} onClick={onDismiss}>
+              Continue
+            </button>
+          )}
         </div>
       </div>
     </div>

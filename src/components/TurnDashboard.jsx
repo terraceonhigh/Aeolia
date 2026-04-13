@@ -225,7 +225,7 @@ export function CommandBar({
         </div>
       )}
 
-      {/* ── Speed + Timer ── */}
+      {/* ── Speed + Timer + Next Turn ── */}
       <div style={{
         padding: '0 14px', display: 'flex', alignItems: 'center',
         gap: 10, flexShrink: 0,
@@ -239,6 +239,28 @@ export function CommandBar({
           paused={timerPaused || speed === 0}
           finished={finished}
         />
+        <button
+          id="next-turn-btn"
+          onClick={onAdvance}
+          disabled={finished || timerPaused}
+          style={{
+            padding: '6px 14px',
+            fontSize: 8,
+            fontFamily: "'JetBrains Mono','Fira Code',monospace",
+            fontWeight: 700,
+            letterSpacing: '1.5px',
+            cursor: (finished || timerPaused) ? 'default' : 'pointer',
+            background: (finished || timerPaused) ? '#0e0b07' : '#1a1408',
+            border: `1px solid ${(finished || timerPaused) ? '#2a1a10' : '#5a4a2a'}`,
+            color: (finished || timerPaused) ? '#3a2a1a' : '#c8a060',
+            borderRadius: 2,
+            transition: 'all 0.15s',
+            flexShrink: 0,
+          }}
+          title={timerPaused ? 'Resolve the current event to continue' : 'Advance to next turn'}
+        >
+          NEXT TURN
+        </button>
       </div>
     </div>
   );

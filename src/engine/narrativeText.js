@@ -708,6 +708,6 @@ export function getCulturalFreezeText(partnerName, cultureDist, seed) {
   return pick([
     `MERCHANT GUILD — Cultural distance to ${partnerName} has reached ${proximity} levels (${(cultureDist * 100).toFixed(0)}% of freeze threshold). Shared institutional frameworks are eroding. Quality standards, contract procedures, and credit instruments are becoming mutually incomprehensible. If distance reaches threshold, trade will cease without active cultural engagement.`,
     `MERCHANT GUILD — Trade friction with ${partnerName} has increased to ${proximity} levels. Our factors report that ${partnerName} commercial practices and our own have diverged substantially. Without shared norms, price discovery fails. Active cultural outreach is recommended before the circuit closes permanently.`,
-    `MERCHANT GUILD — ${proximity.charAt(0).toUpperCase() + proximity.slice(1)} divergence warning for ${partnerName}. The Axelrod threshold is near: below it, cultural distance creates friction and cost; above it, trade simply does not happen. Recommend adjusting cultural policy to maintain sufficient overlap for commercial continuity.`,
+    `MERCHANT GUILD — ${proximity.charAt(0).toUpperCase() + proximity.slice(1)} divergence warning for ${partnerName}. The divergence threshold is near: below it, cultural distance creates friction and cost; above it, trade simply does not happen. Recommend adjusting cultural policy to maintain sufficient overlap for commercial continuity.`,
   ], s);
 }

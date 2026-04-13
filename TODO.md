@@ -137,6 +137,63 @@ Status as of April 9, 2026. Everything above the line is implemented. Everything
 
 ## Pending: Architecture & UX
 
+### Playtester Issues (2026-04-12, Wave 2 — Mace/Calder/Loma, Sonnet agents)
+
+Three specialist reviewers dispatched sequentially: Mace (4X veteran), Calder (Georgian flag officer, 21C world model), Loma (oils/adobe painter, UI critique). Protocol: play-first, no corpus read. Findings below, ordered by severity. Earlier findings from the April 10 Haiku wave are preserved below.
+
+#### From Mace (4X veteran)
+
+**Critical:**
+- **Silent National Focus overrides from situation card responses.** Choosing EXPAND FISHERIES on the Harvest Assessment card silently shifted national focus to EXPLOIT (40/45/15) without warning or confirmation. The card label and mechanical effect are disconnected. This is a trust failure — when the button does not do what it says, players stop engaging with cards. *Fix: add a post-choice dispatch entry explaining any focus override, or surface it as a separate prompt.*
+- **Auto-focus override from revolt pressure (T3) also silent.** Game shifted EXPAND→FORTIFY in response to a revolt warning with no confirmation prompt. The dispatch "Guilds acknowledge new priority" frames an override as institutional response. *Fix: surface as an urgent situation card with recommended action, not a state change. Let the player confirm.*
+
+**Significant:**
+- **Dead turns T4–T11** — seven turns of near-silence, one flavor dispatch, no new situations. The situation card rate needs a minimum floor in early game. Dispatches must narrate passive processes (sovereignty trends, tech movement, fishery stocks) rather than going silent between threshold crossings.
+- **No counterfactual visibility on founding-bargain choices.** Having chosen ADMINISTER, the player has no way to see what EXTRACT would have produced. The choice was present; the consequence differential was not. *Proposed fix: show ADMINISTER/EXTRACT stat comparison in the ArchDetailPanel after the choice is made.*
+- **The Cairn unabsorbed after 14 turns of EXPAND focus** at d=0.45 (second nearest target). No intermediate feedback — no "approach made," no "navigator sighted their shelf." The expansion mechanic generates no partial signals.
+
+**Moderate:**
+- Harvest Assessment card recycled identically 8 turns after first appearance with no visible indication that prior choice produced any fishery state change.
+- NAPH stat held at 1.6 for 16 turns with no dispatch explaining why (probable cause: naphtha locked behind unabsorbed territory, but the game doesn't say so).
+
+#### From Calder (Georgian flag officer)
+
+**Critical:**
+- **ADMIRALTY goes silent for 12 turns after designating an expansion target.** "NAVY PLOTTING APPROACH" acknowledged at T2; zero follow-up for fifteen consecutive turns on that objective. A professional intelligence apparatus would produce conjectural reports from merchant rumors, navigator accounts, seasonal routing intelligence. The silence here is not professional restraint — it is absence. *Fix: generate low-confidence ADMIRALTY dispatches during sustained expansion attempts ("navigator guilds report unfavorable currents near The Cairn this season").*
+- **Threshold language in INTERNAL AFFAIRS breaks the institutional register.** "Approaching revolt threshold" is simulation-engine language dressed as administrative despatch. A real colonial intelligence memo would name the specific incident and leave the threshold inference to the officer. *Fix: audit INTERNAL AFFAIRS dispatches for threshold/percentage language and replace with specific institutional observations.*
+
+**Significant:**
+- **No intelligence about expansion targets.** After 17 turns targeting The Cairn under EXPAND focus, zero information about what is there — population, political structure, rival polity activity. "Known world: 9/42" and "Terra incognita: 33" — but those 33 archipelagos contain polities that are themselves moving. ADMIRALTY should generate conjectural intelligence about rival movements even in Antiquity.
+- **The situation cards occasionally cite academic sources in-line** (Ostrom 1990, Hardin 1968 visible as italic footnotes). This surfaces the designer's apparatus to the player. The `why` field convention is correct; the in-line citation in card body text is not. *Fix: move all real-world academic citations to the `why` field only; keep card body text in-universe.*
+
+**Praised:**
+- ADMIRALTY dispatch register is correct: terse, passive construction, no editorializing. "The Caldera has been absorbed into your domain" is exactly right.
+- MERCHANT GUILD Y5 dispatch is the strongest single piece of writing in the feed — guild voice distinct from ADMIRALTY, commercial intelligence as byproduct of profit motive.
+- Absorption mechanic correctly models institutional fragility at moment of conquest. The ADMINISTER/EXTRACT founding bargain "is a more sophisticated understanding of colonial administration than most strategy games manage."
+- Game grasps that distance is cost, not just space (d=0.39 vs d=0.72 expansion targets).
+
+#### From Loma (oils/adobe painter, UI critique)
+
+**Critical:**
+- **STABILITY in the CommandBar is a simulation variable presented as a self-evident readout**, at the same typographic weight as POP and TECH. Institutional stability is a derived interpretive score (extractiveness × 0.6 + grievance × 0.4). It should be marked as such — visually or through tooltip. PIETY gets a color-coded spectrum (fervent/devout/moderate/secular); STABILITY should too, with explicit framing as a judgment rather than a measurement.
+- **The interface is organized around actions, not institutions** — the right panel presents NATIONAL FOCUS → EXPANSION TARGETS → INTELLIGENCE → CULTURAL POLICY as a decision-tree menu. The game's thesis is that decisions now determine institutional trajectories for centuries; the interface should have a persistent institutional-state view, not only a decision menu. The `why` field convention on situation cards is the honest exception — it should become the rule.
+- **CULTURE label in CommandBar has no urgency coloring.** PIETY gets four color levels; CULTURE ("parochial") does not. Culture position is consequential (trade relationships, Axelrod freezing threshold) and should have the same treatment.
+
+**Significant:**
+- **The globe encodes faction culture in vertex color** (CI/IO positions mapped to RGB) but the variation is too subtle to read at globe scale under the sepia constraint, and there is no legend. The idea is right; the implementation is inaudible.
+- **Edge lines between archipelagos are not differentiated** — subsistence/relay/administered trade connections render identically. The simulation tracks three tiers with meaningfully different energy contributions; the globe should distinguish them visually.
+- **Delta arrows absent from ArchDetailPanel.** Sovereignty, grievance, and extraction rate are shown as current values but not trajectories. "Declining" vs. "recovering" is decision-critical information. *Fix: add small directional indicators (↑↓) with per-turn delta.*
+- **The NEXT TURN button is the brightest interactive element in the interface.** Its visual weight communicates "skip past this" rather than "commit to this." In a game about 50-year consequential ticks, the punctuation mark on every turn should feel like commitment, not dismissal. *Proposed: soften the button color slightly, or reframe the label — "COMMIT TURN" or "ADVANCE 50 YEARS."*
+
+**Praised:**
+- Fog-of-war gradient (dark umber → faint sepia → aged brown) is elegant and load-bearing. The ocean at early game is genuinely dark. Correct.
+- Dispatch left-border color system (ADMIRALTY red-brown, MERCHANT GUILD amber, INTERNAL AFFAIRS muted olive) is one of the interface's best decisions — source identity without palette violation.
+- Crisis gradient (green → yellow → orange → red) is consistent across FOOD, STABILITY, TERR, TENSION. Correct.
+- EventPopup accent-color system correctly separates event types by register (dark forest blood red, fishery collapse cold blue-grey, schism dusty violet).
+- Parchment tonal field (`#b8923a`, `#c8a878`, `#907858`) and typeface commitment (JetBrains Mono throughout) is coherent and correctly executed.
+
+---
+
 ### Playtester Issues (2026-04-10, three independent Haiku sessions)
 
 Six issues surfaced consistently across all three testers:

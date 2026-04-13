@@ -294,6 +294,12 @@ export class SimEngine {
     // Builds from concentrated extraction under collectivist culture;
     // penalizes TFP independently of the naphtha resource curse.
     this.extractiveness = new Float64Array(this.N);
+    // ── Administer/Extract founding bargain (North 1990; AJR 2001) ──────────
+    // Per-territory governance mode set by player at absorption. true = administer
+    // (lower extraction, lower grievance, faster institutional integration);
+    // false = extract (current default: fast yield, structural fragility).
+    // "What happens next depends on whether you administer or merely extract."
+    this.administerMode = new Array(this.N).fill(false);
     // Per-pair relay contact age: maps `${core}_${other}` → tick when contact first established.
     // Used for endemicity transition (McNeill 1976): longer relay-trade contact → more immunity
     // before formal political absorption.
@@ -1525,17 +1531,30 @@ export class SimEngine {
         if (budget < 0.1 || absorbedThisTick >= 1) break;
 
         const techAdv = Math.max(0.1, this.tech[core] - this.tech[target] + 1.0);
-        // pop coefficient reduced 0.05→0.02: Strategy game starts with far less trade energy
-        // than the Python reference (which has all 30 polities active from tick 0).
-        // Populated islands still cost more but remain reachable without a large tech gap.
-        // dist³ coefficient reduced 40→20 earlier for the same reason.
-        let cost = (this.pop[target] * 0.02 + dist ** 3 * 20) / (techAdv ** 1.5);
+        // Distance exponent reduced from 3.0→2.2: cubic penalty made adjacent expansion
+        // mathematically impossible at early tech levels. Quadratic-ish scaling preserves
+        // the principle (distant projection is expensive) while making adjacent hops
+        // reachable ~100 turns earlier. Coefficient 20→15 for same reason.
+        // At dist 1: 15 (was 20). At dist 2: 69 (was 160). At dist 3: 194 (was 540).
+        let cost = (this.pop[target] * 0.02 + dist ** 2.2 * 15) / (techAdv ** 1.5);
 
-        // Early-game navigation penalty: pre-navigation ocean crossing is brutal.
-        // At tech 1 costs are 3× higher; scales linearly to 1× by tech 5.
+        // Early-game navigation penalty: pre-navigation ocean crossing is difficult.
+        // At tech 1 costs are ~1.85× higher; scales linearly to 1× by ~tech 6.3.
+        // Softened from original 3.0/0.4 curve which made early expansion impossible.
         // "The ocean that feeds you also imprisons you" — until shipbuilding catches up.
-        const navPenalty = Math.max(1.0, 3.0 - this.tech[core] * 0.4);
+        const navPenalty = Math.max(1.0, 2.2 - this.tech[core] * 0.35);
         cost *= navPenalty;
+
+        // First-expansion subsidy: every historical polity's founding expansion was
+        // subsidized by local knowledge, proximity, and kinship networks. When you have
+        // only your homeland, your first territorial acquisition costs 25% of normal.
+        // This is strong because the player must feel the transition from "island polity"
+        // to "maritime state" — the founding expansion is the game's first consequential moment.
+        // North (1990): institutional quality at founding determines long-run trajectory.
+        const territory = this._controlled(core).length;
+        if (core === this.playerCore && territory <= 1) {
+          cost *= 0.25;
+        }
 
         const targetCore = this.controller[target];
         if (targetCore !== target) {
@@ -1626,6 +1645,16 @@ export class SimEngine {
       const dist = _gcDistArch(this.archs[core], this.archs[i]);
       let extraction = p.sov_extraction_decay / Math.max(0.1, dist) * _clamp(energyRatio[core] ?? 1, 0, 1.5);
 
+      // ── Administer/Extract founding bargain (North 1990; AJR 2001) ──────────
+      // Player chose governance mode at absorption. Administer = lower extraction
+      // rate (40% of normal), but grievance accumulates 50% slower and sovereignty
+      // recovers 30% faster. Extract = current default.
+      // "What happens next depends on whether you administer or merely extract."
+      const isAdministered = this.administerMode[i];
+      if (isAdministered) {
+        extraction *= 0.4; // 60% less extraction — investing in institutional integration
+      }
+
       // Player sovereignty focus: reduce extraction on focused islands (faster stabilization)
       if (core === this.playerCore && sovFocusSet && sovFocusSet.has(i)) {
         extraction *= 0.4; // 60% less extraction = faster sovereignty recovery
@@ -1645,17 +1674,37 @@ export class SimEngine {
       // that triggers organized resistance (participation axis drift).
       const tolerable = p.sov_extraction_decay * 0.5;
       const excess = Math.max(0, extraction - tolerable);
+      // Administered territories accumulate grievance 50% slower (legitimacy investment)
+      const grievanceMult = isAdministered ? 0.5 : 1.0;
       this.grievance[i] = _clamp(
-        this.grievance[i] * 0.95 + excess * (p.grievance_buildup_rate ?? 0.25),
+        this.grievance[i] * 0.95 + excess * (p.grievance_buildup_rate ?? 0.25) * grievanceMult,
         0, 1.0
       );
       const resistanceMult = 1.0 + this.grievance[i] * (p.grievance_resistance_mult ?? 2.0);
 
+      // Administered territories recover sovereignty 30% faster (institutional investment)
+      const recoveryBonus = isAdministered ? 1.3 : 1.0;
       const recovery = p.sov_extraction_decay * this.sovereignty[i]
-        * (this.pop[i] / Math.max(1, this.pop[core])) * 0.5 * resistanceMult;
+        * (this.pop[i] / Math.max(1, this.pop[core])) * 0.5 * resistanceMult * recoveryBonus;
       this.sovereignty[i] += (recovery - extraction) * 0.1;
       this.sovereignty[i] = _clamp(this.sovereignty[i], 0.05, 0.95);
       if (this.tech[core] >= 9.0 && year >= -200) this.sovereignty[i] = Math.min(0.80, this.sovereignty[i] + 0.015);
+
+      // ── Integration conversion: administered territories that reach high sovereignty
+      // convert to "integrated" status — grievance drops, extraction normalizes.
+      // "The [territory] directorate has petitioned for formal membership."
+      if (isAdministered && this.sovereignty[i] > 0.70 && (tick - (this.absorbedTick[i] ?? 0)) >= 8) {
+        this.administerMode[i] = false; // no longer needs special treatment
+        this.grievance[i] = Math.max(0, this.grievance[i] - 0.3);
+        if (core === this.playerCore) {
+          const archName = this.archs[i].name || `Arch ${i}`;
+          this.dispatches.push({
+            source: 'INTERNAL AFFAIRS',
+            text: `The ${archName} directorate has petitioned for formal membership in the administered network. The council has approved. Institutional integration complete.`,
+            year, tick, priority: 2
+          });
+        }
+      }
 
       // ── Acemoglu-Robinson institutional buildup ─────────────────────────────
       // Extractive institutions crystallise from the practice of extraction.
@@ -1676,6 +1725,42 @@ export class SimEngine {
       const decayRate = 0.02 * (1 + Math.max(0, inclusiveCulture) * 2);
       this.extractiveness[core] -= this.extractiveness[core] * decayRate;
       this.extractiveness[core] = _clamp(this.extractiveness[core], 0, 1.0);
+    }
+
+    // ── Extractiveness dispatches: surface the legitimacy gap before crisis ──
+    // "The popup is the crisis. The indicator is the governance." — marginalia
+    // Graduated INTERNAL AFFAIRS dispatches make the Vaanthi petition pattern
+    // legible to the player: the framework persists, the territory outgrows it,
+    // and someone has to decide what to do about the gap.
+    if (this.playerCore !== null) {
+      const pc = this.playerCore;
+      const ext = this.extractiveness[pc];
+      // Only fire once per threshold crossing, every 6 ticks
+      if (tick % 6 === 0 && ext > 0.10) {
+        const administered = [];
+        for (let i = 0; i < N; i++) {
+          if (this.controller[i] === pc && i !== pc) administered.push(i);
+        }
+        if (administered.length > 0) {
+          // Pick the territory with highest grievance for specificity
+          let worstArch = administered[0];
+          for (const a of administered) {
+            if (this.grievance[a] > this.grievance[worstArch]) worstArch = a;
+          }
+          const archName = this.archs[worstArch].name || `Arch ${worstArch}`;
+          let msg = null;
+          if (ext > 0.50 && this.grievance[worstArch] > 0.40) {
+            msg = `The gap between what your framework provides ${archName} and what its population requires is now visible from the harbor wall. What your intelligence officers describe as 'passive resistance' is what the ${archName} population calls 'choosing not to participate.'`;
+          } else if (ext > 0.30) {
+            msg = `The ${archName} Commercial Association has filed an access petition with the Commerce Council. Administered market participation has declined for the second consecutive assessment period. The withdrawal appears coordinated.`;
+          } else if (ext > 0.15) {
+            msg = `Revenue assessors in ${archName} report compliance delays. The levy is collected, but the administrative friction is measurable. Your magistrates note that the levy is resented as imposition rather than accepted as legitimate taxation.`;
+          }
+          if (msg) {
+            this.dispatches.push({ source: 'INTERNAL AFFAIRS', text: msg, year, tick, priority: 1 });
+          }
+        }
+      }
     }
 
     // ── STAGE 8: Naphtha depletion ──────────────────────────

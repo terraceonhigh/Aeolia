@@ -94,7 +94,7 @@ const INITIAL_STATE = {
   selectedTargets: new Set(),
   frontier: [],
   eventLog: [],
-  speed: 1,           // 0=paused, 1/5/10
+  speed: 0,           // 0=paused, 1/5/10 — starts paused so player reads before the clock runs
   pendingPopup: null,  // { type, data }
   timerKey: 0,         // bump to reset timer
   lastEra: null,
@@ -167,7 +167,7 @@ function gameReducer(state, action) {
         eventLog: [],
         activeFocus: 'balanced',
         allocation: { expansion: 33, techShare: 34, consolidation: 33 },
-        speed: 1,
+        speed: 0,
         pendingPopup: null,
         timerKey: 0,
         lastEra: eraName,
@@ -306,6 +306,25 @@ function gameReducer(state, action) {
         showReignSummary: state.phase === 'GAME_OVER',
       };
 
+    // ── Administer/Extract founding bargain ──────────────────
+    // Player chooses governance mode at absorption. Sets engine flag and dismisses popup.
+    case 'SET_GOVERNANCE_MODE': {
+      const eng = state.engine;
+      if (eng && action.targetIndex != null) {
+        eng.administerMode[action.targetIndex] = action.administer;
+      }
+      return {
+        ...state, pendingPopup: null, timerKey: state.timerKey + 1,
+        eventLog: [...state.eventLog, {
+          yearStr: state.snapshot?.year ?? '?',
+          text: action.administer
+            ? `INTERNAL AFFAIRS — ${action.name} placed under administered directorate with advisory council. Extraction reduced; institutional integration prioritized.`
+            : `INTERNAL AFFAIRS — ${action.name} placed under revenue administration. Extraction rates set at metropolitan standard.`,
+          color: action.administer ? '#5a7a5a' : '#8a7a3a',
+        }],
+      };
+    }
+
     case 'SELECT_ARCH': {
       // Toggle selection — clicking same arch again clears it
       const next = state.selectedArch === action.archIdx ? null : action.archIdx;
@@ -415,6 +434,7 @@ function gameReducer(state, action) {
                 territory: snapshot.playerStats?.territory || '?',
                 crop: targetCrop,
                 method: 'naval expedition',
+                targetIndex: ev.target, // for administer/extract choice
               },
             };
           }
@@ -1359,6 +1379,10 @@ function GameInner({ seed, onBack }) {
     dispatch({ type: 'DISMISS_POPUP' });
   }, []);
 
+  const handleGovernanceChoice = useCallback((targetIndex, name, administer) => {
+    dispatch({ type: 'SET_GOVERNANCE_MODE', targetIndex, name, administer });
+  }, []);
+
   const handleToggleTarget = useCallback((target) => {
     dispatch({ type: 'TOGGLE_TARGET', target });
   }, []);
@@ -1533,6 +1557,7 @@ function GameInner({ seed, onBack }) {
         <EventPopup
           event={game.pendingPopup}
           onDismiss={handleDismissPopup}
+          onGovernanceChoice={handleGovernanceChoice}
           names={names}
           playerCore={game.playerCore}
         />
