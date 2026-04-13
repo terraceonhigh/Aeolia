@@ -75,9 +75,9 @@ export function CommandBar({
   isMobile,
 }) {
   const ps = snapshot?.playerStats;
-  const tick = snapshot?.tick || 60;
+  const tick = snapshot?.tick || 40;
   const year = snapshot?.year;
-  const gameYear = tick - 60;
+  const gameYear = tick - 40;
   const eraName = !year ? 'Antiquity'
     : year < -5000 ? 'Antiquity' : year < -2000 ? 'Serial Contact'
     : year < -500  ? 'Colonial'  : year < -200  ? 'Industrial' : 'Nuclear';
@@ -1021,7 +1021,7 @@ export default function TurnDashboard({
             color: scoutActive ? '#d4b896' : '#6a5a3a', borderRadius: 2,
             fontWeight: scoutActive ? 600 : 400,
           }}>
-            {scoutActive ? '◉ SCOUTING' : '○ Scout'}
+            {scoutActive ? '◉ SCOUTING (−35% exp)' : '○ Scout'}
           </button>
         </div>
         {ownedArchs.length > 1 && (

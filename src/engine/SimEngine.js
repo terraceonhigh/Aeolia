@@ -435,10 +435,15 @@ export class SimEngine {
     }
 
     // Mark rumors (1-hop from contacted territory)
-    for (let j = 0; j < this.N; j++) {
-      if (vis[j] === 'contacted' || vis[j] === 'frontier') {
-        for (const nb of this.adj[j]) {
-          if (vis[nb] === 'unknown') vis[nb] = 'rumor';
+    // Gate on tech >= 2 (relay trade era): pre-relay polities don't hear rumors
+    // from beyond their immediate horizon. The ocean is silent until the relay
+    // networks carry word of distant shores.
+    if (this.tech[core] >= 2.0) {
+      for (let j = 0; j < this.N; j++) {
+        if (vis[j] === 'contacted' || vis[j] === 'frontier') {
+          for (const nb of this.adj[j]) {
+            if (vis[nb] === 'unknown') vis[nb] = 'rumor';
+          }
         }
       }
     }
@@ -801,6 +806,13 @@ export class SimEngine {
       expBudget[core] = budget * expS;
       techBgt[core] = budget * tecS;
       consolBudget[core] = budget * conS;
+
+      // Scouting costs: projecting scouts beyond the frontier consumes expansion budget.
+      // The ocean is vast; sending expeditions to chart unknown waters means fewer
+      // resources for actual conquest. 35% of expansion budget diverted to scouting.
+      if (core === this.playerCore && playerDecision?.scoutActive) {
+        expBudget[core] *= 0.65;
+      }
     }
 
     // ── STAGE 2b: Culture-space drift ───────────────────────
@@ -966,10 +978,15 @@ export class SimEngine {
 
     // ── STAGE 3: Rumor propagation ──────────────────────────
     for (const core of cores) {
-      if (this.tech[core] < 1.5) continue;
+      // Contact requires relay-era navigation (tech >= 2.0, raised from 1.5).
+      // Pre-relay polities are isolated by the ocean — they don't encounter
+      // distant neighbors until trade networks begin carrying information.
+      if (this.tech[core] < 2.0) continue;
       const ctrlSet = new Set(this._controlled(core));
       let newThisTick = 0;
-      const maxNew = this.tech[core] < 5.0 ? 1 : 2;
+      // Max new contacts per tick: 1 until tech 6.0 (raised from 5.0), then 2.
+      // Even with relay networks, the ocean is vast — sustained contact takes time.
+      const maxNew = this.tech[core] < 6.0 ? 1 : 2;
       outer: for (const j of ctrlSet) {
         if (newThisTick >= maxNew) break;
         for (const nb of this.adj[j]) {
@@ -1513,6 +1530,12 @@ export class SimEngine {
         // Populated islands still cost more but remain reachable without a large tech gap.
         // dist³ coefficient reduced 40→20 earlier for the same reason.
         let cost = (this.pop[target] * 0.02 + dist ** 3 * 20) / (techAdv ** 1.5);
+
+        // Early-game navigation penalty: pre-navigation ocean crossing is brutal.
+        // At tech 1 costs are 3× higher; scales linearly to 1× by tech 5.
+        // "The ocean that feeds you also imprisons you" — until shipbuilding catches up.
+        const navPenalty = Math.max(1.0, 3.0 - this.tech[core] * 0.4);
+        cost *= navPenalty;
 
         const targetCore = this.controller[target];
         if (targetCore !== target) {

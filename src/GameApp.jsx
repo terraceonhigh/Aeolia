@@ -139,11 +139,13 @@ function gameReducer(state, action) {
         DEFAULT_PARAMS,
         playerCore
       );
-      // Skip the boring early game — start at tick 60 (~17000 BP, tech ~1.5).
+      // Skip the boring early game — start at tick 40 (~18000 BP, tech ~1.0).
+      // Reduced from 60: the old skip revealed too much world. At tick 40 the
+      // player has 1-2 territories, 0-1 contacts, and the ocean is dark.
       // Guard: if the player's archipelago was already conquered during the skip,
       // back off to tick 0 so they don't immediately receive a defeat popup.
       let engine = _makeEngine();
-      engine.skipToTick(60);
+      engine.skipToTick(40);
       let snapshot = engine.snapshot();
       if (snapshot.playerStats && snapshot.playerStats.territory === 0) {
         engine = _makeEngine(); // fresh engine at tick 0
@@ -206,7 +208,7 @@ function gameReducer(state, action) {
       } else if (card) {
         confirmText = `YOUR ORDERS — ${card.title}: situation filed. No immediate action taken.`;
       }
-      const tick = state.snapshot?.tick || 60;
+      const tick = state.snapshot?.tick || 40;
       const year = state.snapshot?.year;
       const yr = year != null ? (year < 0 ? `${Math.abs(year)}BP` : `${year}CE`) : `T${tick}`;
       const confirmEntry = confirmText
@@ -217,7 +219,7 @@ function gameReducer(state, action) {
       // Culture drift cards also update lastAcknowledgedCulture so the card
       // generator (which uses getCultureLabel, not the engine's 3-way label)
       // doesn't re-fire due to the label-function divergence at boundary positions.
-      const dTick = state.snapshot?.tick || 60;
+      const dTick = state.snapshot?.tick || 40;
       const newDismissedOnApply = new Map(state.dismissedCardIds);
       newDismissedOnApply.set(action.cardId, dTick);
       let newAcknowledgedCulture = state.lastAcknowledgedCulture;
@@ -248,7 +250,7 @@ function gameReducer(state, action) {
     }
 
     case 'DISMISS_CARD': {
-      const dTick = state.snapshot?.tick || 60;
+      const dTick = state.snapshot?.tick || 40;
       const newDismissed = new Map(state.dismissedCardIds);
       newDismissed.set(action.cardId, dTick);
       let newAck = state.lastAcknowledgedCulture;
@@ -277,7 +279,7 @@ function gameReducer(state, action) {
       const focus = FOCUSES.find(f => f.key === action.focus);
       if (!focus) return state;
       const allocStr = `${focus.alloc.expansion}/${focus.alloc.techShare}/${focus.alloc.consolidation}`;
-      const tick = state.snapshot?.tick || 60;
+      const tick = state.snapshot?.tick || 40;
       const year = state.snapshot?.year;
       const yr = year != null ? (year < 0 ? `${Math.abs(year)}BP` : `${year}CE`) : `T${tick}`;
       // Only emit dispatch if not chained from APPLY_CARD (which has its own dispatch)
@@ -391,10 +393,10 @@ function gameReducer(state, action) {
       const newEvents = [...eventLog];
       const vis = snapshot.visibility;
       let popup = null; // first popup-worthy event wins
-      const advTick = snapshot.tick || 60;
+      const advTick = snapshot.tick || 40;
 
       for (const ev of snapshot.events) {
-        const yearStr = `Y${advTick - 60}`;
+        const yearStr = `Y${advTick - 40}`;
         if (ev.core === playerCore) {
           const targetName = action.names[ev.target];
           const targetCrop = snapshot.crops?.[ev.target];
@@ -465,7 +467,7 @@ function gameReducer(state, action) {
           const techCC = snapshot.tech?.[cc];
           const contactName = action.names[cc] || `Nation ${cc}`;
           newEvents.push({
-            yearStr: `Y${advTick - 60}`,
+            yearStr: `Y${advTick - 40}`,
             text: `DIPLOMATIC CORPS — First contact established with ${contactName} (tech ${techCC?.toFixed(1) || '?'}, ${cultureLabel}).`,
             color: '#b8923a',
           });
@@ -480,7 +482,7 @@ function gameReducer(state, action) {
                 culture: cultureLabel,
                 tech: techCC,
                 crop: cropCC,
-                year: advTick - 60,
+                year: advTick - 40,
               },
             };
           }
@@ -530,8 +532,8 @@ function gameReducer(state, action) {
       // ── Flavor events (non-blocking dispatch entries) ────
       const newCultureLabel = snapshot.playerStats?.cultureLabel;
       const prevCultureLabel = state.snapshot?.playerStats?.cultureLabel;
-      const tick = snapshot.tick || 60;
-      const yearStr2 = `Y${tick - 60}`;
+      const tick = snapshot.tick || 40;
+      const yearStr2 = `Y${tick - 40}`;
 
       if (newCultureLabel && prevCultureLabel && newCultureLabel !== prevCultureLabel) {
         newEvents.push({
@@ -767,7 +769,7 @@ function gameReducer(state, action) {
 
       // ── Early-game flavor dispatches ──────────────────────
       // Fill the T0-57 dead zone with one guaranteed navigator/merchant dispatch.
-      const turnNumber = (snapshot.tick || 60) - 60;
+      const turnNumber = (snapshot.tick || 40) - 40;
       if (turnNumber === 5) {
         newEvents.push({
           yearStr: `Y${turnNumber}`,

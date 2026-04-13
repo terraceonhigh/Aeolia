@@ -138,7 +138,7 @@ export default function ReignSummary({ snapshot, eventLog, names, playerCore, fo
   }
 
   const polityName = names?.[playerCore] || `Polity ${playerCore}`;
-  const turns = (snapshot?.tick || 60) - 60;
+  const turns = (snapshot?.tick || 40) - 40;
   const startYear = -17000;
   const endYear = snapshot?.year || 0;
 
