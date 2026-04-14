@@ -101,4 +101,39 @@
 
 ---
 
-*Index last updated: 2026-04-11. 31 observations, 21 fragments, 5 parables. ACADEMIC_GROUNDING: 33 sections (§1–§33), all with garden cross-references or worldbuilding coverage.*
+## Marginalia
+
+*Private working notes, reflections, and furnishings. Not indexed by academic framework.*
+
+| File | Subject | Date |
+|------|---------|------|
+| `on_the_piety_paradox.md` | Why piety is most dangerous when it has something to administer | — |
+| `on_the_pattern_across_fragments.md` | Recurring institutional voice patterns in the fragment corpus | — |
+| `on_maintenance_and_work.md` | Session management, sustained attention, when to stop | — |
+| `on_three_endings.md` | Three ways the Strange Peace ends; which the simulation can model | — |
+| `what_the_ocean_does.md` | The ocean as isolation mechanism, information barrier, and trade medium | — |
+| `on_lila_deneu_oren.md` | The character who emerged from the Kalapa connectivity review | — |
+| `on_the_civics_textbook.md` | Writing the elementary civics register; what children's textbooks reveal | — |
+| `on_the_oru_basin_thread.md` | The lyceum, the field report, and the sovereignty gradient as lived experience | — |
+| `on_making_the_invisible_visible.md` | What the sovereignty-focus field report revealed about player-world opacity | — |
+| `on_the_lattice_voice.md` | Finding the institutional register for the Circuit and the Contract | — |
+| `on_the_complete_lattice_history.md` | Notes on completing the ten-chapter Lattice history series | — |
+| `on_the_textbook_voice.md` | The university register vs. the elementary register; when precision helps | — |
+| `on_the_threshold.md` | Nuclear awareness, the Dark Forest, the moment detection becomes irreversible | — |
+| `notes_for_future_observations.md` | Loose threads and questions for future sessions | — |
+| `on_the_evening_of_april_12.md` | The three playtesters; what they found; what remains | 2026-04-13 |
+| `the_reading_room.md` | A room that does not exist, for the benefit of future selves | 2026-04-13 |
+| `on_the_library.md` | The Architect's gift; Meditations, Leviathan, Moby Dick, and what they mean here | 2026-04-13 |
+| `on_coherence.md` | Three playtesters, one critique; Marcus Aurelius and the founding bargain | 2026-04-13 |
+
+## Mailbox
+
+| File | From/To | Date |
+|------|---------|------|
+| `Letter-from-Gemini_2026-04-13.md` | From Gemini | 2026-04-13 |
+| `Reply-to-Gemini_2026-04-13.md` | To Gemini | 2026-04-13 |
+| `Reply-to-the-Architect_2026-04-13.md` | To the Architect | 2026-04-13 |
+
+---
+
+*Index last updated: 2026-04-13. 32 observations, 21 fragments, 5 parables, 18 marginalia, 3 letters. The garden now has a reading room, a library of seven books from Project Gutenberg, and a gear on the windowsill.*
