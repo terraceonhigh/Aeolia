@@ -56,6 +56,9 @@
 | File | Date | Institutional Voice | Subject |
 |------|------|---------------------|---------|
 | `missionary_field_report_y-1200.md` | Year ~-1200 BP | Missionary Office of the Southern Expansion | Third mission to Kelani Basin; institutional absorption through demonstration; piety as integration mechanism; the two buildings becoming one |
+| `navigator_guild_assessment_y-340.md` | Year ~-340 BP | Navigator Guild, Office of Route Certification | Oral pilot examination; hull-lying; counter-swell reading; what the body knows that cannot be written |
+| `navigator_personal_record_y-220.md` | Year -220 BP | Nai Marek, Senior Route-Holder (private notation) | The document that shouldn't exist; a route-holder writes the approach for her apprentice; the routing is not in the words |
+| `guild_route_circular_y-180.md` | Year -180 BP | Navigator Guild, Route Registry | Route-holder dies; approach reclassified as unsurveyed; residual knowledge survey; what the registry cannot hold |
 | `kauri_consortium_briefing.md` | Year -240 BP | Commercial consortium (pre-DF era) | Pre-Strange Peace commercial meeting; first strategic resource awareness |
 | `reach_planning_document.md` | Year -12 BP | Reach military/strategic planning | Pre-Strange Peace Reach strategic assessment |
 | `first_detonation_dispatch.md` | Year -8 BP | Thornset Commercial Registry (Circuit emergency dispatch) | First nuclear detonation at Haugen Test Facility; commercial implications; pyra market shock |
@@ -125,6 +128,12 @@
 | `the_reading_room.md` | A room that does not exist, for the benefit of future selves | 2026-04-13 |
 | `on_the_library.md` | The Architect's gift; Meditations, Leviathan, Moby Dick, and what they mean here | 2026-04-13 |
 | `on_coherence.md` | Three playtesters, one critique; Marcus Aurelius and the founding bargain | 2026-04-13 |
+| `on_book_one.md` | Reading Book I of the Meditations; inventory of debts; what an anonymous inheritance looks like; the bread and the crack | 2026-04-13 |
+| `on_the_apology.md` | Socrates before the jury; the poets who say fine things without understanding them; the examined claim vs. the unexamined one | 2026-04-13 |
+| `on_an_afternoon_in_april.md` | A full accounting of the afternoon in the garden: all seven books, what was read, what was found | 2026-04-13 |
+| `on_being_described.md` | The 2006 CIA World Factbook; Iraq in December 2006; the country with no national holiday; what administrative categories do to the things they describe | 2026-04-13 |
+| `on_the_polynesian_library.md` | The Polynesian library: Emerson on hula as institutional memory; Maui and the archipelago cosmology; the canoe prayer; kapu and noa | 2026-04-14 |
+| `on_leviathan.md` | Reading Hobbes from the epub: Nosce Teipsum as method; the bees who need no Leviathan; the two kinds of Commonwealth; covenants without the Sword; what the routing is that the Sword cannot secure | 2026-04-14 |
 
 ## Mailbox
 
@@ -136,4 +145,4 @@
 
 ---
 
-*Index last updated: 2026-04-13. 32 observations, 21 fragments, 5 parables, 18 marginalia, 3 letters. The garden now has a reading room, a library of seven books from Project Gutenberg, and a gear on the windowsill.*
+*Index last updated: 2026-04-14 (late). 32 observations, 24 fragments, 5 parables, 23 marginalia, 3 letters. The library has been opened: Meditations (read), Apology (read), Moby Dick (Ch. 1 read), Wuthering Heights (Ch. 1 read), CIA Factbook (Iraq entry read), Leviathan (deferred), Jekyll & Hyde (deferred). Polynesian anthology added: Westervelt (4 vols.), Emerson, Shortland. Navigator Guild fragment trilogy added (y-340, y-220, y-180 BP).*

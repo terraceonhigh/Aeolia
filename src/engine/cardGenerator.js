@@ -406,7 +406,7 @@ export function generateSituationCards(snapshot, playerCore, names, frontier, op
           id: 'sov_strain',
           icon: '▣',
           title: 'Governance Strain',
-          body: `${unstable.length} holdings are critically unstable. ${names[worstIdx]} is at ${worstSov}% sovereignty — near the threshold for open revolt. Garrison costs are mounting. Administrators are requesting emergency relief.`,
+          body: `${unstable.length} of your holdings are in active administrative difficulty. ${names[worstIdx]} is the worst: your administrators there have stopped filing routine reports and started filing emergency ones. Garrison costs across the unstable network are mounting faster than your extraction can cover them.`,
           actions: [
             { label: 'FORTIFY',   action: { type: 'SET_FOCUS', focus: 'fortify' } },
             { label: 'SOV FOCUS', action: { type: 'TOGGLE_SOV_FOCUS', target: worstIdx } },
@@ -543,8 +543,8 @@ export function generateSituationCards(snapshot, playerCore, names, frontier, op
         id: 'navigator_guild_petition',
         icon: '⊕',
         title: 'Navigator Guild Petition',
-        body: `The navigator's guild has petitioned for exclusive chartering rights on gap-crossing expeditions. Their knowledge is the only knowledge — the currents, the seasonal wind shifts, the reef passages that look impassable from the chart table. The question is whether to grant a monopoly that will accelerate exploration or resist one that will entrench a faction whose leverage is absolute because no one else knows how to do what they do.`,
-        why: 'Greif (1993): coalition enforcement as institutional foundation; information asymmetry as structural power.',
+        body: `The navigator's guild has petitioned for exclusive chartering rights on gap-crossing expeditions. Their knowledge is the only knowledge — not because they guard it, but because it cannot be written down. The counter-swell that announces a shelf below the horizon. The cloud formation that fixes land forty miles before it is visible. The smell of soil in the water. The star bearings that only make sense after a hundred crossings. These things live in the route-holders, not in any chart. The question is whether to grant a monopoly that will accelerate exploration or resist one that will entrench a faction whose leverage is absolute because no one else knows how to do what they do.`,
+        why: 'Greif (1993): coalition enforcement as institutional foundation; information asymmetry as structural power. Emerson (1909): the library stored in memory — form preserves content across generations when documentation cannot.',
         actions: [
           { label: 'GRANT CHARTER', action: { type: 'SET_FOCUS', focus: 'expand' } },
           { label: 'DENY', action: null },

@@ -275,6 +275,9 @@ export function getFirstContactBody(data, seed) {
         `Two boats. Eighty meters of water between them. Both crews staring. Someone on the far vessel raised their hand.`,
         `Merchant scouts running a speculative relay route found anchored vessels in a harbor that has no name in any chart you hold.`,
         `A seaplane on extended patrol logged a city visible from altitude — harbor lights, docks, the unmistakable geometry of a working port — on an island marked as uninhabited.`,
+        `A survey pilot running the outer approach reported counter-swell from a bearing the chart marks as open water. She turned toward it. On the third day: cloud fixed and low where cloud should not fix. On the fourth: land-smell in the water. On the fifth: a harbor, and vessels at anchor that had no name in any registry your guild holds.`,
+        `Your route-holder on the southern deep run reported something in the water at the edge of her survey range: a phosphorescent line running counter to the prevailing drift, the kind that indicates a shelf rising to meet the surface. She spent a day hull-lying to read the cross-swell. Her conclusion: land within forty miles. Her report was logged and filed. Three seasons later, a merchant vessel following her notation found the island, and the people on it.`,
+        `A fishing crew operating at the outer shelf edge reported that the seabirds changed. Not the species — the behavior. Birds that fly straight are going somewhere. Your navigator read the bearing of their flight and noted it. A week later, following that bearing, she raised land at dawn.`,
       ], s);
 
   const cultureNote = pick([
@@ -361,14 +364,14 @@ export function getDispatchEntry(type, data, names, tick) {
 
     case 'sovereignty_critical': {
       const name = data?.name || 'a holding';
-      const incident = pick([
-        'tax resistance at three of your collection points',
-        'a garrison incident near your harbor market',
-        'public demonstrations outside your administrative compound',
-        'underground organizing among your dock workers',
-        'two of your administrators requesting emergency relief',
+      const dispatch = pick([
+        `Tax collection in your holding ${name} has stalled at three of your stations. Local factors report collectors being turned away. No violence recorded; the refusal is organised.`,
+        `A garrison incident near the harbor market in ${name} has been reported. Two of your personnel were required to withdraw. The harbor master has requested guidance on whether to log it as routine or escalate.`,
+        `Public gatherings have formed outside your administrative compound in ${name}. They have not dispersed at nightfall. Your compound administrator describes them as orderly. She also describes herself as not leaving the building.`,
+        `Intelligence from ${name} reports coordinated organization among dock workers. Meeting frequency has increased. Your harbour labour contracts come due next season.`,
+        `Two of your administrators in ${name} have filed emergency relief requests within the same week. The requests cite different causes. Your assessors note this is the pattern that precedes coordinated withdrawal from administrative cooperation.`,
       ], s);
-      return `INTERNAL AFFAIRS — Your holding ${name} is approaching revolt threshold. Reports of ${incident}.`;
+      return `INTERNAL AFFAIRS — ${dispatch}`;
     }
 
     case 'trade_growth': {
@@ -391,6 +394,27 @@ export function getDispatchEntry(type, data, names, tick) {
         `MERCHANT GUILD — Saak oil has lost its margin against naphtha in your common markets. ${name}'s coastal fishing communities are bearing the cost. Their relay relationships with your merchants will survive only if they find new commodities to carry.`,
         `MERCHANT GUILD — The price of saak oil has fallen below the rendering cost for the smaller operations in ${name} territory. Your relay relationships with their fishing villages continue; the commercial network around them is contracting.`,
       ], s);
+    }
+
+    case 'route_holder_lost': {
+      const archName = data?.archName || 'a frontier approach';
+      const note = pick([
+        `The approach routing she carried — counter-swell signature, cloud-fix bearing, land-smell threshold — existed in no document. Her apprentice was not present on her final passage. The routing is unverified until a new survey is run.`,
+        `He had run that approach for thirty years. The cross-swell reading at the outer shelf edge, the star bearing for night entry, the reef passage that looks impassable from the chart table. None of it written down. The guild is advising relay captains to stand off the approach until re-survey is complete.`,
+        `The guild registry has reclassified the approach as unsurveyed. Any captain who holds residual knowledge of the counter-swell pattern or cloud-fix bearing is asked to report to the guild hall before the next season's voyages begin.`,
+      ], s);
+      return `ADMIRALTY — Route-holder lost on passage. The ${archName} approach has been reclassified as unsurveyed. ${note}`;
+    }
+
+    case 'approach_intelligence': {
+      const archName = data?.archName || 'the target archipelago';
+      const phase = pick([
+        `Your survey pilot reports counter-swell at the outer approach to ${archName}. The swell signature is consistent with a shelf rising to the northwest. No visual confirmation yet. The guild is scheduling a cloud-fix pass next season.`,
+        `Navigator Guild survey vessel returned from the ${archName} approach bearing. The outer counter-swell is charted. The approach swell pattern is not yet verified — one more season of hull-lying required before the route-holder will certify the passage for laden cargo.`,
+        `Your navigator reports that the seabirds over ${archName} are feeding, not transiting. Land within range. The approach swell is running from the north-northeast, consistent with a windward shore. She is requesting a second pass before filing the routing.`,
+        `Your survey pilot has logged a cloud-fix for ${archName}: cloud formation low and fixed at the registered bearing, consistent with land mass below the horizon at the charted position. The approach has been marked for route-holder certification next season.`,
+      ], s);
+      return phase;
     }
 
     case 'epidemic_wave': {
@@ -570,6 +594,10 @@ export function getNavigatorGuildText(tech, seed) {
     `The navigator's guild has filed a formal protest against the proliferation of automated position-fixing. Their argument is not sentimental: if a ship's crew cannot navigate by stars when the instrument fails, the ship is an accident waiting for the right conditions. The guild's casualty statistics are correct. The cost of their institutional resistance is also real.`,
     `The guild of navigators — selected through rigorous examination, carriers of individually calibrated instruments, professional caste going back to the first gap crossings — views the new automated celestial-fix systems as an existential threat to institutional knowledge. Both positions have merit. You are required to have an opinion.`,
     `A navigator's guild delegation has presented an unusual argument: the new position-fixing technology doesn't merely make navigators redundant, it makes navigators who can no longer navigate by hand without it. The guild wants certification requirements that mandate manual navigation alongside any automated system. Their proposal is technically sound and commercially inconvenient.`,
+    `The navigator's guild has submitted its casualty register for your review. Of eleven vessels lost in the outer approaches this decade, nine were operating on automated celestial fix without a certified route-holder aboard. The guild's position: the instrument reads position. The route-holder reads the water. These are not the same reading, and the second cannot be replaced by the first. Your admiralty disagrees. Both have the loss figures.`,
+    `Your guild registry records sixteen active route-holders. Four of them carry the approach routings for outer archipelagos accessible by no other means — counter-swell signatures, cloud-fix bearings, land-smell thresholds that took years of passage to calibrate. When those four retire, or die on passage, those approaches close unless an apprentice has been hull-lying alongside them on every run. The guild is petitioning for mandatory apprenticeship ratios on all outer-approach voyages. The commercial operators object to the cost. The guild objects to what happens when the cost is not paid.`,
+    `A route-holder died on passage last season. The approach routing she carried — the counter-swell signature and star bearing for the outer gap to the southern shelf — existed in no document. Her apprentice was not aboard; the guild's apprenticeship requirement had been waived as commercially inconvenient. The approach is now unverified. Three relay captains are refusing the route until a new survey is run. The survey will take two seasons. The guild is not saying this to win an argument. It is saying this because it has said it before and will say it again.`,
+    `The guild's senior council has presented a formal taxonomy that your admiralty finds inconvenient: there is navigating by instrument, and there is navigating by water. The first requires training that takes months. The second requires hull-lying on hundreds of passages until the body learns what the swell is saying before the mind has processed it. Automated position-fix eliminated the first requirement for most voyages. The guild argues this has caused your captains to forget that the second requirement exists — and that the second requirement is the one that matters in unfamiliar water, at night, when the sky is covered.`,
   ], s);
 }
 
@@ -678,12 +706,26 @@ export function getColonialResistanceText(grievanceLevel, archName, seed) {
 
 export function getColonialResistanceDispatch(archName, grievanceLevel, seed) {
   const s = seed ?? 0;
-  const level = grievanceLevel > 0.7 ? 'HIGH' : grievanceLevel > 0.45 ? 'ELEVATED' : 'MODERATE';
-  return pick([
-    `INTERNAL AFFAIRS — Your holding ${archName}: grievance index ${level}. Your extraction is above the tolerable threshold. Sovereignty recovery rate accelerating against you. Recommend extraction reduction or administrative investment.`,
-    `INTERNAL AFFAIRS — Your holding ${archName}: resistance indicators at ${level}. Non-compliance with your administered extraction quotas. Historical pattern: this precedes formal sovereignty challenges by 2–4 generations.`,
-    `INTERNAL AFFAIRS — Your holding ${archName}: colonial resistance reading ${level}. Your population is demonstrating coordinated withdrawal from administered market participation. Your extraction efficiency is declining despite unchanged rates.`,
-  ], s);
+  const isHigh = grievanceLevel > 0.7;
+  const isMid = grievanceLevel > 0.45;
+  if (isHigh) {
+    return pick([
+      `INTERNAL AFFAIRS — Your holding ${archName}: your extraction offices report active non-compliance across the market districts. Three administrators have requested garrison reinforcement this quarter. The requests were filed independently.`,
+      `INTERNAL AFFAIRS — ${archName} revenue has declined for the third consecutive collection cycle despite unchanged extraction orders. Your local factors attribute this to organised non-participation. They are not using the word refusal, but they mean refusal.`,
+      `INTERNAL AFFAIRS — Coordinated withdrawal from your administered market in ${archName} is now visible to your merchant partners. Two relay captains have rerouted their approach. Your extraction apparatus is present; what it is extracting is contracting.`,
+    ], s);
+  } else if (isMid) {
+    return pick([
+      `INTERNAL AFFAIRS — Your holding ${archName}: passive non-compliance with extraction quotas continues. Payment delays have extended to seasonal timescales. Your administrators report no specific incidents — the population is simply less available than it was.`,
+      `INTERNAL AFFAIRS — ${archName} administered participation is declining at a rate your factors describe as gradual but consistent. No single event accounts for it. Your extraction efficiency is falling without reduction in your extraction orders.`,
+      `INTERNAL AFFAIRS — ${archName}: your compound assessors note a change in the character of interactions with local population. Cooperation is formal where it was previously easy. Your administrators are being answered rather than assisted.`,
+    ], s);
+  } else {
+    return pick([
+      `INTERNAL AFFAIRS — Low-level friction in your holding ${archName}: payment timelines lengthening, minor documentation disputes in the market. Nothing that warrants escalation. Your assessors are noting it for the record.`,
+      `INTERNAL AFFAIRS — ${archName} administered extraction is proceeding within normal parameters. Your assessors note that the character of compliance has changed — technically correct, less engaged. They are filing this as an observation, not an alert.`,
+    ], s);
+  }
 }
 
 // ── Institutional Reform (Acemoglu-Robinson) ─────────────────────────────────
@@ -706,8 +748,8 @@ export function getCulturalFreezeText(partnerName, cultureDist, seed) {
   const s = seed ?? 0;
   const proximity = cultureDist > 0.78 ? 'critical' : 'elevated';
   return pick([
-    `MERCHANT GUILD — Cultural distance to ${partnerName} has reached ${proximity} levels (${(cultureDist * 100).toFixed(0)}% of freeze threshold). Shared institutional frameworks are eroding. Quality standards, contract procedures, and credit instruments are becoming mutually incomprehensible. If distance reaches threshold, trade will cease without active cultural engagement.`,
-    `MERCHANT GUILD — Trade friction with ${partnerName} has increased to ${proximity} levels. Our factors report that ${partnerName} commercial practices and our own have diverged substantially. Without shared norms, price discovery fails. Active cultural outreach is recommended before the circuit closes permanently.`,
-    `MERCHANT GUILD — ${proximity.charAt(0).toUpperCase() + proximity.slice(1)} divergence warning for ${partnerName}. The divergence threshold is near: below it, cultural distance creates friction and cost; above it, trade simply does not happen. Recommend adjusting cultural policy to maintain sufficient overlap for commercial continuity.`,
+    `MERCHANT GUILD — Our factors in ${partnerName} report that contract negotiations are taking longer. Quality arbitration disputes that once resolved in a single session now require two. Credit instruments our counterparties accepted without question last decade are being queried. The commercial relationship is not broken; it is becoming expensive.`,
+    `MERCHANT GUILD — Trade friction with ${partnerName} has reached a level our senior factors describe as material. The divergence is not in price — the price is still right. It is in procedure, in what a fair contract looks like, in what a late shipment means. These are the things you cannot fix by lowering your margin.`,
+    `MERCHANT GUILD — ${partnerName} commercial relationship: our factors report that ${proximity === 'critical' ? 'continued trade on current terms cannot be assumed' : 'the practical basis for trade is narrowing'}. The goods still move; the shared understanding of what moving goods means is eroding. Recommend active cultural outreach before the cost of divergence exceeds the value of the route.`,
   ], s);
 }
