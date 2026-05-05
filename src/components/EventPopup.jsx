@@ -108,7 +108,7 @@ function buildEventDef(type, eventData, names, playerCore) {
         color: '#8a7a3a',
         title: 'Territory Absorbed',
         subtitle: d.name,
-        body: `Your forces have taken ${d.name}. The ${d.name} council has been dissolved. The population — accustomed to its own governance, its own trade relationships, its own institutional habits — now answers to yours. Sovereignty is near zero. What happens next depends on whether you administer or merely extract.`,
+        body: `Your forces have taken ${d.name}. ${d.name}'s governing council has been dissolved. The population — accustomed to its own governance, its own trade relationships, its own institutional habits — now answers to yours. Sovereignty is near zero. What happens next depends on whether you administer or merely extract.`,
         secondary: d.crop
           ? `The territory cultivates ${d.crop}. Its harbor and fisheries will contribute to your energy budget once the initial garrison period ends. Integration will take generations, not turns.`
           : `The territory will resist until it has reason not to. The choice you make now will determine the institutional character of your relationship for centuries.`,

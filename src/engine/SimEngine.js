@@ -315,6 +315,7 @@ export class SimEngine {
     this.fisheryLog = [];
     this.expansionLog = [];
     this.schismLog = [];       // religious schism / fragmentation events
+    this.dispatches = [];      // engine-generated INTERNAL AFFAIRS dispatches (surfaced via snapshot)
     this.dfYear = null;
     this.dfArch = null;
     this.dfDetector = null;

@@ -313,10 +313,14 @@ function gameReducer(state, action) {
       if (eng && action.targetIndex != null) {
         eng.administerMode[action.targetIndex] = action.administer;
       }
+      const _govYear = state.snapshot?.year;
+      const _govYr = _govYear != null
+        ? (_govYear < 0 ? `${Math.abs(_govYear)}BP` : `${_govYear}CE`)
+        : `T${state.snapshot?.tick ?? '?'}`;
       return {
         ...state, pendingPopup: null, timerKey: state.timerKey + 1,
         eventLog: [...state.eventLog, {
-          yearStr: state.snapshot?.year ?? '?',
+          yearStr: _govYr,
           text: action.administer
             ? `INTERNAL AFFAIRS — ${action.name} placed under administered directorate with advisory council. Extraction reduced; institutional integration prioritized.`
             : `INTERNAL AFFAIRS — ${action.name} placed under revenue administration. Extraction rates set at metropolitan standard.`,
@@ -1420,11 +1424,16 @@ function GameInner({ seed, onBack }) {
   const isPlaying = game.phase === 'PLAYING' || game.phase === 'GAME_OVER';
   const timerDuration = game.speed > 0 ? 10000 / game.speed : 10000;
 
+  // Overlay active = help modal or event popup is showing. Used to block
+  // pointer events on the Three.js canvas so it can't swallow modal clicks.
+  const overlayActive = showHelp || !!game.pendingPopup;
+
   return (
     <div style={{
       width: '100%', height: '100vh', background: '#0a0804', color: '#c8a878',
       fontFamily: "'JetBrains Mono','Fira Code',monospace",
       display: 'flex', flexDirection: 'column', overflow: 'hidden',
+      position: 'relative',  // containing block for all absolute overlays
     }}>
       {/* ── App header (slim title bar) ── */}
       <div style={{
@@ -1443,7 +1452,9 @@ function GameInner({ seed, onBack }) {
             background: showHelp ? '#1a1408' : '#14100a', border: `1px solid ${showHelp ? '#6a5430' : '#2a1f14'}`,
             color: showHelp ? '#d4b896' : '#8a7a5a', borderRadius: 2, fontWeight: 600,
           }}>?</button>
-          <button onClick={onBack} style={{
+          <button onClick={() => {
+            if (!isPlaying || window.confirm('Return to Observatory? Your current game will be lost.')) onBack();
+          }} style={{
             padding: '2px 10px', fontSize: 8, fontFamily: 'inherit', cursor: 'pointer',
             background: '#14100a', border: '1px solid #2a1f14', color: '#8a7a5a',
             letterSpacing: '1px', borderRadius: 2,
@@ -1473,7 +1484,8 @@ function GameInner({ seed, onBack }) {
 
         {/* Globe — map primacy */}
         <div style={{ flex: 1, position: 'relative', overflow: 'hidden', minWidth: 0 }}>
-          <div ref={mountRef} style={{ width: '100%', height: '100%', cursor: 'grab' }}
+          <div ref={mountRef} style={{ width: '100%', height: '100%', cursor: 'grab',
+            pointerEvents: overlayActive ? 'none' : 'auto' }}
             onPointerDown={onPointerDown} onPointerMove={onPointerMove}
             onPointerUp={onPointerUp} onPointerLeave={() => { dragData.current.active = false; }}
             onWheel={onWheel}

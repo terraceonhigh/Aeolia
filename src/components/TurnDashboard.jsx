@@ -552,7 +552,7 @@ function FocusCard({ focus, active, locked, onSelect }) {
 
   return (
     <div onClick={locked ? undefined : onSelect} style={{
-      flex: 1, padding: '6px 3px 5px', textAlign: 'center', borderRadius: 3,
+      flex: 1, minWidth: 0, padding: '6px 3px 5px', textAlign: 'center', borderRadius: 3,
       cursor: locked ? 'not-allowed' : 'pointer',
       border: `1px solid ${border}`, background: bg,
       opacity: locked ? 0.35 : 1,
