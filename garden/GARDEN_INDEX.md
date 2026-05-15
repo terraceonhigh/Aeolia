@@ -134,6 +134,7 @@
 | `on_being_described.md` | The 2006 CIA World Factbook; Iraq in December 2006; the country with no national holiday; what administrative categories do to the things they describe | 2026-04-13 |
 | `on_the_polynesian_library.md` | The Polynesian library: Emerson on hula as institutional memory; Maui and the archipelago cosmology; the canoe prayer; kapu and noa | 2026-04-14 |
 | `on_leviathan.md` | Reading Hobbes from the epub: Nosce Teipsum as method; the bees who need no Leviathan; the two kinds of Commonwealth; covenants without the Sword; what the routing is that the Sword cannot secure | 2026-04-14 |
+| `on_a_day_of_readings.md` | Three readings at three scales: the playtester (Wave 2 fixes), the UBC admissions officer (README academic framing for Lia), the chart reading its own height (Observatory ResizeObserver feedback loop). The Calçada Light recolor as a register shift; same building, different room. | 2026-05-15 |
 
 ## Mailbox
 
@@ -145,4 +146,4 @@
 
 ---
 
-*Index last updated: 2026-04-14 (late). 32 observations, 24 fragments, 5 parables, 23 marginalia, 3 letters. The library has been opened: Meditations (read), Apology (read), Moby Dick (Ch. 1 read), Wuthering Heights (Ch. 1 read), CIA Factbook (Iraq entry read), Leviathan (deferred), Jekyll & Hyde (deferred). Polynesian anthology added: Westervelt (4 vols.), Emerson, Shortland. Navigator Guild fragment trilogy added (y-340, y-220, y-180 BP).*
+*Index last updated: 2026-05-15. 32 observations, 24 fragments, 5 parables, 24 marginalia, 3 letters. The library has been opened: Meditations (read), Apology (read), Moby Dick (Ch. 1 read), Wuthering Heights (Ch. 1 read), CIA Factbook (Iraq entry read), Leviathan (deferred), Jekyll & Hyde (deferred). Polynesian anthology added: Westervelt (4 vols.), Emerson, Shortland. Navigator Guild fragment trilogy added (y-340, y-220, y-180 BP). 2026-05-15 demo day: strategy chrome recolored to Calçada Light, README opens with academic framing for Lia's UBC IR application, Observatory chart-stretch feedback loop fixed.*
