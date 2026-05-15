@@ -50,7 +50,7 @@ export default function TurnTimer({ duration, onComplete, paused, finished, size
   }, [duration, paused, finished]);
 
   const dashOffset = CIRCUMFERENCE * (1 - progress);
-  const ringColor = finished ? '#3a2a1a' : paused ? '#4a3a2a' : progress > 0.75 ? '#a07030' : '#8a7a3a';
+  const ringColor = finished ? '#b0aaa0' : paused ? '#aaa399' : progress > 0.75 ? '#a07030' : '#8a7a3a';
   const fontSize = size < 50 ? Math.round(size * 0.22) : size < 60 ? 12 : 16;
 
   return (
@@ -72,7 +72,7 @@ export default function TurnTimer({ duration, onComplete, paused, finished, size
     >
       <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
         <circle cx={size/2} cy={size/2} r={RADIUS}
-          fill="none" stroke="#1a1408" strokeWidth={STROKE} />
+          fill="none" stroke="#cbc3b6" strokeWidth={STROKE} />
         <circle cx={size/2} cy={size/2} r={RADIUS}
           fill="none" stroke={ringColor} strokeWidth={STROKE}
           strokeDasharray={CIRCUMFERENCE}
@@ -88,7 +88,7 @@ export default function TurnTimer({ duration, onComplete, paused, finished, size
       }}>
         <div style={{
           fontSize, fontWeight: 700,
-          color: finished ? '#3a2a1a' : paused ? '#6a5a3a' : '#d4b896',
+          color: finished ? '#b0aaa0' : paused ? '#7a7a76' : '#1a1a1a',
         }}>
           {finished ? '--' : paused ? '||' : secondsLeft}
         </div>
