@@ -18,9 +18,12 @@ import TurnTimer from './TurnTimer.jsx';
 
 const MONO = "'JetBrains Mono','Fira Code',monospace";
 
-// ── Shared palette helpers ───────────────────────────────────
-const BORDER = '1px solid #2a1f14';
-const BG_PANEL = 'linear-gradient(180deg,#100c06,#0a0804)';
+// ── Shared palette helpers (Calçada Light — Portuguese limestone + basalt) ──
+// Bacalhau's calcada theme: bg #ece6dc / fg #2b2b2b / border #c0b9ad.
+// Source colors (admiralty red, merchant gold, internal olive) keep register
+// and read clearly against limestone — that's why the palette ports cleanly.
+const BORDER = '1px solid #c0b9ad';
+const BG_PANEL = 'linear-gradient(180deg,#ece6dc,#e2dbd0)';
 
 // ── National Focus definitions ───────────────────────────────
 
@@ -28,7 +31,7 @@ const FOCUSES = [
   { key: 'expand',   icon: '⚔', label: 'Expand',   color: '#c47830', desc: 'Aggressive growth',     alloc: { expansion: 65, techShare: 20, consolidation: 15 } },
   { key: 'innovate', icon: '◈', label: 'Innovate',  color: '#a09060', desc: 'Research push',          alloc: { expansion: 15, techShare: 65, consolidation: 20 } },
   { key: 'fortify',  icon: '▣', label: 'Fortify',   color: '#7a8a5a', desc: 'Consolidate holdings',   alloc: { expansion: 10, techShare: 20, consolidation: 70 } },
-  { key: 'balanced', icon: '◎', label: 'Balanced',  color: '#9a8a6a', desc: 'Steady all fronts',      alloc: { expansion: 33, techShare: 34, consolidation: 33 } },
+  { key: 'balanced', icon: '◎', label: 'Balanced',  color: '#5a5a58', desc: 'Steady all fronts',      alloc: { expansion: 33, techShare: 34, consolidation: 33 } },
   { key: 'exploit',  icon: '⛏', label: 'Exploit',   color: '#8a6a4a', desc: 'Extract + research',     alloc: { expansion: 40, techShare: 45, consolidation: 15 }, minTech: 5 },
 ];
 
@@ -50,9 +53,9 @@ function SpeedBar({ speed, onSetSpeed }) {
           <button key={s.key} onClick={() => onSetSpeed(s.key)} style={{
             padding: '2px 7px', fontSize: 8, fontFamily: MONO,
             cursor: 'pointer', fontWeight: active ? 700 : 400,
-            background: active ? '#1a1408' : '#0a0804',
-            border: `1px solid ${active ? '#6a5430' : '#2a1f14'}`,
-            color: active ? '#d4b896' : '#6a5a3a',
+            background: active ? '#d6cfc3' : '#d6cfc3',
+            border: `1px solid ${active ? '#8a8478' : '#c0b9ad'}`,
+            color: active ? '#1a1a1a' : '#7a7a76',
             borderRadius: 2, letterSpacing: '0.5px',
           }}>{s.label}</button>
         );
@@ -89,19 +92,19 @@ export function CommandBar({
   const piety = ps?.piety;
   const piLabel = piety === undefined ? null
     : piety >= 0.75 ? 'fervent' : piety >= 0.50 ? 'devout' : piety >= 0.30 ? 'moderate' : 'secular';
-  const piColor = piety === undefined ? '#8a7a5a'
-    : piety >= 0.75 ? '#b8923a' : piety >= 0.50 ? '#9a8a5a' : '#6a5a3a';
+  const piColor = piety === undefined ? '#6a6a66'
+    : piety >= 0.75 ? '#b8923a' : piety >= 0.50 ? '#5a5a58' : '#7a7a76';
 
   const S = {
-    label: { color: '#6a5a3a', fontSize: isMobile ? 5.5 : 7, letterSpacing: '0.5px' },
-    value: { color: '#d4b896', fontSize: isMobile ? 7 : 9, fontWeight: 600 },
-    pipe:  { color: '#3a2a1a', padding: '0 6px', display: isMobile ? 'none' : 'block' },
+    label: { color: '#7a7a76', fontSize: isMobile ? 5.5 : 7, letterSpacing: '0.5px' },
+    value: { color: '#1a1a1a', fontSize: isMobile ? 7 : 9, fontWeight: 600 },
+    pipe:  { color: '#b0aaa0', padding: '0 6px', display: isMobile ? 'none' : 'block' },
   };
 
   return (
     <div style={{
       flexShrink: 0, borderBottom: BORDER,
-      background: 'linear-gradient(180deg,#130f09,#0c0806)',
+      background: 'linear-gradient(180deg,#ece6dc,#e2dbd0)',
       fontFamily: MONO, display: 'flex', alignItems: isMobile ? 'center' : 'stretch',
       height: isMobile ? 'auto' : 52,
       flexWrap: isMobile ? 'wrap' : 'nowrap',
@@ -115,10 +118,10 @@ export function CommandBar({
         justifyContent: 'center', alignItems: isMobile ? 'baseline' : 'flex-start',
         flexShrink: 0, minWidth: isMobile ? 0 : 130, gap: isMobile ? 6 : 0,
       }}>
-        <div style={{ fontSize: isMobile ? 9 : 11, fontWeight: 700, color: '#d4b896', letterSpacing: '1px' }}>
-          T{gameYear}<span style={{ color: '#4a3a2a', fontWeight: 400 }}>/340</span>
+        <div style={{ fontSize: isMobile ? 9 : 11, fontWeight: 700, color: '#1a1a1a', letterSpacing: '1px' }}>
+          T{gameYear}<span style={{ color: '#aaa399', fontWeight: 400 }}>/340</span>
         </div>
-        <div style={{ fontSize: isMobile ? 6 : 7, color: '#7a6a4a', marginTop: isMobile ? 0 : 2, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
+        <div style={{ fontSize: isMobile ? 6 : 7, color: '#7a7a76', marginTop: isMobile ? 0 : 2, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
           {eraName}
         </div>
       </div>
@@ -143,6 +146,14 @@ export function CommandBar({
               : stabScore < 0.45 ? 'Restive' : 'Crisis';
             const stabColor = stabScore < 0.10 ? '#7a8a5a' : stabScore < 0.25 ? '#8a7a2a'
               : stabScore < 0.45 ? '#c47830' : '#a04030';
+
+            // CULTURE color: civic (outward+individual) reads warm gold;
+            // parochial reads neutral; subject (collective+inward) reads rust.
+            // Maps the 3-way label produced by _cultureLabelFromPos.
+            const cultLbl = ps.cultureLabel;
+            const cultColor = cultLbl === 'civic'    ? '#c8a060'
+                            : cultLbl === 'subject'  ? '#9a6a4a'
+                                                     : '#5a5a58';
 
             // Pre-DF nuclear awareness (Twilight Struggle DEFCON analog)
             const nucAw = snapshot?.nuclearAwareness;
@@ -173,26 +184,27 @@ export function CommandBar({
                     : lbl === 'TERR' ? { ...S.value, color: ps.territory <= 1 ? '#a04030' : ps.territory <= 3 ? '#c47830' : S.value.color }
                     : lbl === 'FOOD' ? { ...S.value, color: foodColor }
                     : lbl === 'STABILITY' ? { ...S.value, color: stabColor }
-                    : lbl === 'TRADE' ? { ...S.value, color: ps.tradeIncome > 0 ? '#7a8a5a' : '#5a4a3a' }
+                    : lbl === 'TRADE' ? { ...S.value, color: ps.tradeIncome > 0 ? '#7a8a5a' : '#9a958c' }
+                    : lbl === 'CULTURE' ? { ...S.value, color: cultColor }
                     : lbl === 'TENSION' ? { ...S.value, color: tensionColor }
                     : S.value}>{val}</div>
                   {lbl === 'PIETY' && piety !== undefined && (
-                    <div style={{ width: 40, height: 2, borderRadius: 1, background: '#1a120a', marginTop: 2, overflow: 'hidden' }}>
+                    <div style={{ width: 40, height: 2, borderRadius: 1, background: '#cbc3b6', marginTop: 2, overflow: 'hidden' }}>
                       <div style={{ height: '100%', width: `${Math.min(piety, 1) * 100}%`, background: piColor, transition: 'width 0.3s' }} />
                     </div>
                   )}
                   {lbl === 'FOOD' && (
-                    <div style={{ width: 40, height: 2, borderRadius: 1, background: '#1a120a', marginTop: 2, overflow: 'hidden' }}>
+                    <div style={{ width: 40, height: 2, borderRadius: 1, background: '#cbc3b6', marginTop: 2, overflow: 'hidden' }}>
                       <div style={{ height: '100%', width: `${foodAvg * 100}%`, background: foodColor, transition: 'width 0.3s' }} />
                     </div>
                   )}
                   {lbl === 'STABILITY' && (
-                    <div style={{ width: 40, height: 2, borderRadius: 1, background: '#1a120a', marginTop: 2, overflow: 'hidden' }}>
+                    <div style={{ width: 40, height: 2, borderRadius: 1, background: '#cbc3b6', marginTop: 2, overflow: 'hidden' }}>
                       <div style={{ height: '100%', width: `${Math.min(stabScore / 0.6, 1) * 100}%`, background: stabColor, transition: 'width 0.3s' }} />
                     </div>
                   )}
                   {lbl === 'TENSION' && (
-                    <div style={{ width: 40, height: 2, borderRadius: 1, background: '#1a120a', marginTop: 2, overflow: 'hidden' }}>
+                    <div style={{ width: 40, height: 2, borderRadius: 1, background: '#cbc3b6', marginTop: 2, overflow: 'hidden' }}>
                       <div style={{ height: '100%', width: `${Math.min(tensionPct / 30 * 100, 100)}%`, background: tensionColor, transition: 'width 0.3s' }} />
                     </div>
                   )}
@@ -218,7 +230,7 @@ export function CommandBar({
             {activeFocusDef.label.toUpperCase()}
           </div>
           {alloc && (
-            <div style={{ fontSize: 6, color: '#6a5a3a', marginTop: 1, letterSpacing: '0.5px' }}>
+            <div style={{ fontSize: 6, color: '#7a7a76', marginTop: 1, letterSpacing: '0.5px' }}>
               {alloc.expansion}/{alloc.techShare}/{alloc.consolidation}
             </div>
           )}
@@ -244,22 +256,24 @@ export function CommandBar({
           onClick={onAdvance}
           disabled={finished || timerPaused}
           style={{
-            padding: '6px 14px',
-            fontSize: 8,
+            padding: '6px 12px',
+            fontSize: 7.5,
             fontFamily: "'JetBrains Mono','Fira Code',monospace",
-            fontWeight: 700,
-            letterSpacing: '1.5px',
+            fontWeight: 600,
+            letterSpacing: '1.2px',
             cursor: (finished || timerPaused) ? 'default' : 'pointer',
-            background: (finished || timerPaused) ? '#0e0b07' : '#1a1408',
-            border: `1px solid ${(finished || timerPaused) ? '#2a1a10' : '#5a4a2a'}`,
-            color: (finished || timerPaused) ? '#3a2a1a' : '#c8a060',
+            background: (finished || timerPaused) ? '#dad3c6' : '#dad3c6',
+            border: `1px solid ${(finished || timerPaused) ? '#c0b9ad' : '#b0a99d'}`,
+            color: (finished || timerPaused) ? '#b0aaa0' : '#5a5a48',
             borderRadius: 2,
             transition: 'all 0.15s',
             flexShrink: 0,
+            lineHeight: 1.1,
+            textAlign: 'center',
           }}
-          title={timerPaused ? 'Resolve the current event to continue' : 'Advance to next turn'}
+          title={timerPaused ? 'Resolve the current event to continue' : 'Commit to a 50-year tick'}
         >
-          NEXT TURN
+          ADVANCE<br/><span style={{ fontSize: 6, opacity: 0.75, letterSpacing: '1px' }}>50 YEARS</span>
         </button>
       </div>
     </div>
@@ -299,7 +313,7 @@ export function FeedZone({ eventLog, pendingCards, cardHistory, onApplyCard, isM
   return (
     <div style={{
       flexShrink: 0, borderTop: BORDER,
-      background: 'linear-gradient(0deg,#0c0806,#100c06)',
+      background: 'linear-gradient(0deg,#e2dbd0,#ece6dc)',
       fontFamily: MONO, display: 'flex',
       flexDirection: isMobile ? 'column' : 'row',
       height: isMobile ? 150 : 190,
@@ -312,8 +326,8 @@ export function FeedZone({ eventLog, pendingCards, cardHistory, onApplyCard, isM
         display: 'flex', flexDirection: 'column', overflow: 'hidden',
       }}>
         <div style={{
-          flexShrink: 0, padding: '5px 14px 4px', borderBottom: '1px solid #1a1408',
-          fontSize: 8, color: '#7a6a3a', letterSpacing: '2px', textTransform: 'uppercase',
+          flexShrink: 0, padding: '5px 14px 4px', borderBottom: '1px solid #d6cfc3',
+          fontSize: 8, color: '#7a7a76', letterSpacing: '2px', textTransform: 'uppercase',
           fontWeight: 600, display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}>
           <span>Dispatches</span>
@@ -324,9 +338,9 @@ export function FeedZone({ eventLog, pendingCards, cardHistory, onApplyCard, isM
                 <button key={f.key} onClick={() => setDispatchFilter(f.key)} style={{
                   padding: '1px 4px', fontSize: 6, fontFamily: MONO,
                   cursor: 'pointer', fontWeight: active ? 700 : 400,
-                  background: active ? '#1a1408' : 'transparent',
-                  border: `1px solid ${active ? '#4a3a20' : '#1a1408'}`,
-                  color: active ? '#c8a878' : '#4a3a2a',
+                  background: active ? '#d6cfc3' : 'transparent',
+                  border: `1px solid ${active ? '#a0998d' : '#d6cfc3'}`,
+                  color: active ? '#2b2b2b' : '#aaa399',
                   borderRadius: 2, letterSpacing: '0.3px',
                   textTransform: 'uppercase',
                 }}>
@@ -341,7 +355,7 @@ export function FeedZone({ eventLog, pendingCards, cardHistory, onApplyCard, isM
           display: 'flex', flexDirection: 'column', gap: 5,
         }}>
           {filteredLog.length === 0 && (
-            <div style={{ color: '#4a3a2a', fontStyle: 'italic', fontSize: 8 }}>
+            <div style={{ color: '#aaa399', fontStyle: 'italic', fontSize: 8 }}>
               {dispatchFilter === 'all' ? 'No dispatches yet' : 'No matching dispatches'}
             </div>
           )}
@@ -360,7 +374,7 @@ export function FeedZone({ eventLog, pendingCards, cardHistory, onApplyCard, isM
               'DIPLOMATIC CORPS':       '#6a9a7a',
               'MERCHANT GUILD REPORT':  '#b8923a',
               'YOUR ORDERS':            '#6a8a6a',
-            }[source] || ev.color || '#3a2a1a';
+            }[source] || ev.color || '#b0aaa0';
             return (
               <div key={i} style={{ paddingLeft: 7, borderLeft: `2px solid ${sourceColor}`, flexShrink: 0 }}>
                 <div style={{ display: 'flex', gap: 5, alignItems: 'baseline' }}>
@@ -369,9 +383,9 @@ export function FeedZone({ eventLog, pendingCards, cardHistory, onApplyCard, isM
                       {source}
                     </span>
                   )}
-                  <span style={{ color: '#5a4a3a', fontSize: 7 }}>{ev.yearStr}</span>
+                  <span style={{ color: '#9a958c', fontSize: 7 }}>{ev.yearStr}</span>
                 </div>
-                <div style={{ color: '#a8906a', fontSize: 7.5, lineHeight: 1.45, marginTop: 1 }}>
+                <div style={{ color: '#4a4a48', fontSize: 7.5, lineHeight: 1.45, marginTop: 1 }}>
                   {body}
                 </div>
               </div>
@@ -386,14 +400,14 @@ export function FeedZone({ eventLog, pendingCards, cardHistory, onApplyCard, isM
         display: 'flex', flexDirection: 'column', overflow: 'hidden',
       }}>
         <div style={{
-          flexShrink: 0, padding: '5px 14px 4px', borderBottom: '1px solid #1a1408',
-          fontSize: 8, color: '#7a6a3a', letterSpacing: '2px', textTransform: 'uppercase',
+          flexShrink: 0, padding: '5px 14px 4px', borderBottom: '1px solid #d6cfc3',
+          fontSize: 8, color: '#7a7a76', letterSpacing: '2px', textTransform: 'uppercase',
           fontWeight: 600, display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}>
           <span>
             Situation
             {cardTab === 'active' && pendingCards?.length > 0 && (
-              <span style={{ color: '#6a5a3a', fontWeight: 400, marginLeft: 6, fontSize: 7 }}>
+              <span style={{ color: '#7a7a76', fontWeight: 400, marginLeft: 6, fontSize: 7 }}>
                 {pendingCards.length}
               </span>
             )}
@@ -408,9 +422,9 @@ export function FeedZone({ eventLog, pendingCards, cardHistory, onApplyCard, isM
                 <button key={t.key} onClick={() => setCardTab(t.key)} style={{
                   padding: '1px 5px', fontSize: 6, fontFamily: MONO,
                   cursor: 'pointer', fontWeight: active ? 700 : 400,
-                  background: active ? '#1a1408' : 'transparent',
-                  border: `1px solid ${active ? '#4a3a20' : '#1a1408'}`,
-                  color: active ? '#c8a878' : '#4a3a2a',
+                  background: active ? '#d6cfc3' : 'transparent',
+                  border: `1px solid ${active ? '#a0998d' : '#d6cfc3'}`,
+                  color: active ? '#2b2b2b' : '#aaa399',
                   borderRadius: 2, letterSpacing: '0.3px', textTransform: 'uppercase',
                 }}>
                   {t.label}
@@ -423,50 +437,70 @@ export function FeedZone({ eventLog, pendingCards, cardHistory, onApplyCard, isM
           {cardTab === 'active' && (
             <>
               {(!pendingCards || pendingCards.length === 0) && (
-                <div style={{ color: '#4a3a2a', fontStyle: 'italic', fontSize: 8, padding: '4px 0' }}>
+                <div style={{ color: '#aaa399', fontStyle: 'italic', fontSize: 8, padding: '4px 0' }}>
                   No active situations
                 </div>
               )}
               {pendingCards?.map(card => (
                 <div key={card.id} style={{
                   padding: '7px 9px', borderRadius: 3, flexShrink: 0,
-                  background: '#110d07', border: '1px solid #3a2a14',
+                  background: '#ece6dc', border: '1px solid #b0a99d',
                 }}>
                   <div style={{
-                    fontSize: 8, color: '#d4b896', fontWeight: 700,
+                    fontSize: 8, color: '#1a1a1a', fontWeight: 700,
                     letterSpacing: '0.5px', marginBottom: 4,
                   }}>
                     {card.icon} {card.title}
                   </div>
                   <div style={{
-                    fontSize: 7.5, color: '#907858', lineHeight: 1.5, marginBottom: card.why ? 3 : 6,
+                    fontSize: 7.5, color: '#5a5a58', lineHeight: 1.5, marginBottom: card.why ? 3 : 6,
                   }}>
                     {card.body}
                   </div>
                   {card.why && (
                     <div style={{
-                      fontSize: 6.5, color: '#5a4a3a', fontStyle: 'italic',
+                      fontSize: 6.5, color: '#9a958c', fontStyle: 'italic',
                       lineHeight: 1.4, marginBottom: 5, paddingLeft: 2,
                     }}>
                       {card.why}
                     </div>
                   )}
                   <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                    {card.actions.map((act, i) => (
-                      <button key={i}
-                        onClick={() => onApplyCard?.(card.id, act.action, act.label)}
-                        style={{
-                          padding: '2px 7px', fontSize: 7, fontFamily: MONO,
-                          cursor: 'pointer', fontWeight: 600, letterSpacing: '1px',
-                          background: act.action ? '#1a1408' : '#0e0a06',
-                          border: `1px solid ${act.action ? '#4a3a20' : '#2a1f14'}`,
-                          color: act.action ? '#c8a878' : '#6a5a3a',
-                          borderRadius: 2, textTransform: 'uppercase',
-                        }}
-                      >
-                        {act.label}
-                      </button>
-                    ))}
+                    {card.actions.map((act, i) => {
+                      // Surface mechanical side-effect: SET_FOCUS overrides aren't
+                      // self-evident from a label like "EXPAND FISHERIES" → Exploit focus.
+                      // Annotate the button so the player sees the consequence before clicking.
+                      const focusHint = act.action?.type === 'SET_FOCUS'
+                        ? (FOCUSES.find(f => f.key === act.action.focus) || null)
+                        : null;
+                      return (
+                        <button key={i}
+                          onClick={() => onApplyCard?.(card.id, act.action, act.label)}
+                          title={focusHint ? `Sets National Focus → ${focusHint.label}` : undefined}
+                          style={{
+                            padding: '2px 7px', fontSize: 7, fontFamily: MONO,
+                            cursor: 'pointer', fontWeight: 600, letterSpacing: '1px',
+                            background: act.action ? '#d6cfc3' : '#e2dbd0',
+                            border: `1px solid ${act.action ? '#a0998d' : '#c0b9ad'}`,
+                            color: act.action ? '#2b2b2b' : '#7a7a76',
+                            borderRadius: 2, textTransform: 'uppercase',
+                            display: 'flex', alignItems: 'center', gap: 4,
+                          }}
+                        >
+                          <span>{act.label}</span>
+                          {focusHint && (
+                            <span style={{
+                              fontSize: 5.5, fontWeight: 700, letterSpacing: '0.3px',
+                              color: focusHint.color, opacity: 0.95,
+                              borderLeft: `1px solid ${focusHint.color}55`,
+                              paddingLeft: 4, marginLeft: 1,
+                            }}>
+                              → {focusHint.label.toUpperCase()}
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               ))}
@@ -475,22 +509,22 @@ export function FeedZone({ eventLog, pendingCards, cardHistory, onApplyCard, isM
           {cardTab === 'history' && (
             <>
               {(!cardHistory || cardHistory.length === 0) && (
-                <div style={{ color: '#4a3a2a', fontStyle: 'italic', fontSize: 8, padding: '4px 0' }}>
+                <div style={{ color: '#aaa399', fontStyle: 'italic', fontSize: 8, padding: '4px 0' }}>
                   No card history yet
                 </div>
               )}
               {cardHistory?.slice().reverse().map((h, i) => (
                 <div key={i} style={{
                   padding: '5px 8px', borderRadius: 2, flexShrink: 0,
-                  background: '#0c0906', border: '1px solid #1e1608',
+                  background: '#e2dbd0', border: '1px solid #cbc3b6',
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                    <span style={{ fontSize: 7.5, color: '#a8906a', fontWeight: 600 }}>
+                    <span style={{ fontSize: 7.5, color: '#4a4a48', fontWeight: 600 }}>
                       {h.icon} {h.title}
                     </span>
-                    <span style={{ fontSize: 6, color: '#4a3a2a' }}>{h.yearStr}</span>
+                    <span style={{ fontSize: 6, color: '#aaa399' }}>{h.yearStr}</span>
                   </div>
-                  <div style={{ fontSize: 6.5, color: '#6a5a3a', marginTop: 2 }}>
+                  <div style={{ fontSize: 6.5, color: '#7a7a76', marginTop: 2 }}>
                     → {h.action}
                   </div>
                 </div>
@@ -515,7 +549,7 @@ const S = {
     width: '100%', flexShrink: 0, borderLeft: BORDER,
     background: BG_PANEL,
     fontFamily: MONO,
-    fontSize: 9, color: '#c8a878',
+    fontSize: 9, color: '#2b2b2b',
     display: 'flex', flexDirection: 'column',
     overflowY: 'auto', height: '100%',
   },
@@ -530,12 +564,12 @@ const S = {
     display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3px 10px',
     fontSize: 8, lineHeight: 1.5,
   },
-  statLabel: { color: '#8a7a5a' },
-  statValue: { color: '#d4b896', fontWeight: 600, textAlign: 'right' },
+  statLabel: { color: '#6a6a66' },
+  statValue: { color: '#1a1a1a', fontWeight: 600, textAlign: 'right' },
   targetItem: (selected) => ({
     padding: '5px 8px', marginBottom: 3, borderRadius: 3, cursor: 'pointer',
-    border: `1px solid ${selected ? '#6a5430' : '#2a1f14'}`,
-    background: selected ? '#1a1408' : '#0e0a06',
+    border: `1px solid ${selected ? '#8a8478' : '#c0b9ad'}`,
+    background: selected ? '#d6cfc3' : '#e2dbd0',
     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
   }),
 };
@@ -545,10 +579,10 @@ function FocusCard({ focus, active, locked, onSelect }) {
 
   // Active: inverted — bright parchment text on prominently lit background
   // Inactive: heavily dimmed so active state reads clearly at a glance
-  const bg     = active ? `${focus.color}38` : '#0c0906';
-  const border = active ? focus.color : '#1e1608';
-  const iconC  = active ? '#f0ddb8' : locked ? '#2a1a0a' : '#4a3a2a';
-  const labelC = active ? '#e8d0a8' : locked ? '#2a1a0a' : '#5a4a32';
+  const bg     = active ? `${focus.color}38` : '#e2dbd0';
+  const border = active ? focus.color : '#cbc3b6';
+  const iconC  = active ? '#1a1a1a' : locked ? '#cbc3b6' : '#aaa399';
+  const labelC = active ? '#2b2b2b' : locked ? '#cbc3b6' : '#9a958c';
 
   return (
     <div onClick={locked ? undefined : onSelect} style={{
@@ -571,14 +605,14 @@ function FocusCard({ focus, active, locked, onSelect }) {
       {/* Allocation bar — three segments, bright when active, dimmed when inactive */}
       {alloc && (
         <div style={{ display: 'flex', marginTop: 5, height: active ? 4 : 2, borderRadius: 2, overflow: 'hidden', gap: 1, transition: 'height 0.15s' }}>
-          <div style={{ flex: alloc.expansion,     background: active ? '#c47830' : locked ? '#1e1608' : '#3a2410' }} />
-          <div style={{ flex: alloc.techShare,     background: active ? '#a09060' : locked ? '#1e1608' : '#302818' }} />
-          <div style={{ flex: alloc.consolidation, background: active ? '#7a8a5a' : locked ? '#1e1608' : '#283018' }} />
+          <div style={{ flex: alloc.expansion,     background: active ? '#c47830' : locked ? '#cbc3b6' : '#b0a99d' }} />
+          <div style={{ flex: alloc.techShare,     background: active ? '#a09060' : locked ? '#cbc3b6' : '#b8a96a' }} />
+          <div style={{ flex: alloc.consolidation, background: active ? '#7a8a5a' : locked ? '#cbc3b6' : '#a8b88a' }} />
         </div>
       )}
       {/* Allocation percentages — shown on all cards, not just active */}
       {alloc && !active && !locked && (
-        <div style={{ fontSize: 5, color: '#4a3a2a', marginTop: 2, letterSpacing: '0.3px' }}>
+        <div style={{ fontSize: 5, color: '#aaa399', marginTop: 2, letterSpacing: '0.3px' }}>
           {alloc.expansion}/{alloc.techShare}/{alloc.consolidation}
         </div>
       )}
@@ -595,8 +629,25 @@ function FocusCard({ focus, active, locked, onSelect }) {
 const MINERAL_LABELS = { C: 'naphtha', Pu: 'pyra', Au: 'chrysos', Cu: 'aes' };
 const MINERAL_DISPLAY_KEYS = new Set(['C', 'Pu', 'Au', 'Cu']);
 
+// Render a delta arrow + sign for a per-tick change. Returns null when
+// the change is below the noise floor so arrows don't flicker every turn.
+function DeltaArrow({ delta, threshold = 0.005, invert = false }) {
+  if (delta == null || Math.abs(delta) < threshold) return null;
+  const rising = delta > 0;
+  // For grievance/extraction, rising is bad; for sovereignty, rising is good.
+  // `invert` flips the color sense.
+  const goodDirection = invert ? !rising : rising;
+  const color = goodDirection ? '#5a8a4a' : '#a05030';
+  return (
+    <span style={{ color, fontSize: 6.5, marginLeft: 3, fontWeight: 700 }}>
+      {rising ? '↑' : '↓'}
+    </span>
+  );
+}
+
 function ArchDetailPanel({
   archIdx, names, frontier, snapshot, playerCore, substrate,
+  prevSovereignty, prevGrievance, prevExtractiveness,
   selectedTargets, onToggleTarget,
   rivalCores, onToggleRival, partnerCores, onTogglePartner,
   onClose,
@@ -620,7 +671,7 @@ function ArchDetailPanel({
   const statusColor = isOwned ? '#7a8a5a'
     : isOnFrontier ? '#c47830'
     : ctrl !== undefined ? '#a09060'
-    : '#5a4a3a';
+    : '#9a958c';
 
   // Intelligence gate — only expose details for owned territory or formally-contacted polities.
   // Frontier islands that haven't been contacted yet are "uncharted waters."
@@ -637,13 +688,13 @@ function ArchDetailPanel({
   return (
     <div style={{
       margin: '0 0 6px 0', padding: '8px 10px',
-      background: '#100c06', border: `1px solid ${statusColor}44`,
+      background: '#ece6dc', border: `1px solid ${statusColor}44`,
       borderLeft: `2px solid ${statusColor}`,
       borderRadius: 2, fontFamily: MONO,
     }}>
       {/* Header row */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-        <div style={{ fontSize: 9, fontWeight: 700, color: '#d4b896', letterSpacing: '1px', textTransform: 'uppercase' }}>
+        <div style={{ fontSize: 9, fontWeight: 700, color: '#1a1a1a', letterSpacing: '1px', textTransform: 'uppercase' }}>
           {name}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -651,7 +702,7 @@ function ArchDetailPanel({
             {status}
           </div>
           <button onClick={onClose} style={{
-            background: 'none', border: 'none', color: '#5a4a3a',
+            background: 'none', border: 'none', color: '#9a958c',
             cursor: 'pointer', fontSize: 10, padding: '0 2px', fontFamily: MONO,
           }}>×</button>
         </div>
@@ -659,7 +710,7 @@ function ArchDetailPanel({
 
       {/* Stats row — distance always visible; pop/tech/crop only after formal contact */}
       {(fEntry || isOwned) && (
-        <div style={{ fontSize: 7, color: '#8a7a5a', display: 'flex', gap: 10, marginBottom: 4 }}>
+        <div style={{ fontSize: 7, color: '#6a6a66', display: 'flex', gap: 10, marginBottom: 4 }}>
           {fEntry?.distance !== undefined && <span>dist {fEntry.distance.toFixed(2)}</span>}
           {isContacted && fEntry?.pop !== undefined && <span>pop {(fEntry.pop / 1000).toFixed(1)}k</span>}
           {isContacted && fEntry?.tech !== undefined && <span>tech {fEntry.tech}</span>}
@@ -681,7 +732,7 @@ function ArchDetailPanel({
             ) : null;
           })()}
           {!isContacted && isOnFrontier && (
-            <span style={{ color: '#4a3a24', fontStyle: 'italic' }}>uncharted waters</span>
+            <span style={{ color: '#aaa399', fontStyle: 'italic' }}>uncharted waters</span>
           )}
         </div>
       )}
@@ -692,7 +743,7 @@ function ArchDetailPanel({
           {mineralList.map(m => (
             <div key={m} style={{
               fontSize: 6, padding: '1px 5px', borderRadius: 2,
-              background: '#1a1408', border: '1px solid #3a2a14',
+              background: '#d6cfc3', border: '1px solid #b0a99d',
               color: '#c47830', letterSpacing: '0.5px', textTransform: 'uppercase',
             }}>{m}</div>
           ))}
@@ -711,15 +762,28 @@ function ArchDetailPanel({
         const extColor = ext > 0.5 ? '#a04030' : ext > 0.3 ? '#c47830' : ext > 0.15 ? '#8a7a2a' : '#5a6a4a';
         const sovPct = Math.round(sov * 100);
         const sovColor = sov > 0.65 ? '#5a6a4a' : sov > 0.35 ? '#8a7a2a' : '#c47830';
+        // Per-tick deltas (null when prev snapshot absent — first turn after select)
+        const dGv  = prevGrievance       != null ? gv  - (prevGrievance[archIdx]       ?? gv)  : null;
+        const dExt = prevExtractiveness  != null ? ext - (prevExtractiveness[archIdx]  ?? ext) : null;
+        const dSov = prevSovereignty     != null ? sov - (prevSovereignty[archIdx]     ?? sov) : null;
         return (
-          <div style={{ fontSize: 7, color: '#8a7a5a', marginBottom: 4 }}>
+          <div style={{ fontSize: 7, color: '#6a6a66', marginBottom: 4 }}>
             <div style={{ display: 'flex', gap: 10, marginBottom: 2 }}>
-              <span style={{ color: gvColor }}>grievance {gv.toFixed(2)}</span>
-              <span style={{ color: extColor }}>extraction {ext.toFixed(2)}</span>
+              <span style={{ color: gvColor }}>
+                grievance {gv.toFixed(2)}
+                <DeltaArrow delta={dGv} threshold={0.01} />
+              </span>
+              <span style={{ color: extColor }}>
+                extraction {ext.toFixed(2)}
+                <DeltaArrow delta={dExt} threshold={0.005} />
+              </span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <span style={{ color: sovColor }}>sovereignty {sovPct}%</span>
-              <div style={{ flex: 1, maxWidth: 50, height: 2, borderRadius: 1, background: '#1a120a', overflow: 'hidden' }}>
+              <span style={{ color: sovColor }}>
+                sovereignty {sovPct}%
+                <DeltaArrow delta={dSov} threshold={0.005} invert />
+              </span>
+              <div style={{ flex: 1, maxWidth: 50, height: 2, borderRadius: 1, background: '#cbc3b6', overflow: 'hidden' }}>
                 <div style={{ height: '100%', width: `${sovPct}%`, background: sovColor, transition: 'width 0.3s' }} />
               </div>
             </div>
@@ -732,9 +796,9 @@ function ArchDetailPanel({
         {isOnFrontier && (
           <button onClick={() => onToggleTarget(archIdx)} style={{
             padding: '2px 8px', fontSize: 7, fontFamily: MONO, cursor: 'pointer', borderRadius: 2,
-            background: isTargeted ? '#1a0e04' : '#0a0804',
-            border: `1px solid ${isTargeted ? '#c47830' : '#3a2a14'}`,
-            color: isTargeted ? '#c47830' : '#6a5a3a',
+            background: isTargeted ? '#f0d6c0' : '#d6cfc3',
+            border: `1px solid ${isTargeted ? '#c47830' : '#b0a99d'}`,
+            color: isTargeted ? '#c47830' : '#7a7a76',
             letterSpacing: '0.5px', fontWeight: isTargeted ? 700 : 400,
           }}>{isTargeted ? '⚔ TARGETED' : '⚔ TARGET'}</button>
         )}
@@ -742,16 +806,16 @@ function ArchDetailPanel({
           <>
             <button onClick={() => onToggleRival(ctrl)} style={{
               padding: '2px 8px', fontSize: 7, fontFamily: MONO, cursor: 'pointer', borderRadius: 2,
-              background: isRival ? '#1a0804' : '#0a0804',
-              border: `1px solid ${isRival ? '#a04030' : '#3a2a14'}`,
-              color: isRival ? '#c05040' : '#6a5a3a',
+              background: isRival ? '#ecd6d0' : '#d6cfc3',
+              border: `1px solid ${isRival ? '#a04030' : '#b0a99d'}`,
+              color: isRival ? '#c05040' : '#7a7a76',
               letterSpacing: '0.5px',
             }}>{isRival ? '✕ RIVAL' : 'RIVAL'}</button>
             <button onClick={() => onTogglePartner(ctrl)} style={{
               padding: '2px 8px', fontSize: 7, fontFamily: MONO, cursor: 'pointer', borderRadius: 2,
-              background: isPartner ? '#0a1408' : '#0a0804',
-              border: `1px solid ${isPartner ? '#508040' : '#3a2a14'}`,
-              color: isPartner ? '#70a060' : '#6a5a3a',
+              background: isPartner ? '#dde6d0' : '#d6cfc3',
+              border: `1px solid ${isPartner ? '#508040' : '#b0a99d'}`,
+              color: isPartner ? '#70a060' : '#7a7a76',
               letterSpacing: '0.5px',
             }}>{isPartner ? '✓ PARTNER' : 'PARTNER'}</button>
           </>
@@ -770,7 +834,7 @@ export default function TurnDashboard({
   rivalCores, onToggleRival,
   partnerCores, onTogglePartner,
   culturePolicyCI, culturePolicyIO, onSetCulturePolicy,
-  sovFocusTargets, prevSovereignty, onToggleSovFocus,
+  sovFocusTargets, prevSovereignty, prevGrievance, prevExtractiveness, onToggleSovFocus,
   scoutActive, onToggleScout,
   // Selected arch from globe click (Phase 4)
   selectedArch, onSelectArch,
@@ -806,6 +870,9 @@ export default function TurnDashboard({
             snapshot={snapshot}
             playerCore={playerCore}
             substrate={substrate}
+            prevSovereignty={prevSovereignty}
+            prevGrievance={prevGrievance}
+            prevExtractiveness={prevExtractiveness}
             selectedTargets={selectedTargets}
             onToggleTarget={onToggleTarget}
             rivalCores={rivalCores}
@@ -836,7 +903,7 @@ export default function TurnDashboard({
         {/* Live allocation summary */}
         {alloc && (
           <div style={{
-            marginTop: 7, fontSize: 7, color: '#6a5a3a',
+            marginTop: 7, fontSize: 7, color: '#7a7a76',
             display: 'flex', justifyContent: 'center', gap: 8,
             letterSpacing: '0.5px',
           }}>
@@ -851,13 +918,13 @@ export default function TurnDashboard({
       <div style={S.section}>
         <div style={S.sectionTitle}>
           Expansion Targets
-          <span style={{ fontSize: 6, color: '#6a5a3a', fontWeight: 400, marginLeft: 6 }}>
+          <span style={{ fontSize: 6, color: '#7a7a76', fontWeight: 400, marginLeft: 6 }}>
             {selectedTargets.size} sel.
           </span>
         </div>
         <div style={{ maxHeight: 180, overflowY: 'auto' }}>
           {frontier.length === 0 && (
-            <div style={{ color: '#5a4a3a', fontStyle: 'italic', fontSize: 8, padding: '4px 0' }}>
+            <div style={{ color: '#9a958c', fontStyle: 'italic', fontSize: 8, padding: '4px 0' }}>
               No frontier reachable
             </div>
           )}
@@ -871,12 +938,12 @@ export default function TurnDashboard({
               <div key={f.index} style={S.targetItem(sel)}
                 onClick={() => onToggleTarget(f.index)}>
                 <div>
-                  <div style={{ fontSize: 8, color: sel ? '#d4b896' : '#c8a878', fontWeight: sel ? 600 : 400 }}>
+                  <div style={{ fontSize: 8, color: sel ? '#1a1a1a' : '#2b2b2b', fontWeight: sel ? 600 : 400 }}>
                     {sel ? '[×] ' : '[  ] '}{names[f.index]}
                     {held && <span style={{ color: '#a07030', marginLeft: 4 }}>(held)</span>}
                   </div>
                   {known ? (
-                    <div style={{ fontSize: 7, color: '#6a5a3a', marginTop: 2 }}>
+                    <div style={{ fontSize: 7, color: '#7a7a76', marginTop: 2 }}>
                       p{f.pop} · t{f.tech} · {f.crop}
                       {f.minerals.Cu && ' · Cu'}
                       {f.minerals.Au && ' · Au'}
@@ -889,12 +956,12 @@ export default function TurnDashboard({
                       )}
                     </div>
                   ) : (
-                    <div style={{ fontSize: 7, color: '#4a3a24', marginTop: 2, fontStyle: 'italic' }}>
+                    <div style={{ fontSize: 7, color: '#aaa399', marginTop: 2, fontStyle: 'italic' }}>
                       uncharted waters
                     </div>
                   )}
                 </div>
-                <div style={{ fontSize: 7, color: '#6a5a3a', marginLeft: 6, flexShrink: 0 }}>
+                <div style={{ fontSize: 7, color: '#7a7a76', marginLeft: 6, flexShrink: 0 }}>
                   d={f.distance.toFixed(2)}
                 </div>
               </div>
@@ -921,20 +988,20 @@ export default function TurnDashboard({
                 const cTech = snapshot?.tech?.[cc];
                 const cPop  = snapshot?.polityPops?.[cc];
                 return [
-                  <span key={`l${i}`} style={{ ...S.statLabel, color: '#7a6a4a', fontSize: 7 }}>
+                  <span key={`l${i}`} style={{ ...S.statLabel, color: '#7a7a76', fontSize: 7 }}>
                     {names[cc] || `Nation ${cc}`}
                   </span>,
-                  <span key={`v${i}`} style={{ ...S.statValue, color: '#b8a080', fontSize: 7 }}>
+                  <span key={`v${i}`} style={{ ...S.statValue, color: '#3a3a38', fontSize: 7 }}>
                     t{cTech} p{cPop ? Math.round(cPop / 100) * 100 : '?'}
                   </span>,
                 ];
               }).flat()}
               {contacts.length > 3 && <>
-                <span style={{ ...S.statLabel, color: '#4a3a2a', fontSize: 7 }}>+{contacts.length - 3} more</span>
+                <span style={{ ...S.statLabel, color: '#aaa399', fontSize: 7 }}>+{contacts.length - 3} more</span>
                 <span style={S.statValue} />
               </>}
               <span style={S.statLabel}>Terra incognita</span>
-              <span style={{ ...S.statValue, color: '#4a3a2a' }}>{total - known}</span>
+              <span style={{ ...S.statValue, color: '#aaa399' }}>{total - known}</span>
             </div>
           );
         })()}
@@ -954,20 +1021,20 @@ export default function TurnDashboard({
               const playerTech = snapshot?.playerStats?.tech ?? 0;
               const techDelta = ccTech - playerTech;
               const techStr = Math.abs(techDelta) < 0.1 ? '=' : (techDelta > 0 ? `+${techDelta.toFixed(1)}` : techDelta.toFixed(1));
-              const techColor = techDelta > 1 ? '#a04030' : techDelta > 0 ? '#c47830' : techDelta < -1 ? '#5a6a4a' : '#6a5a3a';
+              const techColor = techDelta > 1 ? '#a04030' : techDelta > 0 ? '#c47830' : techDelta < -1 ? '#5a6a4a' : '#7a7a76';
               // Walt alignment (post-DF only)
               const alVal = snapshot?.alignment?.[cc] ?? 0;
               const postDF = !!snapshot?.dfYear;
               return (
                 <div key={cc} style={{
                   padding: '3px 6px', marginBottom: 2, borderRadius: 2,
-                  background: isRival ? '#1a0808' : isPartner ? '#0a1408' : '#0e0a06',
-                  border: `1px solid ${isRival ? '#4a2020' : isPartner ? '#2a4a20' : '#1a1408'}`,
+                  background: isRival ? '#ecd6d0' : isPartner ? '#dde6d0' : '#e2dbd0',
+                  border: `1px solid ${isRival ? '#4a2020' : isPartner ? '#2a4a20' : '#d6cfc3'}`,
                   display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                    <span style={{ fontSize: 7.5, color: '#c8a878' }}>{names[cc] || `Nation ${cc}`}</span>
-                    <div style={{ fontSize: 6, color: '#5a4a3a', display: 'flex', gap: 6 }}>
+                    <span style={{ fontSize: 7.5, color: '#2b2b2b' }}>{names[cc] || `Nation ${cc}`}</span>
+                    <div style={{ fontSize: 6, color: '#9a958c', display: 'flex', gap: 6 }}>
                       <span style={{ color: techColor }}>tech {techStr}</span>
                       {postDF && Math.abs(alVal) > 0.05 && (
                         <span style={{ color: alVal > 0 ? '#6a7a9a' : '#9a6a6a' }}>
@@ -978,15 +1045,15 @@ export default function TurnDashboard({
                   </div>
                   <div style={{ display: 'flex', gap: 2 }}>
                     {[
-                      { fn: onToggleRival,   active: isRival,   icon: '⚔', activeClr: '#c06040', activeBg: '#3a1010', activeBdr: '#6a3030', title: 'Rival' },
-                      { fn: onTogglePartner, active: isPartner, icon: '◆', activeClr: '#80c060', activeBg: '#0a1a08', activeBdr: '#3a6a30', title: 'Partner' },
-                      { fn: onToggleEmbargo, active: isEmbargo, icon: '✕', activeClr: '#c0a040', activeBg: '#1a1000', activeBdr: '#6a5020', title: 'Embargo' },
+                      { fn: onToggleRival,   active: isRival,   icon: '⚔', activeClr: '#c06040', activeBg: '#e8c8c0', activeBdr: '#6a3030', title: 'Rival' },
+                      { fn: onTogglePartner, active: isPartner, icon: '◆', activeClr: '#80c060', activeBg: '#d6e6cc', activeBdr: '#3a6a30', title: 'Partner' },
+                      { fn: onToggleEmbargo, active: isEmbargo, icon: '✕', activeClr: '#c0a040', activeBg: '#ece2c8', activeBdr: '#6a5020', title: 'Embargo' },
                     ].map(({ fn, active, icon, activeClr, activeBg, activeBdr, title }) => (
                       <button key={title} onClick={() => fn?.(cc)} title={title} style={{
                         padding: '1px 5px', fontSize: 7, fontFamily: MONO, cursor: 'pointer',
-                        background: active ? activeBg : '#0a0804',
-                        border: `1px solid ${active ? activeBdr : '#2a1f14'}`,
-                        color: active ? activeClr : '#6a5a3a', borderRadius: 2,
+                        background: active ? activeBg : '#d6cfc3',
+                        border: `1px solid ${active ? activeBdr : '#c0b9ad'}`,
+                        color: active ? activeClr : '#7a7a76', borderRadius: 2,
                       }}>{icon}</button>
                     ))}
                   </div>
@@ -994,7 +1061,7 @@ export default function TurnDashboard({
               );
             })}
           </div>
-          <div style={{ fontSize: 6, color: '#3a2a1a', marginTop: 3 }}>
+          <div style={{ fontSize: 6, color: '#b0aaa0', marginTop: 3 }}>
             ⚔ rival (+2.0 targeting) · ◆ partner (+30% trade, -3.0 targeting) · ✕ embargo (blocks trade)
           </div>
         </div>
@@ -1004,7 +1071,7 @@ export default function TurnDashboard({
       <div style={S.section}>
         <div style={S.sectionTitle}>
           Cultural Policy
-          <span style={{ fontSize: 6, color: '#6a5a3a', fontWeight: 400, marginLeft: 6 }}>
+          <span style={{ fontSize: 6, color: '#7a7a76', fontWeight: 400, marginLeft: 6 }}>
             {ps?.cultureLabel || '—'}
           </span>
         </div>
@@ -1017,14 +1084,14 @@ export default function TurnDashboard({
           ].map(({ label, key, val, hint }) => (
             <div key={key}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                <span style={{ fontSize: 6, color: '#6a5a3a', width: 42 }}>{label[0]}</span>
+                <span style={{ fontSize: 6, color: '#7a7a76', width: 42 }}>{label[0]}</span>
                 <input type="range" min={-100} max={100}
                   value={Math.round((val || 0) * 100)}
                   onChange={e => onSetCulturePolicy?.(key, Number(e.target.value) / 100)}
-                  style={{ flex: 1, accentColor: '#8a7a5a' }} />
-                <span style={{ fontSize: 6, color: '#6a5a3a', width: 42, textAlign: 'right' }}>{label[1]}</span>
+                  style={{ flex: 1, accentColor: '#6a6a66' }} />
+                <span style={{ fontSize: 6, color: '#7a7a76', width: 42, textAlign: 'right' }}>{label[1]}</span>
               </div>
-              <div style={{ fontSize: 5.5, color: '#4a3a2a', marginTop: 2, lineHeight: 1.4, paddingLeft: 2 }}>
+              <div style={{ fontSize: 5.5, color: '#aaa399', marginTop: 2, lineHeight: 1.4, paddingLeft: 2 }}>
                 {hint}
               </div>
             </div>
@@ -1038,9 +1105,9 @@ export default function TurnDashboard({
           <div style={S.sectionTitle}>Operations</div>
           <button onClick={() => onToggleScout?.()} style={{
             padding: '2px 7px', fontSize: 7, fontFamily: MONO, cursor: 'pointer',
-            background: scoutActive ? '#1a1408' : '#0a0804',
-            border: `1px solid ${scoutActive ? '#6a5430' : '#2a1f14'}`,
-            color: scoutActive ? '#d4b896' : '#6a5a3a', borderRadius: 2,
+            background: scoutActive ? '#d6cfc3' : '#d6cfc3',
+            border: `1px solid ${scoutActive ? '#8a8478' : '#c0b9ad'}`,
+            color: scoutActive ? '#1a1a1a' : '#7a7a76', borderRadius: 2,
             fontWeight: scoutActive ? 600 : 400,
           }}>
             {scoutActive ? '◉ SCOUTING (−35% exp)' : '○ Scout'}
@@ -1048,7 +1115,7 @@ export default function TurnDashboard({
         </div>
         {ownedArchs.length > 1 && (
           <>
-            <div style={{ fontSize: 6, color: '#6a5a3a', marginBottom: 3, letterSpacing: '1px', textTransform: 'uppercase' }}>
+            <div style={{ fontSize: 6, color: '#7a7a76', marginBottom: 3, letterSpacing: '1px', textTransform: 'uppercase' }}>
               Sovereignty Focus
             </div>
             <div style={{ maxHeight: 90, overflowY: 'auto' }}>
@@ -1062,11 +1129,11 @@ export default function TurnDashboard({
                 return (
                   <div key={i} onClick={() => onToggleSovFocus?.(i)} style={{
                     padding: '2px 5px', marginBottom: 1, cursor: 'pointer', borderRadius: 2,
-                    background: focused ? '#14100a' : '#0e0a06',
-                    border: `1px solid ${focused ? '#4a3a20' : '#1a1408'}`,
+                    background: focused ? '#d6cfc3' : '#e2dbd0',
+                    border: `1px solid ${focused ? '#a0998d' : '#d6cfc3'}`,
                     display: 'flex', justifyContent: 'space-between', fontSize: 7.5,
                   }}>
-                    <span style={{ color: focused ? '#d4b896' : '#8a7a5a' }}>
+                    <span style={{ color: focused ? '#1a1a1a' : '#6a6a66' }}>
                       {focused ? '▣ ' : '□ '}{names[i]}
                     </span>
                     <span>

@@ -126,6 +126,8 @@ const INITIAL_STATE = {
   cardHistory: [],
   // Previous tick sovereignty (for delta arrows in TurnDashboard)
   prevSovereignty: null,
+  prevGrievance: null,
+  prevExtractiveness: null,
   // Terminal report dismissed (player chose Play Again or Main Menu)
   showReignSummary: false,
 };
@@ -462,14 +464,14 @@ function gameReducer(state, action) {
             newEvents.push({
               yearStr,
               text: `CARTOGRAPHIC SURVEY — Distant reports suggest military action near ${action.names[ev.target]}.`,
-              color: '#3a2a1a',
+              color: '#b0aaa0',
             });
           } else {
             const proxyTag = ev.isProxy ? 'The conflict bears hallmarks of great-power competition. ' : '';
             newEvents.push({
               yearStr,
               text: `ADMIRALTY INTELLIGENCE — ${action.names[ev.core]} has absorbed ${action.names[ev.target]}. ${proxyTag}`,
-              color: ev.isProxy ? '#8a3a4a' : '#6a5a3a',
+              color: ev.isProxy ? '#8a3a4a' : '#7a7a76',
             });
           }
         }
@@ -759,7 +761,7 @@ function gameReducer(state, action) {
           newEvents.push({
             yearStr: yearStr2,
             text: getReligiousRevivalDispatch(polityName, pp, tickN),
-            color: '#7a6a3a',
+            color: '#7a7a76',
           });
         }
       }
@@ -801,7 +803,7 @@ function gameReducer(state, action) {
         newEvents.push({
           yearStr: `Y${turnNumber}`,
           text: 'INTERNAL AFFAIRS — Population surveys confirm stable yields across all home islands. Administrative scribes note increased movement between archipelago settlements.',
-          color: '#6a5a3a',
+          color: '#7a7a76',
         });
       }
 
@@ -874,6 +876,8 @@ function gameReducer(state, action) {
         lastContactPopupTick: newLastContactTick,
         lastAbsorptionPopupTick: newLastAbsorptionTick,
         prevSovereignty: state.snapshot?.sovereignty || null,
+        prevGrievance: state.snapshot?.grievance || null,
+        prevExtractiveness: state.snapshot?.extractiveness || null,
         malariaUnlocked: newMalariaUnlocked,
         religiousRevivalShown: newReligiousRevivalShown,
         // If no culture card was generated this tick (card condition didn't fire),
@@ -915,12 +919,12 @@ function HelpOverlay({ onClose }) {
   return (
     <div style={{
       position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-      background: 'rgba(10,8,4,0.92)', zIndex: 18,
+      background: 'rgba(43,43,43,0.55)', zIndex: 18,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }} onClick={onClose}>
       <div style={{
         width: '90%', maxWidth: 620, maxHeight: '85vh', overflowY: 'auto',
-        background: '#0e0a06', border: '1px solid #4a3a2a', borderRadius: 6,
+        background: '#e2dbd0', border: '1px solid #aaa399', borderRadius: 6,
         fontFamily: "'JetBrains Mono','Fira Code',monospace",
         padding: '20px 24px',
       }} onClick={e => e.stopPropagation()}>
@@ -933,12 +937,12 @@ function HelpOverlay({ onClose }) {
         {HELP_SECTIONS.map((s, i) => (
           <div key={i} style={{ marginBottom: 14 }}>
             <div style={{
-              fontSize: 8, fontWeight: 700, color: '#d4b896', letterSpacing: '1.5px',
+              fontSize: 8, fontWeight: 700, color: '#1a1a1a', letterSpacing: '1.5px',
               textTransform: 'uppercase', marginBottom: 4,
             }}>
               {s.title}
             </div>
-            <div style={{ fontSize: 8, color: '#a8906a', lineHeight: 1.7 }}>
+            <div style={{ fontSize: 8, color: '#4a4a48', lineHeight: 1.7 }}>
               {s.body}
             </div>
           </div>
@@ -947,8 +951,8 @@ function HelpOverlay({ onClose }) {
           <button onClick={onClose} style={{
             padding: '6px 24px', fontSize: 9, fontFamily: 'inherit',
             cursor: 'pointer', fontWeight: 600, letterSpacing: '1.5px',
-            background: '#1a1408', border: '1px solid #4a3a2a',
-            color: '#d4b896', borderRadius: 3, textTransform: 'uppercase',
+            background: '#d6cfc3', border: '1px solid #aaa399',
+            color: '#1a1a1a', borderRadius: 3, textTransform: 'uppercase',
           }}>
             Continue
           </button>
@@ -1008,7 +1012,7 @@ function GameInner({ seed, onBack }) {
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(w, h);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setClearColor(0x0a0804); // dark umber void
+    renderer.setClearColor(0xece6dc); // Calçada limestone — matches UI chrome
     el.appendChild(renderer.domElement);
 
     const ambLight = new THREE.AmbientLight(0x998866, 0.5); // warm sepia ambient
@@ -1077,7 +1081,7 @@ function GameInner({ seed, onBack }) {
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.strokeStyle = 'rgba(10,8,4,0.8)'; ctx.lineWidth = 3;
       ctx.strokeText(names[i], 128, 32);
-      ctx.fillStyle = '#c8a878'; // parchment gold text
+      ctx.fillStyle = '#2b2b2b'; // parchment gold text
       ctx.fillText(names[i], 128, 32);
 
       const tex = new THREE.CanvasTexture(canvas);
@@ -1422,30 +1426,30 @@ function GameInner({ seed, onBack }) {
 
   return (
     <div style={{
-      width: '100%', height: '100vh', background: '#0a0804', color: '#c8a878',
+      width: '100%', height: '100vh', background: '#d6cfc3', color: '#2b2b2b',
       fontFamily: "'JetBrains Mono','Fira Code',monospace",
       display: 'flex', flexDirection: 'column', overflow: 'hidden',
     }}>
       {/* ── App header (slim title bar) ── */}
       <div style={{
-        padding: '5px 16px', borderBottom: '1px solid #2a1f14', flexShrink: 0,
+        padding: '5px 16px', borderBottom: '1px solid #c0b9ad', flexShrink: 0,
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        background: 'linear-gradient(180deg,#120e08,#0a0804)',
+        background: 'linear-gradient(180deg,#e2dbd0,#d6cfc3)',
         height: 32,
       }}>
-        <div style={{ fontSize: 11, color: '#d4b896', fontWeight: 600, letterSpacing: '2px' }}>
+        <div style={{ fontSize: 11, color: '#1a1a1a', fontWeight: 600, letterSpacing: '2px' }}>
           AEOLIA
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ fontSize: 8, color: '#4a3a2a', letterSpacing: '1px' }}>seed {seed}</div>
+          <div style={{ fontSize: 8, color: '#aaa399', letterSpacing: '1px' }}>seed {seed}</div>
           <button onClick={() => setShowHelp(h => !h)} style={{
             padding: '2px 8px', fontSize: 9, fontFamily: 'inherit', cursor: 'pointer',
-            background: showHelp ? '#1a1408' : '#14100a', border: `1px solid ${showHelp ? '#6a5430' : '#2a1f14'}`,
-            color: showHelp ? '#d4b896' : '#8a7a5a', borderRadius: 2, fontWeight: 600,
+            background: showHelp ? '#d6cfc3' : '#d6cfc3', border: `1px solid ${showHelp ? '#8a8478' : '#c0b9ad'}`,
+            color: showHelp ? '#1a1a1a' : '#6a6a66', borderRadius: 2, fontWeight: 600,
           }}>?</button>
           <button onClick={onBack} style={{
             padding: '2px 10px', fontSize: 8, fontFamily: 'inherit', cursor: 'pointer',
-            background: '#14100a', border: '1px solid #2a1f14', color: '#8a7a5a',
+            background: '#d6cfc3', border: '1px solid #c0b9ad', color: '#6a6a66',
             letterSpacing: '1px', borderRadius: 2,
           }}>Observatory</button>
         </div>
@@ -1493,9 +1497,9 @@ function GameInner({ seed, onBack }) {
               position: 'absolute', bottom: 8, right: 8, zIndex: 5,
               padding: '6px 12px', fontSize: 8, fontFamily: "'JetBrains Mono',monospace",
               cursor: 'pointer', fontWeight: 700, letterSpacing: '1px',
-              background: showPanel ? '#1a1408' : 'rgba(10,8,4,0.85)',
-              border: `1px solid ${showPanel ? '#6a5430' : '#3a2a1a'}`,
-              color: showPanel ? '#d4b896' : '#8a7a5a', borderRadius: 3,
+              background: showPanel ? '#d6cfc3' : 'rgba(43,43,43,0.4)',
+              border: `1px solid ${showPanel ? '#8a8478' : '#b0aaa0'}`,
+              color: showPanel ? '#1a1a1a' : '#6a6a66', borderRadius: 3,
             }}>{showPanel ? '✕ CLOSE' : '☰ PANEL'}</button>
           )}
         </div>
@@ -1526,6 +1530,8 @@ function GameInner({ seed, onBack }) {
               onSetCulturePolicy={handleSetCulturePolicy}
               sovFocusTargets={game.sovFocusTargets}
               prevSovereignty={game.prevSovereignty}
+              prevGrievance={game.prevGrievance}
+              prevExtractiveness={game.prevExtractiveness}
               onToggleSovFocus={handleToggleSovFocus}
               scoutActive={game.scoutActive}
               onToggleScout={handleToggleScout}
