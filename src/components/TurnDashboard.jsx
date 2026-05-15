@@ -144,6 +144,14 @@ export function CommandBar({
             const stabColor = stabScore < 0.10 ? '#7a8a5a' : stabScore < 0.25 ? '#8a7a2a'
               : stabScore < 0.45 ? '#c47830' : '#a04030';
 
+            // CULTURE color: civic (outward+individual) reads warm gold;
+            // parochial reads neutral; subject (collective+inward) reads rust.
+            // Maps the 3-way label produced by _cultureLabelFromPos.
+            const cultLbl = ps.cultureLabel;
+            const cultColor = cultLbl === 'civic'    ? '#c8a060'
+                            : cultLbl === 'subject'  ? '#9a6a4a'
+                                                     : '#9a8a6a';
+
             // Pre-DF nuclear awareness (Twilight Struggle DEFCON analog)
             const nucAw = snapshot?.nuclearAwareness;
             const showTension = nucAw !== null && nucAw !== undefined;
@@ -174,6 +182,7 @@ export function CommandBar({
                     : lbl === 'FOOD' ? { ...S.value, color: foodColor }
                     : lbl === 'STABILITY' ? { ...S.value, color: stabColor }
                     : lbl === 'TRADE' ? { ...S.value, color: ps.tradeIncome > 0 ? '#7a8a5a' : '#5a4a3a' }
+                    : lbl === 'CULTURE' ? { ...S.value, color: cultColor }
                     : lbl === 'TENSION' ? { ...S.value, color: tensionColor }
                     : S.value}>{val}</div>
                   {lbl === 'PIETY' && piety !== undefined && (
@@ -244,22 +253,24 @@ export function CommandBar({
           onClick={onAdvance}
           disabled={finished || timerPaused}
           style={{
-            padding: '6px 14px',
-            fontSize: 8,
+            padding: '6px 12px',
+            fontSize: 7.5,
             fontFamily: "'JetBrains Mono','Fira Code',monospace",
-            fontWeight: 700,
-            letterSpacing: '1.5px',
+            fontWeight: 600,
+            letterSpacing: '1.2px',
             cursor: (finished || timerPaused) ? 'default' : 'pointer',
-            background: (finished || timerPaused) ? '#0e0b07' : '#1a1408',
-            border: `1px solid ${(finished || timerPaused) ? '#2a1a10' : '#5a4a2a'}`,
-            color: (finished || timerPaused) ? '#3a2a1a' : '#c8a060',
+            background: (finished || timerPaused) ? '#0e0b07' : '#140f08',
+            border: `1px solid ${(finished || timerPaused) ? '#2a1a10' : '#3a2c18'}`,
+            color: (finished || timerPaused) ? '#3a2a1a' : '#8a7a4a',
             borderRadius: 2,
             transition: 'all 0.15s',
             flexShrink: 0,
+            lineHeight: 1.1,
+            textAlign: 'center',
           }}
-          title={timerPaused ? 'Resolve the current event to continue' : 'Advance to next turn'}
+          title={timerPaused ? 'Resolve the current event to continue' : 'Commit to a 50-year tick'}
         >
-          NEXT TURN
+          ADVANCE<br/><span style={{ fontSize: 6, opacity: 0.75, letterSpacing: '1px' }}>50 YEARS</span>
         </button>
       </div>
     </div>
@@ -452,21 +463,41 @@ export function FeedZone({ eventLog, pendingCards, cardHistory, onApplyCard, isM
                     </div>
                   )}
                   <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                    {card.actions.map((act, i) => (
-                      <button key={i}
-                        onClick={() => onApplyCard?.(card.id, act.action, act.label)}
-                        style={{
-                          padding: '2px 7px', fontSize: 7, fontFamily: MONO,
-                          cursor: 'pointer', fontWeight: 600, letterSpacing: '1px',
-                          background: act.action ? '#1a1408' : '#0e0a06',
-                          border: `1px solid ${act.action ? '#4a3a20' : '#2a1f14'}`,
-                          color: act.action ? '#c8a878' : '#6a5a3a',
-                          borderRadius: 2, textTransform: 'uppercase',
-                        }}
-                      >
-                        {act.label}
-                      </button>
-                    ))}
+                    {card.actions.map((act, i) => {
+                      // Surface mechanical side-effect: SET_FOCUS overrides aren't
+                      // self-evident from a label like "EXPAND FISHERIES" → Exploit focus.
+                      // Annotate the button so the player sees the consequence before clicking.
+                      const focusHint = act.action?.type === 'SET_FOCUS'
+                        ? (FOCUSES.find(f => f.key === act.action.focus) || null)
+                        : null;
+                      return (
+                        <button key={i}
+                          onClick={() => onApplyCard?.(card.id, act.action, act.label)}
+                          title={focusHint ? `Sets National Focus → ${focusHint.label}` : undefined}
+                          style={{
+                            padding: '2px 7px', fontSize: 7, fontFamily: MONO,
+                            cursor: 'pointer', fontWeight: 600, letterSpacing: '1px',
+                            background: act.action ? '#1a1408' : '#0e0a06',
+                            border: `1px solid ${act.action ? '#4a3a20' : '#2a1f14'}`,
+                            color: act.action ? '#c8a878' : '#6a5a3a',
+                            borderRadius: 2, textTransform: 'uppercase',
+                            display: 'flex', alignItems: 'center', gap: 4,
+                          }}
+                        >
+                          <span>{act.label}</span>
+                          {focusHint && (
+                            <span style={{
+                              fontSize: 5.5, fontWeight: 700, letterSpacing: '0.3px',
+                              color: focusHint.color, opacity: 0.95,
+                              borderLeft: `1px solid ${focusHint.color}55`,
+                              paddingLeft: 4, marginLeft: 1,
+                            }}>
+                              → {focusHint.label.toUpperCase()}
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               ))}
@@ -595,8 +626,25 @@ function FocusCard({ focus, active, locked, onSelect }) {
 const MINERAL_LABELS = { C: 'naphtha', Pu: 'pyra', Au: 'chrysos', Cu: 'aes' };
 const MINERAL_DISPLAY_KEYS = new Set(['C', 'Pu', 'Au', 'Cu']);
 
+// Render a delta arrow + sign for a per-tick change. Returns null when
+// the change is below the noise floor so arrows don't flicker every turn.
+function DeltaArrow({ delta, threshold = 0.005, invert = false }) {
+  if (delta == null || Math.abs(delta) < threshold) return null;
+  const rising = delta > 0;
+  // For grievance/extraction, rising is bad; for sovereignty, rising is good.
+  // `invert` flips the color sense.
+  const goodDirection = invert ? !rising : rising;
+  const color = goodDirection ? '#5a8a4a' : '#a05030';
+  return (
+    <span style={{ color, fontSize: 6.5, marginLeft: 3, fontWeight: 700 }}>
+      {rising ? '↑' : '↓'}
+    </span>
+  );
+}
+
 function ArchDetailPanel({
   archIdx, names, frontier, snapshot, playerCore, substrate,
+  prevSovereignty, prevGrievance, prevExtractiveness,
   selectedTargets, onToggleTarget,
   rivalCores, onToggleRival, partnerCores, onTogglePartner,
   onClose,
@@ -711,14 +759,27 @@ function ArchDetailPanel({
         const extColor = ext > 0.5 ? '#a04030' : ext > 0.3 ? '#c47830' : ext > 0.15 ? '#8a7a2a' : '#5a6a4a';
         const sovPct = Math.round(sov * 100);
         const sovColor = sov > 0.65 ? '#5a6a4a' : sov > 0.35 ? '#8a7a2a' : '#c47830';
+        // Per-tick deltas (null when prev snapshot absent — first turn after select)
+        const dGv  = prevGrievance       != null ? gv  - (prevGrievance[archIdx]       ?? gv)  : null;
+        const dExt = prevExtractiveness  != null ? ext - (prevExtractiveness[archIdx]  ?? ext) : null;
+        const dSov = prevSovereignty     != null ? sov - (prevSovereignty[archIdx]     ?? sov) : null;
         return (
           <div style={{ fontSize: 7, color: '#8a7a5a', marginBottom: 4 }}>
             <div style={{ display: 'flex', gap: 10, marginBottom: 2 }}>
-              <span style={{ color: gvColor }}>grievance {gv.toFixed(2)}</span>
-              <span style={{ color: extColor }}>extraction {ext.toFixed(2)}</span>
+              <span style={{ color: gvColor }}>
+                grievance {gv.toFixed(2)}
+                <DeltaArrow delta={dGv} threshold={0.01} />
+              </span>
+              <span style={{ color: extColor }}>
+                extraction {ext.toFixed(2)}
+                <DeltaArrow delta={dExt} threshold={0.005} />
+              </span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <span style={{ color: sovColor }}>sovereignty {sovPct}%</span>
+              <span style={{ color: sovColor }}>
+                sovereignty {sovPct}%
+                <DeltaArrow delta={dSov} threshold={0.005} invert />
+              </span>
               <div style={{ flex: 1, maxWidth: 50, height: 2, borderRadius: 1, background: '#1a120a', overflow: 'hidden' }}>
                 <div style={{ height: '100%', width: `${sovPct}%`, background: sovColor, transition: 'width 0.3s' }} />
               </div>
@@ -770,7 +831,7 @@ export default function TurnDashboard({
   rivalCores, onToggleRival,
   partnerCores, onTogglePartner,
   culturePolicyCI, culturePolicyIO, onSetCulturePolicy,
-  sovFocusTargets, prevSovereignty, onToggleSovFocus,
+  sovFocusTargets, prevSovereignty, prevGrievance, prevExtractiveness, onToggleSovFocus,
   scoutActive, onToggleScout,
   // Selected arch from globe click (Phase 4)
   selectedArch, onSelectArch,
@@ -806,6 +867,9 @@ export default function TurnDashboard({
             snapshot={snapshot}
             playerCore={playerCore}
             substrate={substrate}
+            prevSovereignty={prevSovereignty}
+            prevGrievance={prevGrievance}
+            prevExtractiveness={prevExtractiveness}
             selectedTargets={selectedTargets}
             onToggleTarget={onToggleTarget}
             rivalCores={rivalCores}

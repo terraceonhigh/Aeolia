@@ -126,6 +126,8 @@ const INITIAL_STATE = {
   cardHistory: [],
   // Previous tick sovereignty (for delta arrows in TurnDashboard)
   prevSovereignty: null,
+  prevGrievance: null,
+  prevExtractiveness: null,
   // Terminal report dismissed (player chose Play Again or Main Menu)
   showReignSummary: false,
 };
@@ -874,6 +876,8 @@ function gameReducer(state, action) {
         lastContactPopupTick: newLastContactTick,
         lastAbsorptionPopupTick: newLastAbsorptionTick,
         prevSovereignty: state.snapshot?.sovereignty || null,
+        prevGrievance: state.snapshot?.grievance || null,
+        prevExtractiveness: state.snapshot?.extractiveness || null,
         malariaUnlocked: newMalariaUnlocked,
         religiousRevivalShown: newReligiousRevivalShown,
         // If no culture card was generated this tick (card condition didn't fire),
@@ -1526,6 +1530,8 @@ function GameInner({ seed, onBack }) {
               onSetCulturePolicy={handleSetCulturePolicy}
               sovFocusTargets={game.sovFocusTargets}
               prevSovereignty={game.prevSovereignty}
+              prevGrievance={game.prevGrievance}
+              prevExtractiveness={game.prevExtractiveness}
               onToggleSovFocus={handleToggleSovFocus}
               scoutActive={game.scoutActive}
               onToggleScout={handleToggleScout}
