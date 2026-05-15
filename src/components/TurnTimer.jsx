@@ -51,7 +51,7 @@ export default function TurnTimer({ duration, onComplete, paused, finished, size
 
   const dashOffset = CIRCUMFERENCE * (1 - progress);
   const ringColor = finished ? '#b0aaa0' : paused ? '#aaa399' : progress > 0.75 ? '#a07030' : '#8a7a3a';
-  const fontSize = size < 50 ? Math.round(size * 0.22) : size < 60 ? 12 : 16;
+  const fontSize = size < 50 ? Math.round(size * 0.28) : size < 60 ? 15 : 19;
 
   return (
     <div

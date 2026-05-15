@@ -51,7 +51,7 @@ function SpeedBar({ speed, onSetSpeed }) {
         const active = speed === s.key;
         return (
           <button key={s.key} onClick={() => onSetSpeed(s.key)} style={{
-            padding: '2px 7px', fontSize: 8, fontFamily: MONO,
+            padding: '2px 7px', fontSize: 11, fontFamily: MONO,
             cursor: 'pointer', fontWeight: active ? 700 : 400,
             background: active ? '#d6cfc3' : '#d6cfc3',
             border: `1px solid ${active ? '#8a8478' : '#c0b9ad'}`,
@@ -96,8 +96,8 @@ export function CommandBar({
     : piety >= 0.75 ? '#b8923a' : piety >= 0.50 ? '#5a5a58' : '#7a7a76';
 
   const S = {
-    label: { color: '#7a7a76', fontSize: isMobile ? 5.5 : 7, letterSpacing: '0.5px' },
-    value: { color: '#1a1a1a', fontSize: isMobile ? 7 : 9, fontWeight: 600 },
+    label: { color: '#7a7a76', fontSize: isMobile ? 8.5 : 10, letterSpacing: '0.5px' },
+    value: { color: '#1a1a1a', fontSize: isMobile ? 10 : 12, fontWeight: 600 },
     pipe:  { color: '#b0aaa0', padding: '0 6px', display: isMobile ? 'none' : 'block' },
   };
 
@@ -106,7 +106,7 @@ export function CommandBar({
       flexShrink: 0, borderBottom: BORDER,
       background: 'linear-gradient(180deg,#ece6dc,#e2dbd0)',
       fontFamily: MONO, display: 'flex', alignItems: isMobile ? 'center' : 'stretch',
-      height: isMobile ? 'auto' : 52,
+      height: isMobile ? 'auto' : 62,
       flexWrap: isMobile ? 'wrap' : 'nowrap',
       padding: isMobile ? '4px 0' : 0,
     }}>
@@ -118,10 +118,10 @@ export function CommandBar({
         justifyContent: 'center', alignItems: isMobile ? 'baseline' : 'flex-start',
         flexShrink: 0, minWidth: isMobile ? 0 : 130, gap: isMobile ? 6 : 0,
       }}>
-        <div style={{ fontSize: isMobile ? 9 : 11, fontWeight: 700, color: '#1a1a1a', letterSpacing: '1px' }}>
+        <div style={{ fontSize: isMobile ? 12 : 14, fontWeight: 700, color: '#1a1a1a', letterSpacing: '1px' }}>
           T{gameYear}<span style={{ color: '#aaa399', fontWeight: 400 }}>/340</span>
         </div>
-        <div style={{ fontSize: isMobile ? 6 : 7, color: '#7a7a76', marginTop: isMobile ? 0 : 2, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
+        <div style={{ fontSize: isMobile ? 9 : 10, color: '#7a7a76', marginTop: isMobile ? 0 : 2, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
           {eraName}
         </div>
       </div>
@@ -223,14 +223,14 @@ export function CommandBar({
           display: 'flex', flexDirection: 'column', justifyContent: 'center',
           alignItems: 'center', flexShrink: 0, minWidth: 90,
         }}>
-          <div style={{ fontSize: 13, color: activeFocusDef.color, lineHeight: 1 }}>
+          <div style={{ fontSize: 16, color: activeFocusDef.color, lineHeight: 1 }}>
             {activeFocusDef.icon}
           </div>
-          <div style={{ fontSize: 7, fontWeight: 700, color: activeFocusDef.color, letterSpacing: '1px', marginTop: 2 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, color: activeFocusDef.color, letterSpacing: '1px', marginTop: 2 }}>
             {activeFocusDef.label.toUpperCase()}
           </div>
           {alloc && (
-            <div style={{ fontSize: 6, color: '#7a7a76', marginTop: 1, letterSpacing: '0.5px' }}>
+            <div style={{ fontSize: 9, color: '#7a7a76', marginTop: 1, letterSpacing: '0.5px' }}>
               {alloc.expansion}/{alloc.techShare}/{alloc.consolidation}
             </div>
           )}
@@ -245,7 +245,7 @@ export function CommandBar({
         <SpeedBar speed={speed} onSetSpeed={onSetSpeed} />
         <TurnTimer
           key={timerKey}
-          size={44}
+          size={52}
           duration={timerDuration}
           onComplete={onAdvance}
           paused={timerPaused || speed === 0}
@@ -257,7 +257,7 @@ export function CommandBar({
           disabled={finished || timerPaused}
           style={{
             padding: '6px 12px',
-            fontSize: 7.5,
+            fontSize: 10.5,
             fontFamily: "'JetBrains Mono','Fira Code',monospace",
             fontWeight: 600,
             letterSpacing: '1.2px',
@@ -273,7 +273,7 @@ export function CommandBar({
           }}
           title={timerPaused ? 'Resolve the current event to continue' : 'Commit to a 50-year tick'}
         >
-          ADVANCE<br/><span style={{ fontSize: 6, opacity: 0.75, letterSpacing: '1px' }}>50 YEARS</span>
+          ADVANCE<br/><span style={{ fontSize: 9, opacity: 0.75, letterSpacing: '1px' }}>50 YEARS</span>
         </button>
       </div>
     </div>
@@ -316,7 +316,7 @@ export function FeedZone({ eventLog, pendingCards, cardHistory, onApplyCard, isM
       background: 'linear-gradient(0deg,#e2dbd0,#ece6dc)',
       fontFamily: MONO, display: 'flex',
       flexDirection: isMobile ? 'column' : 'row',
-      height: isMobile ? 150 : 190,
+      height: isMobile ? 180 : 230,
     }}>
 
       {/* ── Dispatches ── */}
@@ -327,7 +327,7 @@ export function FeedZone({ eventLog, pendingCards, cardHistory, onApplyCard, isM
       }}>
         <div style={{
           flexShrink: 0, padding: '5px 14px 4px', borderBottom: '1px solid #d6cfc3',
-          fontSize: 8, color: '#7a7a76', letterSpacing: '2px', textTransform: 'uppercase',
+          fontSize: 11, color: '#7a7a76', letterSpacing: '2px', textTransform: 'uppercase',
           fontWeight: 600, display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}>
           <span>Dispatches</span>
@@ -336,7 +336,7 @@ export function FeedZone({ eventLog, pendingCards, cardHistory, onApplyCard, isM
               const active = dispatchFilter === f.key;
               return (
                 <button key={f.key} onClick={() => setDispatchFilter(f.key)} style={{
-                  padding: '1px 4px', fontSize: 6, fontFamily: MONO,
+                  padding: '1px 4px', fontSize: 9, fontFamily: MONO,
                   cursor: 'pointer', fontWeight: active ? 700 : 400,
                   background: active ? '#d6cfc3' : 'transparent',
                   border: `1px solid ${active ? '#a0998d' : '#d6cfc3'}`,
@@ -355,7 +355,7 @@ export function FeedZone({ eventLog, pendingCards, cardHistory, onApplyCard, isM
           display: 'flex', flexDirection: 'column', gap: 5,
         }}>
           {filteredLog.length === 0 && (
-            <div style={{ color: '#aaa399', fontStyle: 'italic', fontSize: 8 }}>
+            <div style={{ color: '#aaa399', fontStyle: 'italic', fontSize: 11 }}>
               {dispatchFilter === 'all' ? 'No dispatches yet' : 'No matching dispatches'}
             </div>
           )}
@@ -379,13 +379,13 @@ export function FeedZone({ eventLog, pendingCards, cardHistory, onApplyCard, isM
               <div key={i} style={{ paddingLeft: 7, borderLeft: `2px solid ${sourceColor}`, flexShrink: 0 }}>
                 <div style={{ display: 'flex', gap: 5, alignItems: 'baseline' }}>
                   {source && (
-                    <span style={{ color: sourceColor, fontSize: 7, fontWeight: 700, letterSpacing: '0.3px' }}>
+                    <span style={{ color: sourceColor, fontSize: 10, fontWeight: 700, letterSpacing: '0.3px' }}>
                       {source}
                     </span>
                   )}
-                  <span style={{ color: '#9a958c', fontSize: 7 }}>{ev.yearStr}</span>
+                  <span style={{ color: '#9a958c', fontSize: 10 }}>{ev.yearStr}</span>
                 </div>
-                <div style={{ color: '#4a4a48', fontSize: 7.5, lineHeight: 1.45, marginTop: 1 }}>
+                <div style={{ color: '#4a4a48', fontSize: 10.5, lineHeight: 1.45, marginTop: 1 }}>
                   {body}
                 </div>
               </div>
@@ -401,13 +401,13 @@ export function FeedZone({ eventLog, pendingCards, cardHistory, onApplyCard, isM
       }}>
         <div style={{
           flexShrink: 0, padding: '5px 14px 4px', borderBottom: '1px solid #d6cfc3',
-          fontSize: 8, color: '#7a7a76', letterSpacing: '2px', textTransform: 'uppercase',
+          fontSize: 11, color: '#7a7a76', letterSpacing: '2px', textTransform: 'uppercase',
           fontWeight: 600, display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}>
           <span>
             Situation
             {cardTab === 'active' && pendingCards?.length > 0 && (
-              <span style={{ color: '#7a7a76', fontWeight: 400, marginLeft: 6, fontSize: 7 }}>
+              <span style={{ color: '#7a7a76', fontWeight: 400, marginLeft: 6, fontSize: 10 }}>
                 {pendingCards.length}
               </span>
             )}
@@ -420,7 +420,7 @@ export function FeedZone({ eventLog, pendingCards, cardHistory, onApplyCard, isM
               const active = cardTab === t.key;
               return (
                 <button key={t.key} onClick={() => setCardTab(t.key)} style={{
-                  padding: '1px 5px', fontSize: 6, fontFamily: MONO,
+                  padding: '1px 5px', fontSize: 9, fontFamily: MONO,
                   cursor: 'pointer', fontWeight: active ? 700 : 400,
                   background: active ? '#d6cfc3' : 'transparent',
                   border: `1px solid ${active ? '#a0998d' : '#d6cfc3'}`,
@@ -437,7 +437,7 @@ export function FeedZone({ eventLog, pendingCards, cardHistory, onApplyCard, isM
           {cardTab === 'active' && (
             <>
               {(!pendingCards || pendingCards.length === 0) && (
-                <div style={{ color: '#aaa399', fontStyle: 'italic', fontSize: 8, padding: '4px 0' }}>
+                <div style={{ color: '#aaa399', fontStyle: 'italic', fontSize: 11, padding: '4px 0' }}>
                   No active situations
                 </div>
               )}
@@ -447,19 +447,19 @@ export function FeedZone({ eventLog, pendingCards, cardHistory, onApplyCard, isM
                   background: '#ece6dc', border: '1px solid #b0a99d',
                 }}>
                   <div style={{
-                    fontSize: 8, color: '#1a1a1a', fontWeight: 700,
+                    fontSize: 11, color: '#1a1a1a', fontWeight: 700,
                     letterSpacing: '0.5px', marginBottom: 4,
                   }}>
                     {card.icon} {card.title}
                   </div>
                   <div style={{
-                    fontSize: 7.5, color: '#5a5a58', lineHeight: 1.5, marginBottom: card.why ? 3 : 6,
+                    fontSize: 10.5, color: '#5a5a58', lineHeight: 1.5, marginBottom: card.why ? 3 : 6,
                   }}>
                     {card.body}
                   </div>
                   {card.why && (
                     <div style={{
-                      fontSize: 6.5, color: '#9a958c', fontStyle: 'italic',
+                      fontSize: 9.5, color: '#9a958c', fontStyle: 'italic',
                       lineHeight: 1.4, marginBottom: 5, paddingLeft: 2,
                     }}>
                       {card.why}
@@ -478,7 +478,7 @@ export function FeedZone({ eventLog, pendingCards, cardHistory, onApplyCard, isM
                           onClick={() => onApplyCard?.(card.id, act.action, act.label)}
                           title={focusHint ? `Sets National Focus → ${focusHint.label}` : undefined}
                           style={{
-                            padding: '2px 7px', fontSize: 7, fontFamily: MONO,
+                            padding: '2px 7px', fontSize: 10, fontFamily: MONO,
                             cursor: 'pointer', fontWeight: 600, letterSpacing: '1px',
                             background: act.action ? '#d6cfc3' : '#e2dbd0',
                             border: `1px solid ${act.action ? '#a0998d' : '#c0b9ad'}`,
@@ -490,7 +490,7 @@ export function FeedZone({ eventLog, pendingCards, cardHistory, onApplyCard, isM
                           <span>{act.label}</span>
                           {focusHint && (
                             <span style={{
-                              fontSize: 5.5, fontWeight: 700, letterSpacing: '0.3px',
+                              fontSize: 8.5, fontWeight: 700, letterSpacing: '0.3px',
                               color: focusHint.color, opacity: 0.95,
                               borderLeft: `1px solid ${focusHint.color}55`,
                               paddingLeft: 4, marginLeft: 1,
@@ -509,7 +509,7 @@ export function FeedZone({ eventLog, pendingCards, cardHistory, onApplyCard, isM
           {cardTab === 'history' && (
             <>
               {(!cardHistory || cardHistory.length === 0) && (
-                <div style={{ color: '#aaa399', fontStyle: 'italic', fontSize: 8, padding: '4px 0' }}>
+                <div style={{ color: '#aaa399', fontStyle: 'italic', fontSize: 11, padding: '4px 0' }}>
                   No card history yet
                 </div>
               )}
@@ -519,12 +519,12 @@ export function FeedZone({ eventLog, pendingCards, cardHistory, onApplyCard, isM
                   background: '#e2dbd0', border: '1px solid #cbc3b6',
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                    <span style={{ fontSize: 7.5, color: '#4a4a48', fontWeight: 600 }}>
+                    <span style={{ fontSize: 10.5, color: '#4a4a48', fontWeight: 600 }}>
                       {h.icon} {h.title}
                     </span>
-                    <span style={{ fontSize: 6, color: '#aaa399' }}>{h.yearStr}</span>
+                    <span style={{ fontSize: 9, color: '#aaa399' }}>{h.yearStr}</span>
                   </div>
-                  <div style={{ fontSize: 6.5, color: '#7a7a76', marginTop: 2 }}>
+                  <div style={{ fontSize: 9.5, color: '#7a7a76', marginTop: 2 }}>
                     → {h.action}
                   </div>
                 </div>
@@ -549,7 +549,7 @@ const S = {
     width: '100%', flexShrink: 0, borderLeft: BORDER,
     background: BG_PANEL,
     fontFamily: MONO,
-    fontSize: 9, color: '#2b2b2b',
+    fontSize: 12, color: '#2b2b2b',
     display: 'flex', flexDirection: 'column',
     overflowY: 'auto', height: '100%',
   },
@@ -557,12 +557,12 @@ const S = {
     padding: '9px 12px', borderBottom: BORDER,
   },
   sectionTitle: {
-    fontSize: 9, color: '#b8923a', letterSpacing: '2px',
+    fontSize: 12, color: '#b8923a', letterSpacing: '2px',
     textTransform: 'uppercase', fontWeight: 600, marginBottom: 6,
   },
   statGrid: {
     display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3px 10px',
-    fontSize: 8, lineHeight: 1.5,
+    fontSize: 11, lineHeight: 1.5,
   },
   statLabel: { color: '#6a6a66' },
   statValue: { color: '#1a1a1a', fontWeight: 600, textAlign: 'right' },
@@ -597,7 +597,7 @@ function FocusCard({ focus, active, locked, onSelect }) {
         {focus.icon}
       </div>
       <div style={{
-        fontSize: 6, fontWeight: active ? 700 : 500, letterSpacing: '0.5px',
+        fontSize: 9, fontWeight: active ? 700 : 500, letterSpacing: '0.5px',
         color: labelC, marginTop: 2,
       }}>
         {focus.label.toUpperCase()}
@@ -612,7 +612,7 @@ function FocusCard({ focus, active, locked, onSelect }) {
       )}
       {/* Allocation percentages — shown on all cards, not just active */}
       {alloc && !active && !locked && (
-        <div style={{ fontSize: 5, color: '#aaa399', marginTop: 2, letterSpacing: '0.3px' }}>
+        <div style={{ fontSize: 8, color: '#aaa399', marginTop: 2, letterSpacing: '0.3px' }}>
           {alloc.expansion}/{alloc.techShare}/{alloc.consolidation}
         </div>
       )}
@@ -639,7 +639,7 @@ function DeltaArrow({ delta, threshold = 0.005, invert = false }) {
   const goodDirection = invert ? !rising : rising;
   const color = goodDirection ? '#5a8a4a' : '#a05030';
   return (
-    <span style={{ color, fontSize: 6.5, marginLeft: 3, fontWeight: 700 }}>
+    <span style={{ color, fontSize: 9.5, marginLeft: 3, fontWeight: 700 }}>
       {rising ? '↑' : '↓'}
     </span>
   );
@@ -694,23 +694,23 @@ function ArchDetailPanel({
     }}>
       {/* Header row */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-        <div style={{ fontSize: 9, fontWeight: 700, color: '#1a1a1a', letterSpacing: '1px', textTransform: 'uppercase' }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: '#1a1a1a', letterSpacing: '1px', textTransform: 'uppercase' }}>
           {name}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{ fontSize: 7, color: statusColor, fontWeight: 700, letterSpacing: '1px' }}>
+          <div style={{ fontSize: 10, color: statusColor, fontWeight: 700, letterSpacing: '1px' }}>
             {status}
           </div>
           <button onClick={onClose} style={{
             background: 'none', border: 'none', color: '#9a958c',
-            cursor: 'pointer', fontSize: 10, padding: '0 2px', fontFamily: MONO,
+            cursor: 'pointer', fontSize: 13, padding: '0 2px', fontFamily: MONO,
           }}>×</button>
         </div>
       </div>
 
       {/* Stats row — distance always visible; pop/tech/crop only after formal contact */}
       {(fEntry || isOwned) && (
-        <div style={{ fontSize: 7, color: '#6a6a66', display: 'flex', gap: 10, marginBottom: 4 }}>
+        <div style={{ fontSize: 10, color: '#6a6a66', display: 'flex', gap: 10, marginBottom: 4 }}>
           {fEntry?.distance !== undefined && <span>dist {fEntry.distance.toFixed(2)}</span>}
           {isContacted && fEntry?.pop !== undefined && <span>pop {(fEntry.pop / 1000).toFixed(1)}k</span>}
           {isContacted && fEntry?.tech !== undefined && <span>tech {fEntry.tech}</span>}
@@ -742,7 +742,7 @@ function ArchDetailPanel({
         <div style={{ display: 'flex', gap: 4, marginBottom: 6, flexWrap: 'wrap' }}>
           {mineralList.map(m => (
             <div key={m} style={{
-              fontSize: 6, padding: '1px 5px', borderRadius: 2,
+              fontSize: 9, padding: '1px 5px', borderRadius: 2,
               background: '#d6cfc3', border: '1px solid #b0a99d',
               color: '#c47830', letterSpacing: '0.5px', textTransform: 'uppercase',
             }}>{m}</div>
@@ -767,7 +767,7 @@ function ArchDetailPanel({
         const dExt = prevExtractiveness  != null ? ext - (prevExtractiveness[archIdx]  ?? ext) : null;
         const dSov = prevSovereignty     != null ? sov - (prevSovereignty[archIdx]     ?? sov) : null;
         return (
-          <div style={{ fontSize: 7, color: '#6a6a66', marginBottom: 4 }}>
+          <div style={{ fontSize: 10, color: '#6a6a66', marginBottom: 4 }}>
             <div style={{ display: 'flex', gap: 10, marginBottom: 2 }}>
               <span style={{ color: gvColor }}>
                 grievance {gv.toFixed(2)}
@@ -795,7 +795,7 @@ function ArchDetailPanel({
       <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
         {isOnFrontier && (
           <button onClick={() => onToggleTarget(archIdx)} style={{
-            padding: '2px 8px', fontSize: 7, fontFamily: MONO, cursor: 'pointer', borderRadius: 2,
+            padding: '2px 8px', fontSize: 10, fontFamily: MONO, cursor: 'pointer', borderRadius: 2,
             background: isTargeted ? '#f0d6c0' : '#d6cfc3',
             border: `1px solid ${isTargeted ? '#c47830' : '#b0a99d'}`,
             color: isTargeted ? '#c47830' : '#7a7a76',
@@ -805,14 +805,14 @@ function ArchDetailPanel({
         {ctrl !== undefined && ctrl !== playerCore && (
           <>
             <button onClick={() => onToggleRival(ctrl)} style={{
-              padding: '2px 8px', fontSize: 7, fontFamily: MONO, cursor: 'pointer', borderRadius: 2,
+              padding: '2px 8px', fontSize: 10, fontFamily: MONO, cursor: 'pointer', borderRadius: 2,
               background: isRival ? '#ecd6d0' : '#d6cfc3',
               border: `1px solid ${isRival ? '#a04030' : '#b0a99d'}`,
               color: isRival ? '#c05040' : '#7a7a76',
               letterSpacing: '0.5px',
             }}>{isRival ? '✕ RIVAL' : 'RIVAL'}</button>
             <button onClick={() => onTogglePartner(ctrl)} style={{
-              padding: '2px 8px', fontSize: 7, fontFamily: MONO, cursor: 'pointer', borderRadius: 2,
+              padding: '2px 8px', fontSize: 10, fontFamily: MONO, cursor: 'pointer', borderRadius: 2,
               background: isPartner ? '#dde6d0' : '#d6cfc3',
               border: `1px solid ${isPartner ? '#508040' : '#b0a99d'}`,
               color: isPartner ? '#70a060' : '#7a7a76',
@@ -855,7 +855,7 @@ export default function TurnDashboard({
 
   const panelStyle = isMobile
     ? { ...S.panel, width: '100%' }
-    : { ...S.panel, width: 240 };
+    : { ...S.panel, width: 280 };
 
   return (
     <div style={panelStyle}>
@@ -903,7 +903,7 @@ export default function TurnDashboard({
         {/* Live allocation summary */}
         {alloc && (
           <div style={{
-            marginTop: 7, fontSize: 7, color: '#7a7a76',
+            marginTop: 7, fontSize: 10, color: '#7a7a76',
             display: 'flex', justifyContent: 'center', gap: 8,
             letterSpacing: '0.5px',
           }}>
@@ -918,13 +918,13 @@ export default function TurnDashboard({
       <div style={S.section}>
         <div style={S.sectionTitle}>
           Expansion Targets
-          <span style={{ fontSize: 6, color: '#7a7a76', fontWeight: 400, marginLeft: 6 }}>
+          <span style={{ fontSize: 9, color: '#7a7a76', fontWeight: 400, marginLeft: 6 }}>
             {selectedTargets.size} sel.
           </span>
         </div>
         <div style={{ maxHeight: 180, overflowY: 'auto' }}>
           {frontier.length === 0 && (
-            <div style={{ color: '#9a958c', fontStyle: 'italic', fontSize: 8, padding: '4px 0' }}>
+            <div style={{ color: '#9a958c', fontStyle: 'italic', fontSize: 11, padding: '4px 0' }}>
               No frontier reachable
             </div>
           )}
@@ -938,12 +938,12 @@ export default function TurnDashboard({
               <div key={f.index} style={S.targetItem(sel)}
                 onClick={() => onToggleTarget(f.index)}>
                 <div>
-                  <div style={{ fontSize: 8, color: sel ? '#1a1a1a' : '#2b2b2b', fontWeight: sel ? 600 : 400 }}>
+                  <div style={{ fontSize: 11, color: sel ? '#1a1a1a' : '#2b2b2b', fontWeight: sel ? 600 : 400 }}>
                     {sel ? '[×] ' : '[  ] '}{names[f.index]}
                     {held && <span style={{ color: '#a07030', marginLeft: 4 }}>(held)</span>}
                   </div>
                   {known ? (
-                    <div style={{ fontSize: 7, color: '#7a7a76', marginTop: 2 }}>
+                    <div style={{ fontSize: 10, color: '#7a7a76', marginTop: 2 }}>
                       p{f.pop} · t{f.tech} · {f.crop}
                       {f.minerals.Cu && ' · Cu'}
                       {f.minerals.Au && ' · Au'}
@@ -956,12 +956,12 @@ export default function TurnDashboard({
                       )}
                     </div>
                   ) : (
-                    <div style={{ fontSize: 7, color: '#aaa399', marginTop: 2, fontStyle: 'italic' }}>
+                    <div style={{ fontSize: 10, color: '#aaa399', marginTop: 2, fontStyle: 'italic' }}>
                       uncharted waters
                     </div>
                   )}
                 </div>
-                <div style={{ fontSize: 7, color: '#7a7a76', marginLeft: 6, flexShrink: 0 }}>
+                <div style={{ fontSize: 10, color: '#7a7a76', marginLeft: 6, flexShrink: 0 }}>
                   d={f.distance.toFixed(2)}
                 </div>
               </div>
@@ -988,16 +988,16 @@ export default function TurnDashboard({
                 const cTech = snapshot?.tech?.[cc];
                 const cPop  = snapshot?.polityPops?.[cc];
                 return [
-                  <span key={`l${i}`} style={{ ...S.statLabel, color: '#7a7a76', fontSize: 7 }}>
+                  <span key={`l${i}`} style={{ ...S.statLabel, color: '#7a7a76', fontSize: 10 }}>
                     {names[cc] || `Nation ${cc}`}
                   </span>,
-                  <span key={`v${i}`} style={{ ...S.statValue, color: '#3a3a38', fontSize: 7 }}>
+                  <span key={`v${i}`} style={{ ...S.statValue, color: '#3a3a38', fontSize: 10 }}>
                     t{cTech} p{cPop ? Math.round(cPop / 100) * 100 : '?'}
                   </span>,
                 ];
               }).flat()}
               {contacts.length > 3 && <>
-                <span style={{ ...S.statLabel, color: '#aaa399', fontSize: 7 }}>+{contacts.length - 3} more</span>
+                <span style={{ ...S.statLabel, color: '#aaa399', fontSize: 10 }}>+{contacts.length - 3} more</span>
                 <span style={S.statValue} />
               </>}
               <span style={S.statLabel}>Terra incognita</span>
@@ -1033,8 +1033,8 @@ export default function TurnDashboard({
                   display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                    <span style={{ fontSize: 7.5, color: '#2b2b2b' }}>{names[cc] || `Nation ${cc}`}</span>
-                    <div style={{ fontSize: 6, color: '#9a958c', display: 'flex', gap: 6 }}>
+                    <span style={{ fontSize: 10.5, color: '#2b2b2b' }}>{names[cc] || `Nation ${cc}`}</span>
+                    <div style={{ fontSize: 9, color: '#9a958c', display: 'flex', gap: 6 }}>
                       <span style={{ color: techColor }}>tech {techStr}</span>
                       {postDF && Math.abs(alVal) > 0.05 && (
                         <span style={{ color: alVal > 0 ? '#6a7a9a' : '#9a6a6a' }}>
@@ -1050,7 +1050,7 @@ export default function TurnDashboard({
                       { fn: onToggleEmbargo, active: isEmbargo, icon: '✕', activeClr: '#c0a040', activeBg: '#ece2c8', activeBdr: '#6a5020', title: 'Embargo' },
                     ].map(({ fn, active, icon, activeClr, activeBg, activeBdr, title }) => (
                       <button key={title} onClick={() => fn?.(cc)} title={title} style={{
-                        padding: '1px 5px', fontSize: 7, fontFamily: MONO, cursor: 'pointer',
+                        padding: '1px 5px', fontSize: 10, fontFamily: MONO, cursor: 'pointer',
                         background: active ? activeBg : '#d6cfc3',
                         border: `1px solid ${active ? activeBdr : '#c0b9ad'}`,
                         color: active ? activeClr : '#7a7a76', borderRadius: 2,
@@ -1061,7 +1061,7 @@ export default function TurnDashboard({
               );
             })}
           </div>
-          <div style={{ fontSize: 6, color: '#b0aaa0', marginTop: 3 }}>
+          <div style={{ fontSize: 9, color: '#b0aaa0', marginTop: 3 }}>
             ⚔ rival (+2.0 targeting) · ◆ partner (+30% trade, -3.0 targeting) · ✕ embargo (blocks trade)
           </div>
         </div>
@@ -1071,7 +1071,7 @@ export default function TurnDashboard({
       <div style={S.section}>
         <div style={S.sectionTitle}>
           Cultural Policy
-          <span style={{ fontSize: 6, color: '#7a7a76', fontWeight: 400, marginLeft: 6 }}>
+          <span style={{ fontSize: 9, color: '#7a7a76', fontWeight: 400, marginLeft: 6 }}>
             {ps?.cultureLabel || '—'}
           </span>
         </div>
@@ -1084,14 +1084,14 @@ export default function TurnDashboard({
           ].map(({ label, key, val, hint }) => (
             <div key={key}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                <span style={{ fontSize: 6, color: '#7a7a76', width: 42 }}>{label[0]}</span>
+                <span style={{ fontSize: 9, color: '#7a7a76', width: 42 }}>{label[0]}</span>
                 <input type="range" min={-100} max={100}
                   value={Math.round((val || 0) * 100)}
                   onChange={e => onSetCulturePolicy?.(key, Number(e.target.value) / 100)}
                   style={{ flex: 1, accentColor: '#6a6a66' }} />
-                <span style={{ fontSize: 6, color: '#7a7a76', width: 42, textAlign: 'right' }}>{label[1]}</span>
+                <span style={{ fontSize: 9, color: '#7a7a76', width: 42, textAlign: 'right' }}>{label[1]}</span>
               </div>
-              <div style={{ fontSize: 5.5, color: '#aaa399', marginTop: 2, lineHeight: 1.4, paddingLeft: 2 }}>
+              <div style={{ fontSize: 8.5, color: '#aaa399', marginTop: 2, lineHeight: 1.4, paddingLeft: 2 }}>
                 {hint}
               </div>
             </div>
@@ -1104,7 +1104,7 @@ export default function TurnDashboard({
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
           <div style={S.sectionTitle}>Operations</div>
           <button onClick={() => onToggleScout?.()} style={{
-            padding: '2px 7px', fontSize: 7, fontFamily: MONO, cursor: 'pointer',
+            padding: '2px 7px', fontSize: 10, fontFamily: MONO, cursor: 'pointer',
             background: scoutActive ? '#d6cfc3' : '#d6cfc3',
             border: `1px solid ${scoutActive ? '#8a8478' : '#c0b9ad'}`,
             color: scoutActive ? '#1a1a1a' : '#7a7a76', borderRadius: 2,
@@ -1115,7 +1115,7 @@ export default function TurnDashboard({
         </div>
         {ownedArchs.length > 1 && (
           <>
-            <div style={{ fontSize: 6, color: '#7a7a76', marginBottom: 3, letterSpacing: '1px', textTransform: 'uppercase' }}>
+            <div style={{ fontSize: 9, color: '#7a7a76', marginBottom: 3, letterSpacing: '1px', textTransform: 'uppercase' }}>
               Sovereignty Focus
             </div>
             <div style={{ maxHeight: 90, overflowY: 'auto' }}>
@@ -1131,17 +1131,17 @@ export default function TurnDashboard({
                     padding: '2px 5px', marginBottom: 1, cursor: 'pointer', borderRadius: 2,
                     background: focused ? '#d6cfc3' : '#e2dbd0',
                     border: `1px solid ${focused ? '#a0998d' : '#d6cfc3'}`,
-                    display: 'flex', justifyContent: 'space-between', fontSize: 7.5,
+                    display: 'flex', justifyContent: 'space-between', fontSize: 10.5,
                   }}>
                     <span style={{ color: focused ? '#1a1a1a' : '#6a6a66' }}>
                       {focused ? '▣ ' : '□ '}{names[i]}
                     </span>
                     <span>
-                      {arrow && <span style={{ color: arrowColor, fontSize: 7, marginRight: 2 }}>{arrow}</span>}
+                      {arrow && <span style={{ color: arrowColor, fontSize: 10, marginRight: 2 }}>{arrow}</span>}
                       {sov !== undefined && (
                         <span style={{
                           color: sov > 0.6 ? '#7a8a5a' : sov > 0.3 ? '#8a7a3a' : '#a05030',
-                          fontSize: 7,
+                          fontSize: 10,
                         }}>
                           {Math.round(sov * 100)}%
                         </span>

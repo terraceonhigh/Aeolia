@@ -929,7 +929,7 @@ function HelpOverlay({ onClose }) {
         padding: '20px 24px',
       }} onClick={e => e.stopPropagation()}>
         <div style={{
-          fontSize: 12, fontWeight: 700, color: '#b8923a', letterSpacing: '3px',
+          fontSize: 15, fontWeight: 700, color: '#b8923a', letterSpacing: '3px',
           textTransform: 'uppercase', marginBottom: 16, textAlign: 'center',
         }}>
           How to Play
@@ -937,19 +937,19 @@ function HelpOverlay({ onClose }) {
         {HELP_SECTIONS.map((s, i) => (
           <div key={i} style={{ marginBottom: 14 }}>
             <div style={{
-              fontSize: 8, fontWeight: 700, color: '#1a1a1a', letterSpacing: '1.5px',
+              fontSize: 11, fontWeight: 700, color: '#1a1a1a', letterSpacing: '1.5px',
               textTransform: 'uppercase', marginBottom: 4,
             }}>
               {s.title}
             </div>
-            <div style={{ fontSize: 8, color: '#4a4a48', lineHeight: 1.7 }}>
+            <div style={{ fontSize: 11, color: '#4a4a48', lineHeight: 1.7 }}>
               {s.body}
             </div>
           </div>
         ))}
         <div style={{ textAlign: 'center', marginTop: 8 }}>
           <button onClick={onClose} style={{
-            padding: '6px 24px', fontSize: 9, fontFamily: 'inherit',
+            padding: '6px 24px', fontSize: 12, fontFamily: 'inherit',
             cursor: 'pointer', fontWeight: 600, letterSpacing: '1.5px',
             background: '#d6cfc3', border: '1px solid #aaa399',
             color: '#1a1a1a', borderRadius: 3, textTransform: 'uppercase',
@@ -1437,18 +1437,18 @@ function GameInner({ seed, onBack }) {
         background: 'linear-gradient(180deg,#e2dbd0,#d6cfc3)',
         height: 32,
       }}>
-        <div style={{ fontSize: 11, color: '#1a1a1a', fontWeight: 600, letterSpacing: '2px' }}>
+        <div style={{ fontSize: 14, color: '#1a1a1a', fontWeight: 600, letterSpacing: '2px' }}>
           AEOLIA
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ fontSize: 8, color: '#aaa399', letterSpacing: '1px' }}>seed {seed}</div>
+          <div style={{ fontSize: 11, color: '#aaa399', letterSpacing: '1px' }}>seed {seed}</div>
           <button onClick={() => setShowHelp(h => !h)} style={{
-            padding: '2px 8px', fontSize: 9, fontFamily: 'inherit', cursor: 'pointer',
+            padding: '2px 8px', fontSize: 12, fontFamily: 'inherit', cursor: 'pointer',
             background: showHelp ? '#d6cfc3' : '#d6cfc3', border: `1px solid ${showHelp ? '#8a8478' : '#c0b9ad'}`,
             color: showHelp ? '#1a1a1a' : '#6a6a66', borderRadius: 2, fontWeight: 600,
           }}>?</button>
           <button onClick={onBack} style={{
-            padding: '2px 10px', fontSize: 8, fontFamily: 'inherit', cursor: 'pointer',
+            padding: '2px 10px', fontSize: 11, fontFamily: 'inherit', cursor: 'pointer',
             background: '#d6cfc3', border: '1px solid #c0b9ad', color: '#6a6a66',
             letterSpacing: '1px', borderRadius: 2,
           }}>Observatory</button>
@@ -1495,7 +1495,7 @@ function GameInner({ seed, onBack }) {
           {isMobile && isPlaying && (
             <button onClick={() => setShowPanel(p => !p)} style={{
               position: 'absolute', bottom: 8, right: 8, zIndex: 5,
-              padding: '6px 12px', fontSize: 8, fontFamily: "'JetBrains Mono',monospace",
+              padding: '6px 12px', fontSize: 11, fontFamily: "'JetBrains Mono',monospace",
               cursor: 'pointer', fontWeight: 700, letterSpacing: '1px',
               background: showPanel ? '#d6cfc3' : 'rgba(43,43,43,0.4)',
               border: `1px solid ${showPanel ? '#8a8478' : '#b0aaa0'}`,
