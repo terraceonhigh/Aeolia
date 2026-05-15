@@ -1,5 +1,7 @@
 # Aeolia
 
+Aeolia is a computational thought experiment in international political economy. Its mechanics are grounded in Wallerstein's world-systems theory, Ricardian comparative advantage, Axelrod's iterated cooperation dynamics, and the Cold War deterrence literature. Simulation output is scored against historical benchmarks by a twelve-term loss function tuned through Bayesian parameter search.
+
 **A procedural civilization game that generates trade networks, resource scrambles, and nuclear deterrence on fictional archipelago worlds.**
 
 Aeolia is a thought experiment in game form. It generates planets — randomized archipelago geographies with distinct climates, crops, and resource endowments — then simulates 10,000 years of geopolitical history. Civilizations trade, expand, colonize, and eventually discover nuclear fission, at which point the system models a deterrence standoff. This is a **game, not a predictive model** — it explores what *could* happen under simplified assumptions on a world very different from our own.
