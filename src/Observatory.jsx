@@ -128,7 +128,7 @@ function LineChart({ series, width, height, yMax, yLabel, selectedIdx, years }) 
   const yTicks = [0, yMax * 0.25, yMax * 0.5, yMax * 0.75, yMax];
 
   return (
-    <svg width={width} height={height} style={{ overflow: 'visible' }}>
+    <svg width={width} height={height} style={{ display: 'block', overflow: 'hidden' }}>
       {/* Grid lines */}
       {yTicks.map((v, i) => (
         <line key={i}
@@ -768,7 +768,7 @@ export default function Observatory({ seed, onBack }) {
         {/* Center: Charts */}
         <div style={S.center}>
           {/* Tech chart */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', borderBottom: '1px solid #1a1410' }}>
+          <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', borderBottom: '1px solid #1a1410' }}>
             <div style={S.sectionLabel}>TECHNOLOGY LEVEL — TOP POLITIES</div>
             <div style={{ ...S.chartWrap, display: 'flex', alignItems: 'flex-start' }}>
               <div style={{ flex: 1, height: '100%', minHeight: 0 }}>
@@ -803,7 +803,7 @@ export default function Observatory({ seed, onBack }) {
           </div>
 
           {/* Population chart */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', borderBottom: '1px solid #1a1410' }}>
+          <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', borderBottom: '1px solid #1a1410' }}>
             <div style={S.sectionLabel}>POPULATION — WORLD + MAJOR POLITIES</div>
             <div style={{ ...S.chartWrap, display: 'flex', alignItems: 'flex-start' }}>
               <div style={{ flex: 1, height: '100%', minHeight: 0 }}>
@@ -841,7 +841,7 @@ export default function Observatory({ seed, onBack }) {
           </div>
 
           {/* Piety chart */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+          <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
             <div style={S.sectionLabel}>RELIGIOUS FERVOR (PIETY) — MAJOR POLITIES</div>
             <div style={{ ...S.chartWrap, display: 'flex', alignItems: 'flex-start' }}>
               <div style={{ flex: 1, height: '100%', minHeight: 0 }}>
