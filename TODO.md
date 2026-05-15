@@ -137,6 +137,27 @@ Status as of April 9, 2026. Everything above the line is implemented. Everything
 
 ## Pending: Architecture & UX
 
+### Wave 2 fixes implemented 2026-05-15 (pre-demo)
+
+- [x] **Surface SET_FOCUS card overrides** (Mace critical) — buttons that fire SET_FOCUS now show a colored `→ FOCUS` hint inside the button itself. EXPAND FISHERIES → EXPLOIT no longer silent.
+- [x] **ArchDetailPanel delta arrows** (Loma) — ↑↓ on grievance, extraction, sovereignty; per-tick deltas threshold-gated; color-coded by direction.
+- [x] **CULTURE urgency color** (Loma) — civic (warm gold) / parochial (neutral) / subject (rust), matching PIETY's spectrum treatment.
+- [x] **NEXT TURN reframe** (Loma) — `ADVANCE / 50 YEARS` in two lines, softened visual weight.
+- [x] **Calçada Light recolor** — strategy chrome (TurnDashboard, GameApp, TurnTimer) ported from parchment-on-ink to Portuguese limestone-and-basalt. Source registers (admiralty red, merchant gold, internal olive) preserved.
+- [x] **Font size +3px floor** — microscopic 5–7px labels lifted across the chrome; CommandBar height 52→62, panel width 240→280, FeedZone height 190→230.
+- [x] **Observatory chart-stretch fix** — minHeight:0 on the three chart-panel divs + display:block on LineChart `<svg>` + overflow:hidden. Killed a ResizeObserver feedback loop where each render added ~4px of inline-baseline descender, which the observer fed back as a larger height prop.
+
+Remaining from Wave 2 (deferred):
+- Counterfactual visibility on ADMINISTER/EXTRACT founding bargain
+- Edge-line differentiation for subsistence/relay/administered trade tiers
+- Culture-color globe legend (or replace the encoding)
+- ADMIRALTY chatter during sustained expansion targeting
+- Dead-turn floor: minimum situation-card rate + passive-process dispatches
+- Phases 4–5 of the Map-Game UX migration (globe click handlers, terminal report)
+
+### README — academic framing (2026-05-15)
+- [x] Three-sentence preamble at top of README.md naming Wallerstein, Ricardo, Axelrod, Cold War deterrence + 12-term loss function + Bayesian parameter search. Pushed live to GitHub Pages so the UBC IR admissions reader landing on `terraceonhigh.github.io/Aeolia` sees the academic framing in the first scroll-position.
+
 ### Playtester Issues (2026-04-12, Wave 2 — Mace/Calder/Loma, Sonnet agents)
 
 Three specialist reviewers dispatched sequentially: Mace (4X veteran), Calder (Georgian flag officer, 21C world model), Loma (oils/adobe painter, UI critique). Protocol: play-first, no corpus read. Findings below, ordered by severity. Earlier findings from the April 10 Haiku wave are preserved below.
